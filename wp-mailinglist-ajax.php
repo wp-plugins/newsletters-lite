@@ -14,7 +14,7 @@ if (file_exists($root . DS . 'wp-config.php')) {
 	require_once($rootup . DS . 'wp-config.php');
 }
 
-include_once(ABSPATH . 'wp-includes' . DS . 'pluggable.php');
+require_once(ABSPATH . '/wp-load.php');
 include_once(ABSPATH . 'wp-includes' . DS . 'registration.php');
 include_once(ABSPATH . 'wp-admin' . DS . 'includes' . DS . 'admin.php');
 

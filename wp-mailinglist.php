@@ -5320,7 +5320,7 @@ if (!class_exists('wpMail')) {
 }
 
 /* Include the necessary class files */
-require_once(ABSPATH . WPINC . DS . 'pluggable.php');
+require_once(ABSPATH . '/wp-load.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'mailinglist.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'subscriber.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'bounce.php');
