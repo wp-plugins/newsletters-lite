@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.2
+Version: 4.2.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -293,6 +293,12 @@ if (!class_exists('wpMail')) {
 							$this -> render_error(sprintf(__('There are %s failed emails in the <a href="%s">queue</a> awaiting review.', $this -> plugin_name), $queueerrorcount, admin_url('admin.php?page=' . $this -> sections -> queue)));
 						}
 					}
+				}
+				
+				if ($this -> has_update() && (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates))) {
+					$update = $this -> vendor('update');
+					$update_info = $update -> get_version_info(true);
+					$this -> render('update', array('update_info' => $update_info), true, 'admin');
 				}
 			}
 		}
@@ -1788,12 +1794,6 @@ if (!class_exists('wpMail')) {
 				$this -> redirect('?page=' . $this -> sections -> submitserial);
 			}
 		
-			if ($this -> has_update()) {
-				$update = $this -> vendor('update');
-				$update_info = $update -> get_version_info(true);
-				$this -> render('update', array('update_info' => $update_info), true, 'admin');
-			}
-		
 			switch ($_GET['method']) {
 				case 'wizard_install'			:
 					$this -> render('wizard' . DS . 'install', false, true, 'admin');
@@ -1865,7 +1865,6 @@ if (!class_exists('wpMail')) {
 		function add_dashboard() {
 			add_dashboard_page(sprintf('Newsletters %s', $this -> version), sprintf('Newsletters %s', $this -> version), 'read', 'newsletters-about', array($this, 'newsletters_about'));
 			remove_submenu_page('index.php', 'newsletters-about');
-			//add_submenu_page("newsletters_page_" . $this -> sections -> settings, sprintf('Newsletters %s', $this -> version), sprintf('Newsletters %s', $this -> version), 'read', $this -> sections -> about, array($this, 'newsletters_about'));
 		}
 		
 		function newsletters_about() {
@@ -1942,6 +1941,7 @@ if (!class_exists('wpMail')) {
 			global $Metabox, $Html;
 			
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings, 'side', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_tableofcontents'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('generaldiv', __('General Mail Settings', $this -> plugin_name) . $Html -> help(__('These are general settings related to the sending of emails such as your email server. You can also turn on/off other features here such as read tracking, click tracking and more.', $this -> plugin_name)), array($Metabox, 'settings_general'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('sendingdiv', __('Sending Settings', $this -> plugin_name), array($Metabox, 'settings_sending'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('optindiv', __('Default Subscription Form Settings', $this -> plugin_name) . $Html -> help(__('Global subscribe form settings for hardcoded and shortcode (post/page) subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_optin'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
@@ -1968,6 +1968,7 @@ if (!class_exists('wpMail')) {
 			$page = "newsletters_page_" . $this -> sections -> settings_templates;
 		
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_templates, 'side', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_templates_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('postsdiv', __('Posts', $this -> plugin_name) . $Html -> help(__('The posts template used when using the [wpmlpost...] or [wpmlposts...] shorcodes in your newsletters.', $this -> plugin_name)), array($Metabox, 'settings_templates_posts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('latestpostsdiv', __('Latest Posts', $this -> plugin_name) . $Html -> help(__('The posts template used for the "Latest Posts Subscription" feature which automatically sends out new posts.', $this -> plugin_name)), array($Metabox, 'settings_templates_latestposts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('confirmdiv', __('Confirmation Email', $this -> plugin_name) . $Html -> help(__('Email message sent to new subscribers to confirm their subscription.', $this -> plugin_name)), array($Metabox, 'settings_templates_confirm'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
@@ -1990,6 +1991,7 @@ if (!class_exists('wpMail')) {
 			global $Html, $Metabox;
 			
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'side', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_subscribers_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
 			add_meta_box('managementdiv', __('Subscriber Management Section', $this -> plugin_name) . $Html -> help(__('This section lets you control the way the subscriber management section behaves. It is the "Manage Subscriptions" page which is provided to subscribers where they unsubscribe, manage current subscriptions, update their profile, etc.', $this -> plugin_name)), array($Metabox, 'settings_management'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
 			add_meta_box('subscribersdiv', __('Subscription Behaviour', $this -> plugin_name) . $Html -> help(__('Control the way the plugin behaves when someone subscribes to your site. Certain things can happen upon subscription based on these settings.', $this -> plugin_name)), array($Metabox, 'settings_subscribers'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
 			add_meta_box('unsubscribediv', __('Unsubscribe Behaviour', $this -> plugin_name) . $Html -> help(__('Control the unsubscribe procedure. Certain things can happen when a subscriber unsubscribes from your site based on these settings.', $this -> plugin_name)), array($Metabox, 'settings_unsubscribe'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
@@ -2013,8 +2015,9 @@ if (!class_exists('wpMail')) {
 		function admin_head_settings_system() {
 			global $Metabox, $Html;
 		
-			add_meta_box('captchadiv', __('Captcha Settings', $this -> plugin_name) . $Html -> help(__('Use these settings for the captcha security image used in the subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_system_captcha'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_system, 'side', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_system_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
+			add_meta_box('captchadiv', __('Captcha Settings', $this -> plugin_name) . $Html -> help(__('Use these settings for the captcha security image used in the subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_system_captcha'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('wprelateddiv', __('WordPress Related', $this -> plugin_name) . $Html -> help(__('These are settings related to WordPress directly and how the plugin interacts with it.', $this -> plugin_name)), array($Metabox, 'settings_wprelated'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('autoimportusersdiv', __('Auto Import Users', $this -> plugin_name) . $Html -> help(__('Use these settings to configure the way that WordPress users are automatically imported as subscribers into the system.', $this -> plugin_name)), array($Metabox, 'settings_importusers'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('commentform', __('WordPress Comment- and Registration Form', $this -> plugin_name) . $Html -> help(__('Put a subscribe checkbox on your WordPress registration and/or comment forms to capture subscribers.', $this -> plugin_name)), array($Metabox, 'settings_commentform'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
@@ -4759,7 +4762,7 @@ if (!class_exists('wpMail')) {
 					$odir = (isset($_COOKIE[$this -> pre . 'history' . $ofield . 'dir'])) ? $_COOKIE[$this -> pre . 'history' . $ofield . 'dir'] : "DESC";
 					$order = array($ofield, $odir);
 					
-					$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
+					$orderfield = (empty($_GET['orderby'])) ? 'created' : $_GET['orderby'];
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
 					
@@ -5467,6 +5470,19 @@ if (!class_exists('wpMail')) {
 			$this -> render_admin('help');
 		}
 		
+		function update_plugin_complete_actions($upgrade_actions = null, $plugin = null) {
+			$this -> add_option('activation_redirect', true);
+			
+			$upgrade_actions['newsletters'] = 
+			'<script type="text/javascript">
+			jQuery("iframe").load(function() {
+				window.location = "' . admin_url('index.php') . "?page=newsletters-about" . '";
+			});
+			</script>';
+			
+			return $upgrade_actions;
+		}
+		
 		function activation_hook() {
 			$this -> add_option('activation_redirect', true);
 			wp_redirect(admin_url('index.php') . "?page=newsletters-about");
@@ -5537,6 +5553,7 @@ require_once(dirname(__FILE__) . DS . 'wp-mailinglist-api.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-functions.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-widget.php');
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'activation_hook'));
+add_filter('update_plugin_complete_actions', array($wpMail, 'update_plugin_complete_actions'), 10, 2);
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'update_options'));
 
 ?>

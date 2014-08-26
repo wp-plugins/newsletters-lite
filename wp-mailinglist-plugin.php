@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.2';
+		var $version = '4.2.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -209,14 +209,6 @@ if (!class_exists('wpMailPlugin')) {
 		        echo '</div>';
 		        echo '</td>';
 		        echo '</tr>';
-	        }
-	        
-	        if (false && $this -> has_update()) {
-	        	$new_version = __('There is a new version of the Newsletter plugin available.', $this -> plugin_name) .' <a class="thickbox" title="Newsletter plugin" href="plugin-install.php?tab=plugin-information&plugin=' . $plugin_name . '&TB_iframe=true&width=640&height=808">'. sprintf(__('View version %s Details', $this -> plugin_name), $version_info["version"]) . '</a>';
-	        	$plugin_file = "wp-mailinglist/wp-mailinglist.php";
-	        	$upgrade_url = wp_nonce_url('update.php?action=upgrade-plugin&amp;plugin=' . urlencode($plugin_name), 'upgrade-plugin_' . $plugin_file);
-	        	$upgrade = sprintf(__('or <a href="%s">update automatically</a>.', $this -> plugin_name), $upgrade_url);
-	            echo '</tr><tr class="plugin-update-tr"><td colspan="3" class="plugin-update"><div class="update-message">' . $new_version . ' ' . $upgrade . '</div></td>';	
 	        }
 	    }
 	    
@@ -1382,6 +1374,7 @@ if (!class_exists('wpMailPlugin')) {
 				<div id="spamscore_report">
 					<div class="wrap newsletters">
 						<h2><?php _e('Spam Score Report', $this -> plugin_name); ?></h2>
+						<p><a href="" onclick="jQuery.colorbox.close(); return false;" class="button button-primary"><?php _e('Close Report', $this -> plugin_name); ?></a></p>
 						<h3><?php _e('Report', $this -> plugin_name); ?></h3>
 						<p><?php echo nl2br($spamscore -> report); ?></p>
 						<h3><?php _e('RAW Email', $this -> plugin_name); ?></h3>
@@ -3731,7 +3724,7 @@ if (!class_exists('wpMailPlugin')) {
 						return $url;
 					} else {
 						if (empty($subscriber -> format) || $subscriber -> format == "html") {
-							$onlinelink = '<a href="' . $url . '" style="' . $style . '">' . $this -> get_option('onlinelinktext') . '</a>';
+							$onlinelink = '<a href="' . $url . '" style="' . $style . '">' . __($this -> get_option('onlinelinktext')) . '</a>';
 						} else {
 							$onlinelink = $url;
 						}

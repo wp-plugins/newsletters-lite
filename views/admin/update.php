@@ -6,26 +6,26 @@
 	
 	?>
 	
-	<div class="error">
-		<p><?php echo sprintf(__('Before updating, please backup any custom folders/files under %s and %s as they might be overwritten.', $this -> plugin_name), '"wp-mailinglist/views/"', '"wp-mailinglist/includes/themes/"'); ?></p>
-	</div>
-	
-	<div class="updated">
-		<p><?php _e('There is a newer version of the Newsletter plugin available.', $this -> plugin_name); ?></p>
-		<p><?php _e('You can update to the latest version automatically or download the update and install it manually.', $this -> plugin_name); ?></p>
-		<p>
-			<a onclick="if (!confirm('<?php _e('Have you backed up any custom folders/files inside the plugin? Are you sure you want to delete all the plugin files and install the latest?', $this -> plugin_name); ?>')) { return false; }" href="<?php echo $upgrade_url; ?>" title="" class="button-primary"><?php _e('Update Automatically', $this -> plugin_name); ?></a>
-			<a target="_blank" href="<?php echo $update_info['url']; ?>" title="" class="button-secondary"><?php _e('Download Update', $this -> plugin_name); ?></a>
-			<a style="color:black; text-decoration:none;" href="?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
-		</p>
+	<div class="update-nag">
+		<span class="newsletters-update-nag"></span> <?php echo sprintf(__('Newsletters plugin %s is available.', $this -> plugin_name), $update_info['version']); ?><br/>
+		<?php _e('You can update automatically or download to install manually.', $this -> plugin_name); ?>
+		<br/><br/>
+		<a href="<?php echo $upgrade_url; ?>" title="" class="button-primary"><?php _e('Update Automatically', $this -> plugin_name); ?></a>
+		<a target="_blank" href="<?php echo $update_info['url']; ?>" title="" class="button-secondary"><?php _e('Download', $this -> plugin_name); ?></a>
+		<a style="color:black; text-decoration:none;" href="<?php echo admin_url('admin.php'); ?>?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
+		<?php if (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates)) : ?>
+			<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> settings_updates); ?>"><?php _e('Changelog', $this -> plugin_name); ?></a>
+		<?php endif; ?>
 	</div>
 <?php else : ?>
-	<div class="error">
-		<p><?php _e('There is a newer version of the Newsletter plugin available.', $this -> plugin_name); ?></p>
-		<p><?php _e('Unfortunately your download has expired and you can renew it to gain access to this new version.', $this -> plugin_name); ?></p>
-		<p>
-			<a style="color:white; text-decoration:none;" href="<?php echo $update_info['url']; ?>" target="_blank" title="" class="button button-primary"><?php _e('Renew Download Now!', $this -> plugin_name); ?></a>
-			<a style="color:black; text-decoration:none;" href="?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
-		</p>
+	<div class="update-nag">
+		<span class="newsletters-update-nag"></span> <?php echo sprintf(__('Newsletters plugin %s is available.', $this -> plugin_name), $update_info['version']); ?><br/>
+		<?php _e('Unfortunately your download has expired, please renew to gain access.', $this -> plugin_name); ?>
+		<br/><br/>
+		<a style="color:white; text-decoration:none;" href="<?php echo $update_info['url']; ?>" target="_blank" title="" class="button button-primary"><?php _e('Renew Now', $this -> plugin_name); ?></a>
+		<a style="color:black; text-decoration:none;" href="<?php echo admin_url('admin.php'); ?>?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
+		<?php if (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates)) : ?>
+			<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> settings_updates); ?>"><?php _e('Changelog', $this -> plugin_name); ?></a>
+		<?php endif; ?>
 	</div>
 <?php endif; ?>

@@ -15,7 +15,10 @@
     	<script type="text/javascript">
     	jQuery(document).ready(function() {
 	    	jQuery.colorbox.close();
-	    	previewrunner();
+	    	<?php $createpreview = $this -> get_option('createpreview'); ?>
+	    	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
+	    		previewrunner();
+	    	<?php endif; ?>
     	});
     	</script>
     <?php endif; ?>

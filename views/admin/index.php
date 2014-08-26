@@ -9,10 +9,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?> <?php echo $this -> sections -> welcome; ?>">
-	<div class="icon32">
-		<img src="<?php echo $this -> url(); ?>/images/icon-36.png" />
-	</div>
+<div class="wrap <?php echo $this -> pre; ?> <?php echo $this -> sections -> welcome; ?> newsletters">
 	<h2><?php echo sprintf(__('Newsletters %s', $this -> plugin_name), $this -> get_option('version')); ?></h2>    
 	<div id="poststuff">
 		<div id="post-body" class="metabox-holder columns-2">

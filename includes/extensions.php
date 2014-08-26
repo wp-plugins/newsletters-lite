@@ -68,7 +68,15 @@ $extensions = array(
 			'slug'				=>	'control',
 			'plugin_name'		=>	'newsletters-control',
 			'plugin_file'		=>	'control.php',
-		),				
+		),
+		'woocommerce'	=>	array(
+			'name'			=>	__('WooCommerce Subscribers', $this -> plugin_name),
+			'link'			=>	"http://tribulant.com/extensions/view/42/woocommerce-subscribers",
+			'description'	=>	sprintf(__("Capture email subscribers from the WooCommerce plugin to the %sNewsletter plugin%s.", $this -> plugin_name), '<a href="http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin" target="_blank">', '</a>'),
+			'slug'			=>	'woocommerce',
+			'plugin_name'	=>	'newsletters-woocommerce',
+			'plugin_file'	=>	'woocommerce.php',
+		),			
 	);
 
 ?>

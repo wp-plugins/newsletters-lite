@@ -20,7 +20,11 @@ function previewrunner() {
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 	var formvalues = jQuery('form#post').serialize();
 	var content = jQuery("iframe#content_ifr").contents().find("body#tinymce").html();
-	tinyMCE.triggerSave();
+	
+	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
+		tinyMCE.triggerSave();
+	}
+		
 	if (previewrequest) { previewrequest.abort(); }
 	jQuery('#previewrunnerbutton').attr('disabled', "disabled");
 	jQuery('#previewrunnerloading').show();

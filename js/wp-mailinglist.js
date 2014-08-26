@@ -112,7 +112,7 @@ function wpml_titletoslug(title) {
 }
 
 function wpml_tinymcetag(tag) {
-	if (tinyMCE.activeEditor) {
+	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function" && tinyMCE.activeEditor) {
 		if (window.tinyMCE && tag != "") {
 			window.tinyMCE.execCommand('mceInsertContent', false, tag);	
 		}

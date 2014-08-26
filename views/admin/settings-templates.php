@@ -9,7 +9,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Email Templates Configuration', $this -> plugin_name); ?></h2>
     <?php $this -> render('settings-navigation', false, true, 'admin'); ?>
     <p>
@@ -34,3 +34,19 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 		</div>
 	</form>
 </div>
+
+<script type="text/javascript">
+jQuery(document).ready(function(){    
+    var divOffset = jQuery("#tableofcontentsdiv").offset().top;
+	
+	jQuery(window).bind("scroll", function() {
+	    var offset = jQuery(this).scrollTop();
+	
+	    if (offset >= divOffset) {
+	        jQuery('#tableofcontentsdiv').addClass('fixed');
+	    } else if (offset < divOffset) {
+	    	jQuery('#tableofcontentsdiv').removeClass('fixed');
+	    }
+	});
+});
+</script>

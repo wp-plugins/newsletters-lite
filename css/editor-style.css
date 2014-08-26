@@ -1,8 +1,0 @@
-img.wpmlTinymce {
-	border: 1px dashed #ccc;
-	background: #fefefe url("../js/tinymce/icon.png") no-repeat scroll center center;
-	width: 80px;
-	height: 40px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-	border-radius: 4px;
-}

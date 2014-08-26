@@ -1,1 +1,218 @@
-<?php /*** PHP Encode v1.0 by zeura.com ***/ $XnNhAWEnhoiqwciqpoHH=file(__FILE__);eval(base64_decode("aWYoIWZ1bmN0aW9uX2V4aXN0cygiWWl1bklVWTc2YkJodWhOWUlPOCIpKXtmdW5jdGlvbiBZaXVuSVVZNzZiQmh1aE5ZSU84KCRnLCRiPTApeyRhPWltcGxvZGUoIlxuIiwkZyk7JGQ9YXJyYXkoNjU1LDIzNiw0MCk7aWYoJGI9PTApICRmPXN1YnN0cigkYSwkZFswXSwkZFsxXSk7ZWxzZWlmKCRiPT0xKSAkZj1zdWJzdHIoJGEsJGRbMF0rJGRbMV0sJGRbMl0pO2Vsc2UgJGY9dHJpbShzdWJzdHIoJGEsJGRbMF0rJGRbMV0rJGRbMl0pKTtyZXR1cm4oJGYpO319"));eval(base64_decode(YiunIUY76bBhuhNYIO8($XnNhAWEnhoiqwciqpoHH)));eval(ZsldkfhGYU87iyihdfsow(YiunIUY76bBhuhNYIO8($XnNhAWEnhoiqwciqpoHH,2),YiunIUY76bBhuhNYIO8($XnNhAWEnhoiqwciqpoHH,1)));__halt_compiler();aWYoIWZ1bmN0aW9uX2V4aXN0cygiWnNsZGtmaEdZVTg3aXlpaGRmc293Iikpe2Z1bmN0aW9uIFpzbGRrZmhHWVU4N2l5aWhkZnNvdygkYSwkaCl7aWYoJGg9PXNoYTEoJGEpKXtyZXR1cm4oZ3ppbmZsYXRlKGJhc2U2NF9kZWNvZGUoJGEpKSk7fWVsc2V7ZWNobygiRXJyb3I6IEZpbGUgTW9kaWZpZWQiKTt9fX0=b449d4e536669e69d38fe049a1b5dfd980f438c7vVptb9y4Ef7sAv0P6iK43Q0cu3ftfUiNtEiLO+RLcUYctCj6QnCl2V2eJVJHUl77evnvHb7onStRhtMgyYrkw2eGo+FwRJLtk81v0pwqReCRKa0261P5V8ryvxwhvWec6fV2m/z317+6sKBk0Ghb8O/FvuKpZoIPARvX+eJCgq4kT7Ss4Mb2+Gz+63VNGTFdGM3Zz2A6YrcL3/mnikkggqeQvP/z3e37Tx+SqwRVfUOzgvFrxtO8ykBdl3l1YPyqPJbrG9uVmQEyRVwDoSjqATa+tKMKOC3ADPpNgXozfsjRCtf9oqXbbuuh+LE4fjsMpyXNMssvuOEj9Ef6SE5lkSuQOKZ7eFpfJlRK+rR5pY9MXSZrC2mbt9ub2iiN3nZ8aIxffkk2neJXXyWWJHnzR2M3x0Ee0HTZpqNpF9PYlloVt17/BFBBa+tBl+5wrFhSSsY1UfopB4VjWSPpoOrr3+I/zxzBlEpW6gFVUxfLxYVmKUqfhFpPRjnmlxxAl0LpBTIK4JXp3iltR+/fu/ieokFv5l3cvwbn5o2rX79OPt7dJd8DZCp5fd34QqMcKk9E6ZSTSu0RuN4m794lq3+sjFt0nAa5Ezc0MyKD3Kw5nFQOWoNUI3c0CNIFoENeDEfZs9Ke5QjcrAvIGEUv5BnRgmBBC2ns5eoZR/805v4Gzf07b7ggD9Wapke0r8YqyDNl6BR9AGv8iUZe5TnyL+Y2qp7l9o19bveWrt+7F3oU4l6NZdbeI+GA8QMk2QtZrEPaBfwsEmbdMSMZVcedoDIbuPNE9yPQbFLKiWXoZorUs8aVST2aGEkYAK0Y07t5/Prb+V57IYyI+VFEADNATwZSKavzoDg7BIPrjnlUMctgnJP4UNMrmJ7fRGhe9+0XZ+V2o53BL4ATDY86E7j68YGkOjzdpUfIKoz3dXgKcTZ1pQSzUpNUCm4miw32+Ex8oZWQ+D9RdKUoazZ8HJNFapVTDcouBnYV6hSfTWkzDORx7XaW9mqeT1xhUAVVCp654L3u1zybOKWlTo80zYHyqrQvqFfzbGJWlEJqM2usup1iLOU6ExjsNCU78ehyjmFFZMgbJAlh5N5Eap8aSnEi80mheQmDXjGzGxdETfPc98LkFHNb9/yGcbNU0Np3MqbKnD4RfBv8ALk4xA+5ntWa8acihXV8j7RSWhQY6TJMutOYCIK2MKZBQ9Qco5q3b9/OkUiBazXG5zLD2TKpbyoKt1bPLau4oLjsg/gudny+d2wwRpJh6tsrz1v22d1b0W2u3K+IFv4cAhTf5BeY3mkXHoZV/czoe5tvncuM6mzMrgGqXkrWU4kbKgrAjSx05YMdwbjKpBaT6V/nAxAl4yy+d7YIVhuX+P0Umz5CJ83tlc7NlaarpFwx43/O0esoYD3TfDfXE2B2cWwMxJDl5WlN4CAYOcgOcJ5BM7XFA0jJMrBt7lNEBXOF678Lmd3iCqWSuyOG/lTgJ7ptOuRiR/PkVVN903xBq7pqtJ4UlNMD+Enc/3JRKem0+u/oGTpV7cwU2EHL1qhz2W2Oo9NQlLmzb4CtaY3UjbOyBP0iXFhCx3wKc9WNcVRm5Q3z2JY4kuyskTKbfmFwOkRS+QAeoHI5nDJrNSwgU1NsRZVrVi7iI/pYFTuOC+F54g6m+d6OYC4B0wQTryaYW8zCKSFVKiquZ2ZGjYqcIEfwGQHiTFA4490j2FL6PU1hh6tPJfM5EV3oUjH6xMwuSYSUDnKpEKlUhACPivRLXHnhpKbfwhC0jHr2DYSAy0TMWT+AWyZgyvIDTBxxTg8CU4xJsw8wi4hnjR7ALRIwZ/IxbBH9lMH7kO1gR+IWY10nw2j2JWwMVG39O0/tgmMuRLmuIyXLmkf8qj66tM5FZ6ZzaEo+4LqCTbNOkuJSLXuV68tA+Hc18JiCLHVTTgXXNmdxQzKJFk2PyWakPFXJoK7Z5R+Yt48Kh/D6mbhVbzvezUa7vv+RPnb3oHs7y63o4ZlHZweZmBgFfh81cPbRNtcazDJiu7cZRVOFaQeYaG63zTZLP4ZNSmjXy8Gi2jsFGoCWMPpNgijiGjvJb06tTCrW+b4KvbwuYpYvu2fFif3sNqpDRm3bo3Tb4WhSmNdwgJvl9hkxYXtJCwjzeoyHzFJinHtgcJIV5zZQBBj7kGiHVSUtMAmTMMU9BEWzH2h1OGMB1zQ78u6Gqh9imC8EjNYzL9Ugee9Rl2oQ5SLjQNNzKgq0oFljnCBPRYHDpOdU7SFm+eAR0krbHDBM1wXMsv1UQTXB1TbPMuFce6CS0Z3b7AoeeXcQs3z+uPYMV9Mav4KUzJSDB/JtU7Mk+vXw7BH/gDrI6S9S3JwnEaVkDy/DZd/BeHMjuCjEKPVifO0WTX0kEmYL4CLU/ELsLXzGBiHgIrVfmL/Fp5WUbbdmw25SRrDPouH8X6S2Xc3UWSJqhF80uC8qrfOm6QO4+wizPtEilzndS0vovkxzjBRH3sMudLMvIMWEPHdc2dnsCrOPYXPE8BhFPIbNEeNSaE4mp2zRh0QG/2fz9g9B7PkDJuH+ZGLTBXWvB569OmXuoLibbs21Qns1ytXh533wklT3fl3/Bl/iez7zJlf/0p2nfnU0mxGoCrn77uPfvvv4z/WHT59uyYcf7j6t/+1PhSSoKjegVkB76Q+z3wO6rE6Pm9X1fzan0+lfV9vN1evttWKry8Ty449FgOpc9UNkLdv81pfauOBtiyWXgF+AKXTo/+S4V4bfgwfXA0NkPTFt9Qofr1bJlW8fXSCzryxkHXuJLRcpzU3HlbnyGIH7gxXV4Nwvuf3hIyJb4zQmby+gDsZ2xpMGbrft3JTsd3mXKC21qMxm0KbIvj0zxiu0D04po/SqeCqoAiVA3wu4Z6CY2ov7e+A54P9y1bnIORqCr3ZjMIoMpdcvZJlAM456SGj/WvjFxZC+4wnPljA/Ovf7eXQHsUHTssyf/ImlGt9Aaea+m6X1tQrf3/t4HQxcZTPf8d/n/wE=
+<?php
+
+if (!class_exists('wpMailCheckinit')) {
+	class wpMailCheckinit {
+	
+		function wpMailCheckinit() {
+			return true;	
+		}
+		
+		function ci_initialize() {				
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			if (!is_plugin_active(plugin_basename('wp-mailinglist/wp-mailinglist.php'))) {
+				return;
+			}
+			
+			add_action('wp_ajax_wpmlserialkey', array($this, 'ajax_serialkey'));
+		
+			if (!is_admin() || (is_admin() && $this -> ci_serial_valid())) {
+				$this -> ci_initialization();
+			} else {			
+				$this -> add_action('admin_print_styles', 'ci_print_styles', 10, 1);
+				$this -> add_action('admin_print_scripts', 'ci_print_scripts', 10, 1);
+				$this -> add_action('admin_notices');
+				$this -> add_action('init', 'init_getpost', 10, 1);
+				$this -> add_action('admin_menu', 'admin_menu');
+			}
+			
+			return false;
+		}
+		
+		function ci_initialization() {								
+			/* RSS Feeds */
+			if ($this -> get_option('rssfeed') == "Y" && !is_admin()) { 
+				add_feed('newsletters', array($this, 'feed_newsletters'));	
+			}
+			
+			$this -> add_filter('media_send_to_editor', 'media_insert', 20, 3);
+			$this -> add_filter('attachment_fields_to_save', 'attachment_fields_to_save', null, 2);
+			$this -> add_filter('attachment_fields_to_edit', 'attachment_fields_to_edit', null, 2);
+			
+			//Action hooks
+			$this -> add_action('register_form');
+			$this -> add_action('admin_menu');
+			$this -> add_action('admin_menu', 'add_dashboard', 10, 1);
+			$this -> add_action('admin_head');
+			$this -> add_action('widgets_init', 'widget_register', 10, 1);
+			$this -> add_action('wp_head', 'wp_head', 15, 1);
+			$this -> add_action('wp_footer');
+			$this -> add_action('admin_footer');
+			$this -> add_action('delete_user', 'delete_user', 10, 1);
+			$this -> add_action('user_register', 'user_register', 10, 1);
+			$this -> add_action('save_post', 'save_post', 10, 2);
+			$this -> add_action('delete_post', 'delete_post', 10, 1);
+			$this -> add_action('init', 'init', 1, 1);
+			$this -> add_action('init', 'init_textdomain', 10, 1);
+			
+			/* Schedules */
+			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
+	        $this -> add_action($this -> pre . '_pophook', 'pop_hook', 10, 1);
+			$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);
+			$this -> add_action($this -> pre . '_activateaction', 'activateaction_hook', 10, 1);
+			$this -> add_action($this -> pre . '_autoresponders', 'autoresponders_hook', 10, 1);
+			$this -> add_action($this -> pre . '_captchacleanup', 'captchacleanup_hook', 10, 1);
+			$this -> add_action($this -> pre . '_importusers', 'importusers_hook', 10, 1);
+			$this -> add_action('do_meta_boxes', 'do_meta_boxes', 10, 1);
+			$this -> add_action('admin_notices');
+			$this -> add_action('after_plugin_row_wp-mailinglist/wp-mailinglist.php', 'after_plugin_row', 10, 2);
+			$this -> add_action('install_plugins_pre_plugin-information', 'display_changelog', 10, 1);
+			$this -> add_action('admin_init', 'tinymce');
+			$this -> add_action('admin_init', 'custom_redirect', 1, 1);
+			$this -> add_action('phpmailer_init', 'phpmailer_init', 999, 1);
+			$this -> add_action('profile_update');
+			$this -> add_action('comment_form');
+			$this -> add_action('wp_insert_comment', 'comment_post', 10, 2);
+			$this -> add_action('wp_print_styles', 'print_styles');
+			$this -> add_action('admin_print_styles', 'print_styles');
+			$this -> add_action('wp_print_scripts', 'print_scripts');
+			$this -> add_action('admin_print_scripts', 'print_scripts');
+			$this -> add_action('wp_dashboard_setup', 'dashboard_setup');
+			
+			//Filter hooks
+			$this -> add_filter('cron_schedules');
+			$this -> add_filter('screen_settings', 'screen_settings', 15, 2);
+			$this -> add_filter('plugin_action_links', 'plugin_action_links', 10, 4);
+			$this -> add_filter('the_editor', 'the_editor', 1, 1);
+			$this -> add_filter('transient_update_plugins', 'check_update', 10, 1);
+	        $this -> add_filter('site_transient_update_plugins', 'check_update', 10, 1);
+	        $this -> add_filter('tiny_mce_before_init', 'override_mce_options', 10, 1);
+			
+			//WordPress Shortcodes
+			global $Shortcode;
+			add_shortcode($this -> pre . 'management', array($this, 'sc_management'));
+			add_shortcode($this -> pre . 'subscribe', array($Shortcode, 'subscribe'));
+			add_shortcode($this -> pre . 'template', array($Shortcode, 'template'));
+			add_shortcode($this -> pre . 'snippet', array($Shortcode, 'template'));
+			add_shortcode($this -> pre . 'history', array($Shortcode, 'history'));
+			add_shortcode($this -> pre . 'meta', array($Shortcode, 'meta'));
+			add_shortcode($this -> pre . 'date', array($Shortcode, 'datestring'));
+			add_shortcode($this -> pre . 'post', array($Shortcode, 'posts_single'));
+			add_shortcode($this -> pre . 'posts', array($Shortcode, 'posts_multiple'));
+			add_shortcode($this -> pre . 'post_thumbnail', array($Shortcode, 'post_thumbnail'));	
+			add_shortcode($this -> pre . 'post_permalink', array($Shortcode, 'post_permalink'));
+			add_shortcode($this -> pre . 'subscriberscount', array($Shortcode, 'subscriberscount'));
+			add_shortcode($this -> pre . 'themailer_address', array($Shortcode, 'themailer_address'));
+			add_shortcode($this -> pre . 'themailer_facebookurl', array($Shortcode, 'themailer_facebookurl'));
+			add_shortcode($this -> pre . 'themailer_twitterurl', array($Shortcode, 'themailer_twitterurl'));
+			add_shortcode($this -> pre . 'themailer_rssurl', array($Shortcode, 'themailer_rssurl'));
+			add_shortcode($this -> pre . 'pronews_address', array($Shortcode, 'pronews_address'));
+			add_shortcode($this -> pre . 'pronews_facebookurl', array($Shortcode, 'pronews_facebookurl'));
+			add_shortcode($this -> pre . 'pronews_twitterurl', array($Shortcode, 'pronews_twitterurl'));
+			add_shortcode($this -> pre . 'pronews_rssurl', array($Shortcode, 'pronews_rssurl'));
+			add_shortcode($this -> pre . 'lagoon_address', array($Shortcode, 'lagoon_address'));
+			add_shortcode($this -> pre . 'lagoon_facebookurl', array($Shortcode, 'lagoon_facebookurl'));
+			add_shortcode($this -> pre . 'lagoon_twitterurl', array($Shortcode, 'lagoon_twitterurl'));
+			add_shortcode($this -> pre . 'lagoon_rssurl', array($Shortcode, 'lagoon_rssurl'));
+			
+			/* Post Shortcodes */
+			$post_shortcodes = array('post_loop', 'post_id', 'post_author', 'post_title', 'post_link', 'post_date_wrapper', 'post_date', 'post_thumbnail', 'post_excerpt', 'post_content');
+			foreach ($post_shortcodes as $post_shortcode) {
+				add_shortcode($post_shortcode, array($Shortcode, 'shortcode_posts'));
+			}
+			
+			/* Ajax */
+			if (is_admin()) {
+				add_action('wp_ajax_newsletters_themeedit', array($this, 'ajax_themeedit'));
+				add_action('wp_ajax_newsletters_addcontentarea', array($this, 'ajax_addcontentarea'));
+				add_action('wp_ajax_newsletters_deletecontentarea', array($this, 'ajax_deletecontentarea'));
+				add_action('wp_ajax_subscribercount', array($this, 'ajax_subscribercount'));
+				add_action('wp_ajax_subscribercountdisplay', array($this, 'ajax_subscribercountdisplay'));
+				add_action('wp_ajax_wpmltestsettings', array($this, 'ajax_testsettings'));
+				add_action('wp_ajax_wpmldkimwizard', array($this, 'ajax_dkimwizard'));
+				add_action('wp_ajax_wpmltestbouncesettings', array($this, 'ajax_testbouncesettings'));
+				add_action('wp_ajax_wpmlhistory_iframe', array($this, 'ajax_historyiframe'));
+				
+				$createpreview = $this -> get_option('createpreview');
+				if (!empty($createpreview) && $createpreview == "Y") {
+					add_action('wp_ajax_wpmlpreviewrunner', array($this, 'ajax_previewrunner'));
+				}
+				
+				add_action('wp_ajax_newsletters_spamscorerunner', array($this, 'ajax_spamscorerunner'));
+				add_action('wp_ajax_newsletters_gauge', array($this, 'ajax_gauge'));
+				add_action('wp_ajax_wpmllatestposts_preview', array($this, 'ajax_latestposts_preview'));
+				add_action('wp_ajax_newsletters_lpsposts', array($this, 'ajax_lps_posts'));
+				add_action('wp_ajax_newsletters_delete_lps_post', array($this, 'ajax_delete_lps_post'));
+				add_action('wp_ajax_wpmlwelcomestats', array($this, 'ajax_welcomestats'));
+				add_action('wp_ajax_wpmlexecutemail', array($this, 'ajax_executemail'));
+				add_action('wp_ajax_wpmlqueuemail', array($this, 'ajax_queuemail'));
+				add_action('wp_ajax_wpmlsetvariables', array($this, 'ajax_setvariables'));
+				add_action('wp_ajax_wpmlgetposts', array($this, 'ajax_getposts'));
+				add_action('wp_ajax_newsletters_api_newkey', array($this, 'api_newkey'));
+			}		
+			
+			add_action('wp_ajax_newsletters_api', array($this, 'api_init'));
+			add_action('wp_ajax_nopriv_newsletters_api', array($this, 'api_init'));
+			add_action('wp_ajax_wpmlsubscribe', array($this, 'ajax_subscribe'));
+			add_action('wp_ajax_nopriv_wpmlsubscribe', array($this, 'ajax_subscribe'));
+			add_action('wp_ajax_managementactivate', array($this, 'ajax_managementactivate'));
+			add_action('wp_ajax_nopriv_managementactivate', array($this, 'ajax_managementactivate'));
+			add_action('wp_ajax_managementsubscribe', array($this, 'ajax_managementsubscribe'));
+			add_action('wp_ajax_nopriv_managementsubscribe', array($this, 'ajax_managementsubscribe'));
+			add_action('wp_ajax_managementcurrentsubscriptions', array($this, 'ajax_managementcurrentsubscriptions'));
+			add_action('wp_ajax_nopriv_managementcurrentsubscriptions', array($this, 'ajax_managementcurrentsubscriptions'));
+			add_action('wp_ajax_managementnewsubscriptions', array($this, 'ajax_managementnewsubscriptions'));
+			add_action('wp_ajax_nopriv_managementnewsubscriptions', array($this, 'ajax_managementnewsubscriptions'));
+			add_action('wp_ajax_managementsavefields', array($this, 'ajax_managementsavefields'));
+			add_action('wp_ajax_nopriv_managementsavefields', array($this, 'ajax_managementsavefields'));
+			add_action('wp_ajax_managementcustomfields', array($this, 'ajax_managementcustomfields'));
+			add_action('wp_ajax_nopriv_managementcustomfields', array($this, 'ajax_managementcustomfields'));
+			add_action('wp_ajax_wpmlimportsubscribers', array($this, 'ajax_importsubscribers'));
+			add_action('wp_ajax_wpmlexportsubscribers', array($this, 'ajax_exportsubscribers'));
+			add_action('wp_ajax_wpmlgetlistfields', array($this, 'ajax_getlistfields'));
+			add_action('wp_ajax_nopriv_wpmlgetlistfields', array($this, 'ajax_getlistfields'));
+			
+			$this -> updating_plugin();
+			
+			return true;
+		}
+		
+		function ci_get_serial() {
+			if ($serial = $this -> get_option('serialkey')) {
+				return $serial;
+			}
+			
+			return false;
+		}
+		
+		function ci_serial_valid() {
+			$host = $_SERVER['HTTP_HOST'];
+			$result = false;
+			
+			if (preg_match("/^(www\.)(.*)/si", $host, $matches)) {
+				$wwwhost = $host;
+				$nonwwwhost = preg_replace("/^(www\.)?/si", "", $wwwhost);
+			} else {
+				$nonwwwhost = $host;
+				$wwwhost = "www." . $host;	
+			}
+			
+			if ($_SERVER['HTTP_HOST'] == "localhost" || $_SERVER['HTTP_HOST'] == "localhost:" . $_SERVER['SERVER_PORT']) {
+				$result = true;	
+			} else {
+				if ($serial = $this -> ci_get_serial()) {			
+					if ($serial == strtoupper(md5($_SERVER['HTTP_HOST'] . "wpml" . "mymasesoetkoekiesisfokkenlekker"))) {
+						$result = true;
+					} elseif (strtoupper(md5($wwwhost . "wpml" . "mymasesoetkoekiesisfokkenlekker")) == $serial || 
+								strtoupper(md5($nonwwwhost . "wpml" . "mymasesoetkoekiesisfokkenlekker")) == $serial) {
+						$result = true;
+					}
+				}
+			}
+			
+			$result = apply_filters($this -> pre . '_serialkey_validation', $result);
+			return $result;
+		}
+	}
+}
+
+?>

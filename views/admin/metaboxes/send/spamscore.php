@@ -21,7 +21,11 @@ function spamscorerunner() {
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 	var formvalues = jQuery('form#post').serialize();
 	var content = jQuery("iframe#content_ifr").contents().find("body#tinymce").html();
-	tinyMCE.triggerSave();
+	
+	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
+		tinyMCE.triggerSave();
+	}
+	
 	if (spamscorerequest) { spamscorerequest.abort(); }
 	jQuery('#spamscorerunnerbutton').attr('disabled', "disabled");
 	jQuery('#spamscorerunnerloading').show();

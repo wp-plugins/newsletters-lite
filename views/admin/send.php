@@ -231,7 +231,10 @@ jQuery(document).ready(function() {
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 
     jQuery('input:not(:button,:submit),textarea,select').change(function() {
-    	previewrunner();
+    	<?php $createpreview = $this -> get_option('createpreview'); ?>
+    	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
+    		previewrunner();
+    	<?php endif; ?>
     	spamscorerunner();
     
         window.onbeforeunload = function () {

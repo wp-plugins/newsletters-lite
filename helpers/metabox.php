@@ -130,6 +130,22 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'settings-submit', false, true, 'admin');
 	}
 	
+	function settings_tableofcontents() {
+		$this -> render('metaboxes' . DS . 'settings' . DS . 'tableofcontents', false, true, 'admin');
+	}
+	
+	function settings_subscribers_tableofcontents() {
+		$this -> render('metaboxes' . DS . 'settings' . DS . 'tableofcontents-subscribers', false, true, 'admin');
+	}
+	
+	function settings_templates_tableofcontents() {
+		$this -> render('metaboxes' . DS . 'settings' . DS . 'tableofcontents-templates', false, true, 'admin');
+	}
+	
+	function settings_system_tableofcontents() {
+		$this -> render('metaboxes' . DS . 'settings' . DS . 'tableofcontents-system', false, true, 'admin');
+	}
+	
 	function settings_sections() {
 		$this -> render('metaboxes' . DS . 'settings-sections', false, true, 'admin');
 	}
