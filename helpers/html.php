@@ -285,8 +285,6 @@ class wpmlHtmlHelper extends wpMailPlugin {
 			return __('No cron schedules are available or no task was specified.', $this -> plugin_name);	
 		}
 		
-		exit();
-		
 		return false;
 	}
 	

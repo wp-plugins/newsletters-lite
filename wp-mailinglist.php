@@ -1483,8 +1483,6 @@ if (!class_exists('wpMail')) {
 			//update the "lastcron" setting
 			$this -> update_option('lastcron', time());
 			echo '<br/>' . $emailssent . " " . __('queued emails have been sent out', $this -> plugin_name);
-			
-			exit();
 		}
 		
 		function the_editor($html = null) {
