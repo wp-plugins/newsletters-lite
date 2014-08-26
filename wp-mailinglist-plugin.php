@@ -91,7 +91,7 @@ if (!class_exists('wpMailPlugin')) {
 			$this -> plugin_name = $name;
 			$this -> plugin_base = rtrim(dirname($base), DS);
 			if (!defined('NEWSLETTERS_LOG_FILE')) { define("NEWSLETTERS_LOG_FILE", $this -> plugin_base() . DS . "newsletters.log"); }
-			$this -> sections = (object) $this -> sections;
+			$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);
 			$this -> set_timezone();
 			$this -> extensions = $this -> get_extensions();
 					
@@ -5893,7 +5893,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if ($role = get_role('administrator')) {		
 				if (!empty($this -> sections)) {			
-					foreach ($this -> sections as $section_key => $section_menu) {								
+					foreach ($this -> sections as $section_key => $section_menu) {												
 						if (empty($role -> capabilities['newsletters_' . $section_key])) {
 							$role -> add_cap('newsletters_' . $section_key);
 							$permissions[$section_key][] = 'administrator';
@@ -6339,7 +6339,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function render($file = null, $params = array(), $output = true, $folder = 'default', $extension = null) {	
-			$this -> sections = (object) $this -> sections;
+			$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);
 			//$this -> plugin_name = 'wp-mailinglist';
 		
 			if (!empty($file)) {				

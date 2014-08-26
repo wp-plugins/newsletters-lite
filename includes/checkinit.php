@@ -15,13 +15,13 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			add_action('wp_ajax_wpmlserialkey', array($this, 'ajax_serialkey'));
 		
-			if (!is_admin() || (is_admin() && $this -> ci_serial_valid())) {
+			if (true || !is_admin() || (is_admin() && $this -> ci_serial_valid())) {
 				$this -> ci_initialization();
 			} else {			
 				$this -> add_action('admin_print_styles', 'ci_print_styles', 10, 1);
 				$this -> add_action('admin_print_scripts', 'ci_print_scripts', 10, 1);
 				$this -> add_action('admin_notices');
-				$this -> add_action('init', 'init_getpost', 10, 1);
+				$this -> add_action('init', 'init', 10, 1);
 				$this -> add_action('admin_menu', 'admin_menu');
 			}
 			

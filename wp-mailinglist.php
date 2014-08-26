@@ -240,22 +240,29 @@ if (!class_exists('wpMail')) {
 				}
 			
 				if (!$this -> ci_serial_valid() && (empty($_GET['page']) || $_GET['page'] != $this -> sections -> submitserial)) {
-					$message = __('Please fill in a serial key for the Newsletter plugin to continue use.', $this -> plugin_name);
-					$message .= ' <a class="button" id="' . $this -> pre . 'submitseriallink" href="' . admin_url('admin.php') . '?page=' . $this -> sections -> submitserial . '" title="Newsletter plugin - Serial Key">' . __('Submit Serial Key', $this -> plugin_name) . '</a>';
-					$this -> render_error($message);
-					
-					?>
-		            
-		            <script type="text/javascript">
-					jQuery(document).ready(function(e) {
-		                jQuery('#<?php echo $this -> pre; ?>submitseriallink').click(function() {					
-							jQuery.colorbox({href:ajaxurl + "?action=<?php echo $this -> pre; ?>serialkey"});
-							return false;
-						});
-		            });
-					</script>
-		            
-		            <?php
+					$hidemessage_submitserial = $this -> get_option('hidemessage_submitserial');
+				
+					if (empty($hidemessage_submitserial)) {
+						//$message = __('Please fill in a serial key for the Newsletter plugin to continue use.', $this -> plugin_name);
+						$message = __('To activate your Newsletters PRO, please submit a serial key', $this -> plugin_name);
+						$message .= ' <a class="button button-primary" id="' . $this -> pre . 'submitseriallink" href="' . admin_url('admin.php') . '?page=' . $this -> sections -> submitserial . '">' . __('Submit Serial Key', $this -> plugin_name) . '</a>';
+						$message .= ' <a class="button button-secondary" href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Buy PRO', $this -> plugin_name) . '</a>';
+						$message .= ' <a style="text-decoration:none;" href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=submitserial') . '" class="newsletters-icon-delete-regular"></a>';
+						$this -> render_error($message);
+						
+						?>
+			            
+			            <script type="text/javascript">
+						jQuery(document).ready(function(e) {
+			                jQuery('#<?php echo $this -> pre; ?>submitseriallink').click(function() {					
+								jQuery.colorbox({href:ajaxurl + "?action=<?php echo $this -> pre; ?>serialkey"});
+								return false;
+							});
+			            });
+						</script>
+			            
+			            <?php
+			        }
 				}
 				
 				global $queue_count;
@@ -352,6 +359,17 @@ if (!class_exists('wpMail')) {
 			
 			if (!empty($_GET['newsletters_method'])) {
 				switch ($_GET['newsletters_method']) {
+					case 'hidemessage'					:
+						if (!empty($_GET['message'])) {
+							switch ($_GET['message']) {
+								case 'submitserial'				:
+									$this -> update_option('hidemessage_submitserial', true);
+									break;
+							}
+						}
+						
+						$this -> redirect($this -> referer);
+						break;
 					case 'hideupdate'					:
 						if (!empty($_GET['version'])) {
 							$this -> update_option('hideupdate', $_GET['version']);
@@ -1881,7 +1899,7 @@ if (!class_exists('wpMail')) {
 		
 		function admin() {	
 			if (!$this -> ci_serial_valid()) {
-				$this -> redirect('?page=' . $this -> sections -> submitserial);
+				//$this -> redirect('?page=' . $this -> sections -> submitserial);
 			}
 		
 			switch ($_GET['method']) {
@@ -1904,7 +1922,7 @@ if (!class_exists('wpMail')) {
 		
 			add_menu_page(__('Newsletters', $this -> plugin_name), __('Newsletters', $this -> plugin_name) . $update_icon, 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'), false, "26.11");
 			
-			if (!$this -> ci_serial_valid()) {
+			if (false && !$this -> ci_serial_valid()) {
 				$this -> menus['newsletters-submitserial'] = add_submenu_page($this -> sections -> welcome, __('Submit Serial', $this -> plugin_name), __('Submit Serial', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> submitserial, array($this, 'admin_submitserial'));
 			} else {
 				$this -> menus['newsletters'] = add_submenu_page($this -> sections -> welcome, __('Overview', $this -> plugin_name), __('Overview', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'));
@@ -1942,6 +1960,12 @@ if (!class_exists('wpMail')) {
 					$this -> menus['newsletters-support'] = add_submenu_page($this -> sections -> welcome, __('Support &amp; Help', $this -> plugin_name), __('Support &amp; Help', $this -> plugin_name), 'newsletters_support', $this -> sections -> support, array($this, 'admin_help'));
 				}
 			}
+			
+			if (!$this -> ci_serial_valid()) {
+				$this -> menus['newsletters-submitserial'] = add_submenu_page($this -> sections -> welcome, __('Submit Serial', $this -> plugin_name), __('Submit Serial', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> submitserial, array($this, 'admin_submitserial'));
+			}
+			
+			do_action('newsletters_admin_menu', $this -> menus);
 			
 			add_action('admin_head-' . $this -> menus['newsletters'], array($this, 'admin_head_welcome'));
 			add_action('admin_head-' . $this -> menus['newsletters-send'], array($this, 'admin_head_send'));
