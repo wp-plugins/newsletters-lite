@@ -1,4 +1,11 @@
-<?php $embed = $this -> get_option('embed'); ?>
+<!-- Default Subscription Form Settings -->
+<?php 
+
+$embed = $this -> get_option('embed'); 
+$captcha_type = $this -> get_option('captcha_type');
+$rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
+
+?>
 
 <p>
 	<?php _e('These settings will affect post/page embedded and hardcoded subscribe forms.', $this -> plugin_name); ?>
@@ -59,12 +66,6 @@
                             <tr>
                                 <th><label for="captchaN_<?php echo $language; ?>"><?php _e('Use Captcha for Form', $this -> plugin_name); ?></label></th>
                                 <td>
-                                    <?php 
-                                    
-                                    $captcha_type = $this -> get_option('captcha_type');
-                                    $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true; 
-                                    
-                                    ?>
                                     <label><input <?php if (!$rr_active) { echo 'disabled="disabled"'; } else { echo ($embed['captcha'][$language] == "Y") ? 'checked="checked"' : ''; } ?> type="radio" name="embed[captcha][<?php echo $language; ?>]" value="Y" id="captchaY_<?php echo $language; ?>" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                                     <label><input <?php if (!$rr_active) { echo 'disabled="disabled" checked="checked"'; } else { echo (empty($embed['captcha'][$language]) || $embed['captcha'][$language] == "N") ? 'checked="checked"' : ''; } ?> type="radio" name="embed[captcha][<?php echo $language; ?>]" value="N" id="captchaN_<?php echo $language; ?>" /> <?php _e('No', $this -> plugin_name); ?></label>
                                     <?php if (!$rr_active) : ?>
@@ -94,14 +95,17 @@
         <tbody>
             <tr>
                 <th><label for="<?php echo $this -> pre; ?>embed_acknowledgement"><?php _e('Acknowledgement', $this -> plugin_name); ?></label></th>
-                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_acknowledgement" name="embed[acknowledgement]" value="<?php echo $embed['acknowledgement']; ?>" /></td>
+                <td>
+                	<input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_acknowledgement" name="embed[acknowledgement]" value="<?php echo $embed['acknowledgement']; ?>" />
+                	<span class="howto"><?php _e('Acknowledgement message to show after a successful subscribe.', $this -> plugin_name); ?></span>
+                </td>
             </tr>
             <tr>
                 <th><label for="<?php echo $this -> pre; ?>embed_subscribeagain"><?php _e('Subscribe Again Link', $this -> plugin_name); ?></label></th>
                 <td>
                     <label><input id="<?php echo $this -> pre; ?>embed_subscribeagain" <?php echo (empty($embed['subscribeagain']) || $embed['subscribeagain'] == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="embed[subscribeagain]" value="Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                     <label><input <?php echo (!empty($embed['subscribeagain']) && $embed['subscribeagain'] == "N") ? 'checked="checked"' : ''; ?> type="radio" name="embed[subscribeagain]" value="N" /> <?php _e('No', $this -> plugin_name); ?></label>
-                    <span class="howto"><?php _e('display a "subscribe again" link on success. useful for forms with multiple mailing lists.', $this -> plugin_name); ?></span>
+                    <span class="howto"><?php _e('Display a "subscribe again" link on success. useful for forms with multiple mailing lists.', $this -> plugin_name); ?></span>
                 </td>
             </tr>
             <tr>
@@ -120,20 +124,15 @@
                 <td>
                     <label><input <?php echo ($embed['scroll'] == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="embed[scroll]" value="Y" id="embed_scrollY" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                     <label><input <?php echo ($embed['scroll'] == "N") ? 'checked="checked"' : ''; ?> type="radio" name="embed[scroll]" value="N" id="embed_scrollN" /> <?php _e('No', $this -> plugin_name); ?></label>
-                    <span class="howto"><?php _e('should the page scroll to focus on the subscription form?', $this -> plugin_name); ?></span>
+                    <span class="howto"><?php _e('Should the page scroll to focus on the subscription form?', $this -> plugin_name); ?></span>
                 </td>
             </tr>
             <tr>
                 <th><label for="captchaN"><?php _e('Use Captcha for Form', $this -> plugin_name); ?></label></th>
                 <td>
-                    <?php $rr_active = (is_plugin_active(plugin_basename('really-simple-captcha/really-simple-captcha.php'))) ? true : false; ?>
                     <label><input <?php if (!$rr_active) { echo 'disabled="disabled"'; } else { echo ($embed['captcha'] == "Y") ? 'checked="checked"' : ''; } ?> type="radio" name="embed[captcha]" value="Y" id="captchaY" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                     <label><input <?php if (!$rr_active) { echo 'disabled="disabled" checked="checked"'; } else { echo ($embed['captcha'] == "N") ? 'checked="checked"' : ''; } ?> type="radio" name="embed[captcha]" value="N" id="captchaN" /> <?php _e('No', $this -> plugin_name); ?></label>
-                    <?php if (!$rr_active) : ?>
-                        <br/><span style="color:red;"><?php _e('you need to install and activate the <a target="_blank" href="http://wordpress.org/extend/plugins/really-simple-captcha/">Really Simple Captcha plugin</a>.', $this -> plugin_name); ?></span>
-                        <input type="hidden" name="captcha" value="N" />
-                    <?php endif; ?>
-                    <span class="howto"><?php _e('requires captcha image input upon subscribing.', $this -> plugin_name); ?></span>
+                    <span class="howto"><?php _e('Requires captcha image input upon subscribing.', $this -> plugin_name); ?></span>
                 </td>
             </tr>
         </tbody>

@@ -94,6 +94,6 @@
 		</tbody>
 	</table>
 	
-	<h3 id="subscribers"><?php _e('Subscribers', $this -> plugin_name); ?> <?php echo $Html -> link(__('Add New', $this -> plugin_name), '?page=' . $this -> sections -> subscribers . '&amp;method=save&amp;mailinglist_id=' . $mailinglist -> id, array('class' => "button add-new-h2")); ?></h3>	
+	<h3 id="subscribers"><?php _e('Subscribers', $this -> plugin_name); ?> <?php echo $Html -> link(__('Add New', $this -> plugin_name), '?page=' . $this -> sections -> subscribers . '&amp;method=save&amp;mailinglist_id=' . $mailinglist -> id, array('class' => "add-new-h2")); ?></h3>	
 	<?php $this -> render_admin('subscribers' . DS . 'loop', array('subscribers' => $subscribers, 'paginate' => $paginate)); ?>
 </div>

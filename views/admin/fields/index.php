@@ -1,5 +1,5 @@
 <div class="wrap">
-	<h2><?php _e('Manage Custom Fields', $this -> name); ?> <a class="add-new-h2 button" href="?page=<?php echo $this -> sections -> fields; ?>&amp;method=save" title="<?php _e('Create a new custom field', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>	
+	<h2><?php _e('Manage Custom Fields', $this -> name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> fields; ?>&amp;method=save" title="<?php _e('Create a new custom field', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>	
 	<?php if (!empty($fields)) : ?>
 		<form id="posts-filter" action="?page=<?php echo $this -> sections -> fields; ?>" method="post">
 			<ul class="subsubsub">

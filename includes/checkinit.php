@@ -123,6 +123,8 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_addcontentarea', array($this, 'ajax_addcontentarea'));
+				add_action('wp_ajax_newsletters_deletecontentarea', array($this, 'ajax_deletecontentarea'));
 				add_action('wp_ajax_subscribercount', array($this, 'ajax_subscribercount'));
 				add_action('wp_ajax_subscribercountdisplay', array($this, 'ajax_subscribercountdisplay'));
 				add_action('wp_ajax_wpmltestsettings', array($this, 'ajax_testsettings'));

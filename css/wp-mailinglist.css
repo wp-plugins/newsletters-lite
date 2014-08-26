@@ -108,9 +108,15 @@
 
 /* WORDPRESS ADMIN BEGIN */
 
+table.mceLayout {
+	border: 1px #f1f1f1 solid !important;
+}
+
 img.newsletters_gravatar {
-	box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-	border-radius: 3px;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+	-webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+	-moz-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+	/*border-radius: 3px;*/
 	border: none;
 	width: 45px;
 }
@@ -177,14 +183,6 @@ table tbody tr.arow {
 	display: block;
 }
 
-.wpml .submitbox span#timestamp {
-	padding-left: 24px !important;
-}
-
-.wpml .submitbox #timestampdiv {
-	margin: 0 0 0 24px !important;
-}
-
 .wpml table.queuetable {
 	border: none;
 }
@@ -195,6 +193,12 @@ table tbody tr.arow {
 
 .wpml .tablenav-pages .page-numbers {
 	margin: 0 2px 0 0;
+}
+
+.wpml .tablenav-pages span.current {
+	padding: 0px 10px 2px;
+	font-size: 16px;
+	font-weight: 400;
 }
 
 .wpml table.form-table th {
@@ -228,19 +232,16 @@ table tbody tr.arow {
 	background-image: url('../images/icons/question.png');
 	background-repeat: no-repeat;
 	display: inline-block;
-	text-indent: 9999px;
+	text-indent: -9999px;
 	text-decoration: none;
 	line-height: 16px;
 	margin: 0 6px 0 0;
 }
 
 .wpml .extensionicon {
-	box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-	-webkit-box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-	-moz-box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+	-webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+	-moz-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
 }
 
 .wpml #farbtastic {
@@ -396,15 +397,16 @@ ul#wpmlsubmenu a.current {
 
 .wpml .scroll-list {
 	white-space: nowrap;
-	overflow:auto; 
+	overflow: auto;
 	max-height:200px; 
 	width:auto; 
-	border:1px #CCCCCC solid; 
-	border-radius:4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	background: #FFFFFF;
-	padding: 5px;
+	/*border:1px #CCCCCC solid;*/
+	background: #f1f1f1;
+	/*padding: 5px;*/
+}
+
+.wpml .postbox .scroll-list {
+	background: #FFFFFF !important;
 }
 
 #aa,#jj,#hh,#mn{padding:1px;font-size:12px;}

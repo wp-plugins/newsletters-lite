@@ -82,8 +82,8 @@ class wpmlEmail extends wpMailPlugin {
 		extract($r, EXTR_SKIP);
 		
 		if (!empty($data)) {
-			if (empty($subscriber_id)) { $this -> errors['subscriber_id'] = __('No subscriber was specified', $this -> plugin_name); }
-			if (empty($mailinglist_id)) { $this -> errors['mailinglist_id'] = __('No mailing list was specified', $this -> plugin_name); }
+			if (empty($subscriber_id) && empty($user_id)) { $this -> errors['subscriber_id'] = __('No subscriber was specified', $this -> plugin_name); }
+			//if (empty($mailinglist_id)) { $this -> errors['mailinglist_id'] = __('No mailing list was specified', $this -> plugin_name); }
 			if (empty($eunique)) { $this -> errors['eunique'] = __('No unique ID was specified', $this -> plugin_name); }
 			if (empty($history_id)) { $this -> errors['history_id'] = __('No history item was specified', $this -> plugin_name); }
 		} else {

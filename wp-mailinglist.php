@@ -1463,7 +1463,8 @@ if (!class_exists('wpMail')) {
 									$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => false, 'user' => $user, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id), false, 'html', true, $email -> theme_id);
 									
 									if ($this -> execute_mail(false, $user, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
-										
+										$Queue -> delete($email -> id);
+										$emailssent++;
 									} else {
 										global $mailerrors;
 										$Db -> model = $Queue -> model;
@@ -1758,8 +1759,8 @@ if (!class_exists('wpMail')) {
 		function admin_menu() {
 			global $Queue, $queue_count;
 			$queue_count = ($Queue -> count()) ? $Queue -> count() : '';
-			$queue_count_icon = '<span class="update-plugins count-1"><span class="update-count">' . $queue_count . '</span></span>';
-			$update_icon = ($this -> has_update()) ? '<span class="update-plugins count-1"><span class="update-count">1</span></span>' : '';
+			$queue_count_icon = ' <span class="update-plugins count-1"><span class="update-count">' . $queue_count . '</span></span>';
+			$update_icon = ($this -> has_update()) ? ' <span class="update-plugins count-1"><span class="update-count">1</span></span>' : '';
 			
 			$this -> check_roles();
 		
@@ -2423,7 +2424,7 @@ if (!class_exists('wpMail')) {
 									}
 								}
 							/* Save email as draft */
-							} elseif (!empty($_POST['draft'])) {												
+							} elseif (!empty($_POST['draft'])) {																			
 								$history_data = array(
 									'from'				=>	$_POST['from'],
 									'fromname'			=>	$_POST['fromname'],
@@ -2470,7 +2471,22 @@ if (!class_exists('wpMail')) {
 									}
 								}
 								
-								if ($History -> save($history_data, false)) {								
+								if ($History -> save($history_data, false)) {
+								
+									if (!empty($_POST['contentarea'])) {
+										$history_id = $History -> insertid;
+										
+										foreach ($_POST['contentarea'] as $number => $content) {
+											$content_data = array(
+												'number'			=>	$number,
+												'history_id'		=>	$history_id,
+												'content'			=>	$content,
+											);
+										
+											$this -> Content -> save($content_data, true);
+										}
+									}
+																
 									$message = __('Draft has been successfully saved. It has been saved to your email history.', $this -> plugin_name);
 									$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $History -> insertid, 'message', $message);
 								} else {

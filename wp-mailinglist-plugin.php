@@ -70,7 +70,7 @@ if (!class_exists('wpMailPlugin')) {
 			'wpmlGroup',
 		);
 		
-		var $models = array('Link', 'Click');
+		var $models = array('Link', 'Click', 'Content');
 		
 		var $helpers = array('Checkinit', 'Db', 'Html', 'Form', 'Metabox', 'Shortcode', 'Auth');	
 		var $tables = array();
@@ -736,7 +736,7 @@ if (!class_exists('wpMailPlugin')) {
 					$g -> set_y_max($Html -> RoundUptoNearestN($y_max));
 					$g -> set_y_right_max($Html -> RoundUptoNearestN($y_right_max));
 					$g -> y_label_steps(5);
-					$g -> set_inner_background('#f5f5f5', '#CBD7E6', 90);
+					$g -> set_inner_background('#FFFFFF', '#FFFFFF', 90);
 					$g -> x_axis_colour('#333333', '#E4F5FC');
 					$g -> y_axis_colour('#333333', '#E4F5FC');
 					$g -> y_right_axis_colour('#333333', '#E4F5FC');
@@ -745,7 +745,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					$g -> set_is_decimal_separator_comma(false);
 					$g -> set_is_thousand_separator_disabled(true);
-					$g -> bg_colour = "#f5f5f5";
+					$g -> bg_colour = "#FFFFFF";
 					echo $g -> render();
 					break;
 			}
@@ -1187,6 +1187,44 @@ if (!class_exists('wpMailPlugin')) {
 	        $pop3 -> quit();	        
 	        $this -> render('testbouncesettings', array('success' => $success, 'message' => $message, 'error' => $error), true, 'admin');
 		
+			exit();
+			die();
+		}
+		
+		function ajax_deletecontentarea() {
+			
+			if (!empty($_POST['number']) && !empty($_POST['history_id'])) {
+				$this -> Content -> delete_all(array('number' => $_POST['number'], 'history_id' => $_POST['history_id']));
+			}
+			
+			exit();
+			die();
+		}
+		
+		function ajax_addcontentarea() {		
+			?>
+			
+			<div class="postbox">
+				<h3 class="hndle"><span><?php echo sprintf(__('Content Area %s', $this -> plugin_name), $_POST['contentarea']); ?></span></h3>
+				<div class="inside">
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	false,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'contentarea[' . $_POST['contentarea'] . ']',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(false, 'contentarea' . $_POST['contentarea'], $settings); 
+					
+					?>
+				</div>
+			</div>
+			
+			<?php
+			
 			exit();
 			die();
 		}
@@ -1926,93 +1964,115 @@ if (!class_exists('wpMailPlugin')) {
 					$error = false;
 					$success = false;
 					$deleted = false;
+					$userfile = false;
 					
-					if (!empty($data[$this -> pre . 'subscriber_id'])) {
+					if (!empty($data[$this -> pre . 'subscriber_id']) || !empty($data['user_id'])) {
 						if (($mailinglists = explode(",", $data[$this -> pre . 'mailinglist_id'])) !== false) {
 							//do nothing, it's good...
 						} else {
 							$mailinglists = false;
 						}
 					
-						$subscriber_query = "SELECT * FROM " . $wpdb -> prefix . $Subscriber -> table . " WHERE id = '" . $data[$this -> pre . 'subscriber_id'] . "'";
-								
-						if ($subscriber = $wpdb -> get_row($subscriber_query)) {
-							/* Management Auth */
-							if (empty($data['cookieauth'])) {
-								$Auth -> set_emailcookie($subscriber -> email);
-								$subscriberauth = $Auth -> gen_subscriberauth();
-								$Db -> model = $Subscriber -> model;
-								$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
-								$Auth -> set_cookie($subscriberauth);
-							}
-						
-							$subscriber -> mailinglists = $mailinglists;
+						if (!empty($data[$this -> pre . 'subscriber_id'])) {
+							$subscriber_query = "SELECT * FROM " . $wpdb -> prefix . $Subscriber -> table . " WHERE id = '" . $data[$this -> pre . 'subscriber_id'] . "'";
+									
+							if ($subscriber = $wpdb -> get_row($subscriber_query)) {
+								/* Management Auth */
+								if (empty($data['cookieauth'])) {
+									$Auth -> set_emailcookie($subscriber -> email);
+									$subscriberauth = $Auth -> gen_subscriberauth();
+									$Db -> model = $Subscriber -> model;
+									$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
+									$Auth -> set_cookie($subscriberauth);
+								}
 							
-							if (empty($subscriber -> mailinglists)) {
-								$errors[] = __('This email was not sent to any lists.', $this -> plugin_name);
+								$subscriber -> mailinglists = $mailinglists;
+								
+								if (empty($subscriber -> mailinglists)) {
+									$errors[] = __('This email was not sent to any lists.', $this -> plugin_name);
+								}
+							} else {
+								$errors[] = __('Your subscriber record cannot be read, please try again.', $this -> plugin_name);
+							}	
+						} elseif (!empty($data['user_id'])) {
+							if ($user = $this -> userdata($data['user_id'])) {
+								// all good
+								$userfile = "-user";
+							} else {
+								$errors[] = __('User cannot be read', $this -> plugin_name);
 							}
 						} else {
-							$errors[] = __('Your subscriber record cannot be read, please try again.', $this -> plugin_name);
-						}	
+							$errors[] = __('No subscriber or user was specified', $this -> plugin_name);
+						}
 					} else {
 						$errors[] = __('No subscriber ID was specified, please try again.', $this -> plugin_name);
 					}
 					
-					if (!empty($data['confirm']) || $this -> get_option('unsubscribeconfirmation') == "N") {
-						if ($this -> get_option('unsubscribeconfirmation') == "N") {
-							$data['unsubscribelists'] = $mailinglists;
-						}
-					
-						if (!empty($data['unsubscribelists'])) {										
-							foreach ($data['unsubscribelists'] as $unsubscribelist_id) {
-								$Db -> model = $Mailinglist -> model;
-								$mailinglist = $Db -> find(array('id' => $unsubscribelist_id));
-								$subscriber -> mailinglist_id = $unsubscribelist_id;
-								$this -> admin_unsubscription_notification($subscriber, $mailinglist);
-								
-								if (!empty($subscriber -> id) && !empty($unsubscribelist_id)) {
-									$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $unsubscribelist_id));
-									$Db -> model = $Queue -> model;
-									$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'mailinglist_id' => $unsubscribelist_id));
-									$Db -> model = $Autoresponderemail -> model;
-									$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $unsubscribelist_id));
-									
-									$Db -> model = $Unsubscribe -> model;
-									$unsubscribe_data = array('email' => $subscriber -> email, 'mailinglist_id' => $unsubscribelist_id, 'history_id' => $data[$this -> pre . 'history_id'], 'comments' => $data[$this -> pre . 'comments']);
-									$Db -> save($unsubscribe_data, true);
-								}
+					if (!empty($data['confirm']) || $this -> get_option('unsubscribeconfirmation') == "N") {					
+						if (!empty($data[$this -> pre . 'subscriber_id'])) {
+							if ($this -> get_option('unsubscribeconfirmation') == "N") {
+								$data['unsubscribelists'] = $mailinglists;
 							}
-												
-							if ($this -> get_option('unsubscriberemoveallsubscriptions') == "Y") {
-								$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists							
-								foreach ($subscribedlists as $subscribedlist_id) {
-									if (!empty($subscriber -> id) && !empty($subscribedlist_id)) {
-										$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $subscribedlist_id));
+						
+							if (!empty($data['unsubscribelists'])) {										
+								foreach ($data['unsubscribelists'] as $unsubscribelist_id) {
+									$Db -> model = $Mailinglist -> model;
+									$mailinglist = $Db -> find(array('id' => $unsubscribelist_id));
+									$subscriber -> mailinglist_id = $unsubscribelist_id;
+									$this -> admin_unsubscription_notification($subscriber, $mailinglist);
+									
+									if (!empty($subscriber -> id) && !empty($unsubscribelist_id)) {
+										$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $unsubscribelist_id));
 										$Db -> model = $Queue -> model;
-										$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'mailinglist_id' => $subscribedlist_id));
+										$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'mailinglist_id' => $unsubscribelist_id));
+										$Db -> model = $Autoresponderemail -> model;
+										$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $unsubscribelist_id));
+										
+										$Db -> model = $Unsubscribe -> model;
+										$unsubscribe_data = array('email' => $subscriber -> email, 'mailinglist_id' => $unsubscribelist_id, 'history_id' => $data[$this -> pre . 'history_id'], 'comments' => $data[$this -> pre . 'comments']);
+										$Db -> save($unsubscribe_data, true);
 									}
 								}
-							}
-							
-							//Should the subscriber be deleted?
-							if ($this -> get_option('unsubscribedelete') == "Y") {											
-								$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists		
-								if (empty($subscribedlists) || !is_array($subscribedlists) || count($subscribedlists) <= 0) {							
-									$Db -> model = $Subscriber -> model;
-									$Db -> delete($subscriber -> id);
-									$deleted = true;
+													
+								if ($this -> get_option('unsubscriberemoveallsubscriptions') == "Y") {
+									$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists							
+									foreach ($subscribedlists as $subscribedlist_id) {
+										if (!empty($subscriber -> id) && !empty($subscribedlist_id)) {
+											$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $subscribedlist_id));
+											$Db -> model = $Queue -> model;
+											$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'mailinglist_id' => $subscribedlist_id));
+										}
+									}
 								}
+								
+								//Should the subscriber be deleted?
+								if ($this -> get_option('unsubscribedelete') == "Y") {											
+									$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists		
+									if (empty($subscribedlists) || !is_array($subscribedlists) || count($subscribedlists) <= 0) {							
+										$Db -> model = $Subscriber -> model;
+										$Db -> delete($subscriber -> id);
+										$deleted = true;
+									}
+								}
+								
+								//$this -> admin_unsubscription_notification($subscriber, $unsubscribelists);						
+								$success = true;
+							} else {
+								$errors[] = __('You did not select any list(s) to unsubscribe from.', $this -> plugin_name); 
+								$success = false;
 							}
-							
-							//$this -> admin_unsubscription_notification($subscriber, $unsubscribelists);						
+						} elseif (!empty($data['user_id'])) {
+							$Db -> model = $Unsubscribe -> model;
+							$unsubscribe_data = array('user_id' => $user -> ID, 'email' => $user -> user_email, 'mailinglist_id' => false, 'history_id' => $data[$this -> pre . 'history_id'], 'comments' => $data[$this -> pre . 'comments']);
+							$Db -> save($unsubscribe_data, true);
 							$success = true;
+							$errors = false;
 						} else {
-							$errors[] = __('You did not select any list(s) to unsubscribe from.', $this -> plugin_name); 
-							$success = false;
+							$errors[] = __('No subscriber or user was specified', $this -> plugin_name);
 						}
 					}
 				
-					$this -> render('unsubscribe', array('subscriber' => $subscriber, 'data' => $data, 'errors' => $errors, 'success' => $success, 'deleted' => $deleted), true, 'default');
+					$this -> render('unsubscribe' . $userfile, array('subscriber' => $subscriber, 'user' => $user, 'data' => $data, 'errors' => $errors, 'success' => $success, 'deleted' => $deleted), true, 'default');
 					break;
 				case 'logout'				:
 					$subscriberemailauth = $Auth -> read_emailcookie();
@@ -2304,6 +2364,10 @@ if (!class_exists('wpMailPlugin')) {
 							
 							//editor
 							wp_enqueue_script('editor', false, false, false, true);
+							wp_enqueue_script('quicktags', false, false, false, true);
+							wp_enqueue_script('wplink', false, false, false, true);
+							wp_enqueue_script('wpdialogs-popup', false, false, false, true);
+							wp_enqueue_style('wp-jquery-ui-dialog', false, false, false, true);
 							wp_enqueue_script('word-count', false, false, false, true);
 							wp_enqueue_script('media-upload', false, false, false, true);
 							wp_admin_css();
@@ -3221,12 +3285,14 @@ if (!class_exists('wpMailPlugin')) {
 			return true;
 		}
 		
-		function gen_unsubscribe_link($subscriber = array(), $theme_id = null, $history_id = null, $alllists = false, $urlonly = false) {
+		function gen_unsubscribe_link($subscriber = null, $user = null, $theme_id = null, $history_id = null, $alllists = false, $urlonly = false) {
 			global $Html, $Subscriber;
 		
-			if (!empty($subscriber)) {
+			if (!empty($subscriber) || !empty($user)) {
 				$linktext = __($this -> get_option('unsubscribetext'));
-				$authkey = $this -> gen_auth($subscriber -> id, $subscriber -> mailinglist_id);
+				$auth_id = (empty($subscriber)) ? $user -> ID : $subscriber -> id;
+				$auth_string = (empty($subscriber)) ? $user -> roles[0] : $subscriber -> mailinglist_id;
+				$authkey = $this -> gen_auth($auth_id, $auth_string);
 				
 				if (!empty($theme_id)) {
 					global $wpdb, $Theme, ${'newsletters_acolor'};
@@ -3242,22 +3308,27 @@ if (!class_exists('wpMailPlugin')) {
 					$style = "color:" . $acolor . ";";
 				}
 				
-				$mailinglists = "";
-				if (!empty($alllists) && $alllists == true) {				
-					$slists = $Subscriber -> mailinglists($subscriber -> id);
-					$mailinglists = implode(",", $slists);
-					$linktext = __($this -> get_option('unsubscribealltext'));
-				} else {				
-					$slists = maybe_unserialize($subscriber -> mailinglists);
-					
-					if (!empty($slists)) {
+				if (!empty($subscriber)) {
+					$mailinglists = "";
+					if (!empty($alllists) && $alllists == true) {				
+						$slists = $Subscriber -> mailinglists($subscriber -> id);
 						$mailinglists = implode(",", $slists);
-					} else {
-						$mailinglists = $subscriber -> mailinglist_id;
+						$linktext = __($this -> get_option('unsubscribealltext'));
+					} else {				
+						$slists = maybe_unserialize($subscriber -> mailinglists);
+						
+						if (!empty($slists)) {
+							$mailinglists = implode(",", $slists);
+						} else {
+							$mailinglists = $subscriber -> mailinglist_id;
+						}
 					}
+					
+					$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&' . $this -> pre . 'subscriber_id=' . $subscriber -> id . '&' . $this -> pre . 'subscriber_email=' . $subscriber -> email . '&' . $this -> pre . 'mailinglist_id=' . $mailinglists . '&authkey=' . $authkey;
+				} elseif (!empty($user)) {
+					$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&user_id=' . $user -> ID . '&user_email=' . $user -> user_email . '&authkey=' . $authkey;
 				}
-				
-				$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&' . $this -> pre . 'subscriber_id=' . $subscriber -> id . '&' . $this -> pre . 'subscriber_email=' . $subscriber -> email . '&' . $this -> pre . 'mailinglist_id=' . $mailinglists . '&authkey=' . $authkey;
+					
 				$url = $Html -> retainquery($querystring, $this -> get_managementpost(true));
 				
 				if ((!empty($urlonly) && $urlonly == true) || empty($subscriber -> format) || $subscriber -> format == "html") {
@@ -3314,14 +3385,21 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function gen_online_link($subscriber = array(), $history_id = null, $onlyurl = false, $theme_id = null) {	
+		function gen_online_link($subscriber = null, $user = null, $history_id = null, $onlyurl = false, $theme_id = null) {	
 			if (!empty($history_id)) {
-				global $Db, $History;
+				global $Db, $Html, $History;
 				$Db -> model = $History -> model;
 				
 				if ($email = $Db -> find(array('id' => $history_id))) {
-					$authkey = $this -> gen_auth($subscriber -> id);
-					$url = home_url() . '/?' . $this -> pre . 'method=newsletter&id=' . $email -> id . '&mailinglist_id=' . $subscriber -> mailinglist_id . '&subscriber_id=' . $subscriber -> id . '&authkey=' . $authkey;
+					$auth_id = (empty($subscriber)) ? $user -> ID : $subscriber -> id;
+					$authkey = $this -> gen_auth($auth_id);
+					
+					if (!empty($subscriber)) {
+						$url = home_url() . '/?' . $this -> pre . 'method=newsletter&id=' . $email -> id . '&mailinglist_id=' . $subscriber -> mailinglist_id . '&subscriber_id=' . $subscriber -> id . '&authkey=' . $authkey;
+					} else {
+						$querystring = $this -> pre . 'method=newsletter&id=' . $email -> id . '&user_id=' . $user -> ID . '&authkey=' . $authkey;
+						$url = $Html -> retainquery($querystring, home_url());
+					}
 					
 					if (!empty($theme_id)) {
 						global $wpdb, $Theme, ${'newsletters_acolor'};
@@ -3444,6 +3522,23 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
+		function gen_role_names($user = null) {
+			$role_names = "";
+			
+			if (!empty($user -> roles) && is_array($user -> roles)) {
+				global $wp_roles;
+				$role_names = array();
+				
+				foreach ($user -> roles as $role_key) {
+					$role_names[] = $wp_roles -> role_names[$role_key];
+				}
+				
+				$role_names = implode(", ", $role_names);
+			}
+			
+			return $role_names;
+		}
+		
 		function gen_mailinglist_names($subscriber = null) {
 			global $wpdb, $Mailinglist;
 			$mailinglist_names = "";
@@ -3523,14 +3618,14 @@ if (!class_exists('wpMailPlugin')) {
 					$newreplace = array(
 						$subscriber -> email, 
 						$subscriber -> email,
-						$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, false), 
-						$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, false, true),
-						$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, true),
+						$this -> gen_unsubscribe_link($subscriber, false, $theme_id, $history_id, false), 
+						$this -> gen_unsubscribe_link($subscriber, false, $theme_id, $history_id, false, true),
+						$this -> gen_unsubscribe_link($subscriber, false, $theme_id, $history_id, true),
 						get_bloginfo('name'), 
 						home_url(), 
 						$this -> gen_activation_link($subscriber, $theme_id), 
 						$this -> gen_manage_link($subscriber, $theme_id), 
-						$this -> gen_online_link($subscriber, $history_id, false, $theme_id), 
+						$this -> gen_online_link($subscriber, false, $history_id, false, $theme_id), 
 						$this -> gen_tracking_link($eunique), 
 						$this -> gen_mailinglist_names($subscriber),
 						stripslashes($subject),
@@ -3595,7 +3690,66 @@ if (!class_exists('wpMailPlugin')) {
 					$subject = preg_replace($newsearch, $newreplace, stripslashes($subject));
 					$message = preg_replace($newsearch, $newreplace, stripslashes($message));
 				} elseif (!empty($user)) {
-				
+					if (!empty($history_id)) {
+						$Db -> model = $History -> model;
+						$subject = $Db -> field('subject', array('id' => $history_id));
+						
+						$Db -> model = $History -> model;
+						$post_id = $Db -> field('post_id', array('id' => $history_id));
+						if (!empty($post_id) && $getpost = get_post($post_id)) {
+							global $post;
+							$post = $getpost;
+						}
+						
+						$themeidquery = "SELECT `theme_id` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
+						$theme_id = $wpdb -> get_var($themeidquery);
+					} else {
+						$themeidquery = "SELECT `id` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `def` = 'Y' LIMIT 1";
+						$theme_id = $wpdb -> get_var($themeidquery);
+					}
+					
+					$newsearch = array(
+						"/\[" . $this -> pre . "email\]/", 
+						'/\[' . $this -> pre . 'field name="email"\]/',
+						"/\[" . $this -> pre . "unsubscribe\]/", 
+						"/\[" . $this -> pre . "unsubscribeurl\]/", 
+						"/\[" . $this -> pre . "unsubscribeall\]/",
+						"/\[" . $this -> pre . "blogname\]/", 
+						"/\[" . $this -> pre . "siteurl\]/", 
+						"/\[" . $this -> pre . "activate\]/", 
+						"/\[" . $this -> pre . "manage\]/", 
+						"/\[" . $this -> pre . "online\]/", 
+						"/\[" . $this -> pre . "track\]/", 
+						"/\[" . $this -> pre . "mailinglist\]/",
+						"/\[" . $this -> pre . "subject\]/",
+						"/\[" . $this -> pre . "historyid\]/",
+						"/\[" . $this -> pre . "unsubscribecomments\]/",
+						"/\[" . $this -> pre . "bouncecount\]/",
+						"/\[" . $this -> pre . "customfields\]/",
+					);
+					
+					$newreplace = array(
+						$user -> user_email, 
+						$user -> user_email,
+						$this -> gen_unsubscribe_link(false, $user, $theme_id, $history_id, false), 
+						$this -> gen_unsubscribe_link(false, $user, $theme_id, $history_id, false, true),
+						$this -> gen_unsubscribe_link(false, $user, $theme_id, $history_id, true),
+						get_bloginfo('name'), 
+						home_url(), 
+						"", 
+						get_edit_user_link($user -> ID), 
+						$this -> gen_online_link(false, $user, $history_id, false, $theme_id), 
+						$this -> gen_tracking_link($eunique), 
+						$this -> gen_role_names($user),
+						stripslashes($subject),
+						$history_id,
+						$this -> gen_unsubscribe_comments(),
+						$subscriber -> bouncecount,
+						"",
+					);
+					
+					$subject = preg_replace($newsearch, $newreplace, stripslashes($subject));
+					$message = preg_replace($newsearch, $newreplace, stripslashes($message));
 				}
 			}
 			
@@ -3830,21 +3984,6 @@ if (!class_exists('wpMailPlugin')) {
 			return (time() * rand(1,999));
 		}
 		
-		function make_bitly_url($url, $format = 'txt') {
-			if (!preg_match("/(wpmlmethod|jpg|png|gif|jpeg|bmp|wpmltrack|wpmllink)/si", $url)) {
-				if (preg_match("/^http\:\/\//si", $url) || preg_match("/^https\:\/\//si", $url)) {
-					$login = $this -> get_option('shortlinkLogin');
-					$appkey = $this -> get_option('shortlinkAPI');
-			
-					$bitly = 'http://api.bit.ly/v3/shorten?longUrl=' . urlencode($url) . '&login=' . $login . '&apiKey=' . $appkey . '&format=' . $format;
-					$bitlink = file_get_contents($bitly);			
-					return $bitlink;
-				}
-			}
-			
-			return $url;
-		}
-		
 		function phpmailer_messageid() {
 			$messageid = "<";
 			$messageid .= md5(uniqid(time()));
@@ -3878,8 +4017,6 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($attachments) && $attachments != false) {
 				$attachments = maybe_unserialize($attachments);
 			}
-			
-			$this -> debug($error);
 			
 			if (empty($error)) {
 				$Db -> model = $Email -> model;			
@@ -5351,12 +5488,26 @@ if (!class_exists('wpMailPlugin')) {
 			return $theme_id;
 		}
 		
+		function make_bitly_url($url, $format = 'txt') {		
+			if (!preg_match("/(manage\-subscriptions|loginauth|wpml|wpmlmethod|jpg|png|gif|jpeg|bmp|wpmltrack|wpmllink)/si", $url)) {			
+				if (preg_match("/^http\:\/\//si", $url) || preg_match("/^https\:\/\//si", $url)) {
+					$login = $this -> get_option('shortlinkLogin');
+					$appkey = $this -> get_option('shortlinkAPI');
+					$bitly = 'http://api.bit.ly/v3/shorten?longUrl=' . urlencode($url) . '&login=' . $login . '&apiKey=' . $appkey . '&format=' . $format;
+					$bitlink = file_get_contents($bitly);			
+					return $bitlink;
+				}
+			}
+			
+			return $url;
+		}
+		
 		function hashlink($link = null, $history_id = null, $subscriber_id = null) {
 			global $Html, $wpmlLink;
 			$hashlink = $link;
 		
 			if (!empty($link)) {			
-				if (!preg_match("/(wpml|wpmlmethod|jpg|png|gif|jpeg|bmp|wpmltrack|wpmllink)/si", $link)) {
+				if (!preg_match("/(manage\-subscriptions|loginauth|wpml|wpmlmethod|jpg|png|gif|jpeg|bmp|wpmltrack|wpmllink)/si", $link)) {
 					if (preg_match("/^http\:\/\//si", $link) || preg_match("/^https\:\/\//si", $link)) {					
 						$hash = md5($text . $link);
 						$hashlink = $Html -> retainquery($this -> pre . 'link=' . $hash . '&history_id=' . $history_id . '&subscriber_id=' . $subscriber_id, home_url());
@@ -5455,10 +5606,27 @@ if (!class_exists('wpMailPlugin')) {
 				$body = do_shortcode($body);
 				$body = str_replace("$", "&#36;", $body);
 				
-				$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';
-				if (preg_match_all($pattern, $body, $regs)) {
+				$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';				
+				if (preg_match_all($pattern, $body, $regs)) {				
+					/* Bit.ly if shortlinks are enabled */
+					if (!empty($shortlinks) && $shortlinks == true && $this -> get_option('shortlinks') == "Y") {								
+						if (!empty($regs[1])) {
+							$results = $regs[1];
+							foreach($results as $k => $v) {							
+								if (apply_filters('wpml_bitlink_loop', true, $v, $regs)) {
+									$bitlink = $this -> make_bitly_url($v);								
+									if (!empty($bitlink)) {									
+										$pattern = '/[\'"](' . preg_quote($v, '/') . ')[\'"]/si';									
+										$body = preg_replace($pattern, '"' . $bitlink . '"', $body);
+										$regs[1][$k] = $bitlink;
+									}
+								}
+							}
+						}
+					}
+				
 					/* Click Tracking */
-					if ($this -> get_option('clicktrack') == "Y") {
+					if ($this -> get_option('clicktrack') == "Y") {					
 						if (!empty($regs[1])) {
 							$results = $regs[1];
 							foreach ($results as $rkey => $result) {
@@ -5470,25 +5638,14 @@ if (!class_exists('wpMailPlugin')) {
 							}
 						}
 					}	
-					
-					/* Bit.ly if shortlinks are enabled */
-					if (!empty($shortlinks) && $shortlinks == true && $this -> get_option('shortlinks') == "Y") {
-						if (!empty($regs[1])) {
-							foreach($result as $k => $v) {
-								if (apply_filters('wpml_bitlink_loop', true, $result, $regs)) {
-									$bitlink = $this -> make_bitly_url($v);								
-									if (!empty($bitlink)) {									
-										$pattern = '/[\'"](' . preg_quote($v, '/') . ')[\'"]/si';									
-										$body = preg_replace($pattern, '"' . $bitlink . '"', $body);
-									}
-								}
-							}
-						}
-					}
 				}
 				
 				global $wpml_textmessage;
 				$wpml_textmessage = $body;
+				
+				if (!empty($history_id)) {
+					$this -> history_id = $history_id;
+				}
 				
 				if (empty($output) || $output == false) {					
 					if ($html == true) {
@@ -5503,6 +5660,10 @@ if (!class_exists('wpMailPlugin')) {
 							
 							$body = '<div class="newsletters_content">' . apply_filters($this -> pre . '_wpmlcontent_before_replace', $body) . '</div>';
 							$new_body = preg_replace("/\[wpmlcontent\]/si", $body, $theme_content);
+							
+							$pattern = "/\[(\[?)(newsletters_content)(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*+(?:\[(?!\/\2\])[^\[]*+)*+)\[\/\2\])?)(\]?)/s";
+							$new_body = preg_replace_callback($pattern, array($this, 'newsletters_content'), $new_body);
+							
 							$new_body = apply_filters($this -> pre . '_wpmlcontent_after_replace', $new_body);
 							$body = $new_body;
 						} else {
@@ -5517,6 +5678,22 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			return false;
+		}
+		
+		function newsletters_content($matches = null) {
+			$output = "";
+		
+			if (!empty($matches)) {
+				$atts = shortcode_parse_atts($matches['3']);
+				
+				if (!empty($this -> history_id) && !empty($atts['id'])) {
+					if ($contentarea = $this -> Content -> find(array('number' => $atts['id'], 'history_id' => $this -> history_id))) {
+						$output = stripslashes($contentarea -> content);
+					}
+				}
+			}
+			
+			return $output;
 		}
 		
 		function check_uploaddir() {

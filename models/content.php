@@ -1,23 +1,23 @@
 <?php
 
-if (!class_exists('wpmlClick')) {
-	class wpmlClick extends wpmlDbHelper {
+if (!class_exists('wpmlContent')) {
+	class wpmlContent extends wpmlDbHelper {
 	
-		var $model = 'Click';
-		var $controller = 'clicks';
+		var $model = 'Content';
+		var $controller = 'contents';
+		var $errors = array();
 		
 		var $tv_fields = array(
 			'id'					=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
-			'link_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+			'number'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 			'history_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
-			'user_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
-			'subscriber_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+			'content'				=>	array("TEXT", "NOT NULL"),
 			'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 			'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 			'key'					=>	"PRIMARY KEY (`id`)"
 		);
 		
-		function wpmlClick($data = null) {
+		function wpmlContent($data = null) {
 			$this -> table = $this -> pre . $this -> controller;
 			
 			foreach ($this -> tv_fields as $field => $attributes) {
@@ -25,6 +25,12 @@ if (!class_exists('wpmlClick')) {
 					$this -> fields[$field] = implode(" ", $attributes);
 				} else {
 					$this -> fields[$field] = $attributes;
+				}
+			}
+			
+			if (!empty($data)) {
+				foreach ($data as $dkey => $dval) {
+					$this -> {$dkey} = stripslashes_deep($dval);
 				}
 			}
 			return;
@@ -38,6 +44,7 @@ if (!class_exists('wpmlClick')) {
 				'modified'			=>	$Html -> gen_date(),
 			);
 			
+			$defaults = apply_filters('newsletters_content_defaults', $defaults);
 			return $defaults;
 		}
 		
@@ -50,11 +57,20 @@ if (!class_exists('wpmlClick')) {
 			extract($r, EXTR_SKIP);
 			
 			if (!empty($data)) {
-				if (empty($link_id)) { $this -> errors['link_id'] = __('Please specify a link', $this -> plugin_name); }
+				if (empty($number)) { $this -> errors['number'] = __('Please specify a number', $this -> plugin_name); }
+				if (empty($history_id)) { $this -> errors['history_id'] = __('Please specify a history email', $this -> plugin_name); }
+				if (empty($content)) { $this -> errors['content'] = __('Please specify content', $this -> plugin_name); }
 			} else {
 				$this -> errors[] = __('No data was provided', $this -> plugin_name);
 			}
 			
+			if (empty($this -> errors)) {
+				if ($contentarea = $this -> find(array('number' => $number, 'history_id' => $history_id), null, null, false)) {
+					$this -> data -> id = $contentarea -> id;
+				}
+			}
+			
+			$this -> errors = apply_filters('newsletters_content_validation', $this -> errors, $data);
 			return $this -> errors;
 		}
 	}

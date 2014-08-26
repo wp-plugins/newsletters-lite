@@ -1,4 +1,4 @@
-<?php $update_icon = ($this -> has_update()) ? ' <span class="update-plugins count-1"><span class="update-count">1</span></span>' : ''; ?>
+<?php /*<?php $update_icon = ($this -> has_update()) ? ' <span class="update-plugins count-1"><span class="update-count">1</span></span>' : ''; ?>
 <div class="tribulant_plugin_tabs">
 	<ul>
         <li <?php echo (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> settings) ? 'class="active"' : ''; ?>><span class="border-left"></span><a href="?page=<?php echo $this -> sections -> settings; ?>"><?php _e('General', $this -> plugin_name); ?></a><span class="border-right"></span></li>
@@ -8,4 +8,4 @@
         <li <?php echo (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> settings_tasks) ? 'class="active"' : ''; ?>><span class="border-left"></span><a href="?page=<?php echo $this -> sections -> settings_tasks; ?>"><?php _e('Scheduled Tasks', $this -> plugin_name); ?></a><span class="border-right"></span></li>
         <li <?php echo (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> settings_updates) ? 'class="active"' : ''; ?>><span class="border-left"></span><a href="?page=<?php echo $this -> sections -> settings_updates; ?>"><?php _e('Updates', $this -> plugin_name); ?><?php echo $update_icon; ?></a><span class="border-right"></span></li>
     </ul>
-</div>
+</div>*/ ?>

@@ -194,13 +194,11 @@ class Newsletters_Widget extends WP_Widget {
 						<input type="text" name="<?php echo $this -> get_field_name('acknowledgement'); ?>" value="<?php echo esc_attr(stripslashes($instance['acknowledgement'])); ?>" id="<?php echo $this -> get_field_id('acknowledgement'); ?>" class="widefat" />
 					</p>
 					<p>
+						<?php $captcha_type = $wpMail -> get_option('captcha_type'); ?>
 						<label for="<?php echo $this -> get_field_id('captcha'); ?>-N"><?php _e('Security Captcha:', $wpMail -> plugin_name); ?></label>
-						<label><input <?php echo (!$wpMail -> is_plugin_active('captcha')) ? 'disabled="disabled"' : ''; ?> <?php echo ($wpMail -> is_plugin_active('captcha') && $instance['captcha'] == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> get_field_name('captcha'); ?>" value="Y" id="<?php echo $this -> get_field_id('captcha'); ?>-Y" /> <?php _e('On', $wpMail -> plugin_name); ?></label>
-						<label><input <?php echo (!$wpMail -> is_plugin_active('captcha')) ? 'disabled="disabled"' : ''; ?> <?php echo (!$wpMail -> is_plugin_active('captcha') || $instance['captcha'] == "N") ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> get_field_name('captcha'); ?>" value="N" id="<?php echo $this -> get_field_id('captcha'); ?>-N" /> <?php _e('Off', $wpMail -> plugin_name); ?></label>
-						<?php echo $Html -> help(__('Display a security captcha image on the subscribe form to prevent spam submissions. It is simply a "human" check to stop bots from subscribing. The security captcha requires the <a href="http://wordpress.org/plugins/really-simple-captcha/" target="_blank">Really Simple Captcha</a> plugin in order to work.', $wpMail -> plugin_name)); ?>
-						<?php if (!$wpMail -> is_plugin_active('captcha')) : ?>
-							<br/><small style="color:#CC0000;"><?php _e('The <a href="http://wordpress.org/plugins/really-simple-captcha/" target="_blank">Really Simple Captcha</a> plugin is required in order to use the security captcha feature in subscribe forms.', $wpMail -> plugin_name); ?></small>
-						<?php endif; ?>
+						<label><input <?php echo (empty($captcha_type) || $captcha_type == "none") ? 'disabled="disabled"' : ''; ?> <?php echo (!empty($captcha_type) && $instance['captcha'] == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> get_field_name('captcha'); ?>" value="Y" id="<?php echo $this -> get_field_id('captcha'); ?>-Y" /> <?php _e('On', $wpMail -> plugin_name); ?></label>
+						<label><input <?php echo (empty($captcha_type) || $captcha_type == "none") ? 'disabled="disabled"' : ''; ?> <?php echo (empty($captcha_type) || $captcha_type == "none" || $instance['captcha'] == "N") ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> get_field_name('captcha'); ?>" value="N" id="<?php echo $this -> get_field_id('captcha'); ?>-N" /> <?php _e('Off', $wpMail -> plugin_name); ?></label>
+						<?php echo $Html -> help(__('Display a security captcha image on the subscribe form to prevent spam submissions.', $wpMail -> plugin_name)); ?>
 					</p>
 					<p>
 						<label for="<?php echo $this -> get_field_id('ajax'); ?>-Y"><?php _e('Ajax Features:', $wpMail -> plugin_name); ?></label>

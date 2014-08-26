@@ -1,3 +1,10 @@
+<?php
+
+$captcha_type = $this -> get_option('captcha_type');
+$rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
+
+?>
+
 <?php if ($this -> is_plugin_active('qtranslate')) : ?>
 	<?php 
 	
@@ -82,13 +89,8 @@
 	                    </p>
 	                    <p>
 	                        <?php _e('Use Captcha for form', $this -> plugin_name); ?> :<br/>
-	                        <?php $rr_active = (is_plugin_active(plugin_basename('really-simple-captcha/really-simple-captcha.php'))) ? true : false; ?>
 	                        <label><input <?php if (!$rr_active) { echo 'disabled="disabled"'; } else { echo ($options[$number]['captcha'][$language] == "Y") ? 'checked="checked"' : ''; } ?> type="radio" name="<?php echo $this -> pre; ?>widget[<?php echo $number; ?>][captcha][<?php echo $language; ?>]" value="Y" id="captchaY" /> <?php _e('Yes', $this -> plugin_name); ?></label>
 	                        <label><input <?php if (!$rr_active) { echo 'disabled="disabled" checked="checked"'; } else { echo (empty($options[$number]['captcha'][$language]) || $options[$number]['captcha'][$language] == "N") ? 'checked="checked"' : ''; } ?> type="radio" name="<?php echo $this -> pre; ?>widget[<?php echo $number; ?>][captcha][<?php echo $language; ?>]" value="N" id="captchaN" /> <?php _e('No', $this -> plugin_name); ?></label>
-	                        <?php if (!$rr_active) : ?>
-	                            <br/><span style="color:red;"><small><?php _e('You need to install and activate the <a target="_blank" href="http://wordpress.org/extend/plugins/really-simple-captcha/">Really Simple Captcha plugin</a>.', $this -> plugin_name); ?></small></span>
-	                            <input type="hidden" name="captcha" value="N" />
-	                        <?php endif; ?>
 	                    </p>
 	                    <p>
 	                        <label for="<?php echo $this -> pre; ?>widget_<?php echo $number; ?>_button_<?php echo $language; ?>">
@@ -162,13 +164,8 @@
     </p>
     <p>
         <?php _e('Use Captcha for form', $this -> plugin_name); ?> :<br/>
-        <?php $rr_active = (is_plugin_active(plugin_basename('really-simple-captcha/really-simple-captcha.php'))) ? true : false; ?>
-            <label><input <?php if (!$rr_active) { echo 'disabled="disabled"'; } else { echo ($options[$number]['captcha'] == "Y") ? 'checked="checked"' : ''; } ?> type="radio" name="<?php echo $this -> pre; ?>widget[<?php echo $number; ?>][captcha]" value="Y" id="captchaY" /> <?php _e('Yes', $this -> plugin_name); ?></label>
-            <label><input <?php if (!$rr_active) { echo 'disabled="disabled" checked="checked"'; } else { echo ($options[$number]['captcha'] == "N") ? 'checked="checked"' : ''; } ?> type="radio" name="<?php echo $this -> pre; ?>widget[<?php echo $number; ?>][captcha]" value="N" id="captchaN" /> <?php _e('No', $this -> plugin_name); ?></label>
-            <?php if (!$rr_active) : ?>
-                <br/><span style="color:red;"><small><?php _e('You need to install and activate the <a target="_blank" href="http://wordpress.org/extend/plugins/really-simple-captcha/">Really Simple Captcha plugin</a>.', $this -> plugin_name); ?></small></span>
-                <input type="hidden" name="captcha" value="N" />
-            <?php endif; ?>
+        <label><input <?php if (!$rr_active) { echo 'disabled="disabled"'; } else { echo ($options[$number]['captcha'] == "Y") ? 'checked="checked"' : ''; } ?> type="radio" name="<?php echo $this -> pre; ?>widget[<?php echo $number; ?>][captcha]" value="Y" id="captchaY" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+        <label><input <?php if (!$rr_active) { echo 'disabled="disabled" checked="checked"'; } else { echo ($options[$number]['captcha'] == "N") ? 'checked="checked"' : ''; } ?> type="radio" name="<?php echo $this -> pre; ?>widget[<?php echo $number; ?>][captcha]" value="N" id="captchaN" /> <?php _e('No', $this -> plugin_name); ?></label>
     </p>
     <p>
         <label for="<?php echo $this -> pre; ?>widget_<?php echo $number; ?>_button">

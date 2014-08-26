@@ -1,3 +1,11 @@
+<!-- Unsubscribe Settings -->
+
+<?php
+
+$unsubscribeemails = $this -> get_option('unsubscribeemails');
+
+?>
+
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -144,15 +152,15 @@
 	</tbody>
 </table>
 
-<div id="adminemailonunsubscribe_div" style="display:<?php echo ($this -> get_option('adminemailonunsubscribe') == "Y") ? 'block' : 'none'; ?>;">
+<div id="adminemailonunsubscribe_div" style="display:<?php echo (!empty($adminemailonunsubscription) && $adminemailonunsubscription == "Y") ? 'block' : 'none'; ?>;">
 	<table class="form-table">
 		<tbody>
 			<tr>
 				<th><label for="unsubscribeemails_single"><?php _e('Unsubscribe Emails', $this -> plugin_name); ?></label>
 				<?php echo $Html -> help(__('When a subscriber is subscribed to multiple mailing lists and they unsubcribe and the "Admin Notification on Unsubscription" setting above is turned on, the administrator is notified via email. This setting allows you to set whether you want the administrator to receive a single email for all the unsubscribes or multiple emails (one for each mailing list).', $this -> plugin_name)); ?></th>
 				<td>
-					<label><input type="radio" name="unsubscribeemails" value="single" id="unsubscribeemails_single" /> <?php _e('Single Email', $this -> plugin_name); ?></label>
-					<label><input type="radio" name="unsubscribeemails" value="multiple" id="unsubscribeemails_multiple" /> <?php _e('Multiple Emails (One for each list)', $this -> plugin_name); ?></label>
+					<label><input <?php echo (!empty($unsubscribeemails) && $unsubscribeemails == "single") ? 'checked="checked"' : ''; ?> type="radio" name="unsubscribeemails" value="single" id="unsubscribeemails_single" /> <?php _e('Single Email', $this -> plugin_name); ?></label>
+					<label><input <?php echo (!empty($unsubscribeemails) && $unsubscribeemails == "multiple") ? 'checked="checked"' : ''; ?> type="radio" name="unsubscribeemails" value="multiple" id="unsubscribeemails_multiple" /> <?php _e('Multiple Emails (One for each list)', $this -> plugin_name); ?></label>
 					<span class="howto"><?php _e('Should the system send a single or multiple unsubscribe emails for an unsubscribe from multiple lists?', $this -> plugin_name); ?></span>
 				</td>
 			</tr>

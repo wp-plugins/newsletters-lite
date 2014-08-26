@@ -12,6 +12,10 @@
 <script type="text/javascript">
 var previewrequest = false;
 
+<?php if (!empty($_POST['ishistory'])) : ?>
+var history_id = "<?php echo $_POST['ishistory']; ?>";
+<?php endif; ?>
+
 function previewrunner() {
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 	var formvalues = jQuery('form#post').serialize();

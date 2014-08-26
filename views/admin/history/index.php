@@ -1,5 +1,5 @@
 <div class="wrap <?php echo $this -> pre; ?>">
-	<h2><?php _e('Sent &amp; Draft Emails', $this -> name); ?> <a class="button add-new-h2" href="?page=<?php echo $this -> sections -> send; ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
+	<h2><?php _e('Sent &amp; Draft Emails', $this -> name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> send; ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
 	<form id="posts-filter" method="post" action="?page=<?php echo $this -> sections -> history; ?>">
 		<?php if (!empty($histories)) : ?>
 			<ul class="subsubsub">

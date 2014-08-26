@@ -43,6 +43,6 @@
 		</tbody>
 	</table>
 	
-	<h3 id="mailinglists"><?php _e('Mailing Lists', $this -> plugin_name); ?> <?php echo $Html -> link(__('Add New', $this -> plugin_name), '?page=' . $this -> sections -> lists . '&amp;method=save&amp;group_id=' . $group -> id, array('class' => "button add-new-h2")); ?></h3>
+	<h3 id="mailinglists"><?php _e('Mailing Lists', $this -> plugin_name); ?> <?php echo $Html -> link(__('Add New', $this -> plugin_name), '?page=' . $this -> sections -> lists . '&amp;method=save&amp;group_id=' . $group -> id, array('class' => "add-new-h2")); ?></h3>
 	<?php $this -> render_admin('mailinglists' . DS . 'loop', array('mailinglists' => $mailinglists, 'paginate' => $paginate)); ?>
 </div>

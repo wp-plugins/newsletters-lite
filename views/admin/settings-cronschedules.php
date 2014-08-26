@@ -1,5 +1,5 @@
 <div class="wrap <?php echo $this -> pre; ?>">
-	<h2><?php _e('Scheduled Tasks', $this -> plugin_name); ?> <?php echo $Html -> link(__('Refresh', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks, array('class' => "button add-new-h2")); ?></h2>   
+	<h2><?php _e('Scheduled Tasks', $this -> plugin_name); ?> <?php echo $Html -> link(__('Refresh', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks, array('class' => "add-new-h2")); ?></h2>   
 	
 	<?php $this -> render('settings-navigation', false, true, 'admin'); ?>
     

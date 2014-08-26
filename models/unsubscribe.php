@@ -62,8 +62,17 @@ class wpmlUnsubscribe extends wpMailPlugin {
 		extract($r, EXTR_SKIP);
 		
 		if (!empty($data)) {
+		
+			if (!empty($user_id)) {
+				global $Db;
+				$Db -> model = $this -> model;
+				if ($Db -> find(array('user_id' => $user_id, 'history_id' => $history_id))) {
+					$this -> errors[] = __('Already exists', $this -> plugin_name);
+				}
+			}
+		
 			if (empty($email)) { $this -> errors['email'] = __('No email was specified.', $this -> plugin_name); }
-			if (empty($mailinglist_id)) { $this -> errors['mailinglist_id'] = __('No mailing list was specified.', $this -> plugin_name); }
+			//if (empty($mailinglist_id)) { $this -> errors['mailinglist_id'] = __('No mailing list was specified.', $this -> plugin_name); }
 			if (empty($history_id)) { $this -> errors['history_id'] = __('No history email was specified', $this -> plugin_name); }
 		} else {
 			$this -> errors[] = __('No data was posted', $this -> plugin_name);

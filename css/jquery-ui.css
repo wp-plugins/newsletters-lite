@@ -388,9 +388,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	height:30px; 
 	text-decoration: none;
 	border:1px solid #DDD;		
-	-moz-border-radius:5px 5px 0 0;
+	/*-moz-border-radius:5px 5px 0 0;
 	-webkit-border-radius:5px 5px 0 0;
-	border-radius:5px 5px 0 0;		
+	border-radius:5px 5px 0 0;*/
 	border-bottom:0 none;
 	background: #DDD;
 	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFFFFF), to(#ececec));

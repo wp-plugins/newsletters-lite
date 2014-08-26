@@ -529,8 +529,9 @@ class wpmlDbHelper extends wpMailPlugin {
 		if (!empty($this -> model)) {
 			global $wpdb, ${$this -> model};
 			
+			$object = (!is_object(${$this -> model})) ? $this : ${$this -> model};
 			$fields = (empty($fields) || !is_array($fields)) ? "*" : implode(", ", $fields);
-			$query = "SELECT " . $fields . " FROM `" . $wpdb -> prefix . "" . ${$this -> model} -> table . "`";
+			$query = "SELECT " . $fields . " FROM `" . $wpdb -> prefix . "" . $object -> table . "`";
 			
 			if (!empty($conditions) && is_array($conditions)) {
 				$query .= " WHERE";
@@ -573,8 +574,8 @@ class wpmlDbHelper extends wpMailPlugin {
 					$data = array();
 					
 					foreach ($records as $record) {
-						if ((!empty($recursive) && $recursive == true) || ${$this -> model} -> recursive == true) { $record -> recursive = true; }
-						$data[] = $this -> init_class(${$this -> model} -> model, $record);
+						if ((!empty($recursive) && $recursive == true) || $object -> recursive == true) { $record -> recursive = true; }
+						$data[] = $this -> init_class($object -> model, $record);
 					}
 					
 					${'newsletters_query_' . $query_hash} = $data;

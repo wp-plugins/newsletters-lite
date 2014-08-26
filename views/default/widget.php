@@ -23,7 +23,7 @@
 		</script>
 	</div>
 	
-	<?php if ($captcha_type = $this -> use_captcha(__($instance['captcha']))) : ?>
+	<?php if ($captcha_type = $this -> use_captcha(__($instance['captcha']))) : ?>		
 		<?php if ($captcha_type == "rsc") : ?>
 	    	<?php 
 	    	

@@ -70,7 +70,7 @@ $createpreview = $this -> get_option('createpreview');
             </td>
         </tr>
         <tr>
-        	<th><label for="shortlinks_Y"><?php _e('Enable Shortlinks', $this -> plugin_name); ?></label></th>
+        	<th><label for="shortlinks_Y"><?php _e('Bit.ly Shortlinks', $this -> plugin_name); ?></label></th>
             <td>
             	<label><input <?php echo ($this -> get_option('shortlinks') == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#shortlinksdiv').show();" type="radio" name="shortlinks" value="Y" id="shortlinks_Y" <?php echo $version; ?> /> <?php _e('Yes', $this -> plugin_name); ?></label>
                 <label><input <?php echo ($this -> get_option('shortlinks') == "N") ? 'checked="checked"' : ''; ?> onclick="jQuery('#shortlinksdiv').hide();" type="radio" name="shortlinks" value="N" id="shortlinks_N" <?php echo $version; ?> /> <?php _e('No', $this -> plugin_name); ?></label>

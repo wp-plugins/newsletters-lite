@@ -1,5 +1,5 @@
 <div class="wrap <?php echo $this -> pre; ?>">
-	<h2><?php _e('Manage Subscribers', $this -> plugin_name); ?> <a class="button add-new-h2" href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save" title="<?php _e('Create a new subscriber', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
+	<h2><?php _e('Manage Subscribers', $this -> plugin_name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save" title="<?php _e('Create a new subscriber', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
 	<?php if (true || !empty($subscribers)) : ?>
 		<form id="posts-filter" action="<?php echo $this -> url; ?>" method="post">
         	<?php if (!empty($subscribers)) : ?>
