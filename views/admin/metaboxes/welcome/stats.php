@@ -39,6 +39,6 @@ jQuery(document).ready(function() {
 <?php
 
 include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
-open_flash_chart_object("100%", "300", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&type=' . $type . '&from=' . $fromdate . '&to=' . $todate, false, $this -> url());
+newsletters_open_flash_chart_object("100%", "300", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&type=' . $type . '&from=' . $fromdate . '&to=' . $todate, false, $this -> url());
 
 ?>

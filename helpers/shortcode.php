@@ -72,7 +72,8 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			'target'			=>	"_self",
 		);
 			
-		extract(shortcode_atts($defaults, $atts));
+		$r = shortcode_atts($defaults, $atts);
+		extract($r);
 		
 		$arguments = array(
 			'post_id'			=>	$post_id,
@@ -80,9 +81,14 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			'language'			=>	$language,
 		);
 		
-		global $wpml_eftype, $wpml_target;
-		$wpml_eftype = $eftype;
-		$wpml_target = $target;
+		//global $wpml_eftype, $wpml_target;
+		//$wpml_eftype = $eftype;
+		//$wpml_target = $target;
+		
+		foreach ($r as $rkey => $rval) {
+			global ${'wpml_' . $rkey};
+			${'wpml_' . $rkey} = $rval;
+		}
 		
 		if (!empty($post_id)) {
 			if ($post = get_post($post_id)) {
@@ -176,20 +182,38 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_excerpt'				:
-				$this -> add_filter('excerpt_length');
-				$this -> add_filter('excerpt_more');
-			
-				if (!empty($shortcode_post)) {
+				if (empty($wpml_eftype) || (!empty($wpml_eftype) && $wpml_eftype != "full")) {					
+					$this -> add_filter('excerpt_length');
+					$this -> add_filter('excerpt_more');
+					
+					if (!empty($shortcode_post)) {
+						setup_postdata($shortcode_post);
+						$return .= get_the_excerpt();
+						wp_reset_postdata();
+					}
+				} else {
 					setup_postdata($shortcode_post);
-					$return .= get_the_excerpt();
+					$return = wpautop(get_the_content());
 					wp_reset_postdata();
-					return $return;
 				}
-				break;
+				
+				return $return;
 			case 'post_content'				:
-				setup_postdata($shortcode_post);
-				$return = get_the_content();
-				wp_reset_postdata();
+				if (empty($wpml_eftype) || (!empty($wpml_eftype) && $wpml_eftype != "excerpt")) {
+					setup_postdata($shortcode_post);
+					$return = wpautop(get_the_content());
+					wp_reset_postdata();
+				} else {
+					$this -> add_filter('excerpt_length');
+					$this -> add_filter('excerpt_more');
+					
+					if (!empty($shortcode_post)) {
+						setup_postdata($shortcode_post);
+						$return .= get_the_excerpt();
+						wp_reset_postdata();
+					}
+				}
+				
 				return $return;
 				break;
 		}

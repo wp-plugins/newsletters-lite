@@ -1,7 +1,7 @@
 <?php
 
-if (!function_exists('open_flash_chart_object_str')) {
-	function open_flash_chart_object_str( $width, $height, $url, $use_swfobject=true, $base='' ) {
+if (!function_exists('newsletters_open_flash_chart_object_str')) {
+	function newsletters_open_flash_chart_object_str( $width, $height, $url, $use_swfobject=true, $base='' ) {
 		//
 		// return the HTML as a string
 		//
@@ -9,8 +9,8 @@ if (!function_exists('open_flash_chart_object_str')) {
 	}
 }
 
-if (!function_exists('open_flash_chart_object')) {
-	function open_flash_chart_object( $width, $height, $url, $use_swfobject=true, $base='' ) {
+if (!function_exists('newsletters_open_flash_chart_object')) {
+	function newsletters_open_flash_chart_object( $width, $height, $url, $use_swfobject=true, $base='' ) {
 		//
 		// stream the HTML into the page
 		//
@@ -111,4 +111,5 @@ if (!function_exists('_ofc')) {
 		return implode("\n",$out);
 	}
 }
+
 ?>

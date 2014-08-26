@@ -112,8 +112,12 @@ function wpml_titletoslug(title) {
 }
 
 function wpml_tinymcetag(tag) {
-	if (window.tinyMCE && tag != "") {
-		window.tinyMCE.execInstanceCommand('content', 'mceInsertContent', false, tag);	
+	if (tinyMCE.activeEditor) {
+		if (window.tinyMCE && tag != "") {
+			window.tinyMCE.execInstanceCommand('content', 'mceInsertContent', false, tag);	
+		}
+	} else {
+		jQuery('textarea#content').text(jQuery('textarea#content').val() + '\n\n' + tag);
 	}
 	
 	wpml_scroll('#wp-content-editor-container');

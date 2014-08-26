@@ -1200,6 +1200,38 @@ if (!class_exists('wpMailPlugin')) {
 			die();
 		}
 		
+		function ajax_themeedit() {
+			global $Db, $Theme;
+			$success = false;
+			$errors = array();
+			
+			if (!empty($_REQUEST)) {
+				if (!empty($_REQUEST['id'])) {
+					if (!empty($_REQUEST['Theme'])) {
+						$Db -> model = $Theme -> model;
+						if ($Db -> save($_REQUEST)) {
+							$success = true;
+						} else {
+							$errors = $Theme -> errors;
+						}
+					}
+				
+					$Db -> model = $Theme -> model;
+					$Db -> find(array('id' => $_GET['id']));
+					$Theme -> data -> paste = $Theme -> data -> content;
+				} else {
+					$errors[] = __('No theme was specified', $this -> plugin_name);
+				}
+			} else {
+				$errors[] = __('No data was specified', $this -> plugin_name);
+			}
+			
+			$this -> render('themes' . DS . 'save-ajax', array('success' => $success, 'errors' => $errors), true, 'admin');
+			
+			exit();
+			die();
+		}
+		
 		function ajax_addcontentarea() {		
 			?>
 			
@@ -2409,17 +2441,17 @@ if (!class_exists('wpMailPlugin')) {
 			} else {						
 				if (wpml_is_management()) {				
 					if ($this -> get_option('loadscript_jqueryuitabs') == "Y") {
-						wp_enqueue_script($this -> get_option('loadscript_jqueryuitabs_handle'), false, array('jquery'), false, true);
-						wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'default', false), array('jquery'));
+						wp_enqueue_script('jquery-ui-tabs', false, array('jquery'), false, true);
+						wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'admin', false), array('jquery'));
 					}
 				}
 			
 				//enqueue the plugin JS
-				if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuibutton_handle'), $this -> render_url('js/jquery-ui-button.js', 'default', false), array('jquery'), false, true); }
-				if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'default', false), array('jquery'), false, true); }
-				if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'default', false), array('jquery'), false, true); }
+				if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script('jquery-ui-button', array('jquery'), false, true); }
+				if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'admin', false), array('jquery'), false, true); }
+				if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'admin', false), array('jquery'), false, true); }
 				
-				wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'default', false), array('jquery'), false, true);
+				wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true);
 				
 				$captcha_type = $this -> get_option('captcha_type');
 				if (!empty($captcha_type) && $captcha_type == "recaptcha") {
@@ -2435,7 +2467,7 @@ if (!class_exists('wpMailPlugin')) {
 			$theme_folder = $this -> get_option('theme_folder');
 			
 			if (is_admin()) {
-				wp_register_style( 'newsletters_dashicons', plugins_url() . '/' . $this -> plugin_name . '/css/newsletters_dashicons.css', false, '1.0.0' );
+				//wp_register_style( 'newsletters_dashicons', plugins_url() . '/' . $this -> plugin_name . '/css/newsletters_dashicons.css', false, '1.0.0' );
 			
 				if (true || !empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
 					$load = true;	
@@ -2444,26 +2476,29 @@ if (!class_exists('wpMailPlugin')) {
 					wp_enqueue_style('wp-color-picker');
 				}
 				
-				$uisrc = plugins_url() . '/' . $this -> plugin_name . '/css/jquery-ui.css';
+				//$uisrc = plugins_url() . '/' . $this -> plugin_name . '/css/jquery-ui.css';
+				$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
 				wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
-				wp_enqueue_style('colorbox', plugins_url() . '/' . $this -> plugin_name . '/css/colorbox.css', false, $this -> version, "all");
+				wp_enqueue_style('colorbox', $this -> render_url('css/colorbox.css', 'admin', false), false, $this -> version, "all");
 				
 				if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> queue) {
-					wp_enqueue_style('jquery-countdown', plugins_url() . '/' . $this -> plugin_name . '/css/jquery-countdown.css', false, false, "all");
+					wp_enqueue_style('jquery-countdown', $this -> render_url('css/jquery-countdown.css', 'admin', false), false, false, "all");
 				}
 			} else {
 				if ($this -> get_option('theme_usestyle') == "Y") {
 					$load = true;	
-					$stylesource = plugins_url() . '/' . $this -> plugin_name . '/views/' . $theme_folder . '/css/style.css';
+					//$stylesource = plugins_url() . '/' . $this -> plugin_name . '/views/' . $theme_folder . '/css/style.css';
+					$stylesource = $this -> render_url('css/style.css', 'default', false);
 				}
 			}
 			
 			if ($load) {
 				if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
-				wp_enqueue_style('uploadify', plugins_url() . '/' . $this -> plugin_name . '/views/' . $theme_folder . '/css/uploadify.css', false, $this -> version, "all");
+				wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
 				
 				if ($this -> get_option('customcss') == "Y") {
-					$customsrc = plugins_url() . '/' . $this -> plugin_name . '/css/' . $this -> plugin_name . '-css.php';
+					//$customsrc = plugins_url() . '/' . $this -> plugin_name . '/css/' . $this -> plugin_name . '-css.php';
+					$customsrc = $this -> render_url('css/' . $this -> plugin_name . '-css.php', 'admin', false);
 					wp_enqueue_style($this -> pre . '-custom', $customsrc, null, $this -> version, "screen");	
 				}
 			}
@@ -2587,7 +2622,10 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($activateaction) && $activateaction != "none") {
 				$timestamp = time();
-				wp_schedule_event($timestamp, "hourly", $this -> pre . '_activateaction');
+				
+				if (!wp_next_scheduled($this -> pre . '_activateaction')) {
+					wp_schedule_event($timestamp, "hourly", $this -> pre . '_activateaction');
+				}
 			}
 			
 			return true;
@@ -2608,7 +2646,9 @@ if (!class_exists('wpMailPlugin')) {
 						$new_timestamp = strtotime($latestposts_startdate);
 					}
 					
-					wp_schedule_event($new_timestamp, $interval, $this -> pre . '_latestposts');
+					if (!wp_next_scheduled($this -> pre . '_latestposts')) {
+						wp_schedule_event($new_timestamp, $interval, $this -> pre . '_latestposts');
+					}
 				}
 			}
 		
@@ -2623,7 +2663,10 @@ if (!class_exists('wpMailPlugin')) {
 	            $schedules = $this -> cron_schedules($schedules);
 				$interval = $this -> get_option('bouncepop_interval');
 				$new_timestamp = time() + $schedules[$interval]['interval'];
-				wp_schedule_event($new_timestamp, $interval, $this -> pre . '_pophook');
+				
+				if (!wp_next_scheduled($this -> pre . '_pophook')) {
+					wp_schedule_event($new_timestamp, $interval, $this -> pre . '_pophook');
+				}
 	        }
 	
 	        return;
@@ -2638,7 +2681,10 @@ if (!class_exists('wpMailPlugin')) {
 				$interval = $this -> get_option('importusersscheduling');
 				$interval = (empty($interval)) ? "hourly" : $interval;
 				$new_timestamp = time() + $schedules[$interval]['interval'];
-				wp_schedule_event($new_timestamp, $interval, $this -> pre . '_importusers');
+				
+				if (!wp_next_scheduled($this -> pre . '_importusers')) {
+					wp_schedule_event($new_timestamp, $interval, $this -> pre . '_importusers');
+				}
 			}
 		}
 		
@@ -2649,7 +2695,10 @@ if (!class_exists('wpMailPlugin')) {
 			$schedules = $this -> cron_schedules($schedules);
 			$interval = $this -> get_option('autoresponderscheduling');
 			$new_timestamp = time() + $schedules[$interval]['interval'];
-			wp_schedule_event($new_timestamp, $interval, $this -> pre . '_autoresponders');
+			
+			if (!wp_next_scheduled($this -> pre . '_autoresponders')) {
+				wp_schedule_event($new_timestamp, $interval, $this -> pre . '_autoresponders');
+			}
 			
 			return true;
 		}
@@ -2661,7 +2710,10 @@ if (!class_exists('wpMailPlugin')) {
 			$schedules = $this -> cron_schedules($schedules);
 			$interval = $this -> get_option('captchainterval');
 			$new_timestamp = time() + $schedules[$interval]['interval'];
-			wp_schedule_event($new_timestamp, $interval, $this -> pre . '_captchacleanup');
+			
+			if (!wp_next_scheduled($this -> pre . '_captchacleanup')) {
+				wp_schedule_event($new_timestamp, $interval, $this -> pre . '_captchacleanup');
+			}
 			
 			return true;
 		}
@@ -2675,7 +2727,10 @@ if (!class_exists('wpMailPlugin')) {
 					$interval = $this -> get_option('scheduleinterval');
 					$new_timestamp = time() + $schedules[$interval]['interval'];
 					if ($increase == true) { $new_timestamp += 300; }
-					wp_schedule_event($new_timestamp, $interval, $this -> pre . '_cronhook');
+					
+					if (!wp_next_scheduled($this -> pre . '_cronhook')) {
+						wp_schedule_event($new_timestamp, $interval, $this -> pre . '_cronhook');
+					}
 				}
 			}
 		}
@@ -3260,7 +3315,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($mailinglist_id)) {
 					$Db -> model = 'SubscribersList';
 					if ($subscriberslist = $Db -> find(array('subscriber_id' => $subscriber_id, 'list_id' => $mailinglist_id))) {
-						if ($subscriberslist -> authinprog == "Y") {
+						if ($subscriberslist -> authinprog == "Y" || !empty($subscriberslist -> authkey)) {
 							$authkey = $subscriberslist -> authkey;
 						} else {
 							$Db -> save_field('authkey', $authkey, array('list_id' => $mailinglist_id, 'subscriber_id' => $subscriber_id));
@@ -3270,15 +3325,13 @@ if (!class_exists('wpMailPlugin')) {
 				} else {
 					$Db -> model = 'Subscriber';
 					if ($subscriber = $Db -> find(array('id' => $subscriber_id))) {
-						if ($subscriber -> authinprog == "Y") {
+						if ($subscriber -> authinprog == "Y" || !empty($subscriber -> authkey)) {
 							$authkey = $subscriber -> authkey;
 						} else {
 							$Db -> save_field('authkey', $authkey, array('id' => $subscriber_id));
 							$Db -> save_field('authinprog', "Y", array('id' => $subscriber_id));
 						}
 					}
-					
-					$Db -> save_field('authkey', $authkey, array('id' => $subscriber_id));
 				}
 			}
 			

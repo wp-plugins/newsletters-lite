@@ -137,25 +137,39 @@ table tbody tr.arow {
 	height: 24px;
 }
 
-.wpml .submitbox #sendfrom #sendfrom-image  {
-	background: 
-	transparent url('../../../../wp-admin/images/menu.png') top left no-repeat;
-	background-position: -306px -35px;
-	width: 24px;
-	height: 24px;
-	display: block;
-	float: left;
+.newsletters .submitbox #sendfrom #sendfrom-image:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f110';
 }
 
+.newsletters .submitbox #sendrecurring #sendrecurring-image:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f113';
+}
+
+.wpml .submitbox #sendfrom #sendfrom-image,
 .wpml .submitbox #sendrecurring #sendrecurring-image  {
-	background: 
-	transparent url('../../../../wp-admin/images/menu.png') top left no-repeat;
+	/*background: transparent url('../../../../wp-admin/images/menu.png') top left no-repeat;
+	background-position: -306px -35px;
+	width: 24px;
+	height: 24px;*/
+	margin: 0 5px 0 0;
+	font-size: 20px;
+	display: block;
+	float: left;
+	color: #8f8f8f;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/*.wpml .submitbox #sendrecurring #sendrecurring-image  {
+	background: transparent url('../../../../wp-admin/images/menu.png') top left no-repeat;
 	background-position: -336px -40px;
 	width: 24px;
 	height: 24px;
 	display: block;
 	float: left;
-}
+}*/
 
 .wpml .submitbox #sendfrom-value {
 	margin: 0 0 0 24px;
@@ -226,7 +240,7 @@ table tbody tr.arow {
 	padding: 2px 5px;
 }
 
-.wpmlhelp {
+/*.wpmlhelp {
 	display: inline-block;
     margin: 2px 0 0 5px;
     vertical-align: top;
@@ -245,7 +259,7 @@ table tbody tr.arow {
 	font-weight: bold;
 	font-size: 10px;
     line-height: 15px;
-}
+}*/
 
 .ui-tooltip {
 	padding: 8px;
@@ -459,9 +473,33 @@ ul#wpmlsubmenu a.current {
 
 /* Admin Menu BEG */
 
-#adminmenu .toplevel_page_newsletters div.wp-menu-image:before {
+#adminmenu .toplevel_page_newsletters div.wp-menu-image:before,
+span.mce_Newsletters:before {
     font-family: 'newsletters_dashicons' !important;
 	content: '\f466';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.wpmlhelp a,
+.wpmlhelp a:hover, 
+.wpmlhelp a:active {
+	text-decoration: none;
+	color: #333;
+}
+
+.wpmlhelp a:before,
+.newsletters_help a:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f223';
+	font-weight: 400;
+	font-size: 20px;
+	vertical-align: middle;
+	text-decoration: none;
+	line-height: 100%;
+	height: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 @font-face {

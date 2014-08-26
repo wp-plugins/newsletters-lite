@@ -57,15 +57,6 @@
 			</td>
 		</tr>
 		<tr>
-			<th><label for="gzip_N"><?php _e('Gzip Compression', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(__('Gzip compression uses the PHP ob_gzhandler() to compress data on the server side before sending it to the browser. Ensure that your hosting supports PHP ob_gzhandler() by asking your server administrator or hosting provider.<br/><br/>This setting is effective on your site frontend only and is not related to emails at all. It will increase the performance of your site.', $this -> plugin_name)); ?></th>
-			<td>
-				<label><input <?php echo ($this -> get_option('gzip') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="gzip" value="Y" id="gzip_Y" /> <?php _e('On', $this -> plugin_name); ?></label>
-				<label><input <?php echo ($this -> get_option('gzip') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="gzip" value="N" id="gzip_N" /> <?php _e('Off', $this -> plugin_name); ?></label>
-				<span class="howto"><?php _e('You can turn On Gzip compression to compress data with the PHP ob_gzhandler.', $this -> plugin_name); ?></span>
-			</td>
-		</tr>
-		<tr>
 			<th><label for="<?php echo $this -> pre; ?>mailtype"><?php _e('Mail Type', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('Choose your preferred way of sending emails. If you are not sure, leave it on "Local Server" setting to send through your own server. Advanced users can use an "SMTP Server" if needed.', $this -> plugin_name)); ?></th>
 			<td>

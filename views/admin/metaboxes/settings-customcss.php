@@ -47,18 +47,16 @@
 		<tr>
 			<th><label for="loadscript_jqueryuitabs_Y"><?php _e('jQuery UI Tabs', $this -> plugin_name); ?></label></th>
 			<td>
-				<label><input onclick="jQuery('#loadscript_jqueryuitabs_div').show();" <?php echo ($this -> get_option('loadscript_jqueryuitabs') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuitabs" value="Y" id="loadscript_jqueryuitabs_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
-				<label><input onclick="jQuery('#loadscript_jqueryuitabs_div').hide();" <?php echo ($this -> get_option('loadscript_jqueryuitabs') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuitabs" value="N" id="loadscript_jqueryuitabs_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
-				<div id="loadscript_jqueryuitabs_div" style="display:<?php echo ($this -> get_option('loadscript_jqueryuitabs') == "Y") ? 'block' : 'none'; ?>;"><label><strong><?php _e('Handle:', $this -> plugin_name); ?></strong> <input type="text" name="loadscript_jqueryuitabs_handle" value="<?php echo esc_attr(stripslashes($this -> get_option('loadscript_jqueryuitabs_handle'))); ?>" id="loadscript_jqueryuitabs_handle" class="widefat" style="width:150px;" /></label></div>
+				<label><input <?php echo ($this -> get_option('loadscript_jqueryuitabs') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuitabs" value="Y" id="loadscript_jqueryuitabs_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
+				<label><input <?php echo ($this -> get_option('loadscript_jqueryuitabs') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuitabs" value="N" id="loadscript_jqueryuitabs_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
 				<span class="howto"><?php _e('Load the jQuery UI Tabs script for the subscriber management section.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
 		<tr>
 			<th><label for="loadscript_jqueryuibutton_Y"><?php _e('jQuery UI Button', $this -> plugin_name); ?></label></th>
 			<td>
-				<label><input onclick="jQuery('#loadscript_jqueryuibutton_div').show();" <?php echo ($this -> get_option('loadscript_jqueryuibutton') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuibutton" value="Y" id="loadscript_jqueryuibutton_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
-				<label><input onclick="jQuery('#loadscript_jqueryuibutton_div').hide();" <?php echo ($this -> get_option('loadscript_jqueryuibutton') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuibutton" value="N" id="loadscript_jqueryuibutton_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
-				<div id="loadscript_jqueryuibutton_div" style="display:<?php echo ($this -> get_option('loadscript_jqueryuibutton') == "Y") ? 'block' : 'none'; ?>;"><label><strong><?php _e('Handle:', $this -> plugin_name); ?></strong> <input type="text" name="loadscript_jqueryuibutton_handle" value="<?php echo esc_attr(stripslashes($this -> get_option('loadscript_jqueryuibutton_handle'))); ?>" id="loadscript_jqueryuibutton_handle" class="widefat" style="width:150px;" /></label></div>
+				<label><input <?php echo ($this -> get_option('loadscript_jqueryuibutton') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuibutton" value="Y" id="loadscript_jqueryuibutton_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
+				<label><input <?php echo ($this -> get_option('loadscript_jqueryuibutton') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuibutton" value="N" id="loadscript_jqueryuibutton_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
 				<span class="howto"><?php _e('Load the jQuery UI Button script for all the buttons.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>

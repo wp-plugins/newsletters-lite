@@ -1556,12 +1556,6 @@ if (!class_exists('wpMail')) {
 			}	
 		}
 		
-		function gzip_compression() {	
-			if ($this -> get_option('gzip') == "Y") {
-				ob_start('ob_gzhandler');
-			}
-		}
-		
 		function save_post($post_id = null, $post = null) {	
 			global $wpdb, $Db, $Html, $Post, $Mailinglist, $History, $Queue, $Subscriber, $SubscribersList;
 			
@@ -1876,7 +1870,7 @@ if (!class_exists('wpMail')) {
 			global $Metabox, $Html;
 			
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings, 'side', 'core');
-			add_meta_box('generaldiv', __('General Mail Settings', $this -> plugin_name) . $Html -> help(__('These are general settings related to the sending of emails such as your email server. You can also turn on/off other features here such as read tracking, click tracking, gzip compression and more.', $this -> plugin_name)), array($Metabox, 'settings_general'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
+			add_meta_box('generaldiv', __('General Mail Settings', $this -> plugin_name) . $Html -> help(__('These are general settings related to the sending of emails such as your email server. You can also turn on/off other features here such as read tracking, click tracking and more.', $this -> plugin_name)), array($Metabox, 'settings_general'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('sendingdiv', __('Sending Settings', $this -> plugin_name), array($Metabox, 'settings_sending'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('optindiv', __('Default Subscription Form Settings', $this -> plugin_name) . $Html -> help(__('Global subscribe form settings for hardcoded and shortcode (post/page) subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_optin'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('subscriptionsdiv', __('Paid Subscriptions', $this -> plugin_name), array($Metabox, 'settings_subscriptions'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
@@ -2071,6 +2065,10 @@ if (!class_exists('wpMail')) {
 							'customtexton'		=>	((!empty($history -> text)) ? true : false),
 							'customtext'		=>	$history -> text,
 						);
+						
+						if (!empty($_POST['condquery']) && !empty($_POST['conditions']) && !empty($_POST['conditionsscope'])) {
+							$_POST['dofieldsconditions'] = 1;
+						}
 						
 						if (!empty($history -> recurring) && $history -> recurring == "Y") {
 							$_POST['sendrecurring'] = "Y";

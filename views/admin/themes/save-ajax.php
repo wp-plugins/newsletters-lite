@@ -1,14 +1,26 @@
-<div class="wrap <?php echo $this -> pre; ?> newsletters">
+<div style="width:800px;" class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Save a Theme', $this -> plugin_name); ?></h2>
     
     <p>
     	<?php _e('This is a full HTML theme and should contain at least <code>[wpmlcontent]</code> somewhere.', $this -> plugin_name); ?><br/>
-        <?php _e('You may use any of the', $this -> plugin_name); ?> <a class="button button-secondary" href="" onclick="jQuery.colorbox({title:'<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>', maxHeight:'80%', maxWidth:'80%', href:'<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>setvariables'}); return false;"> <?php _e('shortcodes/variables', $this -> plugin_name); ?></a> <?php _e('inside themes.', $this -> plugin_name); ?><br/>
         <?php _e('Upload your images, stylesheets and other elements via FTP or the media uploader in WordPress.', $this -> plugin_name); ?><br/>
         <?php _e('Please ensure that all links, images and other references use full, absolute URLs.', $this -> plugin_name); ?>
     </p>
     
-    <form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save" method="post" enctype="multipart/form-data">
+    <?php $this -> render('error', array('errors' => $errors), true, 'admin'); ?>
+    
+    <?php if ($success) : ?>
+    	<p class="newsletters_success"><?php _e('Theme has been saved', $this -> plugin_name); ?></p>
+    	
+    	<script type="text/javascript">
+    	jQuery(document).ready(function() {
+	    	jQuery.colorbox.close();
+	    	previewrunner();
+    	});
+    	</script>
+    <?php endif; ?>
+    
+    <form onsubmit="jQuery.Watermark.HideAll(); newsletters_save_theme(this); return false;" action="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save" method="post" enctype="multipart/form-data">
     	<?php echo $Form -> hidden('Theme[id]'); ?>
     	<?php echo $Form -> hidden('Theme[name]'); ?>
     
@@ -193,11 +205,22 @@
         
         <p class="submit">
         	<input class="button-primary" type="submit" name="save" value="<?php _e('Save Theme', $this -> plugin_name); ?>" />
+        	<span id="newsletters_themeedit_loader" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
         </p>
     </form>
 </div>
 
 <script type="text/javascript">
+function newsletters_save_theme(form) {
+	var formvalues = jQuery(form).serialize();
+	jQuery('#newsletters_themeedit_loader').show();
+	
+	jQuery.post(wpmlajaxurl + '?action=newsletters_themeedit&id=<?php echo $_GET['id']; ?>', formvalues, function(response) {
+		jQuery('#cboxLoadedContent').html(response);
+		jQuery.colorbox.resize();
+	});
+}
+
 jQuery(document).ready(function() {
 	jQuery('[name="Theme[title]"]').Watermark('<?php echo addslashes(__('Enter theme title here', $this -> plugin_name)); ?>');
 });

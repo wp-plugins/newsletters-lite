@@ -2,7 +2,7 @@
 	<?php
 	
 	include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
-	open_flash_chart_object("100%", "180", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats', false, $this -> url());
+	newsletters_open_flash_chart_object("100%", "180", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats', false, $this -> url());
 	
 	?>
 </div>

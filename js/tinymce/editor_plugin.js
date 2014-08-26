@@ -24,7 +24,7 @@
 			ed.addButton('Newsletters', {
 				title : 'Newsletters.desc',
 				cmd : 'mceNewsletters',
-				image : url + '/newsletters.png'
+				//image : url + '/newsletters.png'
 			});	
 		},		
 		createControl : function(n, cm) {

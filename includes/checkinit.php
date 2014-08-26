@@ -20,9 +20,9 @@ if (!class_exists('wpMailCheckinit')) {
 			if (!is_admin() || (is_admin() && $this -> ci_serial_valid())) {
 				$this -> ci_initialization();
 			} else {				
-				wp_enqueue_script($this -> plugin_name, WP_PLUGIN_URL . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
-				wp_enqueue_script('colorbox', WP_PLUGIN_URL . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
-				wp_enqueue_style('colorbox', WP_PLUGIN_URL . '/' . $this -> plugin_name . '/css/colorbox.css', false, $this -> version, "all");
+				wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
+				wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
+				wp_enqueue_style('colorbox', plugins_url() . '/' . $this -> plugin_name . '/css/colorbox.css', false, $this -> version, "all");
 				
 				$this -> add_action('admin_notices');
 				$this -> add_action('init', 'init', 10, 1);
@@ -55,7 +55,6 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('delete_post', 'delete_post', 10, 1);
 			$this -> add_action('init', 'init', 1, 1);
 			$this -> add_action('init', 'init_textdomain', 10, 1);
-			$this -> add_action('init', 'gzip_compression', 10, 1);
 			
 			/* Schedules */
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
@@ -124,6 +123,7 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_themeedit', array($this, 'ajax_themeedit'));
 				add_action('wp_ajax_newsletters_addcontentarea', array($this, 'ajax_addcontentarea'));
 				add_action('wp_ajax_newsletters_deletecontentarea', array($this, 'ajax_deletecontentarea'));
 				add_action('wp_ajax_subscribercount', array($this, 'ajax_subscribercount'));

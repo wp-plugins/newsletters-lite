@@ -187,7 +187,7 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 
 			jQuery('#posts_multiple_message').show();
 			
-			jQuery.post("<?php echo WP_PLUGIN_URL; ?>/wp-mailinglist/wp-mailinglist-ajax.php?cmd=posts_by_category&cat_id=" + posts_category_menu.val(), {category:posts_category_menu.val(),language:postslanguage,post_type:post_type}, function(response) {
+			jQuery.post("<?php echo plugins_url(); ?>/wp-mailinglist/wp-mailinglist-ajax.php?cmd=posts_by_category&cat_id=" + posts_category_menu.val(), {category:posts_category_menu.val(),language:postslanguage,post_type:post_type}, function(response) {
 				posts_post_menu.empty().html(response);
 				jQuery('#posts_multiple_message').hide();
 			});
