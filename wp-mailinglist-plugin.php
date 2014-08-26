@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.5';
+		var $version = '4.3.6';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -290,8 +290,8 @@ if (!class_exists('wpMailPlugin')) {
 				    		<li>
 				    			<span class="insertfieldslistcheckbox"><input type="checkbox" name="insertposts[]" value="<?php echo $post -> ID; ?>" id="insertposts_<?php echo $post -> ID; ?>" /></span>
 				    			
-				    			<?php if ($this -> is_plugin_active('qtranslate')) : ?>
-				    				<span class="insertfieldslistbutton"><a href="" onclick="insert_post('<?php echo $post -> ID; ?>', false); return false;" class="button button-secondary press"><?php echo qtrans_use($_POST['language'], $post -> post_title, false); ?></a></span>
+				    			<?php if ($this -> language_do()) : ?>
+				    				<span class="insertfieldslistbutton"><a href="" onclick="insert_post('<?php echo $post -> ID; ?>', false); return false;" class="button button-secondary press"><?php echo $this -> language_use($_POST['language'], $post -> post_title, false); ?></a></span>
 				    			<?php else : ?>
 				    				<span class="insertfieldslistbutton"><a href="" onclick="insert_post('<?php echo $post -> ID; ?>', false); return false;" class="button button-secondary press"><?php echo __($post -> post_title); ?></a></span>
 				    			<?php endif; ?>
@@ -1016,7 +1016,7 @@ if (!class_exists('wpMailPlugin')) {
 				$instance = $r;
 			}
 			
-			$action = ($this -> is_plugin_active('qtranslate')) ? qtrans_convertURL($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
+			$action = ($this -> language_do()) ? $this -> language_converturl($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
 			$action = $Html -> retainquery($this -> pre . 'method=optin', $action) . '#' . $widget_id;
 			
 			if ($subscriber_id = $Subscriber -> optin($_POST)) {
@@ -1059,8 +1059,8 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($settings[$number])) {
 					$instance = $settings[$number];
 					
-					if ($this -> is_plugin_active('qtranslate')) {
-						$instance['lang'] = qtrans_getLanguage();
+					if ($this -> language_do()) {
+						$instance['lang'] = $this -> language_current();
 					}
 				} else {
 					if ($embed = $this -> get_option('embed')) {
@@ -2484,12 +2484,390 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
+		function plugins_loaded() {
+			return;
+		}
+		
+		function language_ready() {
+			//the language plugin
+			$language_plugin = "LangSwitch/langswitch.php";
+			if ($this -> is_plugin_active($language_plugin)) {
+				return true;
+			}	
+		
+			return false;
+		}
+		
+		function language_useordefault($content) {				
+			$text = $content;
+			
+			if (!empty($text)) {
+				$current_language = $this -> language_current();
+				$language = (empty($current_language)) ? $this -> language_default() : $current_language;
+				$text = $this -> language_use($language, $content, false);
+			}
+			
+			return $text;
+		}
+		
+		function language_use($lang = null, $text = null, $show_available = false) {
+		
+			if(!$this -> language_isenabled($lang)) { 
+				return $text;
+			}
+			
+			if (is_array($text)) {
+				// handle arrays recursively
+				foreach($text as $key => $t) {
+					$text[$key] = $this -> language_use($lang, $text[$key], $show_available);
+				}
+				
+				return $text;
+			}
+			
+			if(is_object($text)||@get_class($text) == '__PHP_Incomplete_Class') {
+				foreach(get_object_vars($text) as $key => $t) {
+					$text->$key = $this -> language_use($lang,$text->$key,$show_available);
+				}
+				return $text;
+			}
+			
+			// prevent filtering weird data types and save some resources
+			if(!is_string($text) || $text == '') {
+				return $text;
+			}
+			
+			// get content
+			$content = $this -> language_split($text);
+			// find available languages
+			$available_languages = array();
+			foreach($content as $language => $lang_text) {
+				$lang_text = trim($lang_text);
+				if(!empty($lang_text)) $available_languages[] = $language;
+			}
+			
+			// if no languages available show full text
+			if(sizeof($available_languages)==0) return $text;
+			// if content is available show the content in the requested language
+			if(!empty($content[$lang])) {
+				return $content[$lang];
+			}
+			// content not available in requested language (bad!!) what now?
+			if(!$show_available){
+				// check if content is available in default language, if not return first language found. (prevent empty result)
+				if($lang != $this -> language_default()) {
+					$str = $this -> language_use($this -> language_default(), $text, $show_available);
+					if ($q_config['show_displayed_language_prefix'])
+						$str = "(". $this -> language_name($this -> language_default()) .") " . $str;
+					return $str;
+				}
+				foreach($content as $language => $lang_text) {
+					$lang_text = trim($lang_text);
+					if (!empty($lang_text)) {
+						$str = $lang_text;
+						if ($q_config['show_displayed_language_prefix'])
+							$str = "(". $this -> language_name($language) .") " . $str;
+						return $str;
+					}
+				}
+			}
+			// display selection for available languages
+			$available_languages = array_unique($available_languages);
+			$language_list = "";
+			if(preg_match('/%LANG:([^:]*):([^%]*)%/',$q_config['not_available'][$lang],$match)) {
+				$normal_seperator = $match[1];
+				$end_seperator = $match[2];
+				// build available languages string backward
+				$i = 0;
+				foreach($available_languages as $language) {
+					if($i==1) $language_list  = $end_seperator.$language_list;
+					if($i>1) $language_list  = $normal_seperator.$language_list;
+					$language_list = "<a href=\"". $this -> language_converturl('', $language)."\">". $this -> language_name($language) ."</a>".$language_list;
+					$i++;
+				}
+			}
+			return "<p>".preg_replace('/%LANG:([^:]*):([^%]*)%/', $language_list, $q_config['not_available'][$lang])."</p>";
+		}
+		
+		function language_converturl($url = null, $language = null) {
+			global $newsletters_languageplugin;
+			$url = false;
+		
+			switch ($newsletters_languageplugin) {
+				case 'qtranslate'				:
+					$url = qtrans_convertURL($url, $language);
+					break;
+				case 'wpml'						:
+					$languages = icl_get_languages();
+					$language = $this -> language_current();
+					if (!empty($languages[$language]['url'])) {
+						$url = $languages[$language]['url'];
+					}
+					break;
+			}
+			
+			return $url;
+		}
+		
+		function language_default() {		
+			global $newsletters_languageplugin, $newsletters_languagedefault;
+			$default = false;
+			
+			if (!empty($newsletters_languagedefault)) {
+				return $newsletters_languagedefault;
+			}
+			
+			switch ($newsletters_languageplugin) {
+				case 'qtranslate'				:
+					global $q_config;
+					$default = $q_config['default_language'];
+					break;
+				case 'wpml'						:
+					global $sitepress;
+					$default = $sitepress -> get_default_language();
+					break;
+			}
+			
+			$newsletters_languagedefault = $default;
+			return $default;
+		}
+		
+		function language_name($language = null) {
+			$name = false;
+		
+			if (!empty($language)) {
+				global $newsletters_languageplugin, ${'newsletters_languagename_' . $language};
+				
+				if (!empty(${'newsletters_languagename_' . $language})) {
+					return ${'newsletters_languagename_' . $language};
+				}
+				
+				switch ($newsletters_languageplugin) {
+					case 'qtranslate'				:
+						global $q_config;
+						$name = $q_config['language_name'][$language];
+						break;
+					case 'wpml'						:
+						$languages = icl_get_languages();
+						if (!empty($languages[$language]['translated_name'])) {
+							$name = $languages[$language]['translated_name'];
+						}
+						break;
+				}
+			}
+			
+			${'newsletters_languagename_' . $language} = $name;
+			return $name;
+		}
+		
+		function language_do() {
+			global $newsletters_languageplugin;
+		
+			if (empty($newsletters_languageplugin)) {			
+				if ($this -> is_plugin_active('qtranslate')) {
+					$newsletters_languageplugin = "qtranslate";
+					return true;
+				} elseif ($this -> is_plugin_active('wpml')) {
+					$newsletters_languageplugin = "wpml";
+					return true;
+				}
+			} else {
+				return true;
+			}
+			
+			return false;
+		}
+		
+		function language_current() {
+			global $newsletters_languageplugin, $newsletters_languagecurrent;
+			$current = false;
+			
+			if (!empty($newsletters_languagecurrent)) {
+				return $newsletters_languagecurrent;
+			}
+			
+			switch ($newsletters_languageplugin) {
+				case 'qtranslate'			:
+					$current = qtrans_getLanguage();
+					break;
+				case 'wpml';
+					$current = ICL_LANGUAGE_CODE;
+					break;
+			}
+			
+			$newsletters_languagecurrent = $current;
+			return $current;
+		}
+		
 		function language_flag($language = null) {
-			global $q_config;
+			global $newsletters_languageplugin, ${'newsletters_languageflag_' . $language};
+			$flag = false;
 			
-			$flag = '<img src="' . content_url() . '/' . $q_config['flag_location'] . '/' . $q_config['flag'][$language] . '" alt="' . $language . '" />';
+			if (!empty(${'newsletters_languageflag_' . $language})) {
+				return ${'newsletters_languageflag_' . $language};
+			}
+		
+			switch ($newsletters_languageplugin) {
+				case 'qtranslate'			:
+					global $q_config;
+					$flag = '<img src="' . content_url() . '/' . $q_config['flag_location'] . '/' . $q_config['flag'][$language] . '" alt="' . $language . '" />';
+					break;
+				case 'wpml'					:
+					$languages = icl_get_languages();
+					$flag = '<img src="' . $languages[$language]['country_flag_url'] . '" alt="' . $language . '" />';
+					break;
+			}
 			
+			${'newsletters_languageflag_' . $language} = $flag;
 			return $flag;
+		}
+		
+		function language_isenabled($language = null) {
+			$enabled = false;
+		
+			if (!empty($language)) {
+				global $newsletters_languageplugin, ${'newsletters_languageenabled_' . $language};
+				
+				if (!empty(${'newsletters_languageenabled_' . $language})) {
+					return ${'newsletters_languageenabled_' . $language};
+				}
+			
+				switch ($newsletters_languageplugin) {
+					case 'qtranslate'				:
+						$enabled = qtrans_isEnabled($language);
+						break;
+					case 'wpml'						:
+						$languages = icl_get_languages();
+						if (!empty($languages[$language])) {
+							$enabled = true;
+						}
+						break;
+				}
+			}
+			
+			${'newsletters_languageenabled_' . $language} = $enabled;
+			return $enabled;
+		}
+		
+		function language_join($texts = array(), $tagTypeMap = array()) {
+			if(!is_array($texts)) $texts = $this -> language_split($texts, false);
+			$split_regex = "#<!--more-->#ism";
+			$max = 0;
+			$text = "";
+			$languages = $this -> language_getlanguages();
+			
+			foreach($languages as $language) {
+				if (!empty($texts[$language])) {
+					$texts[$language] = preg_split($split_regex, $texts[$language]);
+					if(sizeof($texts[$language]) > $max) $max = sizeof($texts[$language]);
+				}
+			}
+			
+			for ($i = 0; $i < $max; $i++) {
+				if($i>=1) {
+					$text .= '<!--more-->';
+				}
+				foreach($languages as $language) {
+					if (isset($texts[$language][$i]) && $texts[$language][$i] !== '') {
+						if (empty($tagTypeMap[$language]))
+							$text .= '<!--:'.$language.'-->'.$texts[$language][$i].'<!--:-->';
+						else
+							$text .= "[:{$language}]{$texts[$language][$i]}";
+					}
+				}
+			}
+			
+			return $text;
+		}
+		
+		function language_split($text, $quicktags = true, array &$languageMap = NULL) {
+			$array = false;
+			
+			if (!empty($text)) {	
+				//init vars
+				$split_regex = "#(<!--[^-]*-->|\[:[a-z]{2}\])#ism";
+				$current_language = "";
+				$result = array();
+				
+				$languages = $this -> language_getlanguages();
+				foreach ($languages as $language) {
+					$result[$language] = "";
+				}
+				
+				// split text at all xml comments
+				$blocks = preg_split($split_regex, $text, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+				foreach($blocks as $block) {
+					# detect language tags
+					if(preg_match("#^<!--:([a-z]{2})-->$#ism", $block, $matches)) {
+						if($this -> language_isenabled($matches[1])) {
+							$current_language = $matches[1];
+							$languageMap[$current_language] = false;
+						} else {
+							$current_language = "invalid";
+						}
+						continue;
+					// detect quicktags
+					} elseif($quicktags && preg_match("#^\[:([a-z]{2})\]$#ism", $block, $matches)) {
+						if($this -> language_isenabled($matches[1])) {
+							$current_language = $matches[1];
+							$languageMap[$current_language] = true;
+						} else {
+							$current_language = "invalid";
+						}
+						
+						continue;
+					} elseif(preg_match("#^<!--:-->$#ism", $block, $matches)) {
+						$current_language = "";
+						continue;
+					} elseif(preg_match("#^<!--more-->$#ism", $block, $matches)) {
+						foreach($languages as $language) {
+							$result[$language] .= $block;
+						}
+						
+						continue;
+					}
+					
+					if($current_language == "") {
+						foreach($languages as $language) {
+							$result[$language] .= $block;
+						}
+					} elseif($current_language != "invalid") {
+						$result[$current_language] .= $block;
+					}
+				}
+				
+				foreach($result as $lang => $lang_content) {
+					$result[$lang] = preg_replace("#(<!--more-->|<!--nextpage-->)+$#ism","",$lang_content);
+				}
+				return $result;
+			}
+			
+			return $array;
+		}
+		
+		function language_getlanguages() {
+			global $newsletters_languageplugin, $newsletters_languagelanguages;
+			$languages = false;
+			
+			if (!empty($newsletters_languagelanguages)) {
+				return $newsletters_languagelanguages;
+			}
+		
+			switch ($newsletters_languageplugin) {
+				case 'qtranslate'					:
+					$languages = qtrans_getSortedLanguages();
+					break;
+				case 'wpml'							:
+					$icl_languages = icl_get_languages();
+					$languages = array();
+					foreach ($icl_languages as $lang => $icl_language) {
+						$languages[] = $lang;
+					}
+					break;
+			}
+			
+			$newsletters_languagelanguages = $languages;
+			return $languages;
 		}
 		
 		function paginate($model = null, $fields = '*', $sub = null, $conditions = false, $searchterm = null, $per_page = 10, $order = array('modified', "DESC"), $conditions_and = null) {
@@ -2718,8 +3096,8 @@ if (!class_exists('wpMailPlugin')) {
 				wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
 				
 			/* Front-End Scripts */
-			} else {						
-				if (wpml_is_management()) {				
+			} else {									
+				if (wpml_is_management()) {								
 					if ($this -> get_option('loadscript_jqueryuitabs') == "Y") {
 						if (apply_filters('newsletters_enqueuescript_jqueryuitabs', true)) { wp_enqueue_script('jquery-ui-tabs', false, array('jquery'), false, true); }
 						if (apply_filters('newsletters_enqueuescript_jquerycookie', true)) { wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'admin', false), array('jquery')); }
@@ -3323,8 +3701,8 @@ if (!class_exists('wpMailPlugin')) {
 										$number = $matches[0];
 										
 										$list = (empty($instance['list'])) ? $_POST['list_id'][0] : $instance['list'];
-										if ($this -> is_plugin_active('qtranslate')) {
-											$list = qtrans_use($instance['lang'], $list, false);
+										if ($this -> language_do()) {
+											$list = $this -> language_use($instance['lang'], $list, false);
 										}
 										
 										if (!empty($list)) {
@@ -3881,7 +4259,7 @@ if (!class_exists('wpMailPlugin')) {
 				}	
 			}
 			
-			return $tracking;
+			return apply_filters('newsletters_tracking_image', $tracking, $eunique);
 		}
 		
 		function strip_set_variables($message = null) {
@@ -4334,7 +4712,8 @@ if (!class_exists('wpMailPlugin')) {
 					$adminemail = $this -> get_option('adminemail');
 					
 					if (!empty($subscriber -> mailinglist_id)) {
-						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
+						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
+
 						$query_hash = md5($adminemailquery);
 						global ${'newsletters_query_' . $query_hash};
 						if (!empty(${'newsletters_query_' . $query_hash})) {
@@ -5208,9 +5587,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.5") < 0) {
+				if (version_compare($cur_version, "4.3.6") < 0) {
 					$this -> update_options();
-					$version = "4.3.5";
+					$version = "4.3.6";
 				}
 			
 				//the current version is older.
@@ -5416,11 +5795,9 @@ if (!class_exists('wpMailPlugin')) {
 				'captcha'				=>	"N",															//security captcha image?
 			);
 			
-			if ($this -> is_plugin_active('qtranslate')) {
-				global $q_config;
-				
+			if ($this -> language_do()) {				
 				foreach ($embed as $ekey => $eval) {
-					$embed[$ekey][$q_config['default_language']] = $eval;	
+					$embed[$ekey][$this -> language_default()] = $eval;	
 				}
 			}
 			
@@ -5629,19 +6006,6 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			}
 			
-			return false;
-		}
-		
-		function language_ready() {
-			//the language plugin
-			$language_plugin = "LangSwitch/langswitch.php";
-		
-			if ($active_plugins = get_option('active_plugins')) {
-				if (!empty($active_plugins) && is_array($active_plugins) && in_array($language_plugin, $active_plugins)) {
-					return true;
-				}
-			}	
-		
 			return false;
 		}
 		
@@ -5917,15 +6281,15 @@ if (!class_exists('wpMailPlugin')) {
 				
 				switch ($type) {
 					case 'posts'				:
-						if (!empty($language) && $this -> is_plugin_active('qtranslate')) {
-							$message = qtrans_use($language, $template, false);
+						if (!empty($language) && $this -> language_do()) {
+							$message = $this -> language_use($language, $template, false);
 						} else {
 							$message = __($template);	
 						}
 						break;
 					default 					:
-						if (!empty($language) && $this -> is_plugin_active('qtranslate')) {
-							$message = wpautop(qtrans_use($language, $template, false));	
+						if (!empty($language) && $this -> language_do()) {
+							$message = wpautop($this -> language_use($language, $template, false));	
 						} else {
 							$message = wpautop(__($template));
 						}
@@ -6454,6 +6818,15 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function is_plugin_active($name = null, $orinactive = false) {
 			if (!empty($name)) {
+				global $Html;
+				$slug = $Html -> sanitize($name);
+			
+				global ${'newsletters_pluginactive_' . $slug};
+				if (!empty(${'newsletters_pluginactive_' . $slug})) {
+					$active = (${'newsletters_pluginactive_' . $slug} == "Y") ? true : false;					
+					return $active;
+				}
+			
 				require_once ABSPATH . 'wp-admin' . DS . 'includes' . DS . 'admin.php';
 				
 				if ($extensions = $this -> get_extensions()) {			
@@ -6475,6 +6848,9 @@ if (!class_exists('wpMailPlugin')) {
 						case 'qtranslate'							:
 							$path = 'qtranslate' . DS . 'qtranslate.php';
 							break;
+						case 'wpml'									:
+							$path = 'sitepress-multilingual-cms' . DS . 'sitepress.php';
+							break;
 						case 'captcha'								:
 							$path = 'really-simple-captcha' . DS . 'really-simple-captcha.php';
 							break;
@@ -6495,6 +6871,9 @@ if (!class_exists('wpMailPlugin')) {
 							/* Let's see if the plugin is installed and activated */
 							if (is_plugin_active(plugin_basename($path)) ||
 								is_plugin_active(plugin_basename($path2))) {
+								
+								${'newsletters_pluginactive_' . $slug} = "Y";
+								
 								return true;
 							}
 							
@@ -6502,6 +6881,9 @@ if (!class_exists('wpMailPlugin')) {
 							if (!empty($orinactive) && $orinactive == true) {
 								if (is_plugin_inactive(plugin_basename($path)) ||
 									is_plugin_inactive(plugin_basename($path2))) {
+									
+									${'newsletters_pluginactive_' . $slug} = "Y";
+									
 									return true;	
 								}
 							}	
@@ -6509,6 +6891,8 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 			}
+			
+			${'newsletters_pluginactive_' . $slug} = "N";
 			
 			return false;
 		}

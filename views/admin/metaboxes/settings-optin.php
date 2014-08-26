@@ -11,15 +11,14 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
 	<?php _e('These settings will affect post/page embedded and hardcoded subscribe forms.', $this -> plugin_name); ?>
 </p>
 
-<?php if ($this -> is_plugin_active('qtranslate')) : ?>
-	<?php global $q_config; ?>
+<?php if ($this -> language_do()) : ?>
     <?php 
     
-    $el = qtrans_getSortedLanguages(); 
+    $el = $this -> language_getlanguages(); 
     
     if (!empty($embed)) {
 	    foreach ($embed as $ekey => $eval) {
-		    $embed[$ekey] = qtrans_split($eval);
+		    $embed[$ekey] = $this -> language_split($eval);
 	    }
     }
     
@@ -30,7 +29,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
         	<ul>
 				<?php $tabnumber = 1; ?>
                 <?php foreach ($el as $language) : ?>
-                 	<li><a href="#languagetab<?php echo $tabnumber; ?>"><img src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a></li>   
+                 	<li><a href="#languagetab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
                     <?php $tabnumber++; ?>
                 <?php endforeach; ?>
             </ul>
@@ -88,7 +87,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
         });
 		</script>
     <?php else : ?>
-    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No qTranslate languages have been defined.', $this -> plugin_name); ?></p>
+    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No languages have been defined.', $this -> plugin_name); ?></p>
     <?php endif; ?>
 <?php else : ?>
     <table class="form-table">

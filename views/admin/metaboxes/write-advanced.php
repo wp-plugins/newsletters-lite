@@ -1,13 +1,12 @@
 <div class="<?php echo $this -> pre; ?> newsletters">
-	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+	<?php if ($this -> language_do()) : ?>
 		<div class="misc-pub-section">
-		<p><strong><?php _e('qTranslate Language', $this -> plugin_name); ?></strong></h4>
+		<p><strong><?php _e('Language', $this -> plugin_name); ?></strong></h4>
 	    <p><?php _e('Choose which title/content in the editor above should be sent to the mailing list(s) chosen below.', $this -> plugin_name); ?></p>
-	    <?php global $q_config; ?>
-	    <?php if (function_exists('qtrans_getSortedLanguages') && $el = qtrans_getSortedLanguages()) : ?>
+	    <?php if ($el = $this -> language_getlanguages()) : ?>
 	    	<p>
 				<?php foreach ($el as $language) : ?>
-	                <label><input <?php echo ($q_config['default_language'] == $language) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>qtranslate_language" value="<?php echo $language; ?>" id="<?php echo $this -> pre; ?>qtranslate_language_<?php echo $language; ?>" /> <img style="border:none;" src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /> <?php echo stripslashes($q_config['language_name'][$language]); ?></label><br/>
+	                <label><input <?php echo ($this -> language_default() == $language) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>qtranslate_language" value="<?php echo $language; ?>" id="<?php echo $this -> pre; ?>qtranslate_language_<?php echo $language; ?>" /> <?php echo $this -> language_flag($language); ?> <?php echo stripslashes($this -> language_name($language)); ?></label><br/>
 	            <?php endforeach; ?>
 	        </p>
 	    <?php else : ?>

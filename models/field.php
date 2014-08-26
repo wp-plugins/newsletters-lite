@@ -329,14 +329,12 @@ class wpmlField extends wpMailPlugin {
 		
 		$this -> data[$this -> model] = (object) $data[$this -> model];
 		
-		if ($this -> is_plugin_active('qtranslate')) {
-			global $q_config;
-		
-			if (function_exists('qtrans_join')) {
-				$this -> data[$this -> model] -> title = qtrans_join($this -> data[$this -> model] -> title);
-				$this -> data[$this -> model] -> caption = qtrans_join($this -> data[$this -> model] -> caption);
-				$this -> data[$this -> model] -> watermark = qtrans_join($this -> data[$this -> model] -> watermark);
-				$this -> data[$this -> model] -> errormessage = qtrans_join($this -> data[$this -> model] -> errormessage);
+		if ($this -> language_do()) {		
+			if (true) {
+				$this -> data[$this -> model] -> title = $this -> language_join($this -> data[$this -> model] -> title);
+				$this -> data[$this -> model] -> caption = $this -> language_join($this -> data[$this -> model] -> caption);
+				$this -> data[$this -> model] -> watermark = $this -> language_join($this -> data[$this -> model] -> watermark);
+				$this -> data[$this -> model] -> errormessage = $this -> language_join($this -> data[$this -> model] -> errormessage);
 				
 				$languages = array();
 				$fieldoptions = array();
@@ -355,7 +353,7 @@ class wpmlField extends wpMailPlugin {
 					}
 					
 					foreach ($newfieldoptions as $newfieldoption_key => $newfieldoption) {
-						$newfieldoptions[$newfieldoption_key] = qtrans_join($newfieldoption);
+						$newfieldoptions[$newfieldoption_key] = $this -> language_join($newfieldoption);
 					}
 					
 					$newfieldoptions = @implode("\r\n", $newfieldoptions);

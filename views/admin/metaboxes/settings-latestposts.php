@@ -78,17 +78,16 @@
                     <span class="howto"><?php _e('only new posts will be sent out and each post not more than once.', $this -> plugin_name); ?></span>
                 </td>
             </tr>
-            <?php if ($this -> is_plugin_active('qtranslate')) : ?>
-            	<?php global $q_config; ?>
+            <?php if ($this -> language_do()) : ?>
                 <?php $latestposts_language = $this -> get_option('latestposts_language'); ?>
-                <?php if (function_exists('qtrans_getSortedLanguages') && $el = qtrans_getSortedLanguages()) : ?>
+                <?php if ($el = $this -> language_getlanguages()) : ?>
                 	<tr>
-                    	<th><?php _e('qTranslate Language', $this -> plugin_name); ?></th>
+                    	<th><?php _e('Language', $this -> plugin_name); ?></th>
                         <td>
 		                	<?php foreach ($el as $language) : ?>
-								<label><input <?php echo (!empty($latestposts_language) && $latestposts_language == $language) ? 'checked="checked"' : ''; ?> type="radio" name="latestposts_language" value="<?php echo esc_attr($language); ?>" id="latestposts_language_<?php echo $language; ?>" /> <img style="border:none;" src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></label>
+								<label><input <?php echo (!empty($latestposts_language) && $latestposts_language == $language) ? 'checked="checked"' : ''; ?> type="radio" name="latestposts_language" value="<?php echo esc_attr($language); ?>" id="latestposts_language_<?php echo $language; ?>" /> <?php echo $this -> language_flag($language); ?></label>
 		                    <?php endforeach; ?>
-		                    <span class="howto"><?php _e('Choose the qTranslate language part which should be used for the posts.', $this -> plugin_name); ?></span>
+		                    <span class="howto"><?php _e('Choose the language part which should be used for the posts.', $this -> plugin_name); ?></span>
                     	</td>
 				<?php endif; ?>
             <?php endif; ?>

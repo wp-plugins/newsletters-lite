@@ -32,6 +32,14 @@ if (!function_exists('wpml_is_management')) {
 					return true;
 				}
 			}
+			
+			if ($wpMail -> is_plugin_active('wpml')) {
+				if ($otherpost = icl_object_id($post_id, 'page', false)) {
+					if (is_page($otherpost) || is_single($otherpost)) {
+						return true;
+					}
+				}
+			}
 		}
 		
 		return false;

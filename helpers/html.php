@@ -573,19 +573,19 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					$value = ${$mn[1]} -> data -> {$mn[2]};
 				}
 				
-				if ($this -> is_plugin_active('qtranslate') && $language) {
+				if ($this -> language_do() && $language) {
 					if ($mn[2] == "fieldoptions") {
 						$alloptions = maybe_unserialize($value);
 						$optionarray = array();
 						
 						foreach ($alloptions as $alloption) {
-							$alloptionsplit = qtrans_split($alloption);
+							$alloptionsplit = $this -> language_split($alloption);
 							$optionarray[] = trim($alloptionsplit[$language]);
 						}
 						
 						return trim(@implode("\r\n", $optionarray));
 					} else {
-						if ($texts = qtrans_split($value)) {
+						if ($texts = $this -> language_split($value)) {
 							if (!empty($texts[$language])) {
 								return $texts[$language];
 							}

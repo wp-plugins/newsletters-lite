@@ -42,17 +42,16 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 			</p>
 			
 			<div id="ptypeglobal" style="display:block;">
-				<?php if ($this -> is_plugin_active('qtranslate')) : ?>
-					<?php global $q_config; ?>
+				<?php if ($this -> language_do()) : ?>
 					<label for=""><?php _e('Language:', $this -> plugin_name); ?></label>
-		        	<?php if (function_exists('qtrans_getSortedLanguages') && $el = qtrans_getSortedLanguages()) : ?>
+		        	<?php if ($el = $this -> language_getlanguages()) : ?>
 		                <?php foreach ($el as $language) : ?>
-		                    <label><input <?php echo ($language == $q_config['default_language']) ? 'checked="checked"' : ''; ?> onclick="get_posts();" type="radio" name="postslanguage" value="<?php echo $language; ?>" id="postslanguage<?php echo $language; ?>" /> <img style="border:none;" src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></label>
+		                    <label><input <?php echo ($language == $this -> language_default()) ? 'checked="checked"' : ''; ?> onclick="get_posts();" type="radio" name="postslanguage" value="<?php echo $language; ?>" id="postslanguage<?php echo $language; ?>" /> <?php echo $this -> language_flag($language); ?></label>
 		                <?php endforeach; ?>
 		            <?php else : ?>
 		            
 		            <?php endif; ?>
-		            <?php echo $Html -> help(__('Since you are using qTranslate, choose the language of the post(s) that you want to use in the newsletter.', $this -> plugin_name)); ?>
+		            <?php echo $Html -> help(__('Since you are using multilingual, choose the language of the post(s) that you want to use in the newsletter.', $this -> plugin_name)); ?>
 		        <?php endif; ?>
 		        
 		        <p>
@@ -337,11 +336,16 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	var inserttabscookieid = jQuery.cookie('inserttabscookie') || 0;
+	if (jQuery.isFunction(jQuery.fn.cookie)) {
+		var inserttabscookieid = jQuery.cookie('inserttabscookie') || 0;
+	}
+		
 	jQuery('#inserttabs').tabs({
 		active:inserttabscookieid,
 		activate: function(event, ui) {
-			jQuery.cookie("inserttabscookie", ui.newTab.index(), {expires:365, path:'/'});
+			if (jQuery.isFunction(jQuery.fn.cookie)) {
+				jQuery.cookie("inserttabscookie", ui.newTab.index(), {expires:365, path:'/'});
+			}
 		}
 	});
 });

@@ -383,8 +383,8 @@ class wpmlMailinglist extends wpMailPlugin {
 			if (empty($this -> errors)) {
 				$created = $modified = $this -> gen_date();
 				
-				if ($this -> is_plugin_active('qtranslate')) {
-					$title = qtrans_join($title);
+				if ($this -> language_do()) {
+					$title = $this -> language_join($title);
 				}
 			
 				$query = (!empty($id)) ?

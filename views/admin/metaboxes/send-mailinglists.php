@@ -247,11 +247,16 @@ jQuery(document).ready(function() {
 		update_subscribers();
 	<?php endif; ?>	
 	
-	var mailingliststabscookieid = jQuery.cookie('mailingliststabscookie') || 0;
+	if (jQuery.isFunction(jQuery.fn.cookie)) {
+		var mailingliststabscookieid = jQuery.cookie('mailingliststabscookie') || 0;
+	}
+		
 	jQuery('#mailingliststabs').tabs({
 		active:mailingliststabscookieid,
 		activate: function(event, ui) {
-			jQuery.cookie("mailingliststabscookie", ui.newTab.index(), {expires:365, path:'/'});
+			if (jQuery.isFunction(jQuery.fn.cookie)) {
+				jQuery.cookie("mailingliststabscookie", ui.newTab.index(), {expires:365, path:'/'});
+			}
 		}
 	});
 });

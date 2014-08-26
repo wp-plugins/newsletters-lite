@@ -1,6 +1,6 @@
 <?php
 
-global $q_config, $wpdb, $Mailinglist, $Template;
+global $wpdb, $Mailinglist, $Template;
 
 ?>
 
@@ -241,13 +241,13 @@ global $q_config, $wpdb, $Mailinglist, $Template;
                 	<br/>
                     <table cellpadding="4" cellspacing="4" border="0">
                     	<tbody>
-                        	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+                        	<?php if ($this -> language_do()) : ?>
                                 <tr>
                                     <td nowrap="nowrap" valign="top"><label for=""><?php _e('Language:', $this -> plugin_name); ?></label></td>
                                     <td>
-                                        <?php if (function_exists('qtrans_getSortedLanguages') && $el = qtrans_getSortedLanguages()) : ?>
+                                        <?php if ($el = $this -> language_getlanguages()) : ?>
                                             <?php foreach ($el as $language) : ?>
-                                                <label><input onclick="posts_changeCategory();" type="radio" name="postslanguage" value="<?php echo $language; ?>" id="postslanguage<?php echo $language; ?>" /> <img style="border:none;" src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></label>
+                                                <label><input onclick="posts_changeCategory();" type="radio" name="postslanguage" value="<?php echo $language; ?>" id="postslanguage<?php echo $language; ?>" /> <?php echo $this -> language_flag($language); ?></label>
                                             <?php endforeach; ?>
                                         <?php else : ?>
                                         

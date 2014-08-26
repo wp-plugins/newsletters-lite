@@ -23,19 +23,18 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 			<th><label for="resubscribetext"><?php _e('Resubscribe Link Text', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('This setting simply specifies the text to use for the link of the [newsletters_resubscribe] shortcode that you put into newsletters to generate a resubscribe link.', $this -> plugin_name)); ?></th>
 			<td>
-				<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+				<?php if ($this -> language_do()) : ?>
 					<?php 
 					
-					global $q_config;
-					$el = qtrans_getSortedLanguages(); 
-					$resubscribetext = qtrans_split($this -> get_option('resubscribetext'));
+					$el = $this -> language_getlanguages(); 
+					$resubscribetext = $this -> language_split($this -> get_option('resubscribetext'));
 					
 					?>
 					<div id="resubscribetexttabs">
 						<ul>
 							<?php $tabnumber = 1; ?>
 			                <?php foreach ($el as $language) : ?>
-			                 	<li><a href="#resubscribetexttab<?php echo $tabnumber; ?>"><img src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a></li>   
+			                 	<li><a href="#resubscribetexttab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
 			                    <?php $tabnumber++; ?>
 			                <?php endforeach; ?>
 			            </ul>
@@ -64,19 +63,18 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 			<th><label for="<?php echo $this -> pre; ?>unsubscribetext"><?php _e('Unsubscription Link Text', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('This setting simply specifies the text to use for the link of the [wpmlunsubscribe] shortcode that you put into newsletters to generate an unsubscribe link. If you want to build your own links with custom text, you can use the [wpmlunsubscribeurl] shortcode to just generate the URL for the unsubscribe link automatically.', $this -> plugin_name)); ?></th>
 			<td>
-				<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+				<?php if ($this -> language_do()) : ?>
 					<?php 
 					
-					global $q_config;
-					$el = qtrans_getSortedLanguages(); 
-					$unsubscribetext = qtrans_split($this -> get_option('unsubscribetext'));
+					$el = $this -> language_getlanguages(); 
+					$unsubscribetext = $this -> language_split($this -> get_option('unsubscribetext'));
 					
 					?>
 					<div id="unsubscribetexttabs">
 						<ul>
 							<?php $tabnumber = 1; ?>
 			                <?php foreach ($el as $language) : ?>
-			                 	<li><a href="#unsubscribetexttab<?php echo $tabnumber; ?>"><img src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a></li>   
+			                 	<li><a href="#unsubscribetexttab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
 			                    <?php $tabnumber++; ?>
 			                <?php endforeach; ?>
 			            </ul>
@@ -105,19 +103,18 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 			<th><label for="unsubscribealltext"><?php _e('Unsubscribe All Link Text', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('Same as the setting above, except that this is the link text for the unsubscribe link to all the lists that the subscriber is subscribed to using the [wpmlunsubscribeall] shortcode.', $this -> plugin_name)); ?></th>
 			<td>
-				<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+				<?php if ($this -> language_do()) : ?>
 					<?php 
 					
-					global $q_config;
-					$el = qtrans_getSortedLanguages(); 
-					$unsubscribealltext = qtrans_split($this -> get_option('unsubscribealltext'));
+					$el = $this -> language_getlanguages(); 
+					$unsubscribealltext = $this -> language_split($this -> get_option('unsubscribealltext'));
 					
 					?>
 					<div id="unsubscribealltexttabs">
 						<ul>
 							<?php $tabnumber = 1; ?>
 			                <?php foreach ($el as $language) : ?>
-			                 	<li><a href="#unsubscribealltexttab<?php echo $tabnumber; ?>"><img src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a></li>   
+			                 	<li><a href="#unsubscribealltexttab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
 			                    <?php $tabnumber++; ?>
 			                <?php endforeach; ?>
 			            </ul>

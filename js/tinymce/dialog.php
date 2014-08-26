@@ -18,7 +18,7 @@ require_once(ABSPATH . 'wp-admin' . DS . 'includes' . DS . 'admin.php');
 $path = WP_CONTENT_DIR . DS . 'plugins' . DS . 'wp-mailinglist' . DS . 'wp-mailinglist.php';
 require_once $path;
 $wpMail = new wpMail();
-global $q_config, $wpdb, $Mailinglist, $Template;
+global $wpdb, $Mailinglist, $Template;
 
 ?>
 
@@ -258,13 +258,13 @@ global $q_config, $wpdb, $Mailinglist, $Template;
                 	<br/>
                     <table cellpadding="4" cellspacing="4" border="0">
                     	<tbody>
-                        	<?php if ($wpMail -> is_plugin_active('qtranslate')) : ?>
+                        	<?php if ($wpMail -> language_do()) : ?>
                                 <tr>
                                     <td nowrap="nowrap" valign="top"><label for=""><?php _e('Language:', $wpMail -> plugin_name); ?></label></td>
                                     <td>
-                                        <?php if (function_exists('qtrans_getSortedLanguages') && $el = qtrans_getSortedLanguages()) : ?>
+                                        <?php if ($el = $wpMail -> language_getlanguages()) : ?>
                                             <?php foreach ($el as $language) : ?>
-                                                <label><input onclick="posts_changeCategory();" type="radio" name="postslanguage" value="<?php echo $language; ?>" id="postslanguage<?php echo $language; ?>" /> <img style="border:none;" src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></label>
+                                                <label><input onclick="posts_changeCategory();" type="radio" name="postslanguage" value="<?php echo $language; ?>" id="postslanguage<?php echo $language; ?>" /> <?php echo $wpMail -> language_flag($language); ?></label>
                                             <?php endforeach; ?>
                                         <?php else : ?>
                                         

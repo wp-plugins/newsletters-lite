@@ -84,13 +84,20 @@ if (!empty($subscriber -> subscriptions)) {
 
 <script type="text/javascript">
 jQuery(document).ready(function() { 
-	var managementtabscookieid = jQuery.cookie('managementtabscookie') || 0;
-	jQuery('#managementtabs').tabs({
-		active: managementtabscookieid,
-		activate: function(event, ui) {
-			jQuery.cookie('managementtabscookie', ui.newTab.index(), {expires: 365, path: '/'});
-		}
-	}); 
+	if (jQuery.isFunction(jQuery.fn.cookie)) {
+		var managementtabscookieid = jQuery.cookie('managementtabscookie') || 0;
+	}
+		
+	if (jQuery.isFunction(jQuery.fn.tabs)) {
+		jQuery('#managementtabs').tabs({
+			active: managementtabscookieid,
+			activate: function(event, ui) {
+				if (jQuery.isFunction(jQuery.fn.cookie)) {
+					jQuery.cookie('managementtabscookie', ui.newTab.index(), {expires: 365, path: '/'});
+				}
+			}
+		}); 
+	}
 });
 
 function wpmlmanagement_savefields() {

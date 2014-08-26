@@ -13,15 +13,15 @@ class Newsletters_Widget extends WP_Widget {
 				
 		extract($args);		
 		echo $before_widget;
-		$title = apply_filters('widget_title', $instance['title']);
-		if (!empty($title)) { echo $before_title . $title . $after_title; }
+		$title = apply_filters('widget_title', __($instance['title']));
+		if (!empty($title)) { echo $before_title . __($title) . $after_title; }
 		$subtitle = apply_filters('widget_subtitle', $instance['subtitle']);
-		if (!empty($subtitle)) { echo '<p>' . $instance['subtitle'] . '</p>'; }
+		if (!empty($subtitle)) { echo '<p>' . __($subtitle) . '</p>'; }
 		
 		$wpMail = new wpMail();
 		$widget = __CLASS__;
 		
-		$action = ($wpMail -> is_plugin_active('qtranslate')) ? qtrans_convertURL($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
+		$action = ($wpMail -> language_do()) ? $wpMail -> language_converturl($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
 		$action = $Html -> retainquery($wpMail -> pre . 'method=optin', $action) . '#' . $widget_id;
 		
 		?>
@@ -51,12 +51,11 @@ class Newsletters_Widget extends WP_Widget {
 					$instance['button'] = __('Subscribe Now', $wpMail -> plugin_name);
 				}
 				
-				if ($wpMail -> is_plugin_active('qtranslate')) {
-					global $q_config;
-					$languages = qtrans_getSortedLanguages();
+				if ($wpMail -> language_do()) {
+					$languages = $wpMail -> language_getlanguages();
 					
 					foreach ($instance as $ikey => $ival) {
-						$instance[$ikey] = qtrans_split($ival);
+						$instance[$ikey] = $wpMail -> language_split($ival);
 					}
 				
 					?>
@@ -66,7 +65,7 @@ class Newsletters_Widget extends WP_Widget {
 							<ul>
 								<?php foreach ($languages as $language) : ?>
 									<li>
-										<a href="#languagetab<?php echo $this -> number . $language; ?>"><img src="<?php echo content_url(); ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a>
+										<a href="#languagetab<?php echo $this -> number . $language; ?>"><?php echo $wpMail -> language_flag($language); ?></a>
 									</li>
 								<?php endforeach; ?>
 							</ul>
@@ -143,11 +142,16 @@ class Newsletters_Widget extends WP_Widget {
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						var widgettabscookie = jQuery.cookie('widgettabscookie') || 0;
+						if (jQuery.isFunction(jQuery.fn.cookie)) {
+							var widgettabscookie = jQuery.cookie('widgettabscookie') || 0;
+						}
+							
 						jQuery('#languagetabs<?php echo $this -> number; ?>').tabs({
 							active: widgettabscookie,
 							activate: function(event, ui) {
-								jQuery.cookie('widgettabscookie', ui.newTab.index(), {expires: 365, path: '/'});
+								if (jQuery.isFunction(jQuery.fn.cookie)) {
+									jQuery.cookie('widgettabscookie', ui.newTab.index(), {expires: 365, path: '/'});
+								}
 							}
 						});
 					});
@@ -240,12 +244,12 @@ class Newsletters_Widget extends WP_Widget {
 			
 		if (class_exists('wpMail')) {
 			if ($wpMail = new wpMail()) {
-				if ($wpMail -> is_plugin_active('qtranslate')) {
+				if ($wpMail -> language_do()) {
 					foreach ($new_instance as $nikey => $nival) {
 						$instance[$nikey] = $nival;
 					
 						if (is_array($new_instance[$nikey])) {
-							$instance[$nikey] = qtrans_join($nival);
+							$instance[$nikey] = $wpMail -> language_join($nival);
 						}
 					}
 				} else {

@@ -53,6 +53,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('delete_post', 'delete_post', 10, 1);
 			$this -> add_action('init', 'init', 1, 1);
 			$this -> add_action('init', 'init_textdomain', 10, 1);
+			$this -> add_action('plugins_loaded', "plugins_loaded", 2, 1);
 			
 			/* Schedules */
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
@@ -86,6 +87,10 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_filter('transient_update_plugins', 'check_update', 10, 1);
 	        $this -> add_filter('site_transient_update_plugins', 'check_update', 10, 1);
 	        $this -> add_filter('tiny_mce_before_init', 'override_mce_options', 10, 1);
+	        
+	        if ($this -> language_do()) {
+	        	add_filter('gettext', array($this, 'language_useordefault'), 0);
+	        }
 			
 			//WordPress Shortcodes
 			global $Shortcode;

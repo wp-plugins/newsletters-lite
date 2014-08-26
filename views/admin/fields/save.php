@@ -1,8 +1,7 @@
 <?php
 
-if ($this -> is_plugin_active('qtranslate')) {
-	global $q_config;
-	$el = qtrans_getSortedLanguages();
+if ($this -> language_do()) {
+	$el = $this -> language_getlanguages();
 }
 
 include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
@@ -23,13 +22,13 @@ $regex = $Html -> field_value('Field[regex]');
 				<tr>
 					<th><label for="Field_title"><?php _e('Title', $this -> plugin_name); ?></label></th>
 					<td>
-						<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+						<?php if ($this -> language_do()) : ?>
 							<div id="tabs_title">
 								<ul>
 									<?php $tabs_title = 1; ?>
 									<?php foreach ($el as $language) : ?>
 										<li>
-											<a href="#tabs_title_<?php echo $tabs_title; ?>"><img src="<?php echo content_url(); ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo esc_attr($language); ?>" /></a>
+											<a href="#tabs_title_<?php echo $tabs_title; ?>"><?php echo $this -> language_flag($language); ?></a>
 										</li>
 										<?php $tabs_title++; ?>
 									<?php endforeach; ?>
@@ -68,14 +67,14 @@ $regex = $Html -> field_value('Field[regex]');
 				<tr>
 					<th><label for="Field.caption"><?php _e('Caption/Description', $this -> plugin_name); ?></label></th>
 					<td>
-						<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+						<?php if ($this -> language_do()) : ?>
 							<div id="tabs_caption">
 								<?php $tabs_caption = 1; ?>
 								<ul>
 									<?php foreach ($el as $language) : ?>
 										<li>
 											<a href="#tabs_caption_<?php echo $tabs_caption; ?>">
-												<img src="<?php echo content_url(); ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" />
+												<?php echo $this -> language_flag($language); ?>
 											</a>
 										</li>	
 										<?php $tabs_caption++; ?>
@@ -99,14 +98,14 @@ $regex = $Html -> field_value('Field[regex]');
 				<tr>
 					<th><label for="Field.watermark"><?php _e('Watermark', $this -> plugin_name); ?></label></th>
 					<td>
-						<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+						<?php if ($this -> language_do()) : ?>
 							<div id="tabs_watermark">
 								<ul>
 									<?php $tabs_watermark = 1; ?>
 									<?php foreach ($el as $language) : ?>
 										<li>
 											<a href="#tabs_watermark_<?php echo $tabs_watermark; ?>">
-												<img src="<?php echo content_url(); ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" />
+												<?php echo $this -> language_flag($language); ?>
 											</a>
 										</li>
 										<?php $tabs_watermark++; ?>
@@ -176,14 +175,14 @@ $regex = $Html -> field_value('Field[regex]');
 					<tr>
 						<th><label for="Field.errormessage"><?php _e('Error Message', $this -> plugin_name); ?></label></th>
 						<td>
-							<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+							<?php if ($this -> language_do()) : ?>
 								<div id="tabs_errormessage">
 									<ul>
 										<?php $tabs_errormessage = 1; ?>
 										<?php foreach ($el as $language) : ?>
 											<li>
 												<a href="#tabs_errormessage_<?php echo $tabs_errormessage; ?>">
-													<img src="<?php echo content_url(); ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" />
+													<?php echo $this -> language_flag($language); ?>
 												</a>
 											</li>
 											<?php $tabs_errormessage++; ?>
@@ -272,14 +271,14 @@ $regex = $Html -> field_value('Field[regex]');
 					<tr class="form-field" style="display:block;">
 						<th><label for="Field.fieldoptions"><?php _e('Field Options', $this -> plugin_name); ?></label></th>
 						<td>
-							<?php if ($this -> is_plugin_active('qtranslate')) : ?>							
+							<?php if ($this -> language_do()) : ?>							
 								<div id="tabs_fieldoptions">
 									<ul>
 										<?php $tabs_fieldoptions = 1; ?>
 										<?php foreach ($el as $language) : ?>
 											<li>
 												<a href="#tabs_fieldoptions_<?php echo $tabs_fieldoptions; ?>">
-													<img src="<?php echo content_url(); ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" />
+													<?php echo $this -> language_flag($language); ?>
 												</a>
 											</li>
 											<?php $tabs_fieldoptions++; ?>
@@ -371,7 +370,7 @@ function validation_change(validation) {
 
 jQuery(document).ready(function() {
 	/* Tabs */
-	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+	<?php if ($this -> language_do()) : ?>
 		jQuery('#tabs_title').tabs();
 		jQuery('#tabs_caption').tabs();
 		jQuery('#tabs_watermark').tabs();

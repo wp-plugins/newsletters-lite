@@ -81,8 +81,8 @@ class wpMailAjax extends wpMailPlugin {
 		
 		if ($posts = get_posts($arguments)) {								
 			foreach ($posts as $post) {
-				if ($this -> is_plugin_active('qtranslate')) {
-					$posts_by_category .= '<option value="' . $post -> ID . '">' . qtrans_use($_REQUEST['language'], $post -> post_title, false) . '</option>';
+				if ($this -> language_do()) {
+					$posts_by_category .= '<option value="' . $post -> ID . '">' . $this -> language_use($_REQUEST['language'], $post -> post_title, false) . '</option>';
 				} else {
 					$posts_by_category .= '<option value="' . $post -> ID . '">' . $post -> post_title . '</option>';
 				}
@@ -168,12 +168,11 @@ class wpMailAjax extends wpMailPlugin {
 		$embed = $this -> get_option('embed');		
 		$newoptions = wp_parse_args($options[$wpoptinid], $embed);
 		
-		//is qTranslate installed and active?
-		if ($this -> is_plugin_active('qtranslate')) {
-			global $q_config;
+		//is multilingual installed and active?
+		if ($this -> language_do()) {
 			$qtranslateactive = true;
 			
-			$language = $q_config['language'];
+			$language = $this -> language_current();
 			if (!empty($_POST['language'])) { $language = $_POST['language']; }
 			
 			foreach ($newoptions as $okey => $oval) {

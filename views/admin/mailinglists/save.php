@@ -4,9 +4,9 @@
 
 $doubleopt = $mailinglist -> doubleopt;
 
-if ($this -> is_plugin_active('qtranslate')) {
-	$languages = qtrans_getSortedLanguages();
-	$mailinglist_title = qtrans_split($Mailinglist -> data[$Mailinglist -> model] -> title);
+if ($this -> language_do()) {
+	$languages = $this -> language_getlanguages();
+	$mailinglist_title = $this -> language_split($Mailinglist -> data[$Mailinglist -> model] -> title);
 }
 
 ?>
@@ -22,7 +22,7 @@ if ($this -> is_plugin_active('qtranslate')) {
 				<tr>
 					<th><label for="Mailinglist.title"><?php _e('List Title', $this -> plugin_name); ?></label></th>
 					<td>
-						<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+						<?php if ($this -> language_do()) : ?>
 							<div id="mailinglist-title-tabs">
 								<ul>
 									<?php foreach ($languages as $language) : ?>

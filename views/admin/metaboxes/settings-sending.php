@@ -153,22 +153,3 @@ $themeintextversion = $this -> get_option('themeintextversion');
 		</tbody>
 	</table>
 </div>
-
-<?php /*
-<table class="form-table">
-	<tbody>
-        <tr>
-            <th><label for="qtranslatesupport_N"><?php _e('Enable qTranslate Support', $this -> plugin_name); ?></label></th>
-            <td>
-            	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
-                	<label><input <?php echo ($this -> get_option('qtranslatesupport') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="qtranslatesupport" value="Y" id="qtranslatesupport_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
-                    <label><input <?php echo (!$this -> get_option('qtranslatesupport') || $this -> get_option('qtranslatesupport') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="qtranslatesupport" value="N" id="qtranslatesupport_N" /> <?php _e('No', $this -> plugin_name); ?></label>
-                    <span class="howto"><?php _e('Turn On for multilingual newsletters using qTranslate plugin.', $this -> plugin_name); ?></span>
-                <?php else : ?>
-                	<span class="error"><?php _e('You do not have <a href="" target="_blank">qTranslate plugin</a> installed or it is not active at the moment.', $this -> plugin_name); ?></span>
-                <?php endif; ?>
-            </td>
-        </tr>
-    </tbody>
-</table>
-*/ ?>

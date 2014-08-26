@@ -5,8 +5,8 @@ var wpmlAjax = '<?php echo rtrim($this -> url(), '/'); ?>/<?php echo $this -> pl
 var wpmlUrl = '<?php echo $this -> url(); ?>';
 var wpmlScroll = "<?php echo ($embed['scroll'] == "Y") ? 'Y' : 'N'; ?>";
 
-<?php if ($this -> is_plugin_active('qtranslate')) : ?>
-	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>?lang=<?php echo qtrans_getLanguage(); ?>&';
+<?php if ($this -> language_do()) : ?>
+	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>?lang=<?php echo $this -> language_current(); ?>&';
 <?php else : ?>
 	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>?';
 <?php endif; ?>

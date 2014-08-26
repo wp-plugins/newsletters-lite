@@ -104,9 +104,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			if ($post = get_post($post_id)) {
 				$shortcode_post_showdate = $showdate;
 				
-				if ($this -> is_plugin_active('qtranslate')) {
+				if ($this -> language_do()) {
 					$shortcode_post_language = $language;
-					$post = qtrans_use($language, $post, false);
+					$post = $this -> language_use($language, $post, false);
 					$shortcode_posts = array($post);
 					$output = do_shortcode($this -> et_message('posts', false, $language));
 				} else {
@@ -249,8 +249,8 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		if (!empty($post_id)) {
 			if ($permalink = get_permalink($post_id)) {
-				if ($this -> is_plugin_active('qtranslate')) {
-					$permalink = qtrans_convertURL($permalink, $shortcode_post_language);
+				if ($this -> language_do()) {
+					$permalink = $this -> language_converturl($permalink, $shortcode_post_language);
 					$permalink = $Html -> retainquery('lang=' . $shortcode_post_language, $permalink);
 				}
 				
@@ -268,7 +268,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	
 	function excerpt_more($more = null) {
 		global $shortcode_post, $shortcode_post_language, $wpml_target;
-		$excerpt_more = ($this -> is_plugin_active('qtranslate')) ? qtrans_use($shortcode_post_language, qtrans_join($this -> get_option('excerpt_more'))) : $this -> get_option('excerpt_more');
+		$excerpt_more = ($this -> language_do()) ? $this -> language_use($shortcode_post_language, $this -> language_join($this -> get_option('excerpt_more'))) : $this -> get_option('excerpt_more');
 		
 		global ${'newsletters_acolor'};
 		if (!empty(${'newsletters_acolor'})) {
@@ -311,11 +311,11 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		if ($posts = get_posts($arguments)) {	
 			$shortcode_post_showdate = $showdate;
 			
-			if ($this -> is_plugin_active('qtranslate')) {
+			if ($this -> language_do()) {
 				$shortcode_post_language = $arguments['language'];
 			
 				foreach ($posts as $pkey => $post) {
-					$posts[$pkey] = qtrans_use($arguments['language'], $post, false);
+					$posts[$pkey] = $this -> language_use($arguments['language'], $post, false);
 				}
 				
 				$shortcode_posts = $posts;
@@ -462,7 +462,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$r = shortcode_atts($defaults, $atts);
 		extract($r);
 		
-		$action = ($this -> is_plugin_active('qtranslate')) ? qtrans_convertURL($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
+		$action = ($this -> language_do()) ? $this -> language_converturl($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
 		$action = $Html -> retainquery($this -> pre . 'method=optin', $action) . '#' . $widget_id;
 		
 		$output = "";

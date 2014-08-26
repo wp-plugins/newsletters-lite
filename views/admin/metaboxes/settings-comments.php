@@ -31,12 +31,11 @@
         	<tr>
             	<th><label for="commentformlabel"><?php _e('Comments Checkbox Label', $this -> plugin_name); ?></label></th>
                 <td>
-                	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+                	<?php if ($this -> language_do()) : ?>
 						<?php
 						
-						global $q_config;
-						$el = qtrans_getSortedLanguages();
-						$commentformlabel = qtrans_split($this -> get_option('commentformlabel'));
+						$el = $this -> language_getlanguages();
+						$commentformlabel = $this -> language_split($this -> get_option('commentformlabel'));
 						
 						?>
 						<?php if (!empty($el)) : ?>					
@@ -44,7 +43,7 @@
 								<ul>
 									<?php $tabnumber = 1; ?>
 					                <?php foreach ($el as $language) : ?>
-					                 	<li><a href="#commentformlabeltab<?php echo $tabnumber; ?>"><img src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a></li>   
+					                 	<li><a href="#commentformlabeltab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
 					                    <?php $tabnumber++; ?>
 					                <?php endforeach; ?>
 					            </ul>
@@ -108,12 +107,11 @@
         	<tr>
             	<th><label for="registerformlabel"><?php _e('Registration Checkbox Label', $this -> plugin_name); ?></label></th>
                 <td>
-                	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+                	<?php if ($this -> language_do()) : ?>
 						<?php
 						
-						global $q_config;
-						$el = qtrans_getSortedLanguages();
-						$registerformlabel = qtrans_split($this -> get_option('registerformlabel'));
+						$el = $this -> language_getlanguages();
+						$registerformlabel = $this -> language_split($this -> get_option('registerformlabel'));
 						
 						?>
 						<?php if (!empty($el)) : ?>					
@@ -121,7 +119,7 @@
 								<ul>
 									<?php $tabnumber = 1; ?>
 					                <?php foreach ($el as $language) : ?>
-					                 	<li><a href="#registerformlabeltab<?php echo $tabnumber; ?>"><img src="<?php echo WP_CONTENT_URL; ?>/<?php echo $q_config['flag_location']; ?>/<?php echo $q_config['flag'][$language]; ?>" alt="<?php echo $language; ?>" /></a></li>   
+					                 	<li><a href="#registerformlabeltab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
 					                    <?php $tabnumber++; ?>
 					                <?php endforeach; ?>
 					            </ul>

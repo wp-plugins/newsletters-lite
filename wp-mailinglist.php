@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.5
+Version: 4.3.6
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -1128,12 +1128,12 @@ if (!class_exists('wpMail')) {
 			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {					
 				if ($posts = get_posts($post_criteria)) {					
 					if (!empty($posts)) {
-						/* qTranslate */
-						if ($this -> is_plugin_active('qtranslate')) {
+						/* multilingual */
+						if ($this -> language_do()) {
 							$latestposts_language = $this -> get_option('latestposts_language');
 							
 							foreach ($posts as $pkey => $post) {
-								$posts[$pkey] = qtrans_use($latestposts_language, $post, false);	
+								$posts[$pkey] = $this -> language_use($latestposts_language, $post, false);	
 							}
 						}
 						
@@ -1554,9 +1554,9 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function the_editor($html = null) {
-			/* Check qTranslate Support */
+			/* Check multilingual Support */
 			if (is_admin()) {
-				if ($this -> is_plugin_active('qtranslate')) {
+				if ($this -> language_do()) {
 					if ($this -> is_plugin_screen('send')) {		
 						remove_filter('the_editor', 'qtrans_modifyRichEditor');	
 						remove_action('wp_tiny_mce_init', 'qtrans_TinyMCE_init');
@@ -1671,13 +1671,12 @@ if (!class_exists('wpMail')) {
 									//prepare global post data
 									setup_postdata($post);
 									
-									/* qTranslate stuff */		
-									if ($this -> is_plugin_active('qtranslate')) {
-										global $q_config;
-										if (!empty($q_config['enabled_languages'])) {
+									/* multilingual stuff */		
+									if ($this -> language_do()) {
+										if ($languages = $this -> language_getlanguages()) {
 											if (!empty($qtranslate_language)) {
-												$titles = qtrans_split($post -> post_title);
-												$contents = qtrans_split($post -> post_content);
+												$titles = $this -> language_split($post -> post_title);
+												$contents = $this -> language_split($post -> post_content);
 												
 												if (!empty($titles[$qtranslate_language])) { $post -> post_title = $titles[$qtranslate_language]; }
 												if (!empty($contents[$qtranslate_language])) { $post -> post_content = $contents[$qtranslate_language]; }
@@ -2070,7 +2069,7 @@ if (!class_exists('wpMail')) {
 			$r = shortcode_atts($defaults, $atts);
 			extract($r);
 			
-			$action = ($this -> is_plugin_active('qtranslate')) ? qtrans_convertURL($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
+			$action = ($this -> language_do()) ? $this -> language_converturl($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
 			$action = $Html -> retainquery($this -> pre . 'method=optin', $action) . '#' . $widget_id;
 			$errors = $Subscriber -> errors;
 			
@@ -5409,10 +5408,10 @@ if (!class_exists('wpMail')) {
 									}
 									break;
 								case 'embed'				:
-									if ($this -> is_plugin_active('qtranslate')) {
+									if ($this -> language_do()) {
 										if (!empty($val) && is_array($val)) {
 											foreach ($val as $vkey => $vval) {
-												$val[$vkey] = qtrans_join($vval);
+												$val[$vkey] = $this -> language_join($vval);
 											}
 										}
 									}
@@ -5420,8 +5419,8 @@ if (!class_exists('wpMail')) {
 									$this -> update_option('embed', $val);
 									break;
 								case 'excerpt_more'			:
-									if ($this -> is_plugin_active('qtranslate')) {
-										$this -> update_option($key, qtrans_join($val));
+									if ($this -> language_do()) {
+										$this -> update_option($key, $this -> language_join($val));
 									} else {
 										$this -> update_option($key, $val);	
 									}
@@ -5461,7 +5460,7 @@ if (!class_exists('wpMail')) {
 			
 				foreach ($_POST as $key => $val) {				
 					switch ($key) {
-						// Actions for qTranslate strings
+						// Actions for multilingual strings
 						case 'managelinktext'				:
 						case 'managementloginsubject'		:
 						case 'subscriberexistsmessage'		:
@@ -5470,8 +5469,8 @@ if (!class_exists('wpMail')) {
 						case 'unsubscribetext'				:
 						case 'unsubscribealltext'			:
 						case 'resubscribetext'				:
-							if ($this -> is_plugin_active('qtranslate')) {
-								$this -> update_option($key, qtrans_join($val));
+							if ($this -> language_do()) {
+								$this -> update_option($key, $this -> language_join($val));
 							} else {
 								$this -> update_option($key, $val);	
 							}
@@ -5503,8 +5502,8 @@ if (!class_exists('wpMail')) {
 				delete_option('tridebugging');
 			
 				foreach ($_POST as $key => $val) {				
-					if ($this -> is_plugin_active('qtranslate') && function_exists('qtrans_join')) {
-						$this -> update_option($key, qtrans_join($val));
+					if ($this -> language_do()) {
+						$this -> update_option($key, $this -> language_join($val));
 					} else {
 						$this -> update_option($key, $val);
 					}
@@ -5536,8 +5535,8 @@ if (!class_exists('wpMail')) {
 							break;
 						case 'commentformlabel'		:
 						case 'registerformlabel'	:
-							if ($this -> is_plugin_active('qtranslate')) {
-								$this -> update_option($key, qtrans_join($val));
+							if ($this -> language_do()) {
+								$this -> update_option($key, $this -> language_join($val));
 							}
 							break;
 						case 'captchainterval'		:
@@ -5654,7 +5653,7 @@ if (!class_exists('wpMail')) {
 		
 		function activation_hook() {
 			$this -> add_option('activation_redirect', true);
-			wp_redirect(admin_url('index.php') . "?page=newsletters-about");
+			//wp_redirect(admin_url('index.php') . "?page=newsletters-about");
 		}
 		
 		function custom_redirect() {
