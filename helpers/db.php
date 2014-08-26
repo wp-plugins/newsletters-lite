@@ -55,7 +55,7 @@ class wpmlDbHelper extends wpMailPlugin {
 				if (empty($object -> errors)) {
 					switch ($object -> model) {
 						case 'Theme'			:
-							$object -> data -> content = mysql_escape_string($object -> data -> content);
+							$object -> data -> content = mysql_real_escape_string($object -> data -> content);
 							break;
 					}
 					

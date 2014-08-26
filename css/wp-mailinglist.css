@@ -137,22 +137,8 @@ table tbody tr.arow {
 	height: 24px;
 }
 
-.newsletters .submitbox #sendfrom #sendfrom-image:before {
-	font-family: 'newsletters_dashicons' !important;
-	content: '\f110';
-}
-
-.newsletters .submitbox #sendrecurring #sendrecurring-image:before {
-	font-family: 'newsletters_dashicons' !important;
-	content: '\f113';
-}
-
 .wpml .submitbox #sendfrom #sendfrom-image,
 .wpml .submitbox #sendrecurring #sendrecurring-image  {
-	/*background: transparent url('../../../../wp-admin/images/menu.png') top left no-repeat;
-	background-position: -306px -35px;
-	width: 24px;
-	height: 24px;*/
 	margin: 0 5px 0 0;
 	font-size: 20px;
 	display: block;
@@ -161,15 +147,6 @@ table tbody tr.arow {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-
-/*.wpml .submitbox #sendrecurring #sendrecurring-image  {
-	background: transparent url('../../../../wp-admin/images/menu.png') top left no-repeat;
-	background-position: -336px -40px;
-	width: 24px;
-	height: 24px;
-	display: block;
-	float: left;
-}*/
 
 .wpml .submitbox #sendfrom-value {
 	margin: 0 0 0 24px;
@@ -240,27 +217,6 @@ table tbody tr.arow {
 	padding: 2px 5px;
 }
 
-/*.wpmlhelp {
-	display: inline-block;
-    margin: 2px 0 0 5px;
-    vertical-align: top;
-	-moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    z-index: 26;
-	background-color: #444444;
-}
-
-.wpmlhelp a {
-	display: block;
-	padding: 0 5px;
-	color: white;
-	text-decoration: none;
-	font-weight: bold;
-	font-size: 10px;
-    line-height: 15px;
-}*/
-
 .ui-tooltip {
 	padding: 8px;
 	position: absolute;
@@ -274,18 +230,6 @@ table tbody tr.arow {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 }
-
-/*.wpmlhelp a {
-	width: 16px;
-	height: 16px;
-	background-image: url('../images/icons/question.png');
-	background-repeat: no-repeat;
-	display: inline-block;
-	text-indent: -9999px;
-	text-decoration: none;
-	line-height: 16px;
-	margin: 0 6px 0 0;
-}*/
 
 .wpml .extensionicon {
 	box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
@@ -494,7 +438,7 @@ span.mce_Newsletters:before {
 	content: '\f223';
 	font-weight: 400;
 	font-size: 20px;
-	vertical-align: middle;
+	vertical-align: top;
 	text-decoration: none;
 	line-height: 100%;
 	height: auto;
@@ -506,13 +450,56 @@ span.mce_Newsletters:before {
   font-family: 'newsletters_dashicons';
   src: url('../fonts/newsletters_dashicons.eot'); // this is for IE
 }
+
 @font-face {
   font-family: 'newsletters_dashicons';
   src: url('../fonts/newsletters_dashicons.woff') format('woff'), 
     url('../fonts/newsletters_dashicons.ttf') format('truetype'), 
     url('../fonts/newsletters_dashicons.svg') format('svg');
-  font-weight: normal;
+  font-weight: bold;
   font-style: normal;
+}
+
+.newsletters_dashicons {
+	font-family: 'newsletters_dashicons' !important;
+	font-size: 16px;
+	text-decoration: none;
+}
+
+.newsletters #statsdiv h3:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f185\ ';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-size: 16px;
+}
+
+.newsletters .submitbox #sendfrom #sendfrom-image:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f110';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.newsletters #themesdiv .newsletters_theme_preview:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f179';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.newsletters #themesdiv .newsletters_theme_edit:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f464';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.newsletters .submitbox #sendrecurring #sendrecurring-image:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f113';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* Admin Menu END */

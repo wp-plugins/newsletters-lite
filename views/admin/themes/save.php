@@ -26,7 +26,7 @@
                 	<?php echo $Html -> help(__('Choose how you want to save this newsletter theme. You can either paste HTML code or upload a .html file.', $this -> plugin_name)); ?></th>
                     <td>
                     	<label><input <?php echo ($Html -> field_value('Theme[type]') == "upload" || $Html -> field_value('Theme[type]') == "") ? 'checked="checked"' : ''; ?> onclick="jQuery('#typediv_upload').show(); jQuery('#typediv_paste').hide();" type="radio" name="Theme[type]" value="upload" id="Theme.type_upload" /> <?php _e('Upload an HTML File', $this -> plugin_name); ?></label>
-                        <label><input <?php echo ($Html -> field_value('Theme[type]') == "paste") ? 'checked="checked"' : ''; ?> onclick="jQuery('#typediv_paste').show(); jQuery('#typediv_upload').hide();" type="radio" name="Theme[type]" value="paste" id="Theme.type_paste" /> <?php _e('Paste HTML Code', $this -> plugin_name); ?></label>
+                        <label><input <?php echo ($Html -> field_value('Theme[type]') == "paste") ? 'checked="checked"' : ''; ?> onclick="jQuery('#typediv_paste').show(); jQuery('#typediv_upload').hide();" type="radio" name="Theme[type]" value="paste" id="Theme.type_paste" /> <?php _e('HTML Code', $this -> plugin_name); ?></label>
                     </td>
                 </tr>
             </tbody>
@@ -49,17 +49,17 @@
         </div>
         
         <div id="typediv_paste" style="display:<?php echo ($Html -> field_value('Theme[type]') == "paste") ? 'block' : 'none'; ?>;">
-        	<table class="form-table">
-            	<tbody>
-                	<tr>
-                    	<th><label for=""><?php _e('Paste HTML Code', $this -> plugin_name); ?></label></th>
-                        <td>
-                        	<?php echo $Form -> textarea('Theme[paste]', array('rows' => "10")); ?>
-                        	<span class="howto"><?php _e('You can use a full HTML layout with html, head, body, etc. tags.', $this -> plugin_name); ?></span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        	<textarea name="Theme[paste]" class="widefat" id="Theme_paste" rows="10" cols="100%"><?php echo esc_attr(stripslashes($Theme -> data -> paste)); ?></textarea>
+        	
+        	<script type="text/javascript">
+        	jQuery(document).ready(function() {
+            	jQuery('textarea#Theme_paste').ckeditor({
+                	fullPage: true,
+					allowedContent: true,
+					height: 500
+            	});
+        	});
+        	</script>
         </div>
         
         <?php $theme_name = $Html -> field_value('Theme[name]'); ?>

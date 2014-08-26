@@ -2513,10 +2513,8 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					// CKEditor
-					if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> themes) {
-						$this -> debug('add ckeditor');
-						wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), false, "4.3.4", false);	
-					}
+					wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
+					wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
 					
 					if ($_GET['page'] == $this -> sections -> welcome ||
 						$_GET['page'] == $this -> sections -> send ||
@@ -2594,9 +2592,7 @@ if (!class_exists('wpMailPlugin')) {
 			$load = false;
 			$theme_folder = $this -> get_option('theme_folder');
 			
-			if (is_admin()) {
-				//wp_register_style( 'newsletters_dashicons', plugins_url() . '/' . $this -> plugin_name . '/css/newsletters_dashicons.css', false, '1.0.0' );
-			
+			if (is_admin()) {			
 				if (true || !empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
 					$load = true;	
 					$stylesource = plugins_url() . '/' . $this -> plugin_name . '/css/' . $this -> plugin_name . '.css';
