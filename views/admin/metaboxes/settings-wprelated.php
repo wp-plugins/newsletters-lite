@@ -86,7 +86,7 @@ $permissions = $this -> get_option('permissions');
     				<tr class="<?php echo $class = (empty($class)) ? 'arow' : ''; ?>">
     					<th style="white-space:nowrap; text-align:right;"><?php echo $Html -> section_name($section_key); ?></th>
     					<?php foreach ($wp_roles -> role_names as $role_key => $role_name) : ?>
-    						<td style="text-align:center;"><input <?php echo (!empty($permissions[$section_key]) && in_array($role_key, $permissions[$section_key])) ? 'checked="checked"' : ''; ?> type="checkbox" name="permissions[<?php echo $section_key; ?>][]" value="<?php echo esc_attr(stripslashes($role_key)); ?>" id="<?php echo $section_key; ?>_<?php echo $role_key; ?>" /></td>
+    						<td style="text-align:center;"><input <?php echo ($role_key == "administrator" || (!empty($permissions[$section_key]) && in_array($role_key, $permissions[$section_key]))) ? 'checked="checked"' : ''; ?> type="checkbox" name="permissions[<?php echo $section_key; ?>][]" value="<?php echo esc_attr(stripslashes($role_key)); ?>" id="<?php echo $section_key; ?>_<?php echo $role_key; ?>" /></td>
 						<?php endforeach; ?>
     				</tr>
     			<?php endforeach; ?>

@@ -308,6 +308,9 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				case 'welcome'			:
 					$name = __('Overview', $this -> plugin_name);
 					break;
+				case 'submitserial'		:
+					$name = __('Submit Serial', $this -> plugin_name);
+					break;
 				case 'send'				:
 					$name = __('Create Newsletter', $this -> plugin_name);
 					break;
@@ -348,7 +351,10 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					$name = __('Sent &amp; Draft Emails', $this -> plugin_name);
 					break;
 				case 'links'			:
-					$name = __('Links &amp; Clicks', $this -> plugin_name);
+					$name = __('Links', $this -> plugin_name);
+					break;
+				case 'clicks'			:
+					$name = __('Clicks', $this -> plugin_name); 
 					break;
 				case 'orders'			:
 					$name = __('Subscribe Orders', $this -> plugin_name);
@@ -371,14 +377,20 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				case 'settings_updates'		:
 					$name = __('Updates', $this -> plugin_name); 
 					break;
-				case 'extensions'		:
+				case 'settings_api'			:
+					$name = __('API', $this -> plugin_name);
+					break;
+				case 'extensions'			:
 					$name = __('Extensions', $this -> plugin_name);
 					break;
 				case 'extensions_settings'	:
 					$name = __('Extensions Settings', $this -> plugin_name);
 					break;
-				case 'support'			:
+				case 'support'				:
 					$name = __('Support &amp; Help', $this -> plugin_name);
+					break;
+				case 'lite_upgrade'			:
+					$name = __('Upgrade to PRO', $this -> plugin_name);
 					break;
 			}
 		}

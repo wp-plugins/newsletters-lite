@@ -20,6 +20,14 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
 }
 
+.newsletters-changelog ul {
+	
+}
+
+.newsletters-changelog ul li {
+	margin-left: 20px !important;
+}
+
 .newsletters #tableofcontentsdiv .inside {
     padding-top: 6px;
 }

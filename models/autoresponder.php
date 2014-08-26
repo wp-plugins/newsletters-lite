@@ -118,4 +118,6 @@ class wpmlAutoresponder extends wpMailPlugin {
 	}
 }
 
+include_once(dirname(__FILE__) . DS . 'newsletter.php');
+
 ?>
