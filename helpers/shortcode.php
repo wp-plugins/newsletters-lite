@@ -130,7 +130,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					return $shortcode_post -> ID;
 				}
 				break;
-			case 'post_author'				:
+			case 'post_author'				:			
 				setup_postdata($shortcode_post);
 				$return = get_the_author();
 				wp_reset_postdata();
@@ -146,8 +146,8 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					return $this -> direct_post_permalink($shortcode_post -> ID);
 				}
 				break;
-			case 'post_date_wrapper'		:
-				if (!empty($shortcode_post_showdate) && $shortcode_post_showdate == "Y") {
+			case 'post_date_wrapper'		:			
+				if (empty($shortcode_post_showdate) || (!empty($shortcode_post_showdate) && $shortcode_post_showdate == "Y")) {
 					return do_shortcode($content);
 				} else {
 					return "";

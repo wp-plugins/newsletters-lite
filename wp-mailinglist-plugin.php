@@ -2593,7 +2593,7 @@ if (!class_exists('wpMailPlugin')) {
 			return true;
 		}
 		
-		function latestposts_scheduling() {
+		function latestposts_scheduling() {		
 			wp_clear_scheduled_hook($this -> pre . '_latestposts');
 			
 			if ($this -> get_option('latestposts') == "Y") {
@@ -2602,7 +2602,7 @@ if (!class_exists('wpMailPlugin')) {
 					$schedules = $this -> cron_schedules($schedules);
 					
 					$latestposts_startdate = $this -> get_option('latestposts_startdate');
-					if (empty($latestposts_startdate) || empty($_POST['latestposts_updateinterval']) || $_POST['latestposts_updateinterval'] == "N") {
+					if (empty($latestposts_startdate) || strtotime($latestposts_startdate) < time() || empty($_POST['latestposts_updateinterval']) || $_POST['latestposts_updateinterval'] == "N") {
 						$new_timestamp = time() + $schedules[$interval]['interval'];
 					} else {
 						$new_timestamp = strtotime($latestposts_startdate);
@@ -4244,13 +4244,7 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function get_managementpost($permalink = false, $autocreate = false) {
-			define('DONOTCACHEPAGE', true);
-			define('DONOTCACHEDB', true);
-			define('DONOTMINIFY', true);
-			define('DONOTCDN', true);
-			define('DONOTCACHCEOBJECT', true);
-		
+		function get_managementpost($permalink = false, $autocreate = false) {		
 			global $wpdb, $user_ID, $wp_rewrite, $newsletters_managementpost_error;
 			require_once(ABSPATH . WPINC . DS . 'rewrite.php');
 			if (!is_object($wp_rewrite)) { $wp_rewrite = new WP_Rewrite(); }
