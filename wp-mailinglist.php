@@ -7,8 +7,8 @@ Version: 4.3.6
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
-License: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
-License URI: http://tribulant.com/policies/license/
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: wp-mailinglist
 Domain Path: /languages
 */
