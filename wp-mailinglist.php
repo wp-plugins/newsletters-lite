@@ -13,8 +13,6 @@ Text Domain: wp-mailinglist
 Domain Path: /languages
 */
 
-/* testing */
-
 if (!defined('DS')) { define("DS", DIRECTORY_SEPARATOR); }
 if (!defined('WP_MEMORY_LIMIT')) { define('WP_MEMORY_LIMIT', "1024M"); }
 if (!defined('W3TC_DYNAMIC_SECURITY')) { define('W3TC_DYNAMIC_SECURITY', md5(rand(0,999))); }
