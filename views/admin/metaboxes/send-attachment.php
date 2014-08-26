@@ -50,7 +50,7 @@
 		var atthtml = "";
 		atthtml += '<div class="newattachment" id="newattachment' + count + '" style="display:none;">';
 		atthtml += '<input type="file" name="attachments[]" value="" />';
-		atthtml += ' <a href="" onclick="if (confirm(\'<?php _e('Are you sure you want to remove this?', $this -> plugin_name); ?>\')) { delete_attachment(' + count + '); } return false;"><?php _e('Remove'); ?></a>';
+		atthtml += ' <a class="button button-secondary button-small" href="" onclick="if (confirm(\'<?php _e('Are you sure you want to remove this?', $this -> plugin_name); ?>\')) { delete_attachment(' + count + '); } return false;"><?php _e('Remove'); ?></a>';
 		atthtml += '</div>';
 		
 		jQuery('#newattachments').append(atthtml);
@@ -62,25 +62,4 @@
 			
 	}
 	</script>
-    
-    <?php /*
-	<table class="form-table">
-		<tbody>
-			<tr>
-				<th><label for="attachmentfile"><?php _e('Attachment File', $this -> name); ?></label></th>
-				<td>
-                	<input class="widefat" style="width:auto;" type="file" name="attachment" id="attachmentfile" />
-                	
-                    <?php if (!empty($_POST['attachment']) && $_POST['attachment'] == "Y") : ?>
-                    	<?php if (!empty($_POST['attachmentfile']) && file_exists($_POST['attachmentfile'])) : ?>
-                        	<br/><br/><?php _e('Current attachment:', $this -> plugin_name); ?> <?php echo $Html -> attachment_link($_POST['attachmentfile']); ?> <a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $_GET['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"><img border="0" style="border:none;" src="<?php echo $this -> url(); ?>/images/icons/delete-16.png" alt="delete" /></a>
-                            <br/><small><?php _e('Leave the file field empty above to keep this attachment intact.', $this -> plugin_name); ?></small>
-                        	<input type="hidden" name="oldattachmentfile" value="<?php echo $_POST['attachmentfile']; ?>" />
-                        <?php endif; ?>
-                    <?php endif; ?>  
-                </td>
-			</tr>
-		</tbody>
-	</table>
-	*/ ?>
 </div>

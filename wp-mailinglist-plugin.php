@@ -5034,18 +5034,34 @@ if (!class_exists('wpMailPlugin')) {
 			return date_i18n($format, $newtime);
 		}
 		
+		function override_mce_options($initArray = null) {
+			if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {			
+				$opts = '*[*]';
+			    $initArray['valid_elements'] = $opts;
+			    $initArray['extended_valid_elements'] = $opts;
+			    //$initArray['verify_html'] = 0;
+			    //$initArray['cleanup'] = 0;
+			    //$initArray['validate_children'] = 0;
+			    //$initArray['valid_children'] = $opts;
+			}
+			    
+			return $initArray;
+		}
+		
 		function stripext($filename = null, $return = 'ext') {
 			if (!empty($filename)) { 
-				$extArray = preg_split("/[/\\.]/i", $filename); 
+				//$extArray = split("[/\\.]", $filename); 
 				
 				if ($return == 'ext') {
-					$p = count($extArray) - 1; 
-					$extension = $extArray[$p]; 
+					//$p = count($extArray) - 1; 
+					//$extension = $extArray[$p]; 
+					$extension = pathinfo($filename, PATHINFO_EXTENSION);
 					return $extension;
 				} else {
-					$p = count($extArray) - 2;
-					$filename = $extArray[$p];
-					return $filename;
+					///$p = count($extArray) - 2;
+					//$filename = $extArray[$p];
+					$file = pathinfo($filename, PATHINFO_FILENAME);
+					return $file;
 				}
 			}
 			

@@ -87,6 +87,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_filter('the_editor', 'the_editor', 1, 1);
 			$this -> add_filter('transient_update_plugins', 'check_update', 10, 1);
 	        $this -> add_filter('site_transient_update_plugins', 'check_update', 10, 1);
+	        $this -> add_filter('tiny_mce_before_init', 'override_mce_options', 10, 1);
 			
 			//WordPress Shortcodes
 			global $Shortcode;
