@@ -1,6 +1,6 @@
 <?php
 
-$debugging = $this -> get_option('debugging');
+$debugging = get_option('tridebugging');
 
 ?>
 

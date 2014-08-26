@@ -6,6 +6,7 @@ class wpmlTheme extends wpMailPlugin {
 	var $model = 'Theme';
 	var $controller = 'themes';
 	var $table_name = 'wpmlthemes';
+	var $recursive = true;
 	
 	var $fields = array(
 		'id'			=>	"INT(11) NOT NULL AUTO_INCREMENT",

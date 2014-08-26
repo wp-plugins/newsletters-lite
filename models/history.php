@@ -263,7 +263,7 @@ class wpmlHistory extends wpMailPlugin {
 	}
 	
 	function queue_scheduled() {
-		global $wpdb, $Db, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
+		global $wpdb, $Db, $Mailinglist, $Queue, $Field, $Subscriber, $SubscribersList;
 		
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE `senddate` <= '" . date_i18n("Y-m-d H:i:s", time()) . "' AND `scheduled` = 'Y' LIMIT 1";
 		
@@ -272,6 +272,7 @@ class wpmlHistory extends wpMailPlugin {
 				$this -> remove_server_limits();
 				$mailinglists = maybe_unserialize($history -> mailinglists);
 				$fieldsconditions = maybe_unserialize($history -> conditions);
+				$condquery = maybe_unserialize($history -> condquery);
 				$subscriberids = array();
 				$subscriberemails = array();
 				
@@ -295,27 +296,37 @@ class wpmlHistory extends wpMailPlugin {
 							$f = 1;
 						
 							foreach ($fieldsconditions as $field_slug => $field_value) {
-								if (!empty($field_value) && $field_value != "0") {
+								if (!empty($field_value)) {
 									$Db -> model = $Field -> model;
-									if ($customfield = $Db -> find(array('slug' => $field_slug), array('id', 'type', 'slug'))) {
-										switch ($customfield -> type) {
-											case 'text'					:
-												$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
-												break;
-											default						:
-												$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
-												break;
-										}
-										
-										if ($f < count($fieldsconditions)) {
-											$fieldsquery .= ($scopeall) ? " AND" : " OR";
-										}
+									$customfield = $Db -> find(array('slug' => $field_slug), array('id', 'slug', 'type'));
+									$condition = $condquery[$field_slug];
+									
+									switch ($condition) {
+										case 'smaller'				:
+											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " < '" . $field_value . "'";
+											break;
+										case 'larger'				:
+											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " > '" . $field_value . "'";
+											break;
+										case 'contains'				:
+											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
+											break;
+										case 'equals'				:
+										default						:
+											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
+											break;
+									}
+									
+									if ($f < count($fieldsconditions)) {
+										$fieldsquery .= ($scopeall) ? " AND" : " OR";
 									}
 								}
 								
 								$f++;
 							}
 							
+							$fieldsquery .= ")";
+							$fieldsquery = str_replace(" AND)", "", $fieldsquery);
 							$fieldsquery .= ")";
 						}
 					}
@@ -338,7 +349,7 @@ class wpmlHistory extends wpMailPlugin {
 					. $wpdb -> prefix . $SubscribersList -> table . " ON "
 					. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id WHERE "
 					. $mailinglistscondition . ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y'"
-					. $fieldsquery;
+					. str_replace(" AND ()", "", $fieldsquery);
 					
 					$sentmailscount = 0;
 					$q_queries = array();

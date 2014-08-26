@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.1';
+		var $version = '4.1.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -95,8 +95,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			global $wpdb;
 			$wpdb -> query("SET sql_mode = '';");
-			$debugging = $this -> get_option('debugging');
-			$debugging = false;
+			$debugging = get_option('tridebugging');
 			$this -> debugging = (empty($debugging)) ? $this -> debugging : true;
 			$this -> debugging($this -> debugging);
 			add_action('plugins_loaded', array($this, 'ci_initialize'));
@@ -1559,14 +1558,12 @@ if (!class_exists('wpMailPlugin')) {
 			// Count the users based on roles
 			$users_count = 0;
 			if (!empty($_POST['roles'])) {
-				if ($count_users = count_users()) {
-					foreach ($count_users['avail_roles'] as $role => $count) {
+				if ($count_users = count_users()) {				
+					foreach ($count_users['avail_roles'] as $role => $count) {					
 						if (array_key_exists($role, $_POST['roles'])) {
 							$users_count += $count;
 						}
 					}
-					
-					$subscribercount += $users_count;
 				}
 			}
 			
@@ -1645,6 +1642,7 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if ($subscribers = $wpdb -> get_results($query)) {
 					$subscribercount = count($subscribers);
+					$subscribercount += $users_count;
 				}
 			}
 			
@@ -4209,7 +4207,7 @@ if (!class_exists('wpMailPlugin')) {
 		 */
 		function debug($var = array(), $output = true) {
 			if ($output == false) { ob_start(); }
-			$debugging = $this -> get_option('debugging');
+			$debugging = get_option('tridebugging');
 			$this -> debugging = (empty($debugging)) ? $this -> debugging : true;
 	
 			if ($this -> debugging == true) {
@@ -4661,9 +4659,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.1") < 0) {
+				if (version_compare($cur_version, "4.1.1") < 0) {
 					$this -> update_options();
-					$version = "4.1";
+					$version = "4.1.1";
 				}
 			
 				//the current version is older.

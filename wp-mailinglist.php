@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.1
+Version: 4.1.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -1815,11 +1815,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_footer() {		
-			if (SAVEQUERIES) {
-				//global $wpdb;
-				//$this -> debug(count($wpdb -> queries));
-				//$this -> debug($wpdb -> queries);
-			}
+			//do nothing...
 		}
 		
 		function admin_head_welcome() {
@@ -2263,7 +2259,7 @@ if (!class_exists('wpMail')) {
 															if (!empty($field_value)) {
 																$Db -> model = $Field -> model;
 																$customfield = $Db -> find(array('slug' => $field_slug), array('id', 'slug', 'type'));
-																$condition = $_POST['condquery'][$customfield -> slug];
+																$condition = $_POST['condquery'][$field_slug];
 																
 																switch ($condition) {
 																	case 'smaller'				:
@@ -2289,6 +2285,8 @@ if (!class_exists('wpMail')) {
 															$f++;
 														}
 														
+														$fieldsquery .= ")";
+														$fieldsquery = str_replace(" AND)", "", $fieldsquery);
 														$fieldsquery .= ")";
 													}
 												}
@@ -5083,12 +5081,17 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST)) {
 						//unset values that are not required
 						unset($_POST['save']);
-						$this -> delete_option('debugging');
+						delete_option('tridebugging');
 						
 						foreach ($_POST as $key => $val) {				
 							$this -> update_option($key, $val);
 							
 							switch ($key) {
+								case 'debugging'			:
+									if (!empty($val)) {
+										update_option('tridebugging', 1);
+									}
+									break;
 								case 'embed'				:
 									if ($this -> is_plugin_active('qtranslate')) {
 										if (!empty($val) && is_array($val)) {
@@ -5273,7 +5276,9 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_extensions_settings() {	
-			switch ($_GET['method']) {
+			$method = (!empty($_GET['method'])) ? $_GET['method'] : false;
+		
+			switch ($method) {
 				default						:
 					if (!empty($_POST)) {
 						foreach ($_POST as $pkey => $pval) {
