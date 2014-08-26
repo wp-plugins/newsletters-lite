@@ -206,8 +206,13 @@ if (!class_exists('wpMailPlugin')) {
 		        echo '<tr class="plugin-update-tr">';
 		        echo '<td colspan="3" class="plugin-update">';
 		        echo '<div class="update-message">';
-		        //echo sprintf('Your download for the Newsletter plugin has expired, please <a href="%s" target="_blank">renew it</a> for updates!', $version_info['url']);
-		        echo sprintf(__('You are running Newsletters LITE. To remove limits, you can submit a serial key or %s.', $this -> plugin_name), '<a href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Upgrade to PRO', $this -> plugin_name) . '</a>');
+
+				if (!$this -> ci_serial_valid()) {
+					echo sprintf(__('You are running Newsletters LITE. To remove limits, you can submit a serial key or %s.', $this -> plugin_name), '<a href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Upgrade to PRO', $this -> plugin_name) . '</a>');
+				} else {
+					echo sprintf('Your download for the Newsletter plugin has expired, please <a href="%s" target="_blank">renew it</a> for updates!', $version_info['url']);
+				}	        
+
 		        echo '</div>';
 		        echo '</td>';
 		        echo '</tr>';
@@ -5449,9 +5454,6 @@ if (!class_exists('wpMailPlugin')) {
 						$post_criteria['exclude'][] = $olderthanpost -> ID;
 					}
 				}
-				
-				$Db -> model = $Latestpost -> model;
-				$verylatestpost = $Db -> find(false, false, array('created', "DESC"));
 			}
 				
 			return apply_filters('newsletters_latest_posts_criteria', $post_criteria);

@@ -1310,9 +1310,21 @@ if (!class_exists('wpMail')) {
 							}
 							
 							if (!empty($sentmailscount)) {
-								foreach ($shortcode_posts as $post) {
-									$Db -> model = $Latestpost -> model;
-									$Db -> save(array('post_id' => $post -> ID), true);
+							
+								if (!empty($shortcode_categories)) {
+									foreach ($shortcode_categories as $shortcode_category) {
+										if (!empty($shortcode_category['posts'])) {
+											foreach ($shortcode_category['posts'] as $post) {
+												$Db -> model = $Latestpost -> model;
+												$Db -> save(array('post_id' => $post -> ID), true);
+											}
+										}
+									}	
+								} else {
+									foreach ($shortcode_posts as $post) {
+										$Db -> model = $Latestpost -> model;
+										$Db -> save(array('post_id' => $post -> ID), true);
+									}
 								}
 							}
 						}
