@@ -3,12 +3,12 @@
 		<div class="tablenav">
 			<div class="alignleft actions">
 				<?php if (apply_filters($this -> pre . '_admin_history_rsslink', true)) : ?>
-				<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="button"><img src="<?php echo rtrim(site_url(), '/'); ?>/<?php echo WPINC; ?>/images/rss.png" alt="rss" style="width:12px; height:12px;" /> <?php _e('RSS Feed', $this -> plugin_name); ?></a>
+					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="button newsletters_rss_link"> <?php _e('RSS', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<?php if (apply_filters($this -> pre . '_admin_history_exportlink', true)) : ?>
-                <a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=export" title="<?php _e('Export to CSV', $this -> plugin_name); ?>" class="button"><img src="<?php echo $this -> url(); ?>/images/icons/csv-16.png" alt="csv" style="width:12px; height:12px;" border="0" /> <?php _e('Export to CSV', $this -> plugin_name); ?></a>
+                	<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=export" title="<?php _e('Export to CSV', $this -> plugin_name); ?>" class="button newsletters_csv_link"> <?php _e('Export', $this -> plugin_name); ?></a>
 				<?php endif; ?>
-				<a href="<?php echo $this -> url; ?>&amp;method=clear" title="<?php _e('Clear all email history', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to clear the email history?', $this -> plugin_name); ?>')) { return false; }" class="button"><img src="<?php echo $this -> url(); ?>/images/icons/delete-16.png" alt="clear" style="width:12px; height:12px;" border="0" /> <?php _e('Clear History', $this -> plugin_name); ?></a>
+				<a href="<?php echo $this -> url; ?>&amp;method=clear" title="<?php _e('Clear all email history', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to clear the email history?', $this -> plugin_name); ?>')) { return false; }" class="button newsletters_delete_link"> <?php _e('Clear', $this -> plugin_name); ?></a>
 			</div>
 			<div class="alignleft actions">
 				<select name="action" class="widefat" style="width:auto;">

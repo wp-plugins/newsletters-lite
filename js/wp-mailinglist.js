@@ -114,7 +114,7 @@ function wpml_titletoslug(title) {
 function wpml_tinymcetag(tag) {
 	if (tinyMCE.activeEditor) {
 		if (window.tinyMCE && tag != "") {
-			window.tinyMCE.execInstanceCommand('content', 'mceInsertContent', false, tag);	
+			window.tinyMCE.execCommand('mceInsertContent', false, tag);	
 		}
 	} else {
 		jQuery('textarea#content').text(jQuery('textarea#content').val() + '\n\n' + tag);

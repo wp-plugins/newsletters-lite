@@ -41,6 +41,7 @@ if (!class_exists('wpMailCheckinit')) {
 			//Action hooks
 			$this -> add_action('register_form');
 			$this -> add_action('admin_menu');
+			$this -> add_action('admin_menu', 'add_dashboard', 10, 1);
 			$this -> add_action('admin_head');
 			$this -> add_action('widgets_init', 'widget_register', 10, 1);
 			$this -> add_action('wp_head', 'wp_head', 15, 1);
@@ -66,6 +67,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('after_plugin_row_wp-mailinglist/wp-mailinglist.php', 'after_plugin_row', 10, 2);
 			$this -> add_action('install_plugins_pre_plugin-information', 'display_changelog', 10, 1);
 			$this -> add_action('admin_init', 'tinymce');
+			$this -> add_action('admin_init', 'custom_redirect', 1, 1);
 			$this -> add_action('phpmailer_init', 'phpmailer_init', 999, 1);
 			$this -> add_action('profile_update');
 			$this -> add_action('comment_form');

@@ -15,6 +15,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $menus = array();
 		
 		var $sections = array(
+			//'about'						=>	"newsletters-about",
 			'welcome'					=> 	"newsletters",
 			'submitserial'				=>	"newsletters-submitserial",
 			'send'						=>	"newsletters-create",

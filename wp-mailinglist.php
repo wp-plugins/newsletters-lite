@@ -7,6 +7,10 @@ Version: 4.1.2
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
+License: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License
+License URI: http://tribulant.com/policies/license/
+Text Domain: wp-mailinglist
+Domain Path: /languages
 */
 
 if (!defined('DS')) { define("DS", DIRECTORY_SEPARATOR); }
@@ -1856,6 +1860,16 @@ if (!class_exists('wpMail')) {
 			add_action('admin_head-' . $this -> menus['newsletters-settings-templates'], array($this, 'admin_head_settings_templates'));
 			add_action('admin_head-' . $this -> menus['newsletters-settings-subscribers'], array($this, 'admin_head_settings_subscribers'));
 			add_action('admin_head-' . $this -> menus['newsletters-extensions-settings'], array($this, 'admin_head_settings_extensions_settings'));
+		}
+		
+		function add_dashboard() {
+			add_dashboard_page(sprintf('Newsletters %s', $this -> version), sprintf('Newsletters %s', $this -> version), 'read', 'newsletters-about', array($this, 'newsletters_about'));
+			remove_submenu_page('index.php', 'newsletters-about');
+			//add_submenu_page("newsletters_page_" . $this -> sections -> settings, sprintf('Newsletters %s', $this -> version), sprintf('Newsletters %s', $this -> version), 'read', $this -> sections -> about, array($this, 'newsletters_about'));
+		}
+		
+		function newsletters_about() {
+			$this -> render('about', false, true, 'admin');
 		}
 		
 		function admin_head() {	
@@ -5450,6 +5464,20 @@ if (!class_exists('wpMail')) {
 			$this -> render_admin('help');
 		}
 		
+		function activation_hook() {
+			$this -> add_option('activation_redirect', true);
+		}
+		
+		function custom_redirect() {
+			$activation_redirect = $this -> get_option('activation_redirect');
+			
+			if (is_admin() && !empty($activation_redirect)) {
+				$this -> delete_option('activation_redirect');
+				header("Location: " . admin_url('index.php') . "?page=newsletters-about");
+				exit();
+			}
+		}
+		
 		function wpMail($data = array()) {
 			$url = explode("&", $_SERVER['REQUEST_URI']);
 			$this -> fullurl = $_SERVER['REQUEST_URI'];
@@ -5505,6 +5533,7 @@ $wpMail = new wpMail();
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-api.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-functions.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-widget.php');
+register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'activation_hook'));
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'update_options'));
 
 ?>

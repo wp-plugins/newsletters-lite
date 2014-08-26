@@ -1,3 +1,25 @@
+.newsletters-badge {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: #0074a2 url('../images/badge.png') no-repeat;
+	background-position: center 24px;
+	-webkit-background-size: 85px 85px;
+	background-size: 85px 85px;
+	color: #78c8e6;
+	font-size: 14px;
+	text-align: center;
+	font-weight: 600;
+	margin: 5px 0 0;
+	padding-top: 120px;
+	height: 40px;
+	display: inline-block;
+	width: 150px;
+	text-rendering: optimizeLegibility;
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,.2);
+	box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
 /* BEG Dashboard Widget */
 
 #dashboard-widgets .ui-sortable {
@@ -426,11 +448,12 @@ ul#wpmlsubmenu a.current {
 /* Admin Menu BEG */
 
 #adminmenu .toplevel_page_newsletters div.wp-menu-image:before,
-span.mce_Newsletters:before {
+.mce-i-Newsletters:before {
     font-family: 'newsletters_dashicons' !important;
 	content: '\f466';
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	font-size: 20px;
 }
 
 .wpmlhelp a,
@@ -476,7 +499,8 @@ span.mce_Newsletters:before {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.newsletters_attachment_remove:before {
+.newsletters_attachment_remove:before,
+.newsletters_delete_link:before {
 	font-family: 'newsletters_dashicons' !important;
 	content: '\f158';
 	-webkit-font-smoothing: antialiased;
@@ -487,6 +511,22 @@ span.mce_Newsletters:before {
 .newsletters_attachment_link:before {
 	font-family: 'newsletters_dashicons' !important;
 	content: '\f104\ ';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-size: 16px;
+}
+
+.newsletters_rss_link:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f303';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-size: 16px;
+}
+
+.newsletters_csv_link:before {
+	font-family: 'newsletters_dashicons' !important;
+	content: '\f316';
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	font-size: 16px;
