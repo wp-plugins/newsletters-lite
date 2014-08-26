@@ -454,7 +454,7 @@ if (!class_exists('wpMailPlugin')) {
 					$g -> set_y_max($Html -> RoundUptoNearestN($y_max));
 					$g -> set_y_right_max($Html -> RoundUptoNearestN($y_right_max));
 					$g -> y_label_steps(5);
-					$g -> set_inner_background('#f5f5f5', '#CBD7E6', 90);
+					$g -> set_inner_background('#FFFFFF', '#FFFFFF', 90);
 					$g -> x_axis_colour('#333333', '#E4F5FC');
 					$g -> y_axis_colour('#333333', '#E4F5FC');
 					$g -> y_right_axis_colour('#333333', '#E4F5FC');
@@ -463,7 +463,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					$g -> set_is_decimal_separator_comma(false);
 					$g -> set_is_thousand_separator_disabled(true);
-					$g -> bg_colour = "#f5f5f5";
+					$g -> bg_colour = "#FFFFFF";
 					echo $g -> render();
 					break;
 				case 'months'			:
@@ -595,7 +595,7 @@ if (!class_exists('wpMailPlugin')) {
 					$g -> set_y_max($Html -> RoundUptoNearestN($y_max));
 					$g -> set_y_right_max($Html -> RoundUptoNearestN($y_right_max));
 					$g -> y_label_steps(5);
-					$g -> set_inner_background('#f5f5f5', '#CBD7E6', 90);
+					$g -> set_inner_background('#FFFFFF', '#FFFFFF', 90);
 					$g -> x_axis_colour('#333333', '#E4F5FC');
 					$g -> y_axis_colour('#333333', '#E4F5FC');
 					$g -> y_right_axis_colour('#333333', '#E4F5FC');
@@ -604,7 +604,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					$g -> set_is_decimal_separator_comma(false);
 					$g -> set_is_thousand_separator_disabled(true);
-					$g -> bg_colour = "#f5f5f5";
+					$g -> bg_colour = "#FFFFFF";
 					echo $g -> render();
 					break;
 				case 'days'				:
