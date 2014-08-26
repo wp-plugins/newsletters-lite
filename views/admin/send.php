@@ -122,6 +122,8 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 													'textarea_name'		=>	'contentarea[' . $contentarea -> number . ']',
 													'textarea_rows'		=>	10,
 													'quicktags'			=>	true,
+													'entities'			=>	"",
+													'entity_encoding'	=>	"raw",
 												);
 												
 												wp_editor(stripslashes($contentarea -> content), 'contentarea' . $contentarea -> number, $settings); 

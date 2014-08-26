@@ -10,13 +10,13 @@ class wpmlAuthHelper extends wpMailPlugin {
 		global $wpdb, $Db, $Subscriber, $user_ID;
 		
 		$Db -> model = $Subscriber -> model;
-		if ($user_ID && $subscriber = $Db -> find(array('user_id' => $user_ID))) {
-			return $subscriber;
-		} elseif ($subscriberauth = $this -> read_cookie()) {
+		if ($subscriberauth = $this -> read_cookie()) {
 			$Db -> model = $Subscriber -> model;			
 			if ($subscriber = $Db -> find(array('cookieauth' => $subscriberauth))) {			
 				return $subscriber;	
 			}
+		} elseif ($user_ID && !empty($user_ID) && $subscriber = $Db -> find(array('user_id' => $user_ID))) {
+			return $subscriber;
 		}
 		
 		return false;	
@@ -122,7 +122,7 @@ class wpmlAuthHelper extends wpMailPlugin {
 	}
 	
 	function gen_subscriberauth() {
-		$subscriberauth = md5(time());	
+		$subscriberauth = md5(microtime());	
 		return $subscriberauth;	
 	}
 }

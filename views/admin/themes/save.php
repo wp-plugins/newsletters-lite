@@ -56,7 +56,8 @@
             	jQuery('textarea#Theme_paste').ckeditor({
                 	fullPage: true,
 					allowedContent: true,
-					height: 500
+					height: 500,
+					entities: false
             	});
         	});
         	</script>

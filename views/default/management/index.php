@@ -11,6 +11,8 @@ if (!empty($subscriber -> subscriptions)) {
 
 ?>
 
+<p><?php _e('You are logged in and the subscriber email below is linked to your user account.', $this -> plugin_name); ?></p>
+
 <p class="managementemail">
 	<?php _e('Your email address is:', $this -> plugin_name); ?> <strong><?php echo stripslashes($subscriber -> email); ?></strong> 
     <span class="managementlogout"><a onclick="if (!confirm('<?php _e('Are you sure you wish to logout?', $this -> plugin_name); ?>')) { return false; }" href="<?php echo $Html -> retainquery('method=logout', get_permalink($this -> get_managementpost())); ?>"><?php _e('Logout', $this -> plugin_name); ?></a></span>

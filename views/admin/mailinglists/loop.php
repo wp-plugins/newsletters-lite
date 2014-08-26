@@ -213,7 +213,7 @@
 							<?php endif; ?>
 							<td><label for="checklist<?php echo $list -> id; ?>"><b><?php echo $SubscribersList -> count(array('list_id' => $list -> id)); ?></b> (<?php echo $SubscribersList -> count(array('list_id' => $list -> id, 'active' => "Y")); ?> <?php _e('active', $this -> plugin_name); ?>)</label></td>
 							<?php if (apply_filters($this -> pre . '_admin_mailinglists_groupcolumn', true)) : ?>
-								<td><code>[<?php echo $this -> pre; ?>subscribe list="<?php echo $list -> id; ?>"]</code></td>
+								<td><code>[newsletters_subscribe list="<?php echo $list -> id; ?>"]</code></td>
 							<?php endif; ?>
 						</tr>
 					<?php endforeach; ?>

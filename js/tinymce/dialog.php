@@ -56,13 +56,13 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 				var lists = jQuery('#lists').val();
 				
 				if (list == "select") {
-					tag += '[wpmlsubscribe list="select"';
+					tag += '[newsletters_subscribe list="select"';
 					if (lists) { tag += ' lists="' + lists + '"'; }
 				} else if (list == "checkboxes") {
-					tag += '[wpmlsubscribe list="checkboxes"';
+					tag += '[newsletters_subscribe list="checkboxes"';
 					if (lists) { tag += ' lists="' + lists + '"'; }
 				} else {
-					tag += '[wpmlsubscribe list="' + list + '"';
+					tag += '[newsletters_subscribe list="' + list + '"';
 				}
 				
 				tag += ']';
@@ -80,7 +80,7 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 					var post_eftype = jQuery('input[name="post_eftype"]:checked').val();
 									
 					if (posts_single_id = jQuery('#posts_post_menu').val()) {
-						tag += '[wpmlpost post_id="' + posts_single_id + '" showdate="' + post_showdate + '" eftype="' + post_eftype + '"';
+						tag += '[newsletters_post post_id="' + posts_single_id + '" showdate="' + post_showdate + '" eftype="' + post_eftype + '"';
 						if (postslanguage) { tag += ' language="' + postslanguage + '"'; }
 						tag += ']';
 					} else {
@@ -94,7 +94,7 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 					var posts_order = jQuery('#posts_order').val();
 					var posts_categories = jQuery('#posts_categories').val();
 					
-					tag += '[wpmlposts numberposts="' + posts_number + '" orderby="' + posts_orderby + '" showdate="' + posts_showdate + '" eftype="' + posts_eftype + '" order="' + posts_order + '" category="' + posts_categories + '"';
+					tag += '[newsletters_posts numberposts="' + posts_number + '" orderby="' + posts_orderby + '" showdate="' + posts_showdate + '" eftype="' + posts_eftype + '" order="' + posts_order + '" category="' + posts_categories + '"';
 					if (postslanguage) { tag += ' language="' + postslanguage + '"'; }
 					
 					/* Are there custom post type checkboxes? */
@@ -114,7 +114,7 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 			if (thumbnailpanel.className.indexOf('current') != -1) {
 				var thumbnail_post_id = jQuery('#thumbnail_post_id').val();
 				var thumbnail_size = jQuery('#thumbnail_size').val();
-				tag += '[wpmlpost_thumbnail';
+				tag += '[newsletters_post_thumbnail';
 				
 				if (thumbnail_post_id != "") {
 					tag += ' post_id="' + thumbnail_post_id + '"';
@@ -125,7 +125,7 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 			}
 			
 			if (historypanel.className.indexOf('current') != -1) {
-				tag += "[wpmlhistory";
+				tag += "[newsletters_history";
 				
 				if (history_number = jQuery('#history_number').val()) {
 					tag += ' number="' + history_number + '"';
@@ -150,7 +150,7 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 			
 			if (templatepanel.className.indexOf('current') != -1) {
 				var template_id = jQuery('#template').val();
-				tag += '[wpmltemplate id="' + template_id + '"]';
+				tag += '[newsletters_template id="' + template_id + '"]';
 			}
 			
 			if (window.tinyMCE && tag != "") {

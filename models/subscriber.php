@@ -602,7 +602,10 @@ class wpmlSubscriber extends wpMailPlugin {
 					
 					/* Management Auth */
 					if (empty($data['cookieauth'])) {
-						$Auth -> set_emailcookie($subscriber -> email);
+						if (!is_admin()) {
+							$Auth -> set_emailcookie($subscriber -> email);
+						}
+							
 						$subscriberauth = $Auth -> gen_subscriberauth();
 						$Db -> model = $this -> model;
 						$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
@@ -680,7 +683,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				}
 			} elseif (!$this -> email_validate($email)) { $this -> errors['email'] = __('Please fill in a valid email address', $this -> plugin_name); }
 			
-			if (empty($mailinglists)) { $this -> errors['mailinglists'] = __('Please select mailing list(s)', $this -> plugin_name); }
+			if (!is_admin() && empty($mailinglists)) { $this -> errors['mailinglists'] = __('Please select mailing list(s)', $this -> plugin_name); }
 			if (empty($registered)) { $this -> errors['registered'] = __('Please select a registered status', $this -> plugin_name); }
 			elseif ($registered == "Y") {
 				if (!$userid = $this -> check_registration($data['email'])) {

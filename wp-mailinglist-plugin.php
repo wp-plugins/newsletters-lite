@@ -5549,6 +5549,8 @@ if (!class_exists('wpMailPlugin')) {
 				$opts = '*[*]';
 			    $initArray['valid_elements'] = $opts;
 			    $initArray['extended_valid_elements'] = $opts;
+			    //$initArray['entities'] = "169,copy,174,reg,8482,trade";
+			    //$initArray['entity_encoding'] = "raw";
 			    //$initArray['verify_html'] = 0;
 			    //$initArray['cleanup'] = 0;
 			    //$initArray['validate_children'] = 0;
@@ -6217,7 +6219,7 @@ if (!class_exists('wpMailPlugin')) {
 							
 							$pattern = "/\[(\[?)(newsletters_content)(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*+(?:\[(?!\/\2\])[^\[]*+)*+)\[\/\2\])?)(\]?)/s";
 							$new_body = preg_replace_callback($pattern, array($this, 'newsletters_content'), $new_body);
-							$new_body = htmlspecialchars_decode($new_body);
+							$new_body = html_entity_decode($new_body);
 							$new_body = apply_filters($this -> pre . '_wpmlcontent_after_replace', $new_body);
 							$body = $new_body;
 						} else {

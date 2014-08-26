@@ -331,6 +331,8 @@ if (!class_exists('wpMail')) {
 						'subscriber_id'		=>	$_GET['subscriber_id'],
 					);
 					
+					$link -> link = html_entity_decode($link -> link);
+					
 					if ($this -> Click -> save($click_data, true)) {
 						header("Location: " . $link -> link);
 						exit();
