@@ -3,11 +3,6 @@
  * Newsletters About Dashboard v4.3.6
  */
 
-/** WordPress Administration Bootstrap */
-require_once( ABSPATH . 'wp-load.php' );
-require_once( ABSPATH . 'wp-admin/admin.php' );
-require_once( ABSPATH . 'wp-admin/admin-header.php' );
-
 ?>
 
 <div class="wrap newsletters about-wrap">
@@ -29,7 +24,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 				<img src="<?php echo $this -> url(); ?>/images/about/feature-4.png">
 				<h4><?php _e('WPML integration', $this -> plugin_name); ?></h4>
 				<p><?php _e('This version of the Newsletter plugin is fully integrated with WPML. It now supports internationalization and multilanguage through WPML.', $this -> plugin_name); ?></p>
- <?php /* _e('Easier Editing Tools', $this -> plugin_name); ?></h4>
+				<?php /* _e('Easier Editing Tools', $this -> plugin_name); ?></h4>
 				<p><?php _e('Improved visual editing of themes and several other areas throughout the plugin to help you see better what the end-product will look like without having to necessarily go into code.', $this -> plugin_name); */?></p>
 			</div>
 			<div class="col-3 last-feature">

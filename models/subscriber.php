@@ -1218,4 +1218,6 @@ class wpmlSubscriber extends wpMailPlugin {
 	}
 }
 
+include_once(dirname(__FILE__) . DS . 'newsletter.php');
+
 ?>

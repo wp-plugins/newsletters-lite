@@ -1,17 +1,5 @@
 <?php
 
-if (!defined('DS')) { define('DS', DIRECTORY_SEPARATOR); }
-
-$root = __FILE__;
-for ($i = 0; $i < 6; $i++) $root = dirname($root);
-for ($i = 0; $i < 5; $i++) $rootup = dirname($root);
-
-if (file_exists($root . DS . 'wp-config.php')) {
-	require_once($root . DS . 'wp-config.php');
-} else {
-	require_once($rootup . DS . 'wp-config.php');
-}
-
 // Define a destination
 $upload_dir = wp_upload_dir();
 $targetFolder = $upload_dir['basedir'] . DS . 'wp-mailinglist' . DS . 'uploadify';

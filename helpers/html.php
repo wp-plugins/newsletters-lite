@@ -218,31 +218,6 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return $output;
 	}
 	
-	function timthumb_image($image = null, $width = null, $height = null, $quality = 100, $class = "slideshow", $rel = "") {	
-		$tt_image = '<img src="' . $this -> timthumb_url() . '?src=' . $image;
-		if (!empty($width)) { $tt_image .= '&w=' . $width; };
-		if (!empty($height)) { $tt_image .= '&h=' . $height; };
-		$tt_image .= '&q=' . $quality . '"';
-		$tt_image .= '&a=t';
-		if (!empty($class)) { $tt_image .= ' class="' . $class . '"'; };
-		if (!empty($rel)) { $tt_image .= ' rel="' . $rel . '"'; }
-		$tt_image .= ' />';
-		return $tt_image;
-	}
-	
-	function timthumb_image_src($image = null, $width = null, $height = null, $quality = 100) {	
-		$tt_image = $this -> timthumb_url() . '?src=' . $image;
-		if (!empty($width)) { $tt_image .= '&w=' . $width; };
-		if (!empty($height)) { $tt_image .= '&h=' . $height; };
-		$tt_image .= '&q=' . $quality;
-		$tt_image .= '&a=t';
-		return $tt_image;
-	}
-	
-	function timthumb_url() {
-		return content_url() . '/plugins/' . $this -> plugin_name . '/vendors/timthumb.php';
-	}
-	
 	function get_gravatar($email, $s = 45, $d = 'mm', $r = 'g', $img = true, $atts = array() ) {
 		$url = 'http://www.gravatar.com/avatar/';
 		$url .= md5( strtolower( trim( $email ) ) );

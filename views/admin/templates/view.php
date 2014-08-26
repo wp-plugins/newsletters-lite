@@ -8,7 +8,7 @@
 		
 		<div class="tablenav">
 			<div class="alignleft">				
-				<a href="?page=<?php echo $this -> sections -> send; ?>&method=template&id=<?php echo $template -> id; ?>" title="<?php _e('Send this snippet as a newsletter', $this -> plugin_name); ?>" class="button"><?php _e('Send', $this -> plugin_name); ?></a>
+				<a href="?page=<?php echo $this -> sections -> send; ?>&method=template&id=<?php echo $template -> id; ?>" title="<?php _e('Send this snippet as a newsletter', $this -> plugin_name); ?>" class="button button-primary"><?php _e('Send', $this -> plugin_name); ?></a>
 				<a href="?page=<?php echo $this -> sections -> templates_save; ?>&amp;id=<?php echo $template -> id; ?>" title="<?php _e('Change the details of this snippet', $this -> plugin_name); ?>" class="button"><?php _e('Change', $this -> plugin_name); ?></a>
 				<a href="?page=<?php echo $this -> sections -> templates; ?>&amp;method=delete&amp;id=<?php echo $template -> id; ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this snippet?', $this -> plugin_name); ?>')) { return false; }" title="<?php _e('Remove this snippet permanently', $this -> plugin_name); ?>" class="button button-highlighted"><?php _e('Delete', $this -> plugin_name); ?></a>
 			</div>
@@ -45,7 +45,7 @@
 				</tr>
 			</tbody>
 		</table>
-		<iframe width="100%" frameborder="0" scrolling="no" class="autoHeight widefat" style="width:100%; margin-top:15px;" src="<?php echo $this -> url(); ?>/wp-mailinglist-ajax.php?cmd=template_iframe&amp;id=<?php echo $template -> id; ?>"></iframe>
+		<iframe width="100%" frameborder="0" scrolling="no" class="autoHeight widefat" style="width:100%; margin-top:15px;" src="<?php echo admin_url('admin-ajax.php?action=newsletters_template_iframe&id=' . $template -> id); ?>"></iframe>
 		<div class="tablenav">
 			
 		</div>

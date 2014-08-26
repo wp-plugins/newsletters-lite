@@ -68,7 +68,7 @@ if (!function_exists('_ofc')) {
 		if( !isset( $open_flash_chart_seqno ) )
 		{
 			$open_flash_chart_seqno = 1;
-			$out[] = '<script type="text/javascript" src="' . rtrim($base, '/') . '/js/swfobject.js"></script>';
+			//$out[] = '<script type="text/javascript" src="' . rtrim($base, '/') . '/js/swfobject.js"></script>';
 		}
 		else
 		{

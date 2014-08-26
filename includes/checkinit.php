@@ -193,6 +193,11 @@ if (!class_exists('wpMailCheckinit')) {
 			add_action('wp_ajax_wpmlgetlistfields', array($this, 'ajax_getlistfields'));
 			add_action('wp_ajax_nopriv_wpmlgetlistfields', array($this, 'ajax_getlistfields'));
 			
+			add_action('wp_ajax_newsletters_posts_by_category', array($this, 'ajax_posts_by_category'));
+			add_action('wp_ajax_newsletters_template_iframe', array($this, 'ajax_template_iframe'));
+			add_action('wp_ajax_newsletters_uploadify', array($this, 'ajax_uploadify'));
+			add_action('wp_ajax_nopriv_newsletters_uploadify', array($this, 'ajax_uploadify'));
+			
 			$this -> updating_plugin();
 			
 			return true;

@@ -15,6 +15,7 @@ global $wpdb, $Mailinglist, $Template;
 		<script language="javascript" type="text/javascript" src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.js"></script>
 		<script language="javascript" type="text/javascript">
 		jQuery.noConflict();
+		var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 		
 		var _self = tinyMCEPopup;
 		function init () {
@@ -169,7 +170,7 @@ global $wpdb, $Mailinglist, $Template;
 
 			jQuery('#posts_multiple_message').show();
 			
-			jQuery.post("<?php echo plugins_url(); ?>/wp-mailinglist/wp-mailinglist-ajax.php?cmd=posts_by_category&cat_id=" + posts_category_menu.val(), {category:posts_category_menu.val(),language:postslanguage,post_type:post_type}, function(response) {
+			jQuery.post(wpmlajaxurl + "?action=newsletters_posts_by_category&cat_id=" + posts_category_menu.val(), {category:posts_category_menu.val(),language:postslanguage,post_type:post_type}, function(response) {
 				posts_post_menu.empty().html(response);
 				jQuery('#posts_multiple_message').hide();
 			});

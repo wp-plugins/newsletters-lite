@@ -259,6 +259,44 @@ if (!class_exists('wpMailPlugin')) {
 	        return $option;
 	    }
 	    
+	    function ajax_posts_by_category() {
+	    	define('DOING_AJAX', true);
+	    	define('SHORTINIT', true);
+	    
+			$posts_by_category = "";
+			
+			$arguments = array(
+				'numberposts'			=>	"-1",
+				'orderby'				=>	'post_title',
+				'order'					=>	"ASC",
+				'post_type'				=>	"post",
+				'post_status'			=>	"publish",
+			);
+			
+			if (!empty($_REQUEST['cat_id']) && $_REQUEST['cat_id'] > 0) {
+				$arguments['category'] = $_REQUEST['cat_id'];	
+			}
+			
+			if (!empty($_REQUEST['post_type'])) {
+				$arguments['post_type'] = $_REQUEST['post_type'];
+			}
+			
+			if ($posts = get_posts($arguments)) {								
+				foreach ($posts as $post) {
+					if ($this -> language_do()) {
+						$posts_by_category .= '<option value="' . $post -> ID . '">' . $this -> language_use($_REQUEST['language'], $post -> post_title, false) . '</option>';
+					} else {
+						$posts_by_category .= '<option value="' . $post -> ID . '">' . $post -> post_title . '</option>';
+					}
+				}
+			}
+			
+			echo $posts_by_category;
+			
+			exit();
+			die();
+		}
+	    
 	    function ajax_getposts() {
 	    	define('DOING_AJAX', true);
 			define('SHORTINIT', true);
@@ -1037,6 +1075,19 @@ if (!class_exists('wpMailPlugin')) {
 				$this -> render('widget', array('action' => $action, 'widget' => $_GET['widget'], 'errors' => $errors, 'args' => $widget, 'instance' => $instance, 'widget_id' => $widget_id, 'number' => $number), true, 'default');
 			}
 		
+			exit();
+			die();
+		}
+		
+		function ajax_template_iframe() {
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+		
+			global $Db, $Template;
+			$Db -> model = $Template -> model;
+			$template = $Db -> find(array('id' => $_REQUEST['id']));
+			$this -> render('templates' . DS . 'iframe', array('template' => $template), true, 'admin');
+			
 			exit();
 			die();
 		}
@@ -3009,9 +3060,11 @@ if (!class_exists('wpMailPlugin')) {
 			if (apply_filters('newsletters_enqueuescript_jqueryuicore', true)) { wp_enqueue_script('jquery-ui-core'); }
 			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }
 	
-			if (is_admin()) {			
+			if (is_admin()) {	
+				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
+					
 				if (preg_match("/(widgets\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
-					wp_enqueue_script('jquery-ui-tooltip', plugins_url() . '/' . $this -> plugin_name . '/js/jquery-ui-tooltip.js', array('jquery'), false, true);
+					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 				}
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
@@ -3040,7 +3093,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {					
 					wp_enqueue_script('jquery-autoheight', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.autoheight.js', array('jquery'), false, true);
-					wp_enqueue_script('jquery-ui-tooltip', plugins_url() . '/' . $this -> plugin_name . '/js/jquery-ui-tooltip.js', array('jquery'), false, true);
+					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 					
 					//countdown script
 					if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> queue) {
@@ -3055,7 +3108,7 @@ if (!class_exists('wpMailPlugin')) {
 					/* Progress Bar */
 					if ($_GET['page'] == $this -> sections -> importexport ||
 						$_GET['page'] == $this -> sections -> send) {
-						wp_enqueue_script('jquery-ui-progressbar', plugins_url() . '/' . $this -> plugin_name . '/js/jquery-ui-progressbar.js', array('jquery-ui-core', 'jquery-ui-widget'));
+						wp_enqueue_script('jquery-ui-progressbar', false, array('jquery-ui-core', 'jquery-ui-widget'));
 					}
 					
 					// Uploadify
@@ -3077,7 +3130,7 @@ if (!class_exists('wpMailPlugin')) {
 						$_GET['page'] == $this -> sections -> settings_templates ||
 						$_GET['page'] == $this -> sections -> settings_subscribers ||
 						$_GET['page'] == $this -> sections -> settings_system ||
-						$_GET['page'] == $this -> sections -> extensions_settings) {																				
+						$_GET['page'] == $this -> sections -> extensions_settings) {																									
 							//meta boxes
 							wp_enqueue_script('common', false, false, false, true);
 							wp_enqueue_script('wp-lists', false, false, false, true);
@@ -3177,11 +3230,6 @@ if (!class_exists('wpMailPlugin')) {
 			if ($load) {
 				if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
 				wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
-				
-				if ($this -> get_option('customcss') == "Y") {
-					$customsrc = $this -> render_url('css/' . $this -> plugin_name . '-css.php', 'admin', false);
-					wp_enqueue_style($this -> pre . '-custom', $customsrc, null, $this -> version, "screen");	
-				}
 			}
 			
 			return true;
@@ -3826,7 +3874,8 @@ if (!class_exists('wpMailPlugin')) {
 							jQuery(document).ready(function() {
 								jQuery('#file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>').uploadify({
 									'swf'      			: 	'<?php echo $this -> url(); ?>/images/uploadify/uploadify.swf',
-									'uploader' 			: 	'<?php echo $this -> url(); ?>/vendors/uploadify/upload.php',
+									//'uploader' 			: 	'<?php echo $this -> url(); ?>/vendors/uploadify/upload.php',
+									'uploader'			:	'<?php echo admin_url('admin-ajax.php?action=newsletters_uploadify'); ?>',
 									'buttonText'		:	'<?php _e('Select File', $this -> plugin_name); ?>',
 									'debug'				:	false,
 									'multi'				:	false,
@@ -5291,6 +5340,16 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
+		function ajax_uploadify() {
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			include($this -> plugin_base() . DS . 'vendors' . DS . 'uploadify' . DS . 'upload.php');
+			
+			exit();
+			die();
+		}
+		
 		function ajax_latestposts_preview() {	
 			define('DOING_AJAX', true);
 	    	define('SHORTINIT', true);
@@ -6719,13 +6778,6 @@ if (!class_exists('wpMailPlugin')) {
 						@mkdir($embedimagesdir, 0777);
 						@chmod($embedimagesdir, 0777);
 					}
-				}
-				
-				/* TimThumb Cache Folder */
-				$cachedir = $uploaddir . 'cache' . DS;
-				if (!file_exists($cachedir)) {
-					@mkdir($cachedir, 0777);
-					@chmod($cachedir, 0777);
 				}
 				
 				/* Uploadify Folder */

@@ -13,3 +13,9 @@ var wpmlScroll = "<?php echo ($embed['scroll'] == "Y") ? 'Y' : 'N'; ?>";
 
 jQuery(document).ready(function() { jQuery('.<?php echo $this -> pre; ?>button').button(); });
 </script>
+
+<style type="text/css">
+<?php if (get_option('wpmlcustomcss') == "Y") : ?>
+	<?php echo stripslashes(get_option('wpmlcustomcsscode')); ?>
+<?php endif; ?>
+</style>

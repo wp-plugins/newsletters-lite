@@ -244,7 +244,7 @@ if (!class_exists('wpMail')) {
 				
 					if (empty($hidemessage_submitserial)) {
 						//$message = __('Please fill in a serial key for the Newsletter plugin to continue use.', $this -> plugin_name);
-						$message = __('To activate your Newsletters PRO, please submit a serial key', $this -> plugin_name);
+						$message = sprintf(__('To activate Newsletters PRO, please submit a serial key, else %s', $this -> plugin_name), '<a href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=submitserial') . '">' . __('continue using Newsletters LITE', $this -> plugin_name) . '</a>');
 						$message .= ' <a class="button button-primary" id="' . $this -> pre . 'submitseriallink" href="' . admin_url('admin.php') . '?page=' . $this -> sections -> submitserial . '">' . __('Submit Serial Key', $this -> plugin_name) . '</a>';
 						$message .= ' <a class="button button-secondary" href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Buy PRO', $this -> plugin_name) . '</a>';
 						$message .= ' <a style="text-decoration:none;" href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=submitserial') . '" class="newsletters-icon-delete-regular"></a>';
@@ -5805,7 +5805,6 @@ if (!class_exists('wpMail')) {
 }
 
 /* Include the necessary class files */
-require_once(ABSPATH . DS . 'wp-load.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'mailinglist.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'subscriber.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'bounce.php');

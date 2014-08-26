@@ -1,12 +1,3 @@
-<?php
-
-/** WordPress Administration Bootstrap */
-require_once( ABSPATH . 'wp-load.php' );
-require_once( ABSPATH . 'wp-admin/admin.php' );
-require_once( ABSPATH . 'wp-admin/admin-header.php' );
-
-?>
-
 <div class="wrap newsletters about-wrap">
 	<h1><?php echo sprintf(__('Upgrade to Newsletters PRO %s', $this -> plugin_name), $this -> version); ?></h1>
 	<div class="about-text">
