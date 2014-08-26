@@ -64,17 +64,23 @@
     padding: 0 !important;
 }
 
-#dashboard-widgets #wp-mailinglist p.sub, #dashboard-widgets #wp-mailinglist .table,
-#dashboard-widgets #wp-mailinglist .versions {
+#dashboard-widgets #wp-mailinglist p.sub, 
+#dashboard-widgets #wp-mailinglist .table,
+#dashboard-widgets #wp-mailinglist .versions,
+#dashboard-widgets #newsletters-lite p.sub, 
+#dashboard-widgets #newsletters-lite .table,
+#dashboard-widgets #newsletters-lite .versions {
     margin: -12px;
 }
 
-#dashboard-widgets #wp-mailinglist .inside {
+#dashboard-widgets #wp-mailinglist .inside,
+#dashboard-widgets #newsletters-lite .inside {
     font-size: 12px;
     padding-top: 0px;
 }
 
-#dashboard-widgets #wp-mailinglist p.sub {
+#dashboard-widgets #wp-mailinglist p.sub,
+#dashboard-widgets #newsletters-lite p.sub {
     color: #8F8F8F;
     font-size: 14px;
     left: 15px;
@@ -83,34 +89,40 @@
     top: -17px;
 }
 
-#dashboard-widgets #wp-mailinglist .table {
+#dashboard-widgets #wp-mailinglist .table,
+#dashboard-widgets #newsletters-lite .table {
     margin: 20px 0 0 0;
     padding: 0;
     position: relative;
 }
 
-#dashboard-widgets #wp-mailinglist .table_content {
+#dashboard-widgets #wp-mailinglist .table_content,
+#dashboard-widgets #newsletters-lite .table_content {
     border-top: 1px solid #ECECEC;
     float: left;
     width: 45%;
 }
 
-#dashboard-widgets #wp-mailinglist .table_discussion {
+#dashboard-widgets #wp-mailinglist .table_discussion,
+#dashboard-widgets #newsletters-lite .table_discussion {
     border-top: 1px solid #ECECEC;
     float: right;
     width: 45%;
 }
 
-#dashboard-widgets #wp-mailinglist table td {
+#dashboard-widgets #wp-mailinglist table td,
+#dashboard-widgets #newsletters-lite table td {
     padding: 3px 0;
     /*white-space: nowrap;*/
 }
 
-#dashboard-widgets #wp-mailinglist table tr.first td {
+#dashboard-widgets #wp-mailinglist table tr.first td,
+#dashboard-widgets #newsletters-lite table tr.first td {
     border-top: medium none;
 }
 
-#dashboard-widgets #wp-mailinglist td.b {
+#dashboard-widgets #wp-mailinglist td.b,
+#dashboard-widgets #newsletters-lite td.b {
     font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
     font-size: 14px;
     padding-right: 6px;
@@ -118,47 +130,57 @@
     width: auto;
 }
 
-#dashboard-widgets #wp-mailinglist td.b a {
+#dashboard-widgets #wp-mailinglist td.b a,
+#dashboard-widgets #newsletters-lite td.b a {
     font-size: 18px;
 }
 
-#dashboard-widgets #wp-mailinglist td.b a:hover {
+#dashboard-widgets #wp-mailinglist td.b a:hover,
+#dashboard-widgets #newsletters-lite td.b a:hover {
     color: #D54E21;
 }
 
-#dashboard-widgets #wp-mailinglist .t {
+#dashboard-widgets #wp-mailinglist .t,
+#dashboard-widgets #newsletters-lite .t {
     color: #777777;
     font-size: 12px;
     padding-right: 12px;
     padding-top: 6px;
 }
 
-#dashboard-widgets #wp-mailinglist .t a {
+#dashboard-widgets #wp-mailinglist .t a,
+#dashboard-widgets #newsletters-lite .t a {
     white-space: nowrap;
 }
 
-#dashboard-widgets #wp-mailinglist .spam {
+#dashboard-widgets #wp-mailinglist .spam,
+#dashboard-widgets #newsletters-lite .spam {
     color: red;
 }
 
-#dashboard-widgets #wp-mailinglist .waiting {
+#dashboard-widgets #wp-mailinglist .waiting,
+#dashboard-widgets #newsletters-lite .waiting {
     color: #E66F00;
 }
 
-#dashboard-widgets #wp-mailinglist .approved {
+#dashboard-widgets #wp-mailinglist .approved,
+#dashboard-widgets #newsletters-lite .approved {
     color: green;
 }
 
-#dashboard-widgets #wp-mailinglist .versions {
+#dashboard-widgets #wp-mailinglist .versions,
+#dashboard-widgets #newsletters-lite .versions {
     clear: both;
     padding: 6px 10px 12px;
 }
 
-#dashboard-widgets #wp-mailinglist .versions .b {
+#dashboard-widgets #wp-mailinglist .versions .b,
+#dashboard-widgets #newsletters-lite .versions .b {
     font-weight: bold;
 }
 
-#dashboard-widgets #wp-mailinglist a.button {
+#dashboard-widgets #wp-mailinglist a.button,
+#dashboard-widgets #newsletters-lite a.button {
     clear: right;
     float: right;
     position: relative;

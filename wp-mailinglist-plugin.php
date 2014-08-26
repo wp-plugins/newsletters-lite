@@ -6480,6 +6480,8 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function render_url($file = null, $folder = 'admin', $extension = null) {	
+			$this -> plugin_name = basename(dirname(__FILE__));
+		
 			if (!empty($file)) {		
 				if (!empty($folder) && $folder != "admin") {
 					$theme_folder = $this -> get_option('theme_folder');
@@ -6572,6 +6574,8 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {						
+			$this -> plugin_name = basename(dirname(__FILE__));
+		
 			if (!empty($file) || !empty($fullbody)) {
 				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
 				$foot = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'foot.php';
@@ -6798,6 +6802,8 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function render_admin($file = null, $params = array(), $output = true) {	
+			$this -> plugin_name = basename(dirname(__FILE__));
+		
 			if (!empty($file)) {
 				$filefull = $this -> plugin_base() . DS . 'views' . DS . 'admin' . DS . $file . '.php';
 			

@@ -89,7 +89,16 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 
 == Screenshots ==
 
-
+1. Premade newsletter themes included
+2. Detailed statistics for emails, subscribers, etc.
+3. Flexible configuration settings
+4. Easy, WYSIWYG newsletter creation
+5. Complete history of newsletters with stats
+6. Import subscribers from CSV or Mac OS X vCard
+7. Export subscribers to CSV file
+8. Email queue with scheduling
+9. Many extensions and integrations available
+10. Dashboard widget for quick overview
 
 == Changelog ==
 
