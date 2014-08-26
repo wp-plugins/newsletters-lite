@@ -60,7 +60,7 @@ class wpmlpaginate extends wpMailPlugin {
 	}
 	
 	function start_paging($page = null) {
-		global $wpdb, $Subscriber, $SubscribersList;
+		global $wpdb, $Html, $Subscriber, $SubscribersList;
 	
 		$page = (empty($page)) ? 1 : $page;
 	
@@ -182,7 +182,7 @@ class wpmlpaginate extends wpMailPlugin {
 			$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
 			$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
 			$this -> pagination .= '<span class="paging-input">';
-			$this -> pagination .= '<input class="current-page" type="text" name="paged" id="paged-input" value="' . $this -> page . '" size="1"> ';
+			$this -> pagination .= '<input class="newsletters-paged-input current-page" type="text" name="paged" id="paged-input" value="' . $this -> page . '" size="1"> ';
 			$this -> pagination .= __('of', $this -> plugin_name); 
 			$this -> pagination .= ' <span class="total-pages">' . $totalpagescount . '</span>';
 			$this -> pagination .= '</span>';
@@ -196,7 +196,7 @@ class wpmlpaginate extends wpMailPlugin {
 			
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
-				jQuery('#paged-input').keypress(function(e) {
+				jQuery('.newsletters-paged-input').keypress(function(e) {
 					code = (e.keyCode ? e.keyCode : e.which);
 		            if (code == 13) {
 		            	window.location = '?page=<?php echo $this -> url_page; ?>&<?php echo $this -> pre; ?>page=' + jQuery(this).val() + '<?php echo $search . $orderby . $order . $this -> after; ?>';

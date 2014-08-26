@@ -782,7 +782,11 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return rtrim($ret, "&");   
 	} 
 	
-	function retainquery($add = null, $old_url = null, $endslash = true) {
+	function retainquery($add = null, $old_url = null, $endslash = true, $onlyquery = false) {
+		if (is_array($add)) {
+			$add = implode("&", $add);
+		}
+	
 		$url = (empty($old_url)) ? $_SERVER['REQUEST_URI'] : rtrim($old_url, '&');
 		$urls = @explode("?", $url);
 		$add = ltrim($add, '&');
@@ -813,6 +817,10 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		
 		if (!empty($querystring)) {
 			$url .= '&' . $querystring;
+			
+			if ($onlyquery) {
+				return $querystring;
+			}
 		}
 				
 		return preg_replace("/\?(\&)?/si", "?", $url);

@@ -3692,9 +3692,12 @@ if (!class_exists('wpMail')) {
 					}
 					
 					$dojoin = false;
+					$sections = $this -> sections -> subscribers;
 					$conditions_and = array();
 					
 					if (!empty($_GET['filter'])) {
+						$sections .= '&filter=1';
+					
 						if (!empty($_GET['list'])) {
 							switch ($_GET['list']) {
 								case 'all'				:
@@ -3709,6 +3712,8 @@ if (!class_exists('wpMail')) {
 									$conditions_and[$subscriberslists_table . '.list_id'] = $_GET['list'];	
 									break;
 							}
+							
+							$sections .= '&list=' . $_GET['list'];
 						}
 						
 						if (!empty($_GET['status'])) {
@@ -3717,10 +3722,14 @@ if (!class_exists('wpMail')) {
 								$conditions_and[$subscriberslists_table . '.active'] = $status;
 								$dojoin = true;
 							}
+							
+							$sections .= '&status=' . $_GET['status'];
 						}
 						
 						if (!empty($_GET['registered']) && $_GET['registered'] != "all") {
 							$conditions_and[$subscribers_table . '.registered'] = $_GET['registered'];
+							
+							$sections .= '&registered=' . $_GET['registered'];
 						}
 					}
 					
@@ -3738,10 +3747,10 @@ if (!class_exists('wpMail')) {
 						$data['Paginate'] = false;
 					} else {
 						if ($dojoin) {
-							$data = $this -> paginate($SubscribersList -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$data = $this -> paginate($SubscribersList -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
 							$subscribers = $data[$SubscribersList -> model];
 						} else {
-							$data = $this -> paginate($Subscriber -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$data = $this -> paginate($Subscriber -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
 							$subscribers = $data[$Subscriber -> model];
 						}
 					}
