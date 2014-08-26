@@ -186,6 +186,9 @@ class wpmlHistory extends wpMailPlugin {
 							}
 							
 							$fieldsquery .= ")";
+							$fieldsquery = str_replace(" AND)", "", $fieldsquery);
+							$fieldsquery .= ")";
+							$fieldsquery = str_replace("))", ")", $fieldsquery);
 						}
 					}
 					
@@ -267,7 +270,7 @@ class wpmlHistory extends wpMailPlugin {
 		
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE `senddate` <= '" . date_i18n("Y-m-d H:i:s", time()) . "' AND `scheduled` = 'Y' LIMIT 1";
 		
-		if ($histories = $wpdb -> get_results($query)) {
+		if ($histories = $wpdb -> get_results($query)) {		
 			foreach ($histories as $history) {
 				$this -> remove_server_limits();
 				$mailinglists = maybe_unserialize($history -> mailinglists);
@@ -328,6 +331,7 @@ class wpmlHistory extends wpMailPlugin {
 							$fieldsquery .= ")";
 							$fieldsquery = str_replace(" AND)", "", $fieldsquery);
 							$fieldsquery .= ")";
+							$fieldsquery = str_replace("))", ")", $fieldsquery);
 						}
 					}
 					

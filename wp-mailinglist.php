@@ -1483,6 +1483,8 @@ if (!class_exists('wpMail')) {
 			//update the "lastcron" setting
 			$this -> update_option('lastcron', time());
 			echo '<br/>' . $emailssent . " " . __('queued emails have been sent out', $this -> plugin_name);
+			
+			exit();
 		}
 		
 		function the_editor($html = null) {
@@ -3284,7 +3286,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_subscribers() {
-			global $wpdb, $Html, $Db, $Email, $Field, $Subscriber, $SubscribersList, $Mailinglist;
+			global $wpdb, $Html, $Db, $wpmlOrder, $Email, $Field, $Subscriber, $SubscribersList, $Mailinglist;
 			$Db -> model = $Subscriber -> model;
 				
 			switch ($_GET['method']) {
@@ -3327,9 +3329,11 @@ if (!class_exists('wpMail')) {
 				case 'view'			:
 					if (!empty($_GET['id'])) {
 						if ($subscriber = $Subscriber -> get($_GET['id'])) {
+							$Db -> model = $wpmlOrder -> model;
+							$orders = $Db -> find_all(array('subscriber_id' => $subscriber -> id));
 							$conditions['subscriber_id'] = $subscriber -> id;
-							$data = $this -> paginate($Email -> model, false, $this -> sections -> subscribers . '&method=view&id=' . $subscriber -> id, $conditions, false, 15);
-							$this -> render_admin('subscribers' . DS . 'view', array('subscriber' => $subscriber, 'emails' => $data[$Email -> model], 'paginate' => $data['Paginate']));
+							$data = $this -> paginate($Email -> model, false, $this -> sections -> subscribers . '&method=view&id=' . $subscriber -> id, $conditions, false, 15);							
+							$this -> render_admin('subscribers' . DS . 'view', array('subscriber' => $subscriber, 'orders' => $orders, 'emails' => $data[$Email -> model], 'paginate' => $data['Paginate']));
 						} else {						
 							$message = __('Subscriber cannot be read', $this -> plugin_name);
 							$this -> redirect($this -> url, 'error', $message);
@@ -3466,6 +3470,12 @@ if (!class_exists('wpMail')) {
 	                $bounce_message .= __('bounced emails were removed.', $this -> plugin_name);
 	                $this -> redirect("?page=" . $this -> sections -> subscribers, 'message', $bounce_message);
 	                break;
+	            case 'check-expired'	:
+	            	global $SubscribersList;
+	            	$updated = $SubscribersList -> check_expirations();
+	            	$message = sprintf(__('%s subscriptions have been deactivated due to expiration or max emails sent.', $this -> plugin_name), $updated);
+	            	$this -> redirect("?page=" . $this -> sections -> subscribers, 'message', $message);
+	            	break;
 				default			:
 					$oldperpage = 15;
 				

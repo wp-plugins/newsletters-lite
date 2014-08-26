@@ -230,22 +230,21 @@ class wpmlSubscribersList extends wpMailPlugin {
 	
 	function check_maxperinterval() {
 		global $wpdb, $Mailinglist, $Subscriber, $SubscribersList;
-		
+		$updated = 0;
 		$mailinglists_table = $wpdb -> prefix . $Mailinglist -> table;
 		$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
 		$subscriberslists_table = $wpdb -> prefix . $SubscribersList -> table;
-	
 		$query = "UPDATE " . $subscriberslists_table . " AS sl LEFT JOIN " . $mailinglists_table . " AS m ON sl.list_id = m.id SET sl.active = 'N' WHERE (sl.paid_sent >= m.maxperinterval AND m.maxperinterval != '') AND sl.active = 'Y'";
-		$wpdb -> query($query);
-		
-		return;
+		$updated = $wpdb -> query($query);
+		return $updated;
 	}
 	
 	function check_expirations($field = null, $value = null, $single = false, $subsriber_id = false) {
 		global $wpdb, $Db, $SubscribersList, $Subscriber, $Mailinglist;
 		$conditions = array('paid' => "Y");
 		
-		$this -> check_maxperinterval();
+		$updated = 0;		
+		$updated = $this -> check_maxperinterval();
 		
 		if (!empty($single) && $single == true && !empty($subscriber_id)) {
 			$conditions['subscriber_id'] = $subscriber_id;	
@@ -263,6 +262,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 						$conditions = array('subscriber_id' => $sl -> subscriber_id, 'list_id' => $sl -> list_id);
 						$this -> save_field('paid', "N", $conditions);
 						$this -> save_field('active', "N", $conditions);
+						$updated++;
 						
 						$mailinglist = $Mailinglist -> get($sl -> list_id, false);
 						if ($mailinglist -> paid == "Y") {						
@@ -276,11 +276,9 @@ class wpmlSubscribersList extends wpMailPlugin {
 					}
 				}
 			}	
-			
-			return true;
 		}
 		
-		return false;
+		return $updated;
 	}
 	
 	function save_field($field = null, $value = null, $conditions = array()) {

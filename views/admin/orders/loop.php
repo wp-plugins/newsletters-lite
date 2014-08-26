@@ -35,12 +35,14 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th class="column-subscriber_id <?php echo ($orderby == "subscriber_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
-						<a href="<?php echo $Html -> retainquery('orderby=subscriber_id&order=' . (($orderby == "subscriber_id") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Subscriber', $this -> plugin_name); ?></span>
-							<span class="sorting-indicator"></span>
-						</a>
-					</th>
+					<?php if (empty($hide_subscriber)) : ?>
+						<th class="column-subscriber_id <?php echo ($orderby == "subscriber_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
+							<a href="<?php echo $Html -> retainquery('orderby=subscriber_id&order=' . (($orderby == "subscriber_id") ? $otherorder : "asc")); ?>">
+								<span><?php _e('Subscriber', $this -> plugin_name); ?></span>
+								<span class="sorting-indicator"></span>
+							</a>
+						</th>
+					<?php endif; ?>
 					<th class="column-amount <?php echo ($orderby == "amount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=amount&order=' . (($orderby == "amount") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Amount', $this -> plugin_name); ?></span>
@@ -76,12 +78,14 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th class="column-subscriber_id <?php echo ($orderby == "subscriber_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
-						<a href="<?php echo $Html -> retainquery('orderby=subscriber_id&order=' . (($orderby == "subscriber_id") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Subscriber', $this -> plugin_name); ?></span>
-							<span class="sorting-indicator"></span>
-						</a>
-					</th>
+					<?php if (empty($hide_subscriber)) : ?>
+						<th class="column-subscriber_id <?php echo ($orderby == "subscriber_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
+							<a href="<?php echo $Html -> retainquery('orderby=subscriber_id&order=' . (($orderby == "subscriber_id") ? $otherorder : "asc")); ?>">
+								<span><?php _e('Subscriber', $this -> plugin_name); ?></span>
+								<span class="sorting-indicator"></span>
+							</a>
+						</th>
+					<?php endif; ?>
 					<th class="column-amount <?php echo ($orderby == "amount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=amount&order=' . (($orderby == "amount") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Amount', $this -> plugin_name); ?></span>
@@ -118,7 +122,9 @@
 							<span class="view"><?php echo $Html -> link(__('View Order', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=view&amp;id=' . $order -> id); ?></span>
 						</div>
 					</td>
-					<td><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('View the details of this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a></td>
+					<?php if (empty($hide_subscriber)) : ?>
+						<td><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('View the details of this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a></td>
+					<?php endif; ?>
 					<td><label for="checklist<?php echo $order -> id; ?>"><strong><?php echo $Html -> currency(); ?><?php echo number_format($order -> amount, 2, '.', ''); ?></strong></label></td>
 					<td><label for="checklist<?php echo $order -> id; ?>"><?php echo (!empty($order -> pmethod) && $order -> pmethod == "2co") ? '2CheckOut' : 'PayPal'; ?></label></td>
 					<td><label for="checklist<?php echo $order -> id; ?>"><abbr title="<?php echo $order -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($order -> modified)); ?></abbr></label></td>

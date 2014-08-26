@@ -4,6 +4,7 @@
 			<div class="alignleft">
                 <?php if ($this -> get_option('bouncemethod') == "pop") : ?>
                     <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-bounced" title="<?php _e('Check for bounced emails', $this -> plugin_name); ?>" class="button" onclick="if (!confirm('<?php _e('Are you sure you wish to check your POP/IMAP mailbox for bounced emails?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Check Bounced Emails', $this -> plugin_name); ?></a>
+                    <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-expired" class="button"><?php _e('Check Expired', $this -> plugin_name); ?></a>
                 <?php endif; ?>
 				<select class="widefat" style="width:auto;" name="action" onchange="action_change(this.value);">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>

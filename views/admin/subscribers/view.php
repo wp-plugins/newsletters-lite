@@ -1,4 +1,7 @@
 <div class="wrap <?php echo $this -> pre; ?>">
+	<div style="float:left; margin:0 10px 0 0;">
+		<?php echo $Html -> get_gravatar($subscriber -> email); ?>
+	</div>
 	<h2><?php _e('View Subscriber:', $this -> plugin_name); ?> <?php echo $subscriber -> email; ?></h2>
 	
 	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Subscribers', $this -> plugin_name), $this -> url, array('title' => __('Manage All Subscribers', $this -> plugin_name))); ?></div>
@@ -7,6 +10,10 @@
 		<div class="alignleft actions">				
 			<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('Change the details of this subscriber', $this -> plugin_name); ?>" class="button"><?php _e('Change', $this -> plugin_name); ?></a>
 			<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=delete&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('Remove this subscriber', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this subscriber?', $this -> plugin_name); ?>')) { return false; }" class="button button-highlighted"><?php _e('Delete', $this -> plugin_name); ?></a>
+			<a href="#emails" class="button"><?php _e('Emails Sent', $this -> plugin_name); ?></a>
+			<?php if (!empty($orders)) : ?>
+				<a href="#orders" class="button"><?php _e('Paid Orders', $this -> plugin_name); ?></a>
+			<?php endif; ?>
 		</div>
 	</div>
 	<?php $class = ''; ?>
@@ -134,4 +141,9 @@
 	
 	<h3 id="emails"><?php _e('Emails', $this -> plugin_name); ?></h3>
 	<?php $this -> render('emails' . DS . 'loop', array('emails' => $emails, 'paginate' => $paginate), true, 'admin'); ?>
+	
+	<?php if (!empty($orders)) : ?>
+		<h3 id="orders"><?php _e('Subscription Orders', $this -> plugin_name); ?></h3>
+		<?php $this -> render('orders' . DS . 'loop', array('orders' => $orders, 'hide_subscriber' => true), true, 'admin'); ?>
+	<?php endif; ?>
 </div>

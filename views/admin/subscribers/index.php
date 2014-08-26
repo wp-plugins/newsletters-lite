@@ -19,6 +19,5 @@
 		</form>
 	<?php endif; ?>
 	<br class="clear" />
-	<?php /*<p class="howto"><?php _e('You can click "Screen Options" in the top, right-hand corner to display custom columns in this table.', $this -> plugin_name); ?></p>*/ ?>
 	<?php $this -> render_admin('subscribers' . DS . 'loop', array('subscribers' => $subscribers, 'paginate' => $paginate)); ?>
 </div>
