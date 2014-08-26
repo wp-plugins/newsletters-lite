@@ -27,6 +27,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 					<?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'side', false); ?>
 				</div>
 				<div id="postbox-container-2" class="postbox-container">
+					<?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'high', false); ?>
 					<?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'normal', false); ?>
                     <?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'advanced', false); ?>
 				</div>

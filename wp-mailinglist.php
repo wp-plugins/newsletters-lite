@@ -2015,7 +2015,7 @@ if (!class_exists('wpMail')) {
 			global $Metabox, $Html;
 			
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings, 'side', 'core');
-			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_tableofcontents'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_tableofcontents'), "newsletters_page_" . $this -> sections -> settings, 'high', 'core');
 			add_meta_box('generaldiv', __('General Mail Settings', $this -> plugin_name) . $Html -> help(__('These are general settings related to the sending of emails such as your email server. You can also turn on/off other features here such as read tracking, click tracking and more.', $this -> plugin_name)), array($Metabox, 'settings_general'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('sendingdiv', __('Sending Settings', $this -> plugin_name), array($Metabox, 'settings_sending'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('optindiv', __('Default Subscription Form Settings', $this -> plugin_name) . $Html -> help(__('Global subscribe form settings for hardcoded and shortcode (post/page) subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_optin'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
@@ -2042,7 +2042,7 @@ if (!class_exists('wpMail')) {
 			$page = "newsletters_page_" . $this -> sections -> settings_templates;
 		
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_templates, 'side', 'core');
-			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_templates_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_templates_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_templates, 'high', 'core');
 			add_meta_box('postsdiv', __('Posts', $this -> plugin_name) . $Html -> help(__('The posts template used when using the [wpmlpost...] or [wpmlposts...] shorcodes in your newsletters.', $this -> plugin_name)), array($Metabox, 'settings_templates_posts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('latestpostsdiv', __('Latest Posts', $this -> plugin_name) . $Html -> help(__('The posts template used for the "Latest Posts Subscription" feature which automatically sends out new posts.', $this -> plugin_name)), array($Metabox, 'settings_templates_latestposts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('confirmdiv', __('Confirmation Email', $this -> plugin_name) . $Html -> help(__('Email message sent to new subscribers to confirm their subscription.', $this -> plugin_name)), array($Metabox, 'settings_templates_confirm'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
@@ -2065,7 +2065,7 @@ if (!class_exists('wpMail')) {
 			global $Html, $Metabox;
 			
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'side', 'core');
-			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_subscribers_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_subscribers_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'high', 'core');
 			add_meta_box('managementdiv', __('Subscriber Management Section', $this -> plugin_name) . $Html -> help(__('This section lets you control the way the subscriber management section behaves. It is the "Manage Subscriptions" page which is provided to subscribers where they unsubscribe, manage current subscriptions, update their profile, etc.', $this -> plugin_name)), array($Metabox, 'settings_management'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
 			add_meta_box('subscribersdiv', __('Subscription Behaviour', $this -> plugin_name) . $Html -> help(__('Control the way the plugin behaves when someone subscribes to your site. Certain things can happen upon subscription based on these settings.', $this -> plugin_name)), array($Metabox, 'settings_subscribers'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
 			add_meta_box('unsubscribediv', __('Unsubscribe Behaviour', $this -> plugin_name) . $Html -> help(__('Control the unsubscribe procedure. Certain things can happen when a subscriber unsubscribes from your site based on these settings.', $this -> plugin_name)), array($Metabox, 'settings_unsubscribe'), "newsletters_page_" . $this -> sections -> settings_subscribers, 'normal', 'core');
@@ -2090,7 +2090,7 @@ if (!class_exists('wpMail')) {
 			global $Metabox, $Html;
 		
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_system, 'side', 'core');
-			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_system_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
+			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_system_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_system, 'high', 'core');
 			add_meta_box('captchadiv', __('Captcha Settings', $this -> plugin_name) . $Html -> help(__('Use these settings for the captcha security image used in the subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_system_captcha'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('wprelateddiv', __('WordPress Related', $this -> plugin_name) . $Html -> help(__('These are settings related to WordPress directly and how the plugin interacts with it.', $this -> plugin_name)), array($Metabox, 'settings_wprelated'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('autoimportusersdiv', __('Auto Import Users', $this -> plugin_name) . $Html -> help(__('Use these settings to configure the way that WordPress users are automatically imported as subscribers into the system.', $this -> plugin_name)), array($Metabox, 'settings_importusers'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
