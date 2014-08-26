@@ -98,7 +98,7 @@
 			<input type="submit" class="button" name="submit" value="<?php echo esc_attr(stripslashes(__($instance['button']))); ?>" id="<?php echo $widget_id; ?>-button" />
 		</span>
 		<span id="<?php echo $widget_id; ?>-loading" class="newsletters_loading" style="display:none;">
-			<img src="<?php echo $this -> render_url('img' . DS . 'loading.gif', 'default', false); ?>" />
+			<img src="<?php echo $this -> render_url('img' . DS . 'loading.gif', 'default', false); ?>" alt="loading" />
 		</span>
 	</div>
 </form>

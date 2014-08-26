@@ -70,7 +70,7 @@ if (!empty($subscriber -> subscriptions)) {
 	            $fields = $FieldsList -> fields_by_list($_POST['list_id'], "order", "ASC", (($this -> get_option('managementallowemailchange') == "Y") ? true : false));
 	            
 	            ?>
-	            <div id="savefields" class="<?php echo $this -> pre; ?>widget <?php echo $this -> pre; ?>">
+	            <div id="savefields" class="<?php echo $this -> pre; ?>widget widget_newsletters <?php echo $this -> pre; ?>">
 	                <?php $this -> render('management' . DS . 'customfields', array('subscriber' => $subscriber, 'fields' => $fields), true, 'default'); ?>
 	            </div>
 	            

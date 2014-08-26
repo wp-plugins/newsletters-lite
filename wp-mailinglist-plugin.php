@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.3';
+		var $version = '4.3.4';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -2745,7 +2745,6 @@ if (!class_exists('wpMailPlugin')) {
 					wp_enqueue_style('wp-color-picker');
 				}
 				
-				//$uisrc = plugins_url() . '/' . $this -> plugin_name . '/css/jquery-ui.css';
 				$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
 				wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
 				wp_enqueue_style('colorbox', $this -> render_url('css/colorbox.css', 'admin', false), false, $this -> version, "all");
@@ -2763,7 +2762,6 @@ if (!class_exists('wpMailPlugin')) {
 			} else {
 				if ($this -> get_option('theme_usestyle') == "Y") {
 					$load = true;	
-					//$stylesource = plugins_url() . '/' . $this -> plugin_name . '/views/' . $theme_folder . '/css/style.css';
 					$stylesource = $this -> render_url('css/style.css', 'default', false);
 				}
 			}
@@ -2773,7 +2771,6 @@ if (!class_exists('wpMailPlugin')) {
 				wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
 				
 				if ($this -> get_option('customcss') == "Y") {
-					//$customsrc = plugins_url() . '/' . $this -> plugin_name . '/css/' . $this -> plugin_name . '-css.php';
 					$customsrc = $this -> render_url('css/' . $this -> plugin_name . '-css.php', 'admin', false);
 					wp_enqueue_style($this -> pre . '-custom', $customsrc, null, $this -> version, "screen");	
 				}
@@ -3276,7 +3273,12 @@ if (!class_exists('wpMailPlugin')) {
 					echo '<div class="newsletters-fieldholder ' . $field -> slug . '">';
 				
 					if ($fieldset == true && $field -> type != "special") {
-						echo '<label for="' . $this -> pre . '-' . $optinid . $field -> slug . '" class="' . $this -> pre . 'customfield ' . $this -> pre . 'customfield' . $field_id . '">';
+						if ($field -> type == "file") {
+							?><label for="file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>" class="<?php echo $this -> pre . 'customfield'; ?> <?php echo $this -> pre; ?>customfield<?php echo $field_id; ?>"><?php	
+						} else {
+							echo '<label for="' . $this -> pre . '-' . $optinid . $field -> slug . '" class="' . $this -> pre . 'customfield ' . $this -> pre . 'customfield' . $field_id . '">';
+						}
+							
 						_e($field -> title);
 						if ($field -> required == "Y") { echo ' <span class="' . $this -> pre . 'required">&#42;</span>'; };
 						echo '</label>';
@@ -3319,7 +3321,7 @@ if (!class_exists('wpMailPlugin')) {
 											if (is_numeric($list)) {
 												echo '<input type="hidden" name="list_id[]" value="' . $list . '" />';
 											} else {
-												echo '<label for="' . $this -> pre . '-' . $optinid . $field -> slug . '" class="' . $this -> pre . 'customfield ' . $this -> pre . 'customfield' . $field_id . '">';
+												echo '<label class="' . $this -> pre . 'customfield ' . $this -> pre . 'customfield' . $field_id . '">';
 												_e($field -> title);
 												if ($field -> required == "Y") { echo ' <span class="' . $this -> pre . 'required">&#42;</span>'; };
 												echo '</label>';
@@ -3409,11 +3411,11 @@ if (!class_exists('wpMailPlugin')) {
 						
 							?>
 							
-							<input type="file" <?php echo $Html -> tabindex($optinid); ?> name="file_upload_<?php echo $field -> id; ?>" value="" id="file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>" />
+							<input type="file" <?php echo $Html -> tabindex($optinid); ?> name="file_upload_<?php echo $field -> id; ?>" id="file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>" />
 							<input type="hidden" name="<?php echo $field -> slug; ?>" value="<?php echo esc_attr(stripslashes($_POST[$field -> slug])); ?>" id="<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>" />
 							
 							<script type="text/javascript">
-							jQuery(function() {
+							jQuery(document).ready(function() {
 								jQuery('#file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>').uploadify({
 									'swf'      			: 	'<?php echo $this -> url(); ?>/images/uploadify/uploadify.swf',
 									'uploader' 			: 	'<?php echo $this -> url(); ?>/vendors/uploadify/upload.php',
@@ -3424,9 +3426,9 @@ if (!class_exists('wpMailPlugin')) {
 									<?php if (!empty($filetypes)) : ?>'fileTypeExts'	:	'<?php echo $filetypes; ?>',<?php endif; ?>
 									<?php if (!empty($field -> filesizelimit)) : ?>'fileSizeLimit'	:	'<?php echo $field -> filesizelimit; ?>',<?php endif; ?>
 									'removeCompleted'	:	false,
-									'onUploadStart'		:	function(file) {
+									/*'onUploadStart'		:	function(file) {
 										<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", true);<?php endif; ?>
-									},
+									},*/
 									'onUploadError' 	: 	function(file, errorCode, errorMsg, errorString) {
 										console.log('The file ' + file.name + ' could not be uploaded: ' + errorString);
 									},
@@ -3434,10 +3436,10 @@ if (!class_exists('wpMailPlugin')) {
 										console.log('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
 										console.log('Updating field #<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>');
 										jQuery('#<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>').val(data);
-									},
+									}/*,
 									'onUploadComplete'	:	function(file) {
 										<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", false);<?php endif; ?>
-									}
+									}*/
 								});
 							});
 							</script>
@@ -4775,10 +4777,12 @@ if (!class_exists('wpMailPlugin')) {
 				if ($autocreate == true) {
 					$postdata = array(
 						'post_title'			=>	__('Manage Subscriptions', $this -> plugin_name),
-						'post_content'			=>	__('[wpmlmanagement]', $this -> plugin_name),
+						'post_content'			=>	__('[newsletters_management]', $this -> plugin_name),
 						'post_type'				=>	"page",
 						'post_status'			=>	"publish",
 						'post_author'			=>	$user_ID,
+						'comment_status'		=>	"closed",
+						'ping_status'			=>	"closed",
 					);
 					
 					$post_id = wp_insert_post($postdata);
@@ -4792,7 +4796,7 @@ if (!class_exists('wpMailPlugin')) {
 				} else {
 					if (is_admin() && $this -> ci_serial_valid()) {
 						if (!$newsletters_managementpost_error) {
-							$error = sprintf(__('Newsletter plugin subscriber management post/page does not exist %s', $this -> plugin_name), '<a href="' . admin_url('admin.php') . '?page=' . $this -> sections -> settings . '&method=managementpost" class="button button-secondary">' . __('Create it Now', $this -> plugin_name) . '</a>');
+							$error = sprintf(__('Newsletter plugin subscriber management post/page does not exist %s', $this -> plugin_name), '<a href="' . admin_url('admin.php') . '?page=' . $this -> sections -> settings . '&method=managementpost" class="button button-secondary button-small">' . __('please create it now', $this -> plugin_name) . '</a>');
 							$this -> render_error($error);
 							$newsletters_managementpost_error = true;
 						}
@@ -4948,7 +4952,7 @@ if (!class_exists('wpMailPlugin')) {
 						
 				$post_criteria = array(
 					'numberposts'			=>	$this -> get_option('latestposts_number'),
-					'category'				=>	implode(",", $this -> get_option('latestposts_categories')),
+					'category'				=>	@implode(",", $this -> get_option('latestposts_categories')),
 					'orderby'				=>	$orderby,
 					'order'					=>	$order,
 					'exclude'				=>	$exclude,
@@ -5194,9 +5198,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.3") < 0) {
+				if (version_compare($cur_version, "4.3.4") < 0) {
 					$this -> update_options();
-					$version = "4.3.3";
+					$version = "4.3.4";
 				}
 			
 				//the current version is older.

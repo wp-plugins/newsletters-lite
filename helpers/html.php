@@ -531,7 +531,8 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		}
 		
 		$wpmltabindex++;
-		$tabindex = 'tabindex="' . $optinid . $wpmltabindex . '"';
+		$string = $optinid . $wpmltabindex;
+		$tabindex = 'tabindex="9' . preg_replace("/[^0-9]+/si", "", $string) . '"';
 		return $tabindex;
 	}
 	
