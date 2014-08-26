@@ -5638,6 +5638,9 @@ if (!class_exists('wpMailPlugin')) {
 				$body = do_shortcode($body);
 				$body = str_replace("$", "&#36;", $body);
 				
+				global $wpml_textmessage;
+				$wpml_textmessage = $body;
+				
 				$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';				
 				if (preg_match_all($pattern, $body, $regs)) {				
 					/* Bit.ly if shortlinks are enabled */
@@ -5671,9 +5674,6 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}	
 				}
-				
-				global $wpml_textmessage;
-				$wpml_textmessage = $body;
 				
 				if (!empty($history_id)) {
 					$this -> history_id = $history_id;

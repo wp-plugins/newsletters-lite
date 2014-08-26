@@ -2119,10 +2119,9 @@ if (!class_exists('wpMail')) {
 						}
 						
 						if (!empty($_POST['sendattachment']) && $_POST['sendattachment'] == "Y") {						
-							/* New Attachments */
-							if (!empty($_FILES['attachments']['name'])) {
-								$newattachments = array();
-								
+							$newattachments = array();
+							
+							if (!empty($_FILES['attachments']['name'])) {								
 								foreach ($_FILES['attachments']['name'] as $fkey => $attachmentfile) {
 									if ($_FILES['attachments']['error'][$fkey] == 0) {
 										$name = $this -> stripext($_FILES['attachments']['name'][$fkey], 'name');
@@ -2137,6 +2136,13 @@ if (!class_exists('wpMail')) {
 												'filename'				=>	$attfull,
 											);	
 										}
+									}
+								}
+							} else {
+								if (!empty($_POST['ishistory'])) {
+									$Db -> model = $History -> model;
+									if ($history = $Db -> find(array('id' => $_POST['ishistory']))) {
+										$newattachments = $history -> attachments;
 									}
 								}
 							}
