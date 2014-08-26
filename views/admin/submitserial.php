@@ -2,14 +2,19 @@
 var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 </script>
 
-<h3><?php _e('Serial Key', $this -> plugin_name); ?></h3>
+<h3><?php _e('Newsletters Serial Key', $this -> plugin_name); ?></h3>
 
 <?php if (empty($success) || $success == false) : ?>
 	<?php if (!$this -> ci_serial_valid()) : ?>
-        <p style="width:400px;"><?php _e('You need to fill in a serial key to continue using the Newsletter plugin.', $this -> plugin_name); ?>
-        <?php _e('Please obtain a serial key from the downloads section in your Tribulant Software account.', $this -> plugin_name); ?>
-        <?php _e('Once in the downloads section, click the KEY icon to request a serial key.', $this -> plugin_name); ?>
-        <a href="http://tribulant.com/downloads/" title="Tribulant Software Downloads" target="_blank"><?php _e('Downloads Section', $this -> plugin_name); ?></a></p>
+        <p style="width:400px;">
+        	<?php _e('You are running Newsletters LITE.', $this -> plugin_name); ?>
+        	<?php echo sprintf(__('To remove limits, you can submit a serial key or %s.'), '<a href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Upgrade to PRO', $this -> plugin_name) . '</a>'); ?>
+        </p>
+        <p style="width:400px;">
+	        <?php _e('Please obtain a serial key from the downloads section in your Tribulant Software account.', $this -> plugin_name); ?>
+	        <?php _e('Once in the downloads section, click the KEY icon to request a serial key.', $this -> plugin_name); ?>
+	        <a href="http://tribulant.com/downloads/" title="Tribulant Software Downloads" target="_blank"><?php _e('Downloads Section', $this -> plugin_name); ?></a>
+        </p>
     
         <div class="newsletters_error">
             <?php $this -> render('error', array('errors' => $errors), true, 'admin'); ?>

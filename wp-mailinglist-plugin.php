@@ -206,7 +206,8 @@ if (!class_exists('wpMailPlugin')) {
 		        echo '<tr class="plugin-update-tr">';
 		        echo '<td colspan="3" class="plugin-update">';
 		        echo '<div class="update-message">';
-		        echo sprintf('Your download for the Newsletter plugin has expired, please <a href="%s" target="_blank">renew it</a> for updates!', $version_info['url']);
+		        //echo sprintf('Your download for the Newsletter plugin has expired, please <a href="%s" target="_blank">renew it</a> for updates!', $version_info['url']);
+		        echo sprintf(__('You are running Newsletters LITE. To remove limits, you can submit a serial key or %s.', $this -> plugin_name), '<a href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Upgrade to PRO', $this -> plugin_name) . '</a>');
 		        echo '</div>';
 		        echo '</td>';
 		        echo '</tr>';
@@ -3719,7 +3720,7 @@ if (!class_exists('wpMailPlugin')) {
 									if (preg_match("/[0-9]/si", $optinid, $matches)) {
 										$number = $matches[0];
 										
-										$list = (empty($instance['list'])) ? $_POST['list_id'][0] : $instance['list'];
+										$list = (empty($instance['list'])) ? __($_POST['list_id'][0]) : __($instance['list']);
 										if ($this -> language_do()) {
 											$list = $this -> language_use($instance['lang'], $list, false);
 										}

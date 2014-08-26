@@ -524,6 +524,7 @@ if (!class_exists('newsletters_lite')) {
 				$this -> add_filter('wpml_mailinglist_validation', 'lite_mailinglist_validation', 10, 2);
 				$this -> add_filter('wpml_sendmail_validation', 'lite_sendmail_validation', 10, 2); 
 				$this -> add_filter('wpml_subscriber_validation', 'lite_subscriber_validation', 10, 2);
+				$this -> add_filter('newsletters_field_validation', 'lite_field_validation', 10, 2);
 			}
 		}
 		
@@ -743,6 +744,17 @@ if (!class_exists('newsletters_lite')) {
 					$errors['limit'] = $error;
 					$this -> render_error($error);
 				}
+			}
+			
+			return $errors;
+		}
+		
+		function lite_field_validation($errors = null, $data = null) {
+		
+			if (empty($data -> id)) {
+				$error = sprintf(__('Additional custom fields are only available in the PRO version, you can %s for unlimited.', $this -> plugin_name), '<a href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">Upgrade to PRO</a>');
+				$errors['limit'] = $error;
+				$this -> render_error($error);
 			}
 			
 			return $errors;

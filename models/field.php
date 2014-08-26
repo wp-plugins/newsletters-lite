@@ -442,6 +442,8 @@ class wpmlField extends wpMailPlugin {
 				}	
 			}
 			
+			$this -> errors = apply_filters('newsletters_field_validation', $this -> errors, $this -> data[$this -> model]);
+			
 			if (empty($this -> errors)) {
 				$created = $modified = $this -> gen_date();
 				

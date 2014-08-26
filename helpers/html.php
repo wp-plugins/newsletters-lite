@@ -578,9 +578,11 @@ class wpmlHtmlHelper extends wpMailPlugin {
 						$alloptions = maybe_unserialize($value);
 						$optionarray = array();
 						
-						foreach ($alloptions as $alloption) {
-							$alloptionsplit = $this -> language_split($alloption);
-							$optionarray[] = trim($alloptionsplit[$language]);
+						if (!empty($alloptions)) {
+							foreach ($alloptions as $alloption) {
+								$alloptionsplit = $this -> language_split($alloption);
+								$optionarray[] = trim($alloptionsplit[$language]);
+							}
 						}
 						
 						return trim(@implode("\r\n", $optionarray));

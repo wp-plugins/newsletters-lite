@@ -578,7 +578,7 @@ if (!class_exists('wpMail')) {
 									<?php
 														
 									if (!empty($_POST)) {															
-										$subscriber -> list_id = $instance['list'];
+										$subscriber -> list_id = __($instance['list']);
 										$subscriber -> email = $_POST['email'];
 										
 										if ($Subscriber -> optin($_POST)) {
@@ -608,7 +608,7 @@ if (!class_exists('wpMail')) {
 										}
 									} else {
 										$iframe = (!empty($_GET['iframe'])) ? '&iframe=1' : '';
-										$action = $Html -> retainquery($this -> pre . 'method=offsite' . $iframe . '&list=' . $instance['list'], home_url());
+										$action = $Html -> retainquery($this -> pre . 'method=offsite' . $iframe . '&list=' . __($instance['list']), home_url());
 										$errors = $Subscriber -> errors;
 										$this -> render('widget', array('action' => $action, 'errors' => $errors, 'instance' => $instance, 'widget_id' => $widget_id, 'number' => $number), true, 'default');
 									}

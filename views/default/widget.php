@@ -16,7 +16,7 @@
 	<div id="<?php echo $widget_id; ?>-fields">
 		<?php 
 		
-		$list_id = (empty($_POST['list_id'])) ? $instance['list'] : $_POST['list_id']; 
+		$list_id = (empty($_POST['list_id'])) ? __($instance['list']) : __($_POST['list_id']); 
 		
 		?>
 		<?php if ($fields = $FieldsList -> fields_by_list($list_id)) : ?>
