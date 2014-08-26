@@ -2410,16 +2410,16 @@ if (!class_exists('wpMailPlugin')) {
 				if (wpml_is_management()) {				
 					if ($this -> get_option('loadscript_jqueryuitabs') == "Y") {
 						wp_enqueue_script($this -> get_option('loadscript_jqueryuitabs_handle'), false, array('jquery'), false, true);
-						wp_enqueue_script('jquery-cookie', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.cookie.js', array('jquery'));
+						wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'default', false), array('jquery'));
 					}
 				}
 			
 				//enqueue the plugin JS
-				if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuibutton_handle'), plugins_url() . '/' . $this -> plugin_name . '/js/jquery-ui-button.js', array('jquery'), false, true); }
-				if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), plugins_url() . '/' . $this -> plugin_name . '/js/jquery.watermark.js', array('jquery'), false, true); }
-				if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), plugins_url() . '/' . $this -> plugin_name . '/js/jquery.uploadify.js', array('jquery'), false, true); }
+				if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuibutton_handle'), $this -> render_url('js/jquery-ui-button.js', 'default', false), array('jquery'), false, true); }
+				if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'default', false), array('jquery'), false, true); }
+				if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'default', false), array('jquery'), false, true); }
 				
-				wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), false, true);
+				wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'default', false), array('jquery'), false, true);
 				
 				$captcha_type = $this -> get_option('captcha_type');
 				if (!empty($captcha_type) && $captcha_type == "recaptcha") {
@@ -5390,13 +5390,22 @@ if (!class_exists('wpMailPlugin')) {
 			$this -> sections = (object) $this -> sections;
 			//$this -> plugin_name = 'wp-mailinglist';
 		
-			if (!empty($file)) {
-				if (!empty($folder) && $folder == "default") {
+			if (!empty($file)) {				
+				$filename = $file . '.php';
+				
+				if (!empty($folder) && $folder != "admin") {
 					$theme_folder = $this -> get_option('theme_folder');
 					$folder = (!empty($theme_folder)) ? $theme_folder : $folder;
+					
+					$template_url = get_stylesheet_directory_uri();
+					$theme_path = get_stylesheet_directory();
+					$full_path = $theme_path . DS . 'newsletters' . DS . $filename;
+					
+					if (!empty($theme_path) && file_exists($full_path)) {
+						$folder = $theme_path . DS . 'newsletters';
+						$theme_serve = true;
+					}
 				}
-			
-				$filename = $file . '.php';
 				
 				if (!empty($extension)) {				
 					if ($extensions = $this -> get_extensions()) {					
@@ -5408,8 +5417,12 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					$filepath = WP_CONTENT_DIR . DS . 'plugins' . DS . $extension_folder . DS;
-				} else {
-					$filepath = $this -> plugin_base() . DS . 'views' . DS . $folder . DS;
+				} else {					
+					if (empty($theme_serve)) {
+						$filepath = $this -> plugin_base() . DS . 'views' . DS . $folder . DS;
+					} else {
+						$filepath = $folder . DS;
+					}
 				}
 				
 				$filefull = $filepath . $filename;

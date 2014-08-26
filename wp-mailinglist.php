@@ -4965,6 +4965,8 @@ if (!class_exists('wpMail')) {
 		function admin_config() {
 			global $wpdb, $Html, $Db, $Subscriber, $Latestpost, $wpmlCountry, $Mailinglist;
 			
+			do_action('newsletters_admin_settings');
+			
 			if (!empty($_GET['reset']) && $_GET['reset'] == 1) {
 				$this -> update_options();
 				$this -> redirect($this -> url);
