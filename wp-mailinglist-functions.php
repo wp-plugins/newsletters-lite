@@ -80,6 +80,19 @@ if (!function_exists('wpml_get_mailinglists')) {
 	}
 }
 
+if (!function_exists('newsletters_get_snippets')) {
+	function newsletters_get_snippets() {
+		global $wpdb, $Db, $Template;
+		$Db -> model = $Template -> model;
+		
+		if ($snippets = $Db -> find_all()) {
+			return $snippets;
+		}
+		
+		return false;
+	}
+}
+
 if (!function_exists('wpml_get_themes')) {
 	function wpml_get_themes() {
 		$themes = array();

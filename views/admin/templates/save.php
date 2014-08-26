@@ -22,7 +22,8 @@ $post_ID = $this -> get_option('imagespost');
 				<div id="post-body-content">
 					<div id="titlediv">
 						<div id="titlewrap">
-                            <?php echo $Form -> text('Template[title]', array('id' => "title", 'width' => "100%", 'tabindex' => "1", 'autocomplete' => "off")); ?>
+                            <label class="screen-reader-text" for="title"></label>
+							<input onclick="jQuery('iframe#content_ifr').attr('tabindex', '2');" tabindex="1" id="title" autocomplete="off" type="text" name="Template[title]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Template[title]'))); ?>" />
                         </div>
                     </div>
                     <div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section">                        

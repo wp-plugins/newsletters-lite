@@ -146,6 +146,8 @@ class wpmlHistory extends wpMailPlugin {
 			wp_cache_set($query_hash, $histories, 'newsletters', 0);
 		}
 		
+		do_action('newsletters_queue_recurring_start', $histories);
+		
 		if (!empty($histories)) {
 			foreach ($histories as $history) {
 				$this -> remove_server_limits();

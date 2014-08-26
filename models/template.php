@@ -79,7 +79,7 @@ class wpmlTemplate extends wpMailPlugin {
 				$select[$template -> id] = $template -> title;
 			}
 			
-			return $select;
+			return apply_filters('newsletters_snippets_select', $select);
 		}
 		
 		return false;

@@ -298,6 +298,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 			
 			<?php $Db -> model = $Template -> model; ?>
 			<?php if ($templates = $Db -> find_all(false, array('id', 'title'), array('title', "ASC"))) : ?>
+				<?php $templates = apply_filters('newsletters_admin_createnewsletter_snippets', $templates); ?>
 				<ul class="insertfieldslist">
 					<?php foreach ($templates as $template) : ?>
 						<li>

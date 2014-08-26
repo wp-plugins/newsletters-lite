@@ -1965,6 +1965,7 @@ if (!class_exists('wpMail')) {
 		
 		function admin_head_settings_templates() {
 			global $Metabox, $Html;
+			$page = "newsletters_page_" . $this -> sections -> settings_templates;
 		
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_templates, 'side', 'core');
 			add_meta_box('postsdiv', __('Posts', $this -> plugin_name) . $Html -> help(__('The posts template used when using the [wpmlpost...] or [wpmlposts...] shorcodes in your newsletters.', $this -> plugin_name)), array($Metabox, 'settings_templates_posts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
@@ -1977,6 +1978,8 @@ if (!class_exists('wpMail')) {
 			add_meta_box('orderdiv', __('Paid Subscription Email', $this -> plugin_name) . $Html -> help(__('Email message sent to the administrator for a new paid subscription order payment.', $this -> plugin_name)), array($Metabox, 'settings_templates_order'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('schedulediv', __('Cron Schedule Email', $this -> plugin_name) . $Html -> help(__('Email message sent to the administrator when the email cron fires.', $this -> plugin_name)), array($Metabox, 'settings_templates_schedule'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('subscribediv', __('New Subscription Email', $this -> plugin_name) . $Html -> help(__('Email message sent to the administrator when a new user subscribes.', $this -> plugin_name)), array($Metabox, 'settings_templates_subscribe'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
+			
+			do_action('newsletters_admin_settingstemplates_metaboxes', $page);
 			
 			do_action('do_meta_boxes', "newsletters_page_" . $this -> sections -> settings_templates, 'side');
 			do_action('do_meta_boxes', "newsletters_page_" . $this -> sections -> settings_templates, 'normal');
