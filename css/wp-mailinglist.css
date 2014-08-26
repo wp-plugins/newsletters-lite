@@ -245,18 +245,6 @@ table tbody tr.arow {
 	margin: 0 4px;
 }
 
-/*
-.wpml .tablenav-pages .page-numbers {
-	margin: 0 2px 0 0;
-}
-
-.wpml .tablenav-pages span.current {
-	padding: 0px 10px 2px;
-	font-size: 16px;
-	font-weight: 400;
-}
-*/
-
 .wpml table.form-table th {
 	/*white-space: nowrap;*/
 }
@@ -638,33 +626,30 @@ ul#wpmlsubmenu a.current {
 	font-style: normal;
 }
 
-[class^="icon-"], [class*=" icon-"] {
-	font-family: 'newsletters_dashicons';
+.newsletters-icon-link:before {
+	content: "\f103";
+}
+
+.newsletters-icon-download:before {
+	content: "\f316";
+}
+
+.newsletters-icon-rss:before {
+	content: "\f303";
+}
+
+[class^="newsletters-icon-"], [class*=" newsletters-icon-"] {
+	font-family: 'newsletters_dashicons' !important;
 	speak: none;
 	font-style: normal;
 	font-weight: normal;
 	font-variant: normal;
 	text-transform: none;
 	line-height: 1;
-
-	/* Better Font Rendering =========== */
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	font-size: 20px;
 }
-
-/*@font-face {
-  font-family: 'newsletters_dashicons';
-  src: url('../fonts/newsletters_dashicons.eot'); // this is for IE
-}
-
-@font-face {
-  font-family: 'newsletters_dashicons';
-  src: url('../fonts/newsletters_dashicons.woff') format('woff'), 
-    url('../fonts/newsletters_dashicons.ttf') format('truetype'), 
-    url('../fonts/newsletters_dashicons.svg') format('svg');
-  font-weight: bold;
-  font-style: normal;
-}*/
 
 .newsletters_dashicons {
 	font-family: 'newsletters_dashicons' !important;

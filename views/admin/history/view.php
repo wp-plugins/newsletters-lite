@@ -43,7 +43,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 						<?php if (is_array($mailinglists) || is_object($mailinglists)) : ?>
 							<?php foreach ($mailinglists as $mailinglist_id) : ?>
 								<?php $mailinglist = $Mailinglist -> get($mailinglist_id, false); ?>
-								<?php echo $Html -> link($mailinglist -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?><?php echo ($m < count($mailinglists)) ? ', ' : ''; ?>
+								<?php echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?><?php echo ($m < count($mailinglists)) ? ', ' : ''; ?>
 								<?php $m++; ?>
 							<?php endforeach; ?>
 						<?php endif; ?>
@@ -112,7 +112,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					$clicks = $this -> Click -> count(array('history_id' => $history -> id));
 					
 					?>
-					<?php echo sprintf(__('%s opened %s, %s unsubscribes %s, %s bounces %s and %s clicks out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . $ebouncedperc . '&#37;)', '<strong>' . $clicks . '</strong>', '<strong>' . $etotal . '</strong>'); ?>
+					<?php echo sprintf(__('%s opened %s, %s unsubscribes %s, %s bounces %s and %s%s clicks%s out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . $ebouncedperc . '&#37;)', '<a href="?page=' . $this -> sections -> clicks . '&amp;history_id=' . $history -> id . '">', '<strong>' . $clicks . '</strong>', '</a>', '<strong>' . $etotal . '</strong>'); ?>
 				</td>
 			</tr>
             <?php if (!empty($history -> attachments)) : ?>

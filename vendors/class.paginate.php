@@ -46,7 +46,7 @@ class wpmlpaginate extends wpMailPlugin {
 	
 	var $pagination = '';
 	
-	function wpmlpaginate($table = null, $fields = null, $sub = null, $parent = null) {	
+	function wpmlpaginate($table = null, $fields = "*", $sub = null, $parent = null) {	
 		$this -> sub = $sub;
 		$this -> parentd = $parent;
 	
@@ -68,27 +68,37 @@ class wpmlpaginate extends wpMailPlugin {
 			$this -> page = $page;
 		}
 		
-		$query = "SELECT " . $this -> fields . " FROM `" . $this -> table . "`";
-		$countquery = "SELECT COUNT(*) FROM `" . $this -> table . "`";
+			$query = "SELECT " . $this -> fields . " FROM `" . $this -> table . "`";
+			$countquery = "SELECT COUNT(*) FROM `" . $this -> table . "`";
 		
 		switch ($this -> model) {
+			case 'Subscriber'					:
+			
+				break;
 			case 'SubscribersList'				:
 				$query .= " LEFT JOIN " . $wpdb -> prefix . $Subscriber -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . $Subscriber -> table . ".id";	
+				$countquery .= " LEFT JOIN " . $wpdb -> prefix . $Subscriber -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . $Subscriber -> table . ".id";	
 				break;
 		}
 		
+		$didwhere = false;
+		
 		if (!empty($this -> where)) {
-			$query .= " WHERE";
-			$countquery .= " WHERE";
+			$didwhere = true;
+			$query .= " WHERE (";
+			$countquery .= " WHERE (";
 			$c = 1;
 			
 			foreach ($this -> where as $key => $val) {
 				if (preg_match("/(LIKE)/si", $val)) {
-					$query .= " `" . $key . "` " . $val . "";	
-					$countquery .= " `" . $key . "` " . $val . "";
+					$query .= " " . $key . " " . $val . "";	
+					$countquery .= " " . $key . " " . $val . "";
+				} elseif (preg_match("/(NOT IN)/si", $val)) {
+					$query .= " " . $key . " " . $val . "";
+					$countquery .= " " . $key . " " . $val . "";
 				} else {
-					$query .= " `" . $key . "` = '" . $val . "'";
-					$countquery .= " `" . $key . "` = '" . $val . "'";
+					$query .= " " . $key . " = '" . $val . "'";
+					$countquery .= " " . $key . " = '" . $val . "'";
 				}
 				
 				if ($c < count($this -> where)) {
@@ -97,6 +107,38 @@ class wpmlpaginate extends wpMailPlugin {
 				}
 				
 				$c++;
+			}
+			
+			$query .= ")";
+			$countquery .= ")";
+		}
+		
+		if (!empty($this -> where_and)) {
+			if (!$didwhere) {
+				$query .= " WHERE";
+				$countquery .= " WHERE";
+			} else {
+				$query .= " AND";
+				$countquery .= " AND";
+			}
+		
+			$a = 1;
+		
+			foreach ($this -> where_and as $key => $val) {
+				if (preg_match("/(NOT IN)/si", $val)) {
+					$query .= " " . $key . " " . $val . "";
+					$countquery .= " " . $key . " " . $val . "";
+				} else {
+					$query .= " " . $key . " = '" . $val . "'";
+					$countquery .= " " . $key . " = '" . $val . "'";
+				}
+				
+				if ($a < count($this -> where_and)) {
+					$query .= " AND";
+					$countquery .= " AND";
+				}
+				
+				$a++;
 			}
 		}
 		
@@ -107,14 +149,21 @@ class wpmlpaginate extends wpMailPlugin {
 		} else {
 			$begRecord = 0;
 		}
+		
+		switch ($this -> model) {
+			case 'SubscribersList'			:
+				$query .= " GROUP BY " . $this -> table . ".subscriber_id";
+				break;
+		}
 			
 		$endRecord = $begRecord + $this -> per_page;
 		list($ofield, $odir) = $this -> order;
-		$query .= " ORDER BY IF (" . $ofield . " = '' OR " . $ofield . " IS NULL,1,0), " . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
+		$query .= " ORDER BY IF (" . $this -> table . "." . $ofield . " = '' OR " . $this -> table . "." . $ofield . " IS NULL,1,0), " . $this -> table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
 		
-		$records = $wpdb -> get_results($query);	
+		$records = $wpdb -> get_results($query);			
 		$records_count = count($records);
-		$this -> allcount = $allRecordsCount = $count = $wpdb -> get_var($countquery);		
+		$this -> allcount = $allRecordsCount = $count = $wpdb -> get_var($countquery);	
+			
 		$totalpagescount = ceil($this -> allcount / $this -> per_page);
 		
 		if (empty($this -> url_page)) {

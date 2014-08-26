@@ -18,7 +18,7 @@
 					<th><label for="checkboxall"><?php _e('Mailing List(s)', $this -> plugin_name); ?><label>
 					<?php echo $Html -> help(__('Choose the mailing list(s) to subscribe this user to. Sending to any of the list(s) that you subscribe this user to will result in this user receiving the email newsletter.', $this -> plugin_name)); ?></th>
 					<td>
-						<div><label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Check All', $this -> plugin_name); ?></label></div>
+						<div><label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Select all', $this -> plugin_name); ?></label></div>
 						<?php if ($mailinglists = $Mailinglist -> select(true)) : ?>
 							<?php foreach ($mailinglists as $key => $val) : ?>
 								<?php $mailinglists[$key] = $val . ' (' . $SubscribersList -> count(array('list_id' => $key)) . ' ' . __('subscribers', $this -> plugin_name) . ')'; ?>

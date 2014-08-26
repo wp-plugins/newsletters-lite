@@ -2,6 +2,9 @@
 	<form action="?page=<?php echo $this -> sections -> links; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you want to apply this action to the selected links?', $this -> plugin_name); ?>')) { return false; }">
 		<div class="tablenav">
 			<div class="alignleft actions">
+				<a href="?page=<?php echo $this -> sections -> clicks; ?>" class="newsletters-icon-link button"> <?php _e('Clicks', $this -> plugin_name); ?></a>
+			</div>
+			<div class="alignleft actions">
 				<select name="action">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
@@ -75,7 +78,7 @@
 								</div>
 							</td>
 							<td>
-								<?php echo $this -> Click -> count(array('link_id' => $link -> id)); ?>
+								<?php echo $Html -> link($this -> Click -> count(array('link_id' => $link -> id)), '?page=' . $this -> sections -> clicks . '&amp;link_id=' . $link -> id); ?>
 							</td>
 							<td>
 								<abbr title="<?php echo $link -> created; ?>"><?php echo $Html -> gen_date("Y-m-d", strtotime($link -> created)); ?></abbr>

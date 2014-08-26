@@ -48,7 +48,11 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		if (function_exists('has_post_thumbnail') && has_post_thumbnail($thepost -> ID)) {
 			$output .= (!empty($link)) ? '<a href="' . $link . '" title="' . esc_attr(__($title)) . '">' : '';
-			$output .= get_the_post_thumbnail($thepost -> ID, $size, array('align' => "left", 'style' => "margin-right:15px;", 'hspace' => "15", 'title' => __($title), 'alt' => $alt));
+			
+			$thumbnail_attr = array('align' => "left", 'style' => "margin-right:15px;", 'hspace' => "15", 'title' => __($title), 'alt' => $alt);
+			$thumbnail_attr = apply_filters('newsletters_post_thumbnail_attr', $thumbnail_attr, $thepost -> ID);
+			
+			$output .= get_the_post_thumbnail($thepost -> ID, $size, $thumbnail_attr);
 			$output .= (!empty($link)) ? '</a>' : '';
 		}
 		
@@ -188,7 +192,8 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					if (function_exists('has_post_thumbnail')) {
 						if (has_post_thumbnail($shortcode_post -> ID)) {							
 							$return .= '<a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '">';
-							$return .= get_the_post_thumbnail($shortcode_post -> ID, $size, array('style' => "margin-right:15px;", 'align' => "left", 'hspace' => "15", 'class' => "post_thumbnail"));
+							$attr = apply_filters('newsletters_post_thumbnail_attr', array('style' => "margin-right:15px;", 'align' => "left", 'hspace' => "15", 'class' => "post_thumbnail"), $shortcode_post -> ID);
+							$return .= get_the_post_thumbnail($shortcode_post -> ID, $size, $attr);
 							$return .= '</a>';						
 							return $return;
 						}

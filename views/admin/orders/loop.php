@@ -123,7 +123,7 @@
 							<th class="check-column"><input type="checkbox" name="orderslist[]" value="<?php echo $order -> id; ?>" id="checklist<?php echo $order -> id; ?>" /></th>
 							<td><label for="checklist<?php echo $order -> id; ?>"><?php echo $order -> id; ?></label></td>
 							<td>
-								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $mailinglist -> id; ?>" title="<?php _e('View the details of this mailinglist', $this -> plugin_name); ?>"><?php echo $mailinglist -> title; ?></a></strong>
+								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $mailinglist -> id; ?>" title="<?php _e('View the details of this mailinglist', $this -> plugin_name); ?>"><?php echo __($mailinglist -> title); ?></a></strong>
 								<div class="row-actions">
 									<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=save&amp;id=' . $order -> id); ?> |</span>
 									<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=delete&amp;id=' . $order -> id, array('class' => "submitdelete", 'onclick' => "if (!confirm('" . __('Are you sure you want to delete this order? Linked subscription will be removed as well.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>

@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.4';
+		var $version = '4.3.5';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -32,6 +32,7 @@ if (!class_exists('wpMailPlugin')) {
 			'queue'						=>	"newsletters-queue",
 			'history'					=>	"newsletters-history",
 			'links'						=>	"newsletters-links",
+			'clicks'					=>	"newsletters-links-clicks",
 			'orders'					=>	"newsletters-orders",
 			'settings'					=>	"newsletters-settings",
 			'settings_subscribers'		=>	"newsletters-settings-subscribers",
@@ -1947,7 +1948,7 @@ if (!class_exists('wpMailPlugin')) {
 					if ($subscriber = $Auth -> logged_in()) {
 						if ($subscriber -> id == $_POST['subscriber_id']) {
 							$Db -> model = $Mailinglist -> model;
-							
+							$query = "SELECT * FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `id` = '" . $_POST['mailinglist_id'] . "'";
 							$mailinglist = $wpdb -> get_row($query);
 							
 							$paid = $mailinglist -> paid;
@@ -1971,7 +1972,7 @@ if (!class_exists('wpMailPlugin')) {
 										}
 									}
 									
-									$this -> admin_unsubscription_notification($subscriber, $mailinglist -> id);
+									$this -> admin_unsubscription_notification($subscriber, $_POST['mailinglist_id']);
 								
 									if (!empty($deleted) || $deleted == true) {
 										$message = __('Subscription removed and subscriber record deleted', $this -> plugin_name);
@@ -2483,7 +2484,15 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function paginate($model = null, $fields = '*', $sub = null, $conditions = false, $searchterm = null, $per_page = 10, $order = array('modified', "DESC")) {
+		function language_flag($language = null) {
+			global $q_config;
+			
+			$flag = '<img src="' . content_url() . '/' . $q_config['flag_location'] . '/' . $q_config['flag'][$language] . '" alt="' . $language . '" />';
+			
+			return $flag;
+		}
+		
+		function paginate($model = null, $fields = '*', $sub = null, $conditions = false, $searchterm = null, $per_page = 10, $order = array('modified', "DESC"), $conditions_and = null) {
 			global $wpdb, $Db, $Autoresponder, $Autoresponderemail, $Subscriber, $SubscribersList, $Mailinglist, 
 			${$model}, $AutorespondersList, $Mailinglist, $History;
 			
@@ -2497,6 +2506,7 @@ if (!class_exists('wpMailPlugin')) {
 				$paginate -> sub = (empty($sub)) ? $object -> controller : $sub;
 				$paginate -> fields = (empty($fields)) ? '*' : $fields;
 				$paginate -> where = (empty($conditions)) ? false : $conditions;
+				$paginate -> where_and = (empty($conditions_and)) ? false : $conditions_and;
 				$paginate -> searchterm = (empty($searchterm)) ? false : $searchterm;
 				$paginate -> per_page = $per_page;
 				$paginate -> order = $order;
@@ -4319,8 +4329,8 @@ if (!class_exists('wpMailPlugin')) {
 		function admin_unsubscription_notification($subscriber = array(), $mailinglist = array()) {
 			global $wpdb, $Mailinglist, $Subscriber;
 			
-			if (!empty($subscriber) && !empty($mailinglist)) {
-				if ($this -> get_option('adminemailonunsubscription') == "Y") {
+			if (!empty($subscriber) && !empty($mailinglist)) {			
+				if ($this -> get_option('adminemailonunsubscription') == "Y") {				
 					$adminemail = $this -> get_option('adminemail');
 					
 					if (!empty($subscriber -> mailinglist_id)) {
@@ -4345,6 +4355,7 @@ if (!class_exists('wpMailPlugin')) {
 						$subscriber -> mailinglists = array($mailinglist);
 					}
 					
+					$to = new stdClass();
 					$to -> id = $Subscriber -> admin_subscriber_id();
 					$to -> email = $adminemail;
 					$subject = $this -> et_subject('unsubscribe', $subscriber);
@@ -4990,10 +5001,9 @@ if (!class_exists('wpMailPlugin')) {
 				
 				$Db -> model = $Latestpost -> model;
 				$verylatestpost = $Db -> find(false, false, array('created', "DESC"));
-				$vl_post = get_post($verylatestpost -> post_id);
 			}
 				
-			return $post_criteria;
+			return apply_filters('newsletters_latest_posts_criteria', $post_criteria);
 		}
 		
 		function updating_plugin() {
@@ -5198,9 +5208,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.4") < 0) {
+				if (version_compare($cur_version, "4.3.5") < 0) {
 					$this -> update_options();
-					$version = "4.3.4";
+					$version = "4.3.5";
 				}
 			
 				//the current version is older.
@@ -5487,7 +5497,8 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function check_roles() {
 			global $wp_roles;
-			$permissions = $this -> get_option('permissions');
+			//$permissions = $this -> get_option('permissions');
+			$permissions = array();
 			
 			if ($role = get_role('administrator')) {		
 				if (!empty($this -> sections)) {			
@@ -6263,7 +6274,7 @@ if (!class_exists('wpMailPlugin')) {
 							
 							$pattern = "/\[(\[?)(newsletters_content)(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*+(?:\[(?!\/\2\])[^\[]*+)*+)\[\/\2\])?)(\]?)/s";
 							$new_body = preg_replace_callback($pattern, array($this, 'newsletters_content'), $new_body);
-							$new_body = html_entity_decode($new_body);
+							$new_body = htmlspecialchars_decode($new_body);
 							$new_body = apply_filters($this -> pre . '_wpmlcontent_after_replace', $new_body);
 							$body = $new_body;
 						} else {

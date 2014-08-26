@@ -9,10 +9,14 @@
 				<select class="widefat" style="width:auto;" name="action" onchange="action_change(this.value);">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
-					<option value="active"><?php _e('Activate', $this -> plugin_name); ?></option>
-					<option value="inactive"><?php _e('Deactivate', $this -> plugin_name); ?></option>
-					<option value="assignlists"><?php _e('Assign Lists (appends)', $this -> plugin_name); ?></option>
-					<option value="setlists"><?php _e('Set Lists (overwrites)', $this -> plugin_name); ?></option>
+					<optgroup label="<?php _e('Status', $this -> plugin_name); ?>">
+						<option value="active"><?php _e('Activate', $this -> plugin_name); ?></option>
+						<option value="inactive"><?php _e('Deactivate', $this -> plugin_name); ?></option>
+					</optgroup>
+					<optgroup  label="<?php _e('Mailing Lists', $this -> plugin_name); ?>">
+						<option value="assignlists"><?php _e('Assign Lists (appends)', $this -> plugin_name); ?></option>
+						<option value="setlists"><?php _e('Set Lists (overwrites)', $this -> plugin_name); ?></option>
+					</optgroup>
 				</select>
 				<input type="submit" name="execute" class="button" value="<?php _e('Apply', $this -> plugin_name); ?>" />
 			</div>
@@ -188,7 +192,7 @@
 								<?php if (!empty($subscriber -> Mailinglist)) : ?>
 									<?php $m = 1; ?>
 									<?php foreach ($subscriber -> Mailinglist as $list) : ?>
-										<?php echo $Html -> link($list -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span style="color:red;">' . __('inactive', $this -> plugin_name); ?></span>)
+										<?php echo $Html -> link(__($list -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span style="color:red;">' . __('inactive', $this -> plugin_name); ?></span>)
 										<?php if ($m < count($subscriber -> Mailinglist)) : ?>
 											<?php echo ', '; ?>
 										<?php endif; ?>

@@ -17,7 +17,7 @@
                 <?php if ($mailinglist = $Db -> find(array('id' => $list_id))) : ?>
                     <tr>
                         <td>
-							<?php echo $mailinglist -> title; ?>
+							<?php echo __($mailinglist -> title); ?>
                             <?php if ($mailinglist -> paid == "Y") : ?>
                             	<?php $intervals = $this -> get_option('intervals'); ?>
                             	<span class="wpmlcustomfieldcaption"><small>(<?php echo $Html -> currency() . '' . number_format($mailinglist -> price, 2, '.', '') . ' ' . $intervals[$mailinglist -> interval]; ?>)</small></span>

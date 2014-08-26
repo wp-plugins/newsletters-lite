@@ -237,6 +237,7 @@ class wpmlQueue extends wpMailPlugin {
 		
 			if ($exists == false) {
 				$subject = addslashes($subject);
+				$message = apply_filters('newsletters_admin_queue_save_message', $message, $subscriber, $subject,  $attachments, $post_id, $history_id, $return_query, $theme_id, $senddate);
 				$message = addslashes($message);
 				$nowdate = $Html -> gen_date();
 				

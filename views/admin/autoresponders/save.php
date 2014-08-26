@@ -31,9 +31,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                 	<?php echo $Html -> help(__('Choose the mailing list(s) to attach to this autoresponder. When a subscriber subscribes to any of the chosen list(s) and the subscription is active, this autoresponder will be sent to the subscriber.', $this -> plugin_name)); ?></th>
                     <td>
                     	<?php if ($mailinglists = $Mailinglist -> select(true)) : ?>
-                        	<div><label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Check All', $this -> plugin_name); ?></label></div>
-							<div><label style="font-weight:bold;"><input type="checkbox" name="checkinvert" value="checkinvert" id="checkinvert" /> <?php _e('Inverse Selection', $this -> plugin_name); ?></label></div>
-                        
+                        	<div><label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Select all', $this -> plugin_name); ?></label></div>                        
                         	<!-- loop of mailing lists -->
                         	<div class="scroll-list">
                             	<?php foreach ($mailinglists as $list_id => $list_title) : ?>

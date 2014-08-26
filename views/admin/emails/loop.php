@@ -3,7 +3,7 @@
 		<?php if ($_GET['page'] == $this -> sections -> history) : ?>
 	    	<div class="alignleft actions">
 	    		<?php $exportlink = ($_GET['page'] == $this -> sections -> history) ? '?page=' . $this-> sections -> history . '&amp;method=exportsent&amp;history_id=' . $history -> id : '?page='; ?>
-	        	<a href="<?php echo $exportlink; ?>" title="<?php _e('Export sent emails to CSV', $this -> plugin_name); ?>" class="button"><img border="0" style="width:12px; height:12px;" src="<?php echo $this -> url(); ?>/images/icons/csv-16.png" alt="csv" /> <?php _e('Export to CSV', $this -> plugin_name); ?></a>
+	        	<a href="<?php echo $exportlink; ?>" title="<?php _e('Export sent emails to CSV', $this -> plugin_name); ?>" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
 	        </div>
 	    <?php endif; ?>    
     	<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
@@ -193,13 +193,13 @@
 	                    <td>
 	                    	<?php
 	                    	
-	                    	if (!empty($subscriber)) {
-	                    		$clicked = $this -> Click -> count(array('history_id' => $history -> id, 'subscriber_id' => $email -> subscriber_id));
+	                    	if (!empty($email -> subscriber_id)) {
+	                    		$clicked = $this -> Click -> count(array('history_id' => $email -> history_id, 'subscriber_id' => $email -> subscriber_id));
 							} elseif (!empty($user)) {
-								$clicked = $this -> Click -> count(array('history_id' => $history -> id, 'user_id' => $email -> user_id));
+								$clicked = $this -> Click -> count(array('history_id' => $email -> history_id, 'user_id' => $email -> user_id));
 							}
 							
-							echo (empty($clicked)) ? '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name) . '</span>' : '<span class="' . $this -> pre . 'success">' . __('Yes', $this -> plugin_name) . '</span> (' . $clicked . ')'; 
+							echo (empty($clicked)) ? '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name) . '</span>' : '<span class="' . $this -> pre . 'success">' . __('Yes', $this -> plugin_name) . '</span> (<a href="?page=' . $this -> sections -> clicks . '&amp;history_id=' . $email -> history_id . '&amp;subscriber_id=' . $email -> subscriber_id . '">' . $clicked . '</a>)'; 
 	                    	
 	                    	?>
 	                    </td>

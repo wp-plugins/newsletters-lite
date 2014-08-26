@@ -4,6 +4,11 @@
 
 $doubleopt = $mailinglist -> doubleopt;
 
+if ($this -> is_plugin_active('qtranslate')) {
+	$languages = qtrans_getSortedLanguages();
+	$mailinglist_title = qtrans_split($Mailinglist -> data[$Mailinglist -> model] -> title);
+}
+
 ?>
 
 <div class="wrap <?php echo $this -> pre; ?> newsletters">
@@ -17,7 +22,28 @@ $doubleopt = $mailinglist -> doubleopt;
 				<tr>
 					<th><label for="Mailinglist.title"><?php _e('List Title', $this -> plugin_name); ?></label></th>
 					<td>
-						<?php echo $Form -> text('Mailinglist[title]'); ?>
+						<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+							<div id="mailinglist-title-tabs">
+								<ul>
+									<?php foreach ($languages as $language) : ?>
+										<li><a href="#mailinglist-title-tabs-<?php echo $language; ?>"><?php echo $this -> language_flag($language); ?></a></li>
+									<?php endforeach; ?>
+								</ul>
+								<?php foreach ($languages as $language) : ?>
+									<div id="mailinglist-title-tabs-<?php echo $language; ?>">
+										<input type="text" class="widefat" name="Mailinglist[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($mailinglist_title[$language])); ?>" id="Mailinglist_title_<?php echo $language; ?>" />
+									</div>
+								<?php endforeach; ?>
+							</div>
+							
+							<script type="text/javascript">
+							jQuery(document).ready(function() {
+								jQuery('#mailinglist-title-tabs').tabs();
+							});
+							</script>
+						<?php else : ?>
+							<?php echo $Form -> text('Mailinglist[title]'); ?>
+						<?php endif; ?>
                     	<span class="howto"><?php _e('Fill in a title for your list as your users will see it.', $this -> plugin_name); ?></span>    
                     </td>
 				</tr>
@@ -37,7 +63,7 @@ $doubleopt = $mailinglist -> doubleopt;
 					<tr>
 						<th><label for="checkboxall"><?php _e('Custom Fields', $this -> plugin_name); ?></label></th>
 						<td>
-							<label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Check All', $this -> plugin_name); ?></label>
+							<label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Select all', $this -> plugin_name); ?></label>
 							<div class="scroll-list">
 								<?php echo $Form -> checkbox('Mailinglist[fields][]', $fields); ?>
 							</div>

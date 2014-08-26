@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.4
+Version: 4.3.5
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -1126,15 +1126,7 @@ if (!class_exists('wpMail')) {
 			global $wpdb, $post, $user_ID, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			
 			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {					
-				if ($posts = get_posts($post_criteria)) {			
-					if (!empty($vl_post)) {
-						foreach ($posts as $pid => $post) {
-							if (strtotime($post -> post_date) < strtotime($vl_post -> post_date)) {
-								unset($posts[$pid]);
-							}
-						}
-					}
-					
+				if ($posts = get_posts($post_criteria)) {					
 					if (!empty($posts)) {
 						/* qTranslate */
 						if ($this -> is_plugin_active('qtranslate')) {
@@ -1852,7 +1844,8 @@ if (!class_exists('wpMail')) {
 				$this -> menus['newsletters-history'] = add_submenu_page($this -> sections -> welcome, __('Sent &amp; Draft Emails', $this -> plugin_name), __('Sent &amp; Draft Emails', $this -> plugin_name), 'newsletters_history', $this -> sections -> history, array($this, 'admin_history'));
 				
 				if ($this -> get_option('clicktrack') == "Y") {
-					$this -> menus['newsletters-links'] = add_submenu_page($this -> sections -> welcome, __('Links &amp; Clicks', $this -> plugin_name), __('Links &amp; Clicks', $this -> plugin_name), 'newsletters_links', $this -> sections -> links, array($this, 'admin_links'));		
+					$this -> menus['newsletters-links'] = add_submenu_page($this -> sections -> welcome, __('Links &amp; Clicks', $this -> plugin_name), __('Links &amp; Clicks', $this -> plugin_name), 'newsletters_links', $this -> sections -> links, array($this, 'admin_links'));
+					$this -> menus['newsletters-links-clicks'] = add_submenu_page($this -> menus['newsletters-links'], __('Clicks', $this -> plugin_name), __('Clicks', $this -> plugin_name), 'newsletters_clicks', $this -> sections -> clicks, array($this, 'admin_clicks'));
 				}
 				
 				$this -> menus['newsletters-autoresponders'] = add_submenu_page($this -> sections -> welcome, __('Autoresponders', $this -> plugin_name), __('Autoresponders', $this -> plugin_name), 'newsletters_autoresponders', $this -> sections -> autoresponders, array($this, 'admin_autoresponders'));
@@ -3146,12 +3139,12 @@ if (!class_exists('wpMail')) {
 						if ($mailinglist = $Mailinglist -> get($_GET['id'])) {
 							$perpage = (!empty($_COOKIE[$this -> pre . 'subscribersperpage'])) ? $_COOKIE[$this -> pre . 'subscribersperpage'] : 15;						
 							$sub = $this -> sections -> lists . '&amp;method=view&amp;id=' . $_GET['id'];
-							$conditions = array('list_id' => $_GET['id']);
+							$subscriberslists_table = $wpdb -> prefix . $SubscribersList -> table;
+							$conditions = array($subscriberslists_table . '.list_id' => $_GET['id']);
 							$searchterm = false;
 							$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 							$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
-							$order = array($wpdb -> prefix . $Subscriber -> table . "." . $orderfield, $orderdirection);
-							//$order = array('modified', 'DESC');
+							$order = array($orderfield, $orderdirection);
 							$data = $this -> paginate($SubscribersList -> model, false, $sub, $conditions, $searchterm, $perpage, $order);
 							$subscribers = $data[$SubscribersList -> model];
 							
@@ -3683,17 +3676,52 @@ if (!class_exists('wpMail')) {
 						$this -> redirect($searchurl);
 					}
 					
-					$conditions = (!empty($searchterm)) ? array('email' => "LIKE '%" . $searchterm . "%'") : false;
+					$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
+					$subscriberslists_table = $wpdb -> prefix . $SubscribersList -> table;
+					
+					$conditions = (!empty($searchterm)) ? array($subscribers_table . '.email' => "LIKE '%" . $searchterm . "%'") : false;
 					
 					if (!empty($searchterm)) {
 						$Db -> model = $Field -> model;
 						$fieldsconditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
 						if ($fields = $Db -> find_all($fieldsconditions)) {
-							if (empty($conditions) || !is_array($conditions)) { $conditions = array(); }
-						
+							if (empty($conditions) || !is_array($conditions)) { $conditions = array(); }						
 							foreach ($fields as $field) {
-								$conditions[$field -> slug] = "LIKE '%" . $searchterm . "%'";
+								$conditions[$subscribers_table . "." . $field -> slug] = "LIKE '%" . $searchterm . "%'";
 							}
+						}
+					}
+					
+					$dojoin = false;
+					$conditions_and = array();
+					
+					if (!empty($_GET['filter'])) {
+						if (!empty($_GET['list'])) {
+							switch ($_GET['list']) {
+								case 'all'				:
+									$dojoin = false;
+									break;
+								case 'none'				:
+									$dojoin = false;
+									$conditions_and[$subscribers_table . '.id'] = "NOT IN (SELECT subscriber_id FROM " . $subscriberslists_table . ")";
+									break;
+								default					:
+									$dojoin = true;
+									$conditions_and[$subscriberslists_table . '.list_id'] = $_GET['list'];	
+									break;
+							}
+						}
+						
+						if (!empty($_GET['status'])) {
+							if ($_GET['status'] != "all") {
+								$status = ($_GET['status'] == "active") ? "Y" : "N";
+								$conditions_and[$subscriberslists_table . '.active'] = $status;
+								$dojoin = true;
+							}
+						}
+						
+						if (!empty($_GET['registered']) && $_GET['registered'] != "all") {
+							$conditions_and[$subscribers_table . '.registered'] = $_GET['registered'];
 						}
 					}
 					
@@ -3710,10 +3738,16 @@ if (!class_exists('wpMail')) {
 						$data[$Subscriber -> model] = $subscribers;
 						$data['Paginate'] = false;
 					} else {
-						$data = $this -> paginate($Subscriber -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order);
+						if ($dojoin) {
+							$data = $this -> paginate($SubscribersList -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$subscribers = $data[$SubscribersList -> model];
+						} else {
+							$data = $this -> paginate($Subscriber -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$subscribers = $data[$Subscriber -> model];
+						}
 					}
 					
-					$this -> render_admin('subscribers' . DS . 'index', array('subscribers' => $data[$Subscriber -> model], 'paginate' => $data['Paginate']));
+					$this -> render_admin('subscribers' . DS . 'index', array('subscribers' => $subscribers, 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
@@ -4659,7 +4693,7 @@ if (!class_exists('wpMail')) {
 									/* Mailing List */
 									$Db -> model = $Mailinglist -> model;
 		                        	$mailinglist = $Db -> find(array('id' => $email -> mailinglist_id));
-									$data .= '"' . $mailinglist -> title . '",';
+									$data .= '"' . __($mailinglist -> title) . '",';
 								} elseif (!empty($email -> user_id)) {
 									$user = $this -> userdata($email -> user_id);
 									$data .= '"' . $user -> user_email . '",';
@@ -4735,7 +4769,7 @@ if (!class_exists('wpMail')) {
 								
 								foreach ($email -> mailinglists as $mailinglist_id) {
 									$mailinglist = $Mailinglist -> get($mailinglist_id);	
-									$data .= $mailinglist -> title;
+									$data .= __($mailinglist -> title);
 									
 									if ($m < count($email -> mailinglists)) {
 										$data .= ', ';
@@ -4909,21 +4943,81 @@ if (!class_exists('wpMail')) {
 						$this -> redirect($this -> url . '&' . $this -> pre . 'searchterm=' . urlencode($searchterm));
 					}
 					
-					$conditions = (!empty($searchterm)) ? array('subject' => "LIKE '%" . $searchterm . "%'") : false;					
+					$conditions = (!empty($searchterm)) ? array('link' => "LIKE '%" . $searchterm . "%'") : false;					
 					$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
 					$sub = $this -> sections -> links;
 						
 					if (!empty($_GET['showall'])) {
-						$Db -> model = $History -> model;
-						$histories = $Db -> find_all(false, "*", $order);
-						$data[$History -> model] = $histories;
+						$links = $this -> Link -> find_all(false, "*", $order);
+						$data[$this -> Link -> model] = $links;
 						$data['Paginate'] = false;
 					} else {	
 						$data = $this -> paginate($this -> Link -> model, "*", $sub, $conditions, $searchterm, $perpage, $order);
 					}
 					$this -> render('links' . DS . 'index', array('links' => $data[$this -> Link -> model], 'paginate' => $data['Paginate']), true, 'admin');
+					break;
+			}
+		}
+		
+		function admin_clicks() {
+			switch ($_GET['method']) {
+				case 'delete'					:
+					if (!empty($_GET['id'])) {
+						if ($this -> Click -> delete($_GET['id'])) {
+							$msg_type = 'message';
+							$message = __('Click has been deleted', $this -> plugin_name);
+						} else {
+							$msg_type = 'error';
+							$message = __('Click could not be deleted', $this -> plugin_name);
+						}
+					} else {
+						$msg_type = 'error';
+						$message = __('No click was specified', $this -> plugin_name);
+					}
+					
+					$this -> redirect('?page=' . $this -> sections -> clicks, $msg_type, $message);
+					break;
+				default							:
+					$perpage = (isset($_COOKIE[$this -> pre . 'linksperpage'])) ? $_COOKIE[$this -> pre . 'linksperpage'] : 15;
+					$searchterm = (!empty($_GET[$this -> pre . 'searchterm'])) ? $_GET[$this -> pre . 'searchterm'] : false;
+					$searchterm = (!empty($_POST['searchterm'])) ? $_POST['searchterm'] : $searchterm;
+					
+					if (!empty($_POST['searchterm'])) {
+						$this -> redirect($this -> url . '&' . $this -> pre . 'searchterm=' . urlencode($searchterm));
+					}
+					
+					$conditions = (!empty($searchterm)) ? array('link' => "LIKE '%" . $searchterm . "%'") : false;					
+					$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
+					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
+					$order = array($orderfield, $orderdirection);
+					$sub = $this -> sections -> links;
+					
+					$conditions_and = array();
+					
+					if (!empty($_GET['subscriber_id'])) {
+						$conditions_and['subscriber_id'] = $_GET['subscriber_id'];
+					}
+					
+					if (!empty($_GET['link_id'])) {
+						$conditions_and['link_id'] = $_GET['link_id'];
+					}
+					
+					if (!empty($_GET['history_id'])) {
+						$conditions_and['history_id'] = $_GET['history_id'];
+					}
+					
+					if (!empty($_GET['showall'])) {
+						$clicks = $this -> Click -> find_all(false, "*", $order);
+						$data[$this -> Click -> model] = $clicks;
+						$data['Paginate'] = false;
+					} else {
+						$data = $this -> paginate($this -> Click -> model, "*", $sub, $conditions, $searchterm, $perpage, $order, $conditions_and);
+						$clicks = $data[$this -> Click -> model];
+					}
+					
+					$this -> render('clicks' . DS . 'index', array('clicks' => $clicks, 'paginate' => $data['Paginate']), true, 'admin');
 					break;
 			}
 		}

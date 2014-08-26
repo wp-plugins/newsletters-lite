@@ -26,6 +26,13 @@ if (!class_exists('wpmlClick')) {
 					$this -> fields[$field] = $attributes;
 				}
 			}
+			
+			if (!empty($data)) {
+				foreach ($data as $dkey => $dval) {
+					$this -> {$dkey} = stripslashes_deep($dval);
+				}
+			}
+			
 			return;
 		}
 		

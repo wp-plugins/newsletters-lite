@@ -44,7 +44,7 @@
 						<?php foreach ($subscriberslists as $sl) : ?>
 							<?php $Db -> model = $Mailinglist -> model; ?>
 							<?php if ($mailinglist = $Db -> find(array('id' => $sl -> list_id))) : ?>
-								<?php echo $Html -> link($mailinglist -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $sl -> list_id); ?>
+								<?php echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $sl -> list_id); ?>
 								(<span <?php echo ($sl -> active == "Y") ? 'style="color:green;">' . __('active', $this -> plugin_name) : 'style="color:red;">' . __('inactive', $this -> plugin_name); ?></span>)
 								<?php if ($m < count($subscriberslists)) : ?>
 									<?php echo ', '; ?>
@@ -108,6 +108,10 @@
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Emails Sent', $this -> plugin_name); ?></th>
 				<td><?php echo $subscriber -> emailssent; ?> <?php _e('newsletters', $this -> plugin_name); ?></td>
+			</tr>
+			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+				<th><?php _e('Links Clicked', $this -> plugin_name); ?></th>
+				<td><?php echo $Html -> link($this -> Click -> count(array('subscriber_id' => $subscriber -> id)), '?page=' . $this -> sections -> clicks . '&amp;subscriber_id=' . $subscriber -> id); ?></td>
 			</tr>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Email Format', $this -> plugin_name); ?></th>

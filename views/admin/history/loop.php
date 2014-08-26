@@ -3,10 +3,10 @@
 		<div class="tablenav">
 			<div class="alignleft actions">
 				<?php if (apply_filters($this -> pre . '_admin_history_rsslink', true)) : ?>
-					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="button newsletters_rss_link"> <?php _e('RSS', $this -> plugin_name); ?></a>
+					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="newsletters-icon-rss button"> <?php _e('RSS', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<?php if (apply_filters($this -> pre . '_admin_history_exportlink', true)) : ?>
-                	<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=export" title="<?php _e('Export to CSV', $this -> plugin_name); ?>" class="button newsletters_csv_link"> <?php _e('Export', $this -> plugin_name); ?></a>
+                	<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=export" title="<?php _e('Export to CSV', $this -> plugin_name); ?>" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<a href="<?php echo $this -> url; ?>&amp;method=clear" title="<?php _e('Clear all email history', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to clear the email history?', $this -> plugin_name); ?>')) { return false; }" class="button newsletters_delete_link"> <?php _e('Clear', $this -> plugin_name); ?></a>
 			</div>
@@ -186,7 +186,7 @@
 								<?php if (!empty($mailinglists) && (is_array($mailinglists) || is_object($mailinglists))) : ?>
 									<?php foreach ($mailinglists as $mailinglist_id) : ?>
 										<?php $mailinglist = $Mailinglist -> get($mailinglist_id, false); ?>
-										<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $mailinglist_id; ?>" title="<?php echo $mailinglist -> title; ?>"><?php echo $mailinglist -> title; ?></a><?php echo ($m < count($mailinglists)) ? ', ' : ''; ?>
+										<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $mailinglist_id; ?>" title="<?php echo __($mailinglist -> title); ?>"><?php echo __($mailinglist -> title); ?></a><?php echo ($m < count($mailinglists)) ? ', ' : ''; ?>
 										<?php $m++; ?>
 									<?php endforeach; ?>
 								<?php endif; ?>

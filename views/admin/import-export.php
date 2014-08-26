@@ -22,8 +22,7 @@
 					<th><label for="importlistid"><?php _e('Mailing List(s)', $this -> plugin_name); ?></label></th>
 					<td>
 						<?php if (!empty($lists)) : ?>
-							<label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Check All', $this -> plugin_name); ?></label><br/>
-							<label style="font-weight:bold;"><input type="checkbox" name="checkinvert" value="checkinvert" id="checkinvert" /> <?php _e('Inverse Selection', $this -> plugin_name); ?></label><br/>
+							<label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /> <?php _e('Select all', $this -> plugin_name); ?></label><br/>
 							<div class="scroll-list">
 								<?php foreach ($lists as $id => $title) : ?>
 									<?php $Db -> model = $SubscribersList -> model; ?>

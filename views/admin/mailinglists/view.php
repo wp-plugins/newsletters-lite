@@ -1,5 +1,5 @@
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
-	<h2><?php _e('View List:', $this -> plugin_name); ?> <?php echo $mailinglist -> title; ?></h2>
+	<h2><?php _e('View List:', $this -> plugin_name); ?> <?php echo __($mailinglist -> title); ?></h2>
 	
 	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Mailing Lists', $this -> plugin_name), $this -> url, array('title' => __('Manage All Mailing Lists', $this -> plugin_name))); ?></div>
 	
@@ -26,7 +26,7 @@
 		<tbody>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Title', $this -> plugin_name); ?></th>
-				<td><?php echo $mailinglist -> title; ?></td>
+				<td><?php echo __($mailinglist -> title); ?></td>
 			</tr>
             <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
             	<th><?php _e('Group', $this -> plugin_name); ?></th>

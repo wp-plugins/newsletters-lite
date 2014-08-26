@@ -164,7 +164,7 @@
 							<th class="check-column"><input id="checklist<?php echo $list -> id; ?>" type="checkbox" name="mailinglistslist[]" value="<?php echo $list -> id; ?>" /></th>
 							<td><label for="checklist<?php echo $list -> id; ?>"><?php echo $list -> id; ?></label></td>
 							<td>
-								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $list -> id; ?>" title="<?php _e('View the details of this mailing list', $this -> plugin_name); ?>"><?php echo $list -> title; ?></a></strong>
+								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $list -> id; ?>" title="<?php _e('View the details of this mailing list', $this -> plugin_name); ?>"><?php echo __($list -> title); ?></a></strong>
 								<?php if (!empty($list -> adminemail)) : ?>
 									<br/><small>(<?php _e('Admin Email:', $this -> plugin_name); ?> <strong><?php echo $list -> adminemail; ?>)</strong></small>
 								<?php endif; ?>

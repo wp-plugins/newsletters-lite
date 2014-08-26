@@ -232,7 +232,7 @@ class wpmlMailinglist extends wpMailPlugin {
 			
 			foreach ($lists as $list) {
 				$paid = ($list -> paid == "Y") ? ' <span class="wpmlsmall">(' . __('Paid', $this -> name) . ': ' . $Html -> currency() . '' . number_format($list -> price, 2, '.', '') . ' ' . $this -> intervals[$list -> interval] . ')</span>' : '';
-				$listselect[$list -> id] = $list -> title . $paid;
+				$listselect[$list -> id] = __($list -> title) . $paid;
 			}
 			
 			return apply_filters($this -> pre . '_mailinglists_select', $listselect);
@@ -382,6 +382,10 @@ class wpmlMailinglist extends wpMailPlugin {
 			$this -> errors = apply_filters($this -> pre . '_mailinglist_validation', $this -> errors, $this -> data[$this -> model]);
 			if (empty($this -> errors)) {
 				$created = $modified = $this -> gen_date();
+				
+				if ($this -> is_plugin_active('qtranslate')) {
+					$title = qtrans_join($title);
+				}
 			
 				$query = (!empty($id)) ?
 				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `doubleopt` = '" . $doubleopt . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `maxperinterval` = '" . $maxperinterval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :

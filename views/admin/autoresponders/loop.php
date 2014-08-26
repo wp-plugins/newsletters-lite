@@ -146,7 +146,7 @@
 	                        	<?php if (!empty($autoresponder -> mailinglists)) : ?>
 	                            	<?php $m = 1; ?>
 	                            	<?php foreach ($autoresponder -> mailinglists as $mailinglist) : ?>
-	                                	<?php echo $Html -> link($mailinglist -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?>
+	                                	<?php echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?>
 	                                    <?php if ($m < count($autoresponder -> mailinglists)) : ?>
 											<?php echo ', '; ?>
 	                                    <?php endif; ?>
