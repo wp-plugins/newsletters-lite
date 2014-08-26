@@ -1,3 +1,11 @@
+<!-- Custom Fields Loop -->
+
+<?php
+
+include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
+
+?>
+
 <?php if (!empty($fields)) : ?>
 	<form action="?page=<?php echo $this -> sections -> fields; ?>&amp;method=mass" method="post" id="Field.form" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action?', $this -> plugin_name); ?>')) { return false; };">
 		<div class="tablenav">
@@ -60,6 +68,12 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<th class="column-validation <?php echo ($orderby == "validation") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=validation&order=' . (($orderby == "validation") ? $otherorder : "asc")); ?>">
+							<span><?php _e('Validation', $this -> plugin_name); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
 					<th class="column-modified <?php echo ($orderby == "modified") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=modified&order=' . (($orderby == "modified") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Date', $this -> plugin_name); ?></span>
@@ -100,6 +114,12 @@
 					<th class="column-required <?php echo ($orderby == "required") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=required&order=' . (($orderby == "required") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Required', $this -> plugin_name); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
+					<th class="column-validation <?php echo ($orderby == "validation") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=validation&order=' . (($orderby == "validation") ? $otherorder : "asc")); ?>">
+							<span><?php _e('Validation', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -157,6 +177,13 @@
 						</td>
 						<td><code>[<?php echo $this -> pre; ?>field name="<?php echo $field -> slug; ?>"]</code></td>
 						<td><label for="checklist<?php echo $field -> id; ?>"><?php echo (empty($field -> required) || $field -> required == "N") ? '<span style="color:red;">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
+						<td>
+							<?php if (empty($field -> validation) || $field -> validation == "notempty") : ?>
+								<?php echo __('Not Empty', $this -> plugin_name); ?>
+							<?php else : ?>
+								<?php echo __($validation_rules[$field -> validation]['title']); ?>
+							<?php endif; ?>
+						</td>
 						<td><label for="checklist<?php echo $field -> id; ?>"><abbr title="<?php echo $field -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($field -> modified)); ?></abbr></label></td>
 					</tr>
 				<?php endforeach; ?>

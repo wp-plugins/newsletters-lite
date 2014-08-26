@@ -33,6 +33,8 @@ class wpmlField extends wpMailPlugin {
 		'errormessage'	=>	"TEXT NOT NULL",
 		'invalidmessage'	=> "TEXT NOT NULL",
 		'display'		=>	"ENUM('always','specific') NOT NULL DEFAULT 'specific'",
+		'validation'	=>	"TEXT NOT NULL",
+		'regex'			=>	"TEXT NOT NULL",
 		'order'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
@@ -53,6 +55,8 @@ class wpmlField extends wpMailPlugin {
 		'errormessage'	=>	array("TEXT", "NOT NULL"),
 		'invalidmessage'	=>	array("TEXT", "NOT NULL"),
 		'display'		=>	array("ENUM('always','specific')", "NOT NULL DEFAULT 'specific'"),
+		'validation'	=>	array("TEXT", "NOT NULL"),
+		'regex'			=>	array("TEXT", "NOT NULL"),
 		'order'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
@@ -412,7 +416,7 @@ class wpmlField extends wpMailPlugin {
 				}
 			
 				if (!empty($id)) {
-					$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET `title` = '" . $title . "', `slug` = '" . $slug . "', `display` = '" . $display . "', `required` = '" . $required . "', `errormessage` = '" . $errormessage . "', `type` = '" . $type . "', `filetypes` = '" . $filetypes . "', `filesizelimit` = '" . $filesizelimit . "', `fieldoptions` = '" . $fieldoptions . "', `modified` = '" . $modified . "', `caption` = '" . $caption . "', `watermark` = '" . $watermark . "' WHERE `id` = '" . $id . "' LIMIT 1;";
+					$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET `title` = '" . $title . "', `slug` = '" . $slug . "', `display` = '" . $display . "', `required` = '" . $required . "', `errormessage` = '" . $errormessage . "', `validation` = '" . $validation . "', `regex` = '" . $regex . "', `type` = '" . $type . "', `filetypes` = '" . $filetypes . "', `filesizelimit` = '" . $filesizelimit . "', `fieldoptions` = '" . $fieldoptions . "', `modified` = '" . $modified . "', `caption` = '" . $caption . "', `watermark` = '" . $watermark . "' WHERE `id` = '" . $id . "' LIMIT 1;";
 					$field_old = $this -> get($id);
 				} else {
 					$query1 = "INSERT INTO `" . $wpdb -> prefix . "" . $this -> table . "` (";
@@ -484,6 +488,7 @@ class wpmlField extends wpMailPlugin {
 	
 	function validate_optin($data = array(), $type = 'subscribe') {	
 		global $wpdb, $FieldsList;
+		include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
 			
 		if ($fields = $FieldsList -> fields_by_list($data['list_id'], "order", "ASC", true, true)) {									
 			if (!empty($fields)) {				
@@ -508,8 +513,17 @@ class wpmlField extends wpMailPlugin {
 								}
 								break;
 							default					:
-								if (empty($data[$field -> slug])) {
-									$this -> errors[$field -> slug] = __($field -> errormessage);
+								if (empty($field -> validation) || $field -> validation == "notempty") {
+									if (empty($data[$field -> slug])) {
+										$this -> errors[$field -> slug] = __($field -> errormessage);
+									}
+								} else {
+									if (!empty($field -> validation)) {
+										$regex = ($field -> validation == "custom") ? $field -> regex : $validation_rules[$field -> validation]['regex'];										
+										if (!preg_match($regex, $data[$field -> slug])) {
+											$this -> errors[$field -> slug] = __($field -> errormessage);
+										}
+									}
 								}
 								break;
 						}

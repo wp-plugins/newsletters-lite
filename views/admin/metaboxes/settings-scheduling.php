@@ -63,8 +63,13 @@ $command = '<code>wget -O /dev/null "' . $commandurl . '" > /dev/null 2>&1</code
 
 <div id="schedulecrontype_server_div" style="display:<?php echo ($this -> get_option('schedulecrontype') == "server") ? 'block' : 'none'; ?>;">
 	<p>
-		<?php _e('You have to create a cron job on your server to execute every 5 minutes with the following command', $this -> plugin_name); ?> <?php echo $command; ?> . <?php _e('Please see the documentation for instructions and check with your hosting provider that the WGET command is fully supported on your hosting.', $this -> plugin_name); ?>
-		<?php echo sprintf(__('If you cannot create a cron job or your hosting does not support WGET, you can use the %sfree cron job service%s with the URL %s', $this -> plugin_name), '<a href="https://mywebcron-com.loopiasecure.com/" target="_blank">', '</a>', '<code>' . $commandurl . '</code>'); ?>
+		<?php echo sprintf(__('You have to create a cron job on your server to execute every 5 minutes with the following command %s', $this -> plugin_name), $command); ?>
+	</p>
+	<p>
+		<?php _e('Please see the documentation for instructions and check with your hosting provider that the WGET command is fully supported on your hosting.', $this -> plugin_name); ?>
+	</p>
+	<p>
+		<?php echo sprintf(__('If you cannot create a cron job or your hosting does not support WGET, you can use %s with the URL %s', $this -> plugin_name), '<a href="https://tribulant.com/partners/easycron/" target="_blank">EasyCron</a>', '<code>' . $commandurl . '</code>'); ?>
 	</p>
 </div>
 

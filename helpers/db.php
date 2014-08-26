@@ -132,6 +132,7 @@ class wpmlDbHelper extends wpMailPlugin {
 									
 									$query1 = "SELECT DISTINCT " 
 									. $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id as sid, "
+									. $wpdb -> prefix . $AutorespondersList -> table . ".list_id, "
 									. $wpdb -> prefix . $AutorespondersList -> table . ".autoresponder_id, "
 									. "'" . $Html -> gen_date() . "', '" . $Html -> gen_date() . "', '" . $senddate . "' FROM " 
 									. $wpdb -> prefix . $SubscribersList -> table . " LEFT JOIN "
@@ -142,7 +143,7 @@ class wpmlDbHelper extends wpMailPlugin {
 									. $wpdb -> prefix . $AutorespondersList -> table . ".autoresponder_id = '" . ${$oldmodel} -> insertid . "'";
 									
 									$query2 = "INSERT INTO " . $wpdb -> prefix . $Autoresponderemail -> table 
-									. " (subscriber_id, autoresponder_id, created, modified, senddate) (" . $query1 . ")";
+									. " (subscriber_id, list_id, autoresponder_id, created, modified, senddate) (" . $query1 . ")";
 									
 									$wpdb -> query($query2);
 								}

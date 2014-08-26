@@ -210,6 +210,7 @@ if (!class_exists('wpMail')) {
 		
 			if (is_admin()) {
 				$this -> check_uploaddir();
+				$this -> get_managementpost();
 				
 				//Open the menu accordingly
 				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
@@ -1978,7 +1979,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_send() {
-			global $wpdb, $user_ID, $Db, $Template, $Html, $History, $HistoriesAttachment, $Mailinglist, $Queue, $Subscriber, $Field, $SubscribersList;
+			global $wpdb, $Unsubscribe, $user_ID, $Db, $Template, $Html, $History, $HistoriesAttachment, $Mailinglist, $Queue, $Subscriber, $Field, $SubscribersList;
 		
 			$this -> remove_server_limits();
 			$mailinglists = $Mailinglist -> get_all('*', true);
@@ -2035,8 +2036,10 @@ if (!class_exists('wpMail')) {
 							'subject'			=>	$history -> subject,
 							'content'			=>	$history -> message,
 							'groups'			=>	$history -> groups,
+							'roles'				=>	maybe_unserialize($history -> roles),
 							'mailinglists'		=>	$history -> mailinglists,
 							'theme_id'			=>	$history -> theme_id,
+							'condquery'			=>	maybe_unserialize($history -> condquery),
 							'conditions'		=>	maybe_unserialize($history -> conditions),
 							'conditionsscope'	=>	$history -> conditionsscope,
 							'daterange'			=>	$history -> daterange,
@@ -2090,7 +2093,9 @@ if (!class_exists('wpMail')) {
 						if (empty($_POST['content'])) { $errors['content'] = __('Please fill in a newsletter message', $this -> plugin_name); }
 						
 						if (empty($_POST['preview'])) {
-							if (empty($_POST['mailinglists']) || !is_array($_POST['mailinglists'])) { $errors['mailinglists'] = __('Please select mailing list(s)', $this -> plugin_name); }
+							if ((empty($_POST['mailinglists']) || !is_array($_POST['mailinglists'])) && empty($_POST['roles'])) { 
+								$errors['mailinglists'] = __('Please select mailing list(s)', $this -> plugin_name); 
+							}
 						}
 						
 						if (!empty($_POST['sendattachment']) && $_POST['sendattachment'] == "Y") {						
@@ -2142,6 +2147,7 @@ if (!class_exists('wpMail')) {
 											'message'			=>	$_POST['content'],
 											'text'				=>	((!empty($_POST['customtexton']) && !empty($_POST['customtext'])) ? strip_tags($_POST['customtext']) : false),
 											'theme_id'			=>	$_POST['theme_id'],
+											'condquery'			=>	serialize($_POST['condquery']),
 											'conditions'		=>	serialize($_POST['fields']),
 											'conditionsscope'	=>	$_POST['fieldsconditionsscope'],
 											'daterange'			=>	$_POST['daterange'],
@@ -2149,6 +2155,7 @@ if (!class_exists('wpMail')) {
 											'daterangeto'		=>	$_POST['daterangeto'],
 											'mailinglists'		=>	serialize($_POST['mailinglists']),
 											'groups'			=>	serialize($_POST['groups']),
+											'roles'				=>	serialize($_POST['roles']),
 											'newattachments'	=>	$newattachments,
 											'senddate'			=>	$_POST['senddate'],
 											'scheduled'			=>	$_POST['scheduled'],
@@ -2197,7 +2204,7 @@ if (!class_exists('wpMail')) {
 											$subscriberids = array();
 											$subscriberemails = array();
 											
-											if (!empty($_POST['mailinglists'])) {
+											if (!empty($_POST['mailinglists']) || !empty($_POST['roles'])) {
 												$this -> scheduling(true);
 												$mailinglistscondition = "(";
 												$m = 1;
@@ -2221,13 +2228,21 @@ if (!class_exists('wpMail')) {
 															if (!empty($field_value)) {
 																$Db -> model = $Field -> model;
 																$customfield = $Db -> find(array('slug' => $field_slug), array('id', 'slug', 'type'));
+																$condition = $_POST['condquery'][$customfield -> slug];
 																
-																switch ($customfield -> type) {
-																	case 'text'					:
+																switch ($condition) {
+																	case 'smaller'				:
+																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " < '" . $field_value . "'";
+																		break;
+																	case 'larger'				:
+																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " > '" . $field_value . "'";
+																		break;
+																	case 'contains'				:
 																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
 																		break;
+																	case 'equals'				:
 																	default						:
-																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";	
+																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
 																		break;
 																}
 																
@@ -2265,6 +2280,33 @@ if (!class_exists('wpMail')) {
 												
 												$sentmailscount = 0;
 												$q_queries = array();
+												
+												/*if (!empty($_POST['roles'])) {
+													$users = array();
+													$exclude_users_query = "SELECT GROUP_CONCAT(`user_id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `user_id` != '0'";
+													$exclude_users = $wpdb -> get_var($exclude_users_query);
+													
+													foreach ($_POST['roles'] as $role_key) {
+														$users_arguments = array(
+															'blog_id'				=>	$GLOBALS['blog_id'],
+															'role'					=>	$role_key,
+															'exclude'				=>	$exclude_users,
+															'fields'				=>	array('ID', 'user_email', 'user_login'),
+														);
+														
+														$role_users = get_users($users_arguments);
+														$users = array_merge($users, $role_users);
+													}
+													
+													if (!empty($users)) {
+														foreach ($users as $user) {
+															
+														}
+													}
+												}
+												
+												$this -> debug($users);
+												exit();*/
 												
 												if ($subscribers = $wpdb -> get_results($query)) {				
 													$datasets = array();
@@ -2321,6 +2363,9 @@ if (!class_exists('wpMail')) {
 														$this -> redirect('?page=' . $this -> sections -> queue, 'message', $message);
 													}
 												}
+											} else {
+												$message = __('No mailing lists or roles have been selected', $this -> plugin_name);
+												$this -> render_error($message);
 											}
 										} else {
 											$message = sprintf(__('Newsletter has been scheduled for %s', $this -> plugin_name), $_POST['senddate']);
@@ -2341,6 +2386,7 @@ if (!class_exists('wpMail')) {
 									'message'			=>	$_POST['content'],
 									'text'				=>	((!empty($_POST['customtexton']) && !empty($_POST['customtext'])) ? strip_tags($_POST['customtext']) : false),
 									'theme_id'			=>	$_POST['theme_id'],
+									'condquery'			=>	serialize($_POST['condquery']),
 									'conditions'		=>	serialize($_POST['fields']),
 									'conditionsscope'	=>	$_POST['fieldsconditionsscope'],
 									'daterange'			=>	$_POST['daterange'],
@@ -2348,6 +2394,7 @@ if (!class_exists('wpMail')) {
 									'daterangeto'		=>	$_POST['daterangeto'],
 									'mailinglists'		=>	serialize($_POST['mailinglists']),
 									'groups'			=>	serialize($_POST['groups']),
+									'roles'				=>	serialize($_POST['roles']),
 									'newattachments'	=>	$newattachments,
 									'recurring'			=>	"N",
 								);
@@ -2392,6 +2439,7 @@ if (!class_exists('wpMail')) {
 									'message'			=>	$_POST['content'],
 									'text'				=>	((!empty($_POST['customtexton']) && !empty($_POST['customtext'])) ? strip_tags($_POST['customtext']) : false),
 									'theme_id'			=>	$_POST['theme_id'],
+									'condquery'			=>	serialize($_POST['condquery']),
 									'conditions'		=>	serialize($_POST['fields']),
 									'conditionsscope'	=>	$_POST['fieldsconditionsscope'],
 									'daterange'			=>	$_POST['daterange'],
@@ -2399,6 +2447,7 @@ if (!class_exists('wpMail')) {
 									'daterangeto'		=>	$_POST['daterangeto'],
 									'mailinglists'		=>	serialize($_POST['mailinglists']),
 									'groups'			=>	serialize($_POST['groups']),
+									'roles'				=>	serialize($_POST['roles']),
 									'newattachments'	=>	$newattachments,
 								);
 								
@@ -2445,8 +2494,10 @@ if (!class_exists('wpMail')) {
 									'subject'			=>	$history -> subject,
 									'content'			=>	$history -> message,
 									'groups'			=>	$history -> groups,
+									'roles'				=>	maybe_unserialize($history -> roles),
 									'mailinglists'		=>	$history -> mailinglists,
 									'theme_id'			=>	$history -> theme_id,
+									'condquery'			=>	maybe_unserialize($history -> condquery),
 									'conditions'		=>	maybe_unserialize($history -> conditions),
 									'conditionsscope'	=>	$history -> conditionsscope,
 									'daterange'			=>	$history -> daterage,
@@ -4828,6 +4879,12 @@ if (!class_exists('wpMail')) {
 			}
 	
 			switch ($_GET['method']) {
+				case 'managementpost'	:
+					$this -> get_managementpost(false, true);
+					$msg_type = 'message';
+					$message = __('Manage subscriptions post/page has been created', $this -> plugin_name);
+					$this -> redirect($this -> referer, $msg_type, $message);
+					break;
 				case 'checkdb'			:
 					$this -> check_tables();
 					
@@ -5180,6 +5237,7 @@ require_once(dirname(__FILE__) . DS . 'models' . DS . 'order.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'field.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'fields_list.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'subscribers_list.php');
+require_once(dirname(__FILE__) . DS . 'models' . DS . 'users_list.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'country.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'autoresponder.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'autoresponders_list.php');

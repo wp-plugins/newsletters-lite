@@ -1,3 +1,11 @@
+<!-- History View -->
+
+<?php
+
+$preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'history_iframe&id=' . $history -> id . '&rand=' . rand(1,999);
+
+?>
+
 <div class="wrap <?php echo $this -> pre; ?>">
 	<h2><?php _e('Sent/Draft:', $this -> plugin_name); ?> <?php echo $history -> subject; ?> <a href="?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history -> id; ?>" class="button add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a></h2>
 	
@@ -6,6 +14,7 @@
 	<div class="tablenav">
 		<div class="alignleft actions">
 			<a href="?page=<?php echo $this -> sections -> send; ?>&amp;method=history&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Send this history email again or edit the draft', $this -> plugin_name); ?>" class="button button-primary"><?php _e('Send/Edit', $this -> plugin_name); ?></a>
+			<a onclick="jQuery.colorbox({href:'<?php echo $preview_src; ?>'}); return false;" href="#" class="button"><?php _e('Preview', $this -> plugin_name); ?></a>
 			<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=delete&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Remove this history email permanently', $this -> plugin_name); ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this history email?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
 		</div>
 	</div>
@@ -113,7 +122,7 @@
 	    <h4><?php _e('HTML Version', $this -> plugin_name); ?></h4>
 	<?php endif; ?>
     
-	<iframe width="100%" frameborder="0" scrolling="no" class="autoHeight widefat" style="width:100%; margin:15px 0 0 0;" src="<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>history_iframe&id=<?php echo $history -> id; ?>&rand=<?php echo rand(1,999); ?>" id="historypreview<?php echo $history -> id; ?>"></iframe>
+	<iframe width="100%" frameborder="0" scrolling="no" class="autoHeight widefat" style="width:100%; margin:15px 0 0 0;" src="<?php echo $preview_src; ?>" id="historypreview<?php echo $history -> id; ?>"></iframe>
     
 	<div class="tablenav">
 	

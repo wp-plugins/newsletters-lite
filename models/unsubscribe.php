@@ -9,6 +9,7 @@ class wpmlUnsubscribe extends wpMailPlugin {
 	var $fields = array(
 		'id'				=>	"INT(11) NOT NULL AUTO_INCREMENT",
 		'email'				=>	"VARCHAR(250) NOT NULL DEFAULT ''",
+		'user_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'mailinglist_id'	=>	"INT(11) NOT NULL DEFAULT '0'",
 		'history_id'		=>	"INT(11) NOT NULL DEFAULT '0'",
 		'comments'			=>	"TEXT NOT NULL",
@@ -20,6 +21,7 @@ class wpmlUnsubscribe extends wpMailPlugin {
 	var $tv_fields = array(
 		'id'				=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
 		'email'				=>	array("VARCHAR(250)", "NOT NULL DEFAULT ''"),
+		'user_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'mailinglist_id'	=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'history_id'		=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'comments'			=>	array("TEXT", "NOT NULL"),

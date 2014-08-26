@@ -18,6 +18,7 @@ class wpmlQueue extends wpMailPlugin {
 	var $table_fields = array(
 		'id' 				=>	"INT(11) NOT NULL AUTO_INCREMENT",
 		'post_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
+		'user_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'subscriber_id'		=>	"INT(11) NOT NULL DEFAULT '0'",
 		'mailinglist_id'	=>	"INT(11) NOT NULL DEFAULT '0'",
 		'mailinglists'		=>	"TEXT NOT NULL",
@@ -37,6 +38,7 @@ class wpmlQueue extends wpMailPlugin {
 	var $tv_fields = array(
 		'id' 				=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
 		'post_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'user_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'subscriber_id'		=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'mailinglist_id'	=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'mailinglists'		=>	array("TEXT", "NOT NULL"),
@@ -192,7 +194,7 @@ class wpmlQueue extends wpMailPlugin {
 		return false;
 	}
 	
-	function save($subscriber = array(), $subject = null, $message = null, $attachments = array(), $post_id = 0, $history_id = 0, $return_query = false, $theme_id = 0, $senddate = null) {
+	function save($subscriber = null, $user = null, $subject = null, $message = null, $attachments = array(), $post_id = 0, $history_id = 0, $return_query = false, $theme_id = 0, $senddate = null) {
 		global $wpdb, $Html;
 		$this -> errors = array();
 		
@@ -201,7 +203,7 @@ class wpmlQueue extends wpMailPlugin {
 			$senddate = date_i18n("Y-m-d H:i:s", time());
 		}
 		
-		if (empty($subscriber)) { $this -> errors[] = __('No subscriber specified', $this -> plugin_name); }		
+		if (empty($subscriber) && empty($user)) { $this -> errors[] = __('No subscriber specified', $this -> plugin_name); }		
 		if (empty($subject)) { $this -> errors[] = __('No subject specified', $this -> plugin_name); }
 		else { $slug = $Html -> sanitize($subject); }		
 		if (empty($message)) { $this -> errors[] = __('No message specified', $this -> plugin_name); }
@@ -211,7 +213,16 @@ class wpmlQueue extends wpMailPlugin {
 		if (empty($this -> errors)) {
 			$exists = false;
 			
-			$existsquery = "SELECT `id` FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `subscriber_id` = '" . $subscriber -> id . "' AND `slug` = '" . $slug . "' LIMIT 1";
+			if (!empty($subscriber)) {
+				$user_id = 0;
+				$subscriber_id = $subscriber -> id;
+				$existsquery = "SELECT `id` FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `subscriber_id` = '" . $subscriber -> id . "' AND `slug` = '" . $slug . "' LIMIT 1";
+			} elseif (!empty($user)) {
+				$subscriber_id = 0;
+				$user_id = $user -> ID;
+				$existsquery = "SELECT `id` FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `user_id` = '" . $user -> ID . "' AND `slug` = '" . $slug . "' LIMIT 1";
+			}
+				
 			if ($wpdb -> get_var($existsquery)) {
 				$exists = true;
 			}
@@ -224,7 +235,8 @@ class wpmlQueue extends wpMailPlugin {
 				$query = "INSERT INTO `" . $wpdb -> prefix . $this -> table_name . "` (
 					`post_id`, 
 					`history_id`, 
-					`theme_id`, 
+					`theme_id`,
+					`user_id`,
 					`subscriber_id`, 
 					`mailinglist_id`, 
 					`mailinglists`,
@@ -238,7 +250,8 @@ class wpmlQueue extends wpMailPlugin {
 					'" . (empty($post_id) ? '0' : $post_id) . "', 
 					'" . $history_id . "', 
 					'" . $theme_id . "', 
-					'" . $subscriber -> id . "', 
+					'" . $user_id . "',
+					'" . $subscriber_id . "', 
 					'" . $subscriber -> mailinglist_id . "', 
 					'" . maybe_serialize($subscriber -> mailinglists) . "',
 					'" . $subject . "', 

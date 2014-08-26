@@ -5,6 +5,10 @@ if ($this -> is_plugin_active('qtranslate')) {
 	$el = qtrans_getSortedLanguages();
 }
 
+include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
+$validation = $Html -> field_value('Field[validation]');
+$regex = $Html -> field_value('Field[regex]');
+
 ?>
 
 <div class="wrap <?php echo $this -> pre; ?>">
@@ -138,6 +142,35 @@ if ($this -> is_plugin_active('qtranslate')) {
 		</table>
 		
 		<div id="errormessagediv" style="display:<?php echo ($Html -> field_value('Field[required]') == "Y") ? 'block' : 'none'; ?>;">
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th><label for="Field_validation"><?php _e('Validation', $this -> plugin_name); ?></label></th>
+						<td>
+							<select onchange="validation_change(this.value);" name="Field[validation]" id="Field_validation">
+								<?php foreach ($validation_rules as $validation_key => $validation_rule) : ?>
+									<option <?php echo (!empty($validation) && $validation == $validation_key) ? 'selected="selected"' : ''; ?> value="<?php echo $validation_key; ?>"><?php echo __($validation_rule['title']); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div id="validation_custom_div" style="display:<?php echo (!empty($validation) && $validation == "custom") ? 'block' : 'none'; ?>;">
+				<table class="form-table">
+					<tbody>
+						<tr>
+							<th><label for="Field_regex"><?php _e('Custom Regex', $this -> plugin_name); ?></label></th>
+							<td>
+								<input type="text" name="Field[regex]" value="<?php echo esc_attr(stripslashes($regex)); ?>" id="Field_regex" class="widefat" />
+								<span class="howto"><?php echo sprintf(__('Specify a custom PHP regular expression, eg. %s', $this -> plugin_name), "<code>/^[0-9]*$/</code>"); ?></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
 			<table class="form-table">
 				<tbody>
 					<tr>
@@ -328,6 +361,14 @@ if ($this -> is_plugin_active('qtranslate')) {
 </div>
 
 <script type="text/javascript">
+function validation_change(validation) {
+	if (validation == "custom") {
+		jQuery('#validation_custom_div').show();
+	} else {
+		jQuery('#validation_custom_div').hide();
+	}
+}
+
 jQuery(document).ready(function() {
 	/* Tabs */
 	<?php if ($this -> is_plugin_active('qtranslate')) : ?>

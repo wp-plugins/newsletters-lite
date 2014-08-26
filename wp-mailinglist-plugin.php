@@ -1504,6 +1504,20 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			}
 			
+			// Count the users based on roles
+			$users_count = 0;
+			if (!empty($_POST['roles'])) {
+				if ($count_users = count_users()) {
+					foreach ($count_users['avail_roles'] as $role => $count) {
+						if (array_key_exists($role, $_POST['roles'])) {
+							$users_count += $count;
+						}
+					}
+					
+					$subscribercount += $users_count;
+				}
+			}
+			
 			if (!empty($_POST['mailinglists'])) {
 				$query = "SELECT DISTINCT " . $wpdb -> prefix . $Subscriber -> table . ".id FROM " . $wpdb -> prefix . "" . $SubscribersList -> table . " LEFT JOIN 
 				" . $wpdb -> prefix . "" . $Subscriber -> table . " ON 
@@ -1527,19 +1541,28 @@ if (!class_exists('wpMailPlugin')) {
 					$supportedfields = array('text', 'radio', 'select', 'pre_country', 'pre_gender');
 					$scopeall = (empty($_POST['fieldsconditionsscope']) || $_POST['fieldsconditionsscope'] == "all") ? true : false;
 					$f = 1;
-					foreach ($_POST['fields'] as $field) {					
+					foreach ($_POST['fields'] as $fkey => $field) {					
 						if (!empty($field[0]) && $field[1] != "") {
 							if (preg_match("/\d+/si", $field[0], $matches)) {
 								$field_id = $matches[0];	
 								
 								$Db -> model = $Field -> model;
-								if ($customfield = $Db -> find(array('id' => $field_id), array('id', 'slug', 'type'))) {								
+								if ($customfield = $Db -> find(array('id' => $field_id), array('id', 'slug', 'type'))) {	
+									$condition = $_POST['condquery'][$customfield -> slug];
+															
 									if (in_array($customfield -> type, $supportedfields)) {									
-										switch ($customfield -> type) {
-											case 'text'					:
+										switch ($condition) {
+											case 'smaller'			:
+												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " < " . $field[1] . "";
+												break;
+											case 'larger'			:
+												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " > " . $field[1] . "";
+												break;
+											case 'contains'			:
 												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " LIKE '%" . $field[1] . "%'";
 												break;
-											default 					:
+											case 'equals'			:
+											default  				:
 												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " = '" . $field[1] . "'";
 												break;
 										}
@@ -4052,36 +4075,46 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function get_managementpost($permalink = false) {
+		function get_managementpost($permalink = false, $autocreate = false) {
 			define('DONOTCACHEPAGE', true);
 			define('DONOTCACHEDB', true);
 			define('DONOTMINIFY', true);
 			define('DONOTCDN', true);
 			define('DONOTCACHCEOBJECT', true);
 		
-			global $wpdb, $user_ID, $wp_rewrite;
+			global $wpdb, $user_ID, $wp_rewrite, $newsletters_managementpost_error;
 			require_once(ABSPATH . WPINC . DS . 'rewrite.php');
 			if (!is_object($wp_rewrite)) { $wp_rewrite = new WP_Rewrite(); }
 			
 			$managementpost = get_option($this -> pre . 'managementpost');
-			$query = "SELECT ID FROM " . $wpdb -> posts . " WHERE ID = '" . $managementpost . "'";
+			$query = "SELECT `ID` FROM `" . $wpdb -> posts . "` WHERE `ID` = '" . $managementpost . "' AND `post_status` = 'publish'";
 			
 			if (empty($managementpost) || !$post = $wpdb -> get_row($query)) {
-				$postdata = array(
-					'post_title'			=>	__('Manage Subscriptions', $this -> plugin_name),
-					'post_content'			=>	__('[wpmlmanagement]', $this -> plugin_name),
-					'post_type'				=>	"page",
-					'post_status'			=>	"publish",
-					'post_author'			=>	$user_ID,
-				);
-				
-				$post_id = wp_insert_post($postdata);
-				update_option($this -> pre . 'managementpost', $post_id);
-				
-				if ($permalink == true) {
-					return get_permalink($post_id);	
+				if ($autocreate == true) {
+					$postdata = array(
+						'post_title'			=>	__('Manage Subscriptions', $this -> plugin_name),
+						'post_content'			=>	__('[wpmlmanagement]', $this -> plugin_name),
+						'post_type'				=>	"page",
+						'post_status'			=>	"publish",
+						'post_author'			=>	$user_ID,
+					);
+					
+					$post_id = wp_insert_post($postdata);
+					update_option($this -> pre . 'managementpost', $post_id);
+					
+					if ($permalink == true) {
+						return get_permalink($post_id);	
+					} else {
+						return $post_id;
+					}
 				} else {
-					return $post_id;
+					if (is_admin()) {
+						if (!$newsletters_managementpost_error) {
+							$error = sprintf(__('Newsletter plugin subscriber management post/page does not exist %s', $this -> plugin_name), '<a href="?page=' . $this -> sections -> settings . '&method=managementpost" class="button button-secondary">' . __('Create it Now', $this -> plugin_name) . '</a>');
+							$this -> render_error($error);
+							$newsletters_managementpost_error = true;
+						}
+					}	
 				}
 			} else {
 				if ($permalink == true) {
@@ -4473,6 +4506,7 @@ if (!class_exists('wpMailPlugin')) {
 		function update_options() {
 			if (!is_admin()) return;
 			$this -> check_tables();
+			$this -> get_managementpost(false, true);
 			
 			global $wpml_add_option_count, $wpdb, $Theme;
 			$wpml_add_option_count = 0;

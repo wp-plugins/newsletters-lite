@@ -382,6 +382,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 
 .wpml .ui-tabs .ui-tabs-nav li a { 
 	float: left;
+	font-weight: bold;
 	padding:0 15px; 
 	line-height:30px; 
 	height:30px; 
