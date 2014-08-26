@@ -47,6 +47,7 @@
 			importingnumber = 1000;
 			confirmation_subject = jQuery('#confirmation_subject').html();
 			confirmation_email = jQuery('#confirmation_email').html(); 
+			import_preventbu = "<?php echo (!empty($_POST['import_preventbu'])) ? 'Y' : 'N'; ?>";
 			jQuery('#startimporting').removeAttr('disabled').text('<?php echo addslashes(__("Start Importing", $this -> plugin_name)); ?>');
 		});
 		
@@ -106,7 +107,7 @@
 		
 			requests++;
 		
-			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>importsubscribers', {subscriber:subscriber, confirmation_subject:confirmation_subject, confirmation_email:confirmation_email}, function(response) {		
+			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>importsubscribers', {subscriber:subscriber, import_preventbu:import_preventbu, confirmation_subject:confirmation_subject, confirmation_email:confirmation_email}, function(response) {		
 				var data = response.split('<|>');
 				var success = data[0];
 				var email = data[1];

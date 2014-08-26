@@ -249,7 +249,7 @@
                     	<?php if (!empty($email -> attachments)) : ?>
                         	<ul style="padding:0; margin:0;">
                             	<?php foreach ($email -> attachments as $attachment) : ?>
-                                	<li class="<?php echo $this -> pre; ?>attachment"><?php echo $Html -> attachment_link($attachment['filename'], false); ?></li>
+                                	<li class="<?php echo $this -> pre; ?>attachment"><?php echo $Html -> attachment_link($attachment, false); ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php else : ?>

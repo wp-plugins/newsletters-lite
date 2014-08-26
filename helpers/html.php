@@ -62,7 +62,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		
 			?>
 			
-			<span class="wpmlhelp"><a href="" onclick="return false;" title="<?php echo esc_attr(strip_tags(stripslashes($help))); ?>"></a></span>
+			<span class="wpmlhelp"><a href="" onclick="return false;" title="<?php echo esc_attr(stripslashes($help)); ?>"></a></span>
 			
 			<?php
 			
@@ -167,12 +167,28 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return false;	
 	}
 	
-	function uploads_path() {
-		if ($upload_dir = wp_upload_dir()) {		
-			return str_replace("\\", "/", $upload_dir['basedir']);
+	function uploads_path($dated = false) {
+		if ($upload_dir = wp_upload_dir()) {	
+			if ($dated) {
+				return str_replace("\\", "/", $upload_dir['path']);	
+			} else {
+				return str_replace("\\", "/", $upload_dir['basedir']);
+			}
 		}
 		
 		return str_replace("\\", "/", WP_CONTENT_DIR . '/uploads');
+	}
+	
+	function uploads_subdir() {
+		$subdir = '';
+	
+		if ($upload_dir = wp_upload_dir()) {
+			if (!empty($upload_dir['subdir'])) {
+				$subdir = $upload_dir['subdir'];
+			}
+		}
+		
+		return $subdir;
 	}
 	
 	function uploads_url() {
@@ -288,14 +304,21 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return false;
 	}
 	
-	function attachment_link($attachmentfile = null, $icononly = false) {
-		if (!empty($attachmentfile)) {
-			$icon = '<img border="0" style="border:none;" src="' . $this -> url() . '/images/icons/clip-16.png" alt="attachment" />';
-			
+	function attachment_link($attachment = null, $icononly = false) {		
+		$attachmentfile = "";
+		
+		if (!empty($attachment['subdir'])) {
+			$attachmentfile .= $attachment['subdir'] . '/';
+		}
+		
+		$attachmentfile .= basename($attachment['filename']);
+		$attachmentfile = ltrim($attachmentfile, DS);
+	
+		if (!empty($attachmentfile)) {			
 			if ($icononly == false) {
-				return '<a class="button" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . basename($attachmentfile) . '">' . $icon . ' ' . basename($attachmentfile) . '</a>';
+				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '">' . $this -> truncate(basename($attachmentfile), 20) . '</a>';
 			} else {
-				return '<a class="button" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . basename($attachmentfile) . '">' . $icon . '</a>';
+				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '"></a>';
 			}
 		}
 		
@@ -657,10 +680,11 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return false;
 	}
 	
-	function truncate($text, $length = 100, $ending = '...', $exact = false, $considerHtml = false) {
+	function truncate($text = null, $length = 100, $ending = '...', $exact = false, $considerHtml = false) {
 		if (is_array($ending)) {
 			extract($ending);
 		}
+		
 		if ($considerHtml) {
 			if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
 				return $text;

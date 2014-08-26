@@ -55,14 +55,14 @@ class wpmlUnsubscribe extends wpMailPlugin {
 	}
 	
 	function validate($data = array()) {
+		global $Db;
 		$this -> errors = array();
 		
 		$data = (empty($data[$this -> model])) ? $data : $data[$this -> model];
 		$r = wp_parse_args($data, $defaults);
 		extract($r, EXTR_SKIP);
 		
-		if (!empty($data)) {
-		
+		if (!empty($data)) {		
 			if (!empty($user_id)) {
 				global $Db;
 				$Db -> model = $this -> model;
@@ -74,6 +74,11 @@ class wpmlUnsubscribe extends wpMailPlugin {
 			if (empty($email)) { $this -> errors['email'] = __('No email was specified.', $this -> plugin_name); }
 			//if (empty($mailinglist_id)) { $this -> errors['mailinglist_id'] = __('No mailing list was specified.', $this -> plugin_name); }
 			if (empty($history_id)) { $this -> errors['history_id'] = __('No history email was specified', $this -> plugin_name); }
+			
+			$Db -> model = $this -> model;
+			if ($current = $Db -> find(array('email' => $email, 'mailinglist_id' => $mailinglist_id))) {
+				$this -> data -> id = $current -> id;
+			}
 		} else {
 			$this -> errors[] = __('No data was posted', $this -> plugin_name);
 		}

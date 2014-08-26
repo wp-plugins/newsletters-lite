@@ -60,7 +60,7 @@
                <ul style="margin:0; padding:0;"> 
                     <?php foreach ($attachments as $attachment) : ?>
                     	<li class="<?php echo $this -> pre; ?>attachment">
-                        	<?php echo $Html -> attachment_link($attachment['filename'], false); ?>
+                        	<?php echo $Html -> attachment_link($attachment, false); ?>
                         </li>    
                     <?php endforeach; ?>
                </ul>

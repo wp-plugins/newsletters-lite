@@ -97,8 +97,8 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
                     	<ul style="padding:0; margin:0;">
 							<?php foreach ($history -> attachments as $attachment) : ?>
                             	<li class="<?php echo $this -> pre; ?>attachment">
-                                	<?php echo $Html -> attachment_link($attachment['filename'], false); ?>
-                                    <a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"><img border="0" style="border:none;" src="<?php echo $this -> url(); ?>/images/icons/delete-16.png" alt="delete" /></a>
+                                	<?php echo $Html -> attachment_link($attachment, false); ?>
+                                    <a class="button button-primary newsletters_attachment_remove" href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"></a>
                                 </li>
                             <?php endforeach; ?>
                         </ul>

@@ -46,6 +46,7 @@ class Newsletters_Widget extends WP_Widget {
 					$instance['subtitle'] = __('Subscribe for email updates', $wpMail -> plugin_name);
 					$instance['acknowledgement'] = __('Thank you for subscribing!', $wpMail -> plugin_name);
 					$instance['ajax'] = "Y";
+					$instance['scroll'] = 1;
 					$instance['captcha'] = "N";
 					$instance['button'] = __('Subscribe Now', $wpMail -> plugin_name);
 				}
@@ -126,6 +127,9 @@ class Newsletters_Widget extends WP_Widget {
 										<label><input <?php echo ($instance['ajax'][$language] == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> get_field_name('ajax'); ?>[<?php echo $language; ?>]" value="Y" id="<?php echo $this -> get_field_id('ajax'); ?>-<?php echo $language; ?>-Y" /> <?php _e('On', $wpMail -> plugin_name); ?></label>
 										<label><input <?php echo ($instance['ajax'][$language] == "N") ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> get_field_name('ajax'); ?>[<?php echo $language; ?>]" value="N" id="<?php echo $this -> get_field_id('ajax'); ?>-<?php echo $language; ?>-N" /> <?php _e('Off', $wpMail -> plugin_name); ?></label>
 										<?php echo $Html -> help(__('Turn on/off Ajax for the subscribe form. If you turn Ajax on, the subscribe form will submit without any page refresh and it is much quicker. Turning it off will generate a page refresh as the user submits the form to subscribe.', $wpMail -> plugin_name)); ?>
+									</p>
+									<p>
+										<label><input <?php echo (!empty($instance['scroll'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $this -> get_field_name('scroll'); ?>" value="1" id="<?php echo $this -> get_field_id('scroll'); ?>" /> <?php _e('Scroll to subscribe form', $this -> plugin_name); ?></label>
 									</p>
 									<p>
 										<label for="<?php echo $this -> get_field_id('button'); ?>-<?php echo $language; ?>"><?php _e('Button Text:', $wpMail -> plugin_name); ?></label>
@@ -229,7 +233,11 @@ class Newsletters_Widget extends WP_Widget {
 	}
 	
 	public function update($new_instance, $old_instance) {		
-		$instance = array();		
+		$instance = array();
+		unset($new_instance['scroll']);
+		
+		print_r($new_instance);
+			
 		if (class_exists('wpMail')) {
 			if ($wpMail = new wpMail()) {
 				if ($wpMail -> is_plugin_active('qtranslate')) {

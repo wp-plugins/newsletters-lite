@@ -121,7 +121,14 @@ class wpmlSubscriber extends wpMailPlugin {
 		$mailinglists = false;
 	
 		if (!empty($subscriber_id)) {
-			$query = "SELECT `list_id` FROM `" . $wpdb -> prefix . $SubscribersList -> table . "` WHERE `subscriber_id` = '" . $subscriber_id . "' AND `active` = '" . $active . "'";
+			$query = "SELECT `list_id` FROM `" . $wpdb -> prefix . $SubscribersList -> table . "` WHERE `subscriber_id` = '" . $subscriber_id . "'";
+			if (!empty($active)) { $query .= " AND `active` = '" . $active . "'"; }
+			
+			$query_hash = md5($query);
+			if ($mailinglists = wp_cache_get($query_hash, 'newsletters')) {
+				return $mailinglists;
+			}
+			
 			$listsarray = $wpdb -> get_results($query);
 			$mailinglists = array();
 			
@@ -138,6 +145,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			}
 		}
 		
+		wp_cache_set($query_hash, $mailinglists, 'newsletters', 0);
 		return $mailinglists;
 	}
 	
@@ -238,6 +246,11 @@ class wpmlSubscriber extends wpMailPlugin {
 		
 		if (!empty($subscriber_id)) {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `id` = '" . $subscriber_id . "' LIMIT 1";
+			
+			$query_hash = md5($query);
+			if ($subscriber = wp_cache_get($query_hash, 'newsletters')) {
+				return $subscriber;
+			}
 		
 			if ($subscriber = $wpdb -> get_row($query)) {			
 				$subscriber = $this -> init_class($this -> model, $subscriber);				
@@ -254,6 +267,7 @@ class wpmlSubscriber extends wpMailPlugin {
 					$this -> data[$this -> model] = $this -> init_class($this -> model, $subscriber); 
 				}
 
+				wp_cache_set($query_hash, $subscriber, 'newsletters', 0);
 				return $subscriber;
 			}
 		}
@@ -265,7 +279,14 @@ class wpmlSubscriber extends wpMailPlugin {
 		global $wpdb;
 		
 		if (!empty($list)) {
-			if ($subscribers = $wpdb -> get_results("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `list_id` = '" . $list . "'")) {
+			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `list_id` = '" . $list . "'";
+		
+			$query_hash = md5($query);
+			if ($data = wp_cache_get($query_hash, 'newsletters')) {
+				return $data;
+			}
+		
+			if ($subscribers = $wpdb -> get_results($query)) {
 				if (!empty($subscribers)) {
 					$data = array();
 				
@@ -273,6 +294,7 @@ class wpmlSubscriber extends wpMailPlugin {
 						$data[] = $this -> init_class('wpmlSubscriber', $subscriber);
 					}
 					
+					wp_cache_set($query_hash, $data, 'newsletters', 0);
 					return $data;
 				}
 			}
@@ -301,7 +323,14 @@ class wpmlSubscriber extends wpMailPlugin {
 	function get_all() {
 		global $wpdb;
 		
-		if ($subscribers = $wpdb -> get_results("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` ORDER BY `email` ASC")) {
+		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` ORDER BY `email` ASC";
+		
+		$query_hash = md5($query);
+		if ($data = wp_cache_get($query_hash, 'newsletters')) {
+			return $data;
+		}
+		
+		if ($subscribers = $wpdb -> get_results($query)) {
 			if (!empty($subscribers)) {
 				$data = array();
 				
@@ -309,6 +338,7 @@ class wpmlSubscriber extends wpMailPlugin {
 					$data[] = $this -> init_class('wpmlSubscriber', $subscriber);
 				}
 				
+				wp_cache_set($query_hash, $data, 'newsletters', 0);
 				return $data;
 			}
 		}
@@ -468,10 +498,12 @@ class wpmlSubscriber extends wpMailPlugin {
 				}
 			}
 			
-			if ($validate == true) {
-				if (empty($data['email'])) { $this -> errors['email'] = __($emailfield -> errormessage); }
-				elseif (!$this -> email_validate($data['email'])) { $this -> errors['email'] = __($emailfield -> errormessage); }
-				
+			// The email address should always be validated, we don't want broken addresses
+			if (empty($data['email'])) { $this -> errors['email'] = __($emailfield -> errormessage); }
+			elseif (!$this -> email_validate($data['email'])) { $this -> errors['email'] = __($emailfield -> errormessage); }
+			
+			// Should everything be validated?
+			if ($validate == true) {				
 				$Field -> validate_optin($data);					
 				if (!empty($Field -> errors)) {
 					$this -> errors = array_merge($this -> errors, $Field -> errors);
@@ -564,6 +596,8 @@ class wpmlSubscriber extends wpMailPlugin {
 			} else {
 				$_POST[$this -> pre . 'errors'] = $this -> errors;
 			}
+		} else {
+			$this -> errors[] = __('No data was posted', $this -> plugin_name);
 		}
 		
 		$this -> data = $data;
@@ -571,7 +605,9 @@ class wpmlSubscriber extends wpMailPlugin {
 	}
 	
 	function save($data = array(), $validate = true, $return_query = false) {
-		global $wpdb, $Html, $Db, $wpmlCountry, $Field, $FieldsList, $Mailinglist, $SubscribersList;
+		global $wpdb, $Html, $Db, $wpmlCountry, $Field, $FieldsList, $Mailinglist, $SubscribersList, 
+		$Bounce, $Unsubscribe;
+		
 		$this -> errors = false;
 		
 		$defaults = array(
@@ -864,6 +900,11 @@ class wpmlSubscriber extends wpMailPlugin {
 			if (empty($return_query) || $return_query == false) {				
 				if ($wpdb -> query($query)) {
 					$this -> insertid = $subscriber_id = (empty($id)) ? $wpdb -> insert_id : $id;
+					
+					$unsubscribe_delete_query = "DELETE FROM " . $wpdb -> prefix . $Unsubscribe -> table . " WHERE `email` = '" . $data['email'] . "'";
+					$wpdb -> query($unsubscribe_delete_query);
+					$bounce_delete_query = "DELETE FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE `email` = '" . $data['email'] . "'";
+					$wpdb -> query($bounce_delete_query);
 					
 					/* Mailing list associations */
 					if (!empty($mailinglists)) {

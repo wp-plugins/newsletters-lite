@@ -56,6 +56,11 @@ $email_templates['unsubscribe'] = array(
 	'message'					=>	"Good day Administrator,\r\n\r\nA subscriber has unsubscribed from a mailing list.\r\nThe mailing list is: [wpmlmailinglist].\r\nThe subscriber email is: [wpmlemail].\r\n\r\n[wpmlunsubscribecomments]\r\n\r\nAll the best,\r\n[wpmlblogname]",
 );
 
+$email_templates['unsubscribeuser'] = array(
+	'subject'					=>	"You are unsubscribed",
+	'message'					=>	"Your e-mail has been removed from our database.\r\nYou will no longer receive communication from us.\r\nThanks for your readership, and we hope you'll visit us again!\r\n\r\nWas this a mistake? If it was, you can [newsletters_resubscribe]",
+);
+
 /* Expiration notification email to the subscriber */
 $email_templates['expire'] = array(
 	'subject'					=>	"Subscription Expired",

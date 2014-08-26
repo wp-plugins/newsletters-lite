@@ -228,6 +228,10 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'templates' . DS . 'unsubscribe', false, true, 'admin');
 	}
 	
+	function settings_templates_unsubscribeuser() {
+		$this -> render('metaboxes' . DS . 'templates' . DS . 'unsubscribeuser', false, true, 'admin');
+	}
+	
 	function settings_templates_expire() {
 		$this -> render('metaboxes' . DS . 'templates' . DS . 'expire', false, true, 'admin');
 	}

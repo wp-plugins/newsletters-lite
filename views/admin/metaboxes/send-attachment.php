@@ -1,10 +1,13 @@
+<!-- Send Attachments -->
+
 <table class="form-table">
 	<tbody>
 		<tr>
-			<th><label for="sendattachmentN"><?php _e('Send Attachment(s)', $this -> plugin_name); ?></label></th>
+			<th><label for="sendattachment"><?php _e('Send Attachment(s)', $this -> plugin_name); ?></label></th>
 			<td>
-				<label><input <?php echo (!empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="jQuery('#attachmentdivinside').show();" type="radio" name="sendattachment" value="Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
-				<label><input <?php echo (empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="jQuery('#attachmentdivinside').hide();" type="radio" name="sendattachment" id="sendattachmentN" value="N" /> <?php _e('No', $this -> plugin_name); ?></label>
+				<?php /*<label><input <?php echo (!empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="jQuery('#attachmentdivinside').show();" type="radio" name="sendattachment" value="Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+				<label><input <?php echo (empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="jQuery('#attachmentdivinside').hide();" type="radio" name="sendattachment" id="sendattachmentN" value="N" /> <?php _e('No', $this -> plugin_name); ?></label>*/ ?>
+				<label><input <?php echo (!empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="if (jQuery(this).is(':checked')) { jQuery('#attachmentdivinside').show(); } else { jQuery('#attachmentdivinside').hide(); }" type="checkbox" name="sendattachment" value="1" id="sendattachment" /> <?php _e('Yes, I want to attach files to this email', $this -> plugin_name); ?></label>
                 <span class="howto"><?php _e('You can attach files to this email for your subscribers to receive.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
@@ -12,7 +15,6 @@
 </table>
 
 <div id="attachmentdivinside" style="display:<?php echo (!empty($_POST['attachments'])) ? 'block' : 'none'; ?>;">
-	
     <table class="form-table">
     	<tbody>
             <tr>
@@ -23,8 +25,8 @@
                            <ul style="margin:0; padding:0;"> 
                                 <?php foreach ($_POST['attachments'] as $attachment) : ?>
                                 	<li class="<?php echo $this -> pre; ?>attachment">
-                                    	<?php echo $Html -> attachment_link($attachment['filename'], false); ?>
-                                        <a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"><img border="0" style="border:none;" src="<?php echo $this -> url(); ?>/images/icons/delete-16.png" alt="delete" /></a>
+                                    	<?php echo $Html -> attachment_link($attachment, false); ?>
+                                        <a class="button button-primary newsletters_attachment_remove" href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"></a>
                                     </li>    
                                 <?php endforeach; ?>
                            </ul>

@@ -43,6 +43,16 @@ function previewrunner() {
 			
 			var iframeheight = jQuery("#previewiframe").contents().find("html").outerHeight();
 			jQuery("#previewiframe").height(iframeheight).css({height: iframeheight}).attr("height", iframeheight);
+			
+			var date = new Date();
+			var year = date.getFullYear();
+			var month = ("0" + (date.getMonth() + 1)).slice(-2);
+			var day = ("0" + date.getDate()).slice(-2);
+			var hours = ("0" + date.getHours()).slice(-2);
+			var minutes = ("0" + date.getMinutes()).slice(-2);
+			var today = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+			var autosavedate = year + '-' + ('0' + (month + 1)).slice(-2) + '-' + day + ' ' + hours + ':' + minutes;
+			jQuery('#autosave').html('<?php _e('Draft saved at', $this -> plugin_name); ?> ' + autosavedate).show();
 		}
 	});
 }

@@ -99,7 +99,10 @@ class wpmlBounce extends wpMailPlugin {
 			if (empty($this -> errors)) {
 				$bouncequery = "SELECT * FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `email` = '" . $email . "' AND `history_id` = '" . $history_id . "'";
 				
-				if ($bounce = $wpdb -> get_row($bouncequery)) {
+				$query_hash = md5($bouncequery);
+				$oc_bounce = wp_cache_get($query_hash, 'newsletters');
+				
+				if (!empty($oc_bounce) || $bounce = $wpdb -> get_row($bouncequery)) {
 					$query = "UPDATE `" . $wpdb -> prefix . $this -> table . "` "
 					. " SET `count` = '" . ((int) $bounce -> count + 1) . "', `modified` = '" . $modified . "' WHERE `id` = '" . $bounce -> id . "' LIMIT 1";
 				} else {

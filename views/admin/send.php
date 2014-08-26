@@ -55,6 +55,13 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 							ed.onKeyDown.add(function (ed, evt) {
 				            	var content = jQuery('iframe#content_ifr').contents().find('body#tinymce').html();
 				            	jQuery('#previewiframe').contents().find('html div.newsletters_content').html(content);
+				            	
+								var val = jQuery.trim(content),  
+								words = val.replace(/\s+/gi, ' ').split(' ').length,
+								chars = val.length;
+								if(!chars)words=0;
+								
+								jQuery('#word-count').html(words + ' " . __('words and', $this -> plugin_name) . " ' + chars + ' " . __('characters', $this -> plugin_name) . "');
 				            });
 						}";
 						
@@ -78,7 +85,9 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 										<span id="word-count">0</span>
 									</td>
 									<td class="autosave-info">
-										<span id="autosave" style="display:none;"></span>
+										<span id="autosave" style="display:none;">
+											
+										</span>
 									</td>
 								</tr>
 							</tbody>
@@ -185,15 +194,7 @@ function deletecontentarea(number, history_id) {
 	jQuery('#contentareabox' + number).remove();
 }
 
-function addcontentarea() {
-	/*var data = {contentarea:contentarea};
-	jQuery('#contentarea_loading').show();
-	jQuery.post(wpmlajaxurl + '?action=newsletters_addcontentarea', data, function(response) {
-		jQuery('#contentarea_loading').hide();
-		jQuery('#contentareas').append(response);
-		tinyMCE.execCommand('mceAddControl', false, 'contentarea' + contentarea);
-	});*/
-	
+function addcontentarea() {	
 	var contentarea_html = '';
 	contentarea_html += '<div class="postbox" id="contentareabox' + contentarea + '">';
 	contentarea_html += '<div class="handlediv" title="Click to toggle"><br></div>';

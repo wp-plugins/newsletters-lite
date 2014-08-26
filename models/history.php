@@ -106,6 +106,7 @@ class wpmlHistory extends wpMailPlugin {
 						'id'					=>	$attachment -> id,
 						'title'					=>	$attachment -> title,
 						'filename'				=>	$attachment -> filename,
+						'subdir'				=>	$attachment -> subdir,
 					);	
 				}
 			}
@@ -136,7 +137,16 @@ class wpmlHistory extends wpMailPlugin {
 		AND (`recurringlimit` = '' OR `recurringlimit` = '0' OR `recurringlimit` > `recurringsent`) 
 		AND (`recurringdate` <= NOW())";
 		
-		if ($histories = $wpdb -> get_results($query)) {
+		$query_hash = md5($query);
+		
+		if ($oc_histories = wp_cache_get($query_hash, 'newsletters')) {
+			$histories = $oc_histories;
+		} else {
+			$histories = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $histories, 'newsletters', 0);
+		}
+		
+		if (!empty($histories)) {
 			foreach ($histories as $history) {
 				$this -> remove_server_limits();
 				$mailinglists = maybe_unserialize($history -> mailinglists);
@@ -215,7 +225,15 @@ class wpmlHistory extends wpMailPlugin {
 					$sentmailscount = 0;
 					$q_queries = array();
 					
-					if ($subscribers = $wpdb -> get_results($query)) {				
+					$query_hash = md5($query);
+					if ($oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
+						$subscribers = $oc_subscribers;
+					} else {
+						$subscribers = $wpdb -> get_results($query);
+						wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
+					}
+					
+					if (!empty($subscribers)) {				
 						$datasets = array();
 						$q_queries = array();
 						$d = 0;
@@ -270,7 +288,15 @@ class wpmlHistory extends wpMailPlugin {
 		
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE `senddate` <= '" . date_i18n("Y-m-d H:i:s", time()) . "' AND `scheduled` = 'Y' LIMIT 1";
 		
-		if ($histories = $wpdb -> get_results($query)) {		
+		$query_hash = md5($query);
+		if ($oc_histories = wp_cache_get($query_hash, 'newsletters')) {
+			$histories = $oc_histories;
+		} else {
+			$histories = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $histories, 'newsletters', 0);
+		}
+		
+		if (!empty($histories)) {		
 			foreach ($histories as $history) {
 				$this -> remove_server_limits();
 				$mailinglists = maybe_unserialize($history -> mailinglists);
@@ -358,7 +384,15 @@ class wpmlHistory extends wpMailPlugin {
 					$sentmailscount = 0;
 					$q_queries = array();
 					
-					if ($subscribers = $wpdb -> get_results($query)) {				
+					$query_hash = md5($query);
+					if ($oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
+						$subscribers = $oc_subscribers;
+					} else {
+						$subscribers = $wpdb -> get_results($query);
+						wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
+					}
+					
+					if (!empty($subscribers)) {				
 						$datasets = array();
 						$q_queries = array();
 						$d = 0;
@@ -439,8 +473,9 @@ class wpmlHistory extends wpMailPlugin {
 			'modified' 			=> 		$Html -> gen_date()
 		);
 		
-		$data = (empty($data[$this -> model])) ? $data : $data[$this -> model];
-		//$r = wp_parse_args($defaults, $data);
+		$data = (empty($data[$this -> model])) ? $data : $data[$this -> model];		
+		$data = apply_filters('newsletters_db_data_before_validate', $data, $this -> model);
+		
 		$r = wp_parse_args($data, $defaults);
 		$this -> data = (array) $this -> data;
 		$this -> data[$this -> model] = $this -> array_to_object($r);		
@@ -456,6 +491,8 @@ class wpmlHistory extends wpMailPlugin {
 		//ensure that there are no errors.
 		if (empty($this -> errors)) {		
 			//check if an ID was passed.
+			$this -> table_fields = apply_filters('newsletters_db_table_fields', $this -> table_fields, $this -> model);
+			
 			if (!empty($id)) {
 				$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET";
 				$c = 1;

@@ -9,6 +9,10 @@
 			<?php _e('You will no longer receive correspondence on the list(s) unsubscribed from.', $this -> plugin_name); ?>
 		</p>
 		
+		<p>
+			<?php echo sprintf(__('Was this a mistake? If it was, you can %s', $this -> plugin_name), $this -> gen_resubscribe_link($subscriber)); ?>
+		</p>
+		
 		<?php if (empty($deleted) && $deleted == false) : ?>
 			<ul>
 				<li><?php _e('Go back to', $this -> plugin_name); ?> <a href="<?php echo home_url(); ?>" title="<?php echo esc_attr(stripslashes(get_bloginfo('name'))); ?>"><?php echo get_bloginfo('name'); ?></a></li>

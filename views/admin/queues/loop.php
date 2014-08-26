@@ -177,7 +177,7 @@
                         	<ul style="padding:0; margin:0;">
                             	<?php foreach ($queue -> attachments as $attachment) : ?>
                                 	<li class="<?php echo $this -> pre; ?>attachment">
-                                    	<?php echo $Html -> attachment_link($attachment['filename']); ?>
+                                    	<?php echo $Html -> attachment_link($attachment); ?>
                                         
                                     </li>
                                 <?php endforeach; ?>

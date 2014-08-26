@@ -106,9 +106,25 @@ class wpmlpaginate extends wpMailPlugin {
 		list($ofield, $odir) = $this -> order;
 		$query .= " ORDER BY IF (`" . $ofield . "` = '' OR `" . $ofield . "` IS NULL,1,0), `" . $ofield . "` " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
 		
-		$records = $wpdb -> get_results($query);		
+		$query_hash = md5($query);
+		if ($oc_records = wp_cache_get($query_hash, 'newsletters')) {
+			$records = $oc_records;
+		} else {
+			$records = $wpdb -> get_results($query);	
+			wp_cache_set($query_hash, $records, 'newsletters', 0);	
+		}
+			
 		$records_count = count($records);
-		$this -> allcount = $allRecordsCount = $wpdb -> get_var($countquery);
+		
+		$query_hash = md5($countquery);
+		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+			$this -> allcount = $allRecordsCount = $oc_count;
+		} else {
+			$count = $wpdb -> get_var($countquery);
+			$this -> allcount = $allRecordsCount = $count;
+			wp_cache_set($query_hash, $count, 'newsletters', 0);
+		}
+		
 		$totalpagescount = round($records_count / $this -> per_page);
 		
 		if (empty($this -> url_page)) {

@@ -28,7 +28,8 @@ class wpmlCountry extends wpMailPlugin {
 		$this -> table = $this -> pre . $this -> controller;
 		
 		if (is_admin()) {		
-			$query = "SELECT `id` FROM `" . $wpdb -> prefix . "" . $this -> table . "`";
+			$query = "SELECT `id` FROM `" . $wpdb -> prefix . "" . $this -> table . "` LIMIT 1";
+			
 			if ($this -> get_option('countriesinserted') == "N" || !$wpdb -> get_var($query)) {
 				global $wpmlsql;
 				

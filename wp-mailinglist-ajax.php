@@ -291,7 +291,15 @@ class wpMailAjax extends wpMailPlugin {
 		$fields_done = array();
 		
 		$emailfieldquery = "SELECT `id` FROM " . $wpdb -> prefix . $Field -> table . " WHERE `slug` = 'email'";
-		$emailfield_id = $wpdb -> get_var($emailfieldquery);
+		
+		$query_hash = md5($emailfieldquery);
+		if ($oc_emailfield_id = wp_cache_get($query_hash, 'newsletters')) {
+			$emailfield_id = $oc_emailfield_id;
+		} else {
+			$emailfield_id = $wpdb -> get_var($emailfieldquery);
+			wp_cache_set($query_hash, $emailfield_id, 'newsletters', 0);
+		}
+			
 		$fields_done[] = $emailfield_id;
 	
 		if (!empty($_POST['list_id']) && !empty($_POST['list_id'][0])) {

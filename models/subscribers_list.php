@@ -85,7 +85,13 @@ class wpmlSubscribersList extends wpMailPlugin {
 				$c++;
 			}
 			
+			$query_hash = md5($query);
+			if ($count = wp_cache_get($query_hash, 'newsletters')) {
+				return $count;
+			}
+			
 			if ($count = $wpdb -> get_var($query)) {
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
 				return $count;
 			}
 		}

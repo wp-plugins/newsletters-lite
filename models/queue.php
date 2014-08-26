@@ -79,6 +79,7 @@ class wpmlQueue extends wpMailPlugin {
 						'id'				=>	$attachment -> id,
 						'title'				=>	$attachment -> title,
 						'filename'			=>	$attachment -> filename,
+						'subdir'			=>	$attachment -> subdir,
 					);	
 				}
 			}
@@ -103,7 +104,13 @@ class wpmlQueue extends wpMailPlugin {
 			}
 		}
 		
+		$query_hash = md5($query);
+		if ($count = wp_cache_get($query_hash, 'newsletters')) {
+			return $count;
+		}
+		
 		if ($count = $wpdb -> get_var($query)) {
+			wp_cache_set($query_hash, $count, 'newsletters', 0);
 			return $count;
 		}
 		
@@ -223,8 +230,16 @@ class wpmlQueue extends wpMailPlugin {
 				$existsquery = "SELECT `id` FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `user_id` = '" . $user -> ID . "' AND `slug` = '" . $slug . "' LIMIT 1";
 			}
 				
-			if ($wpdb -> get_var($existsquery)) {
-				$exists = true;
+			$query_hash = md5($existsquery);
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {			
+				$exists = ${'newsletters_query_' . $query_hash};
+			} else {
+				if ($wpdb -> get_var($existsquery)) {
+					$exists = true;
+				}
+				
+				${'newsletters_query_' . $query_hash} = $exists;
 			}
 		
 			if ($exists == false) {

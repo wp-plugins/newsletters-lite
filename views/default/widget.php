@@ -1,7 +1,13 @@
+<!-- Subscribe Form -->
+
+<?php do_action('newsletters_subscribe_before_form', $instance); ?>
+
 <form action="<?php echo $action; ?>" onsubmit="jQuery.Watermark.HideAll();" method="post" id="<?php echo $widget_id; ?>-form" class="newsletters-form">
 	<?php foreach ($instance as $ikey => $ival) : ?>
 		<input type="hidden" name="instance[<?php echo $ikey; ?>]" value="<?php echo esc_attr(stripslashes($ival)); ?>" />
 	<?php endforeach; ?>
+	
+	<?php do_action('newsletters_subscribe_inside_form_top', $instance); ?>
 
 	<div id="<?php echo $widget_id; ?>-fields">
 		<?php 
@@ -97,11 +103,18 @@
 	</div>
 </form>
 
+<?php do_action('newsletters_subscribe_after_form', $instance); ?>
+
 <?php $this -> render('error', array('errors' => $Subscriber -> errors)); ?>
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	<?php $ajax = __($instance['ajax']); ?>
+	<?php 
+	
+	$ajax = __($instance['ajax']); 
+	$scroll = __($instance['scroll']);
+	
+	?>
 	<?php if (!empty($ajax) && $ajax == "Y") : ?>
 		jQuery('#<?php echo $widget_id; ?>-form').submit(function() {
 			jQuery('#<?php echo $widget_id; ?>-loading').show();
@@ -115,7 +128,9 @@ jQuery(document).ready(function() {
 				cache: false,
 				success: function(response) {
 					jQuery('#<?php echo $widget_id; ?>-wrapper').html(response);
-					wpml_scroll(jQuery('#<?php echo $widget_id; ?>'));
+					<?php if (!empty($scroll)) : ?>
+						wpml_scroll(jQuery('#<?php echo $widget_id; ?>'));
+					<?php endif; ?>
 				}
 			});
 			

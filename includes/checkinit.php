@@ -140,8 +140,11 @@ if (!class_exists('wpMailCheckinit')) {
 				add_action('wp_ajax_wpmlqueuemail', array($this, 'ajax_queuemail'));
 				add_action('wp_ajax_wpmlsetvariables', array($this, 'ajax_setvariables'));
 				add_action('wp_ajax_wpmlgetposts', array($this, 'ajax_getposts'));
+				add_action('wp_ajax_newsletters_api_newkey', array($this, 'api_newkey'));
 			}		
 			
+			add_action('wp_ajax_newsletters_api', array($this, 'api_init'));
+			add_action('wp_ajax_nopriv_newsletters_api', array($this, 'api_init'));
 			add_action('wp_ajax_wpmlsubscribe', array($this, 'ajax_subscribe'));
 			add_action('wp_ajax_nopriv_wpmlsubscribe', array($this, 'ajax_subscribe'));
 			add_action('wp_ajax_managementactivate', array($this, 'ajax_managementactivate'));

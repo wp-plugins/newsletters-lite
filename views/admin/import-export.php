@@ -1,6 +1,8 @@
+<!-- Import/Export -->
+
 <?php $lists = $Mailinglist -> select(true); ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Import/Export Subscribers', $this -> plugin_name); ?></h2>
 	<h3><?php _e('Import', $this -> plugin_name); ?></h3>
     
@@ -208,6 +210,13 @@
 		
 		<table class="form-table">
 			<tbody>
+				<tr>
+					<th><label for="import_preventbu"><?php _e('Bounces/Unsubscribes', $this -> plugin_name); ?></label></th>
+					<td>
+						<label><input checked="checked" type="checkbox" name="import_preventbu" value="1" id="import_preventbu" /> <?php _e('Prevent previous bounces/unsubscribes from being imported again', $this -> plugin_name); ?></label>
+						<span class="howto"><?php _e('By ticking this, the system will check each subscriber and if they bounced/unsubscribed, they will not be imported.', $this -> plugin_name); ?></span>
+					</td>
+				</tr>
 				<tr>
 					<th><label for="import_progress_N"><?php _e('Show Progress', $this -> plugin_name); ?></label></th>
 					<td>
