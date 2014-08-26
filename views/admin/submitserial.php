@@ -11,7 +11,7 @@ var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
         <?php _e('Once in the downloads section, click the KEY icon to request a serial key.', $this -> plugin_name); ?>
         <a href="http://tribulant.com/downloads/" title="Tribulant Software Downloads" target="_blank"><?php _e('Downloads Section', $this -> plugin_name); ?></a></p>
     
-        <div style="color:red;">
+        <div class="newsletters_error">
             <?php $this -> render('error', array('errors' => $errors), true, 'admin'); ?>
         </div>
         

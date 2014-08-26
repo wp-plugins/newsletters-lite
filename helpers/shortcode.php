@@ -174,7 +174,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	}
 	
 	function shortcode_posts($atts = array(), $content = null, $tag = null) {
-		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate;
+		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_categories, $shortcode_category, $shortcode_categories_done, $shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate;
 		$return = "";
 		
 		if (!empty($wpml_eftype) && $wpml_eftype == "full" && $tag == "post_excerpt") {
@@ -182,9 +182,34 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		}
 		
 		switch ($tag) {
+			case 'category_heading'						:
+			case 'newsletters_category_heading'			:
+				$category_heading = "";
+				
+				if (!empty($shortcode_category)) {
+					if (empty($shortcode_categories_done) || (!empty($shortcode_categories_done) && !in_array($shortcode_category -> cat_ID, $shortcode_categories_done))) {
+						$category_heading = '<a href="' . get_category_link($shortcode_category -> cat_ID) . '">' . __($shortcode_category -> name) . '</a>';
+						$shortcode_categories_done[] = $shortcode_category -> cat_ID;
+					}					
+				}
+				
+				return $category_heading;
+				break;
 			case 'post_loop'				:
 			case 'newsletters_post_loop'	:			
-				if (!empty($shortcode_posts)) {
+				if (!empty($shortcode_categories)) {	
+					$shortcode_post_row = 1;			
+					foreach ($shortcode_categories as $category) {
+						$shortcode_category = $category['category'];
+						$shortcode_posts = $category['posts'];
+						
+						foreach ($shortcode_posts as $post) {
+							$shortcode_post = $post;
+							$return .= do_shortcode($content);
+							$shortcode_post_row++;
+						}
+					}
+				} elseif (!empty($shortcode_posts)) {
 					$shortcode_post_row = 1;				
 					foreach ($shortcode_posts as $post) {
 						$shortcode_post = $post;

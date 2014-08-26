@@ -3,7 +3,7 @@
 	
 	<?php if (!empty($subscribers)) : ?>
 		<p><?php echo sprintf(__('You are about to export <b>%d</b> subscribers from <b>%d</b> mailing lists with <b>%s</b> status.', $this -> plugin_name), count($subscribers), count($_POST['export_lists']), $_POST['export_status']); ?></p>
-		<p><span id="exportajaxcount"><strong><span id="exportajaxcountinside" style="color:green;">0</span></strong></span> <span id="exportajaxfailedcount">(<strong><span id="exportajaxfailedcountinside" style="color:red;">0</span></strong> failed)</span> <?php _e('out of', $this -> plugin_name); ?> <strong><?php echo count($subscribers); ?></strong> <?php _e('subscribers have been exported.', $this -> plugin_name); ?></p>
+		<p><span id="exportajaxcount"><strong><span id="exportajaxcountinside" style="color:green;">0</span></strong></span> <span id="exportajaxfailedcount">(<strong><span id="exportajaxfailedcountinside" class="newsletters_error">0</span></strong> failed)</span> <?php _e('out of', $this -> plugin_name); ?> <strong><?php echo count($subscribers); ?></strong> <?php _e('subscribers have been exported.', $this -> plugin_name); ?></p>
 		
 		<div id="exportprogressbar"></div>
 		

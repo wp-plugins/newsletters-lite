@@ -1,3 +1,5 @@
+<!-- Latest Posts Settings -->
+
 <table class="form-table">
 	<tbody>
     	<tr>
@@ -32,7 +34,7 @@
         		<?php
         		
         		global $wpdb;
-        		
+        		$countquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Latestpost -> table . "";
         		$query_hash = md5($countquery);
         		global ${'newsletters_query_' . $query_hash};
         		if (!empty(${'newsletters_query_' . $query_hash})) {
@@ -72,10 +74,11 @@
                 </td>
             </tr>
             <tr>
-            	<th><label for="latestposts_number"><?php _e('Number of Posts', $this -> plugin_name); ?></label></th>
+            	<th><label for="latestposts_number"><?php _e('Number of Posts', $this -> plugin_name); ?></label>
+            	<?php echo $Html -> help(__('Specify the number of posts to include. If you are using Post Categories and Group by Category is turned on below, the number of posts will be used per category, not in total.', $this -> plugin_name)); ?></th>
                 <td>
                 	<input type="text" class="widefat" style="width:65px;" name="latestposts_number" value="<?php echo esc_attr(stripslashes($this -> get_option('latestposts_number'))); ?>" id="latestposts_number" />
-                    <span class="howto"><?php _e('only new posts will be sent out and each post not more than once.', $this -> plugin_name); ?></span>
+                    <span class="howto"><?php _e('Only new posts will be sent out and each post not more than once.', $this -> plugin_name); ?></span>
                 </td>
             </tr>
             <?php if ($this -> language_do()) : ?>
@@ -152,6 +155,19 @@
 	                    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No categories are available', $this -> plugin_name); ?></p>
 	                    <?php endif; ?>
 	                </td>
+	            </tr>
+	            <?php
+	            
+	            $latestposts_groupbycategory = $this -> get_option('latestposts_groupbycategory');
+	            
+	            ?>
+	            <tr>
+	            	<th><label for="latestposts_groupbycategory_Y"><?php _e('Group by Category', $this -> plugin_name); ?></label></th>
+	            	<td>
+	            		<label><input <?php echo (!empty($latestposts_groupbycategory) && $latestposts_groupbycategory == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="latestposts_groupbycategory" value="Y" id="latestposts_groupbycategory_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+	            		<label><input <?php echo (empty($latestposts_groupbycategory) || (!empty($latestposts_groupbycategory) && $latestposts_groupbycategory == "N")) ? 'checked="checked"' : ''; ?> type="radio" name="latestposts_groupbycategory" value="N" id="latestposts_groupbycategory_N" /> <?php _e('No', $this -> plugin_name); ?></label>
+	            		<span class="howto"><?php _e('Group posts by category, each set with a category heading and link.', $this -> plugin_name); ?></span>
+	            	</td>
 	            </tr>
 	        </tbody>
 	    </table>

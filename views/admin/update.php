@@ -6,7 +6,7 @@
 	
 	?>
 	
-	<div class="update-nag">
+	<div class="update-nag newsletters-update-nag-wrapper">
 		<span class="newsletters-update-nag"></span> <?php echo sprintf(__('Newsletters plugin %s is available.', $this -> plugin_name), $update_info['version']); ?><br/>
 		<?php _e('You can update automatically or download to install manually.', $this -> plugin_name); ?>
 		<br/><br/>
@@ -15,10 +15,11 @@
 		<a style="color:black; text-decoration:none;" href="<?php echo admin_url('admin.php'); ?>?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
 		<?php if (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates)) : ?>
 			<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> settings_updates); ?>"><?php _e('Changelog', $this -> plugin_name); ?></a>
+			<a href="?newsletters_method=hideupdate&version=<?php echo $update_info['version']; ?>" class="newsletters-icon-delete"></a>
 		<?php endif; ?>
 	</div>
 <?php else : ?>
-	<div class="update-nag">
+	<div class="update-nag newsletters-update-nag-wrapper">
 		<span class="newsletters-update-nag"></span> <?php echo sprintf(__('Newsletters plugin %s is available.', $this -> plugin_name), $update_info['version']); ?><br/>
 		<?php _e('Unfortunately your download has expired, please renew to gain access.', $this -> plugin_name); ?>
 		<br/><br/>
@@ -26,6 +27,7 @@
 		<a style="color:black; text-decoration:none;" href="<?php echo admin_url('admin.php'); ?>?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
 		<?php if (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates)) : ?>
 			<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> settings_updates); ?>"><?php _e('Changelog', $this -> plugin_name); ?></a>
+			<a href="?newsletters_method=hideupdate&version=<?php echo $update_info['version']; ?>" class="newsletters-icon-delete"></a>
 		<?php endif; ?>
 	</div>
 <?php endif; ?>

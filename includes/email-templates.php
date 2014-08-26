@@ -25,6 +25,7 @@ $email_templates['latestposts'] = array(
 	'subject'					=>	false,
 	'message'					=>	'<div class="wpmlposts">
 	[newsletters_post_loop]
+		<h2>[newsletters_category_heading]</h2>
 		<div class="wpmlpost">
 			<h3><a href="[newsletters_post_link]" title="[newsletters_post_title]">[newsletters_post_title]</a></h3>
 			[newsletters_post_date_wrapper]<p><small>Posted on [newsletters_post_date format="F jS, Y"] by [newsletters_post_author]</small></p>[/newsletters_post_date_wrapper]
@@ -84,5 +85,7 @@ $email_templates['subscribe'] = array(
 	'subject'					=>	"New Subscription",
 	'message'					=>	"Good day Administrator,\r\n\r\nA user/visitor has just subscribed to: [wpmlmailinglist].\r\nThe email address of this subscriber is: [wpmlemail].\r\n\r\n[wpmlcustomfields]\r\n\r\nAll the best,\r\n[wpmlblogname]",
 );
+
+$email_templates = apply_filters('newsletters_email_templates', $email_templates);
 	
 ?>

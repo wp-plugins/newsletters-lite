@@ -1,19 +1,20 @@
 
-	<form action="?page=<?php echo $this -> sections -> history; ?>&amp;method=mass" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected history emails?', $this -> plugin_name); ?>')) { return false; }" method="post">
+	<form action="?page=<?php echo $this -> sections -> history; ?>&amp;method=mass" id="newsletters-history-form" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected history emails?', $this -> plugin_name); ?>')) { return false; }" method="post">
 		<div class="tablenav">
 			<div class="alignleft actions">
 				<?php if (apply_filters($this -> pre . '_admin_history_rsslink', true)) : ?>
 					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="newsletters-icon-rss button"> <?php _e('RSS', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<?php if (apply_filters($this -> pre . '_admin_history_exportlink', true)) : ?>
-                	<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=export" title="<?php _e('Export to CSV', $this -> plugin_name); ?>" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
+                	<a onclick="jQuery('#newsletters-history-action').val('export'); jQuery('#newsletters-history-form').removeAttr('onsubmit').submit(); return false;" href="" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<a href="<?php echo $this -> url; ?>&amp;method=clear" title="<?php _e('Clear all email history', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to clear the email history?', $this -> plugin_name); ?>')) { return false; }" class="button newsletters_delete_link"> <?php _e('Clear', $this -> plugin_name); ?></a>
 			</div>
 			<div class="alignleft actions">
-				<select name="action" class="widefat" style="width:auto;">
+				<select name="action" id="newsletters-history-action">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
+					<option value="export"><?php _e('Export', $this -> plugin_name); ?></option>
 				</select>
 				<input type="submit" name="execute" value="<?php _e('Apply', $this -> plugin_name); ?>" class="button-secondary" />
 			</div>

@@ -9,7 +9,7 @@
 	    <p><?php _e('This function will test your current email settings and provide an explanatory error message if email sending fails.', $this -> plugin_name); ?>
 	     <?php _e('Please type an email address below to send a test email to.', $this -> plugin_name); ?></p>
 	    
-	    <div style="color:red;"><?php $this -> render('error', array('errors' => $errors), true, 'admin'); ?></div>
+	    <div class="newsletters_error"><?php $this -> render('error', array('errors' => $errors), true, 'admin'); ?></div>
 	    
 	    <form id="testsettingsform" onsubmit="wpml_testsettings(this); return false;" action="<?php echo home_url(); ?>/?<?php echo $this -> pre; ?>method=testsettings" method="post">    
 	        <p>

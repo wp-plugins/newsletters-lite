@@ -49,6 +49,7 @@ if ($this -> language_do()) {
 				<div class="howto">
 					<strong><?php _e('Shortcode Information', $this -> plugin_name); ?></strong><br/>
 					<code>[newsletters_post_loop]...[/newsletters_post_loop]</code> <?php _e('The posts loop. Use the codes below inside.', $this -> plugin_name); ?><br/>
+					<code>[newsletters_category_heading]</code> <?php _e('Category heading and link if using group by category.', $this -> plugin_name); ?><br/>
 					<code>[newsletters_post_id]</code> <?php _e('The ID of the post.', $this -> plugin_name); ?><br/>
 					<code>[newsletters_post_author]</code> <?php _e('The display name of the author.', $this -> plugin_name); ?><br/>
 					<code>[newsletters_post_title]</code> <?php _e('The title of the post.', $this -> plugin_name); ?><br/>

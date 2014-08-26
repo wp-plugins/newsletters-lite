@@ -107,6 +107,20 @@
 			</div>
 		<?php endif; ?>
 		
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th><label for="Subscriber_mandatory_N"><?php _e('Mandatory?', $this -> plugin_name); ?></label>
+					<?php echo $Html -> help(__('A mandatory subscriber is a subscriber that must be subscribed and stay subscribed and cannot unsubscribe. This could be a client or a site administrator that must always be subscribed.', $this -> plugin_name)); ?></th>
+					<td>
+						<label><input <?php echo (!empty($Subscriber -> data -> mandatory) && $Subscriber -> data -> mandatory == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="Subscriber[mandatory]" value="Y" id="Subscriber_mandatory_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+						<label><input <?php echo (empty($Subscriber -> data -> mandatory) || (!empty($Subscriber -> data -> mandatory) && $Subscriber -> data -> mandatory == "N")) ? 'checked="checked"' : ''; ?> type="radio" name="Subscriber[mandatory]" value="N" id="Subscriber_mandatory_N" /> <?php _e('No', $this -> plugin_name); ?></label>
+						<span class="howto"><?php _e('A mandatory subscriber cannot unsubscribe', $this -> plugin_name); ?></span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
 		<p class="submit">
 			<?php echo $Form -> submit(__('Save Subscriber', $this -> plugin_name)); ?>
 		</p>

@@ -2230,6 +2230,7 @@ if (!class_exists('wpMailPlugin')) {
 					global $wpdb, $Html, $Auth, $Db, $Subscriber, $Mailinglist, $SubscribersList, $Queue;
 				
 					$data = (empty($_POST)) ? $_GET : $_POST;
+					$dorender = true;
 					$error = false;
 					$success = false;
 					$deleted = false;
@@ -2248,19 +2249,24 @@ if (!class_exists('wpMailPlugin')) {
 							$subscriber = $wpdb -> get_row($subscriber_query);
 									
 							if (!empty($subscriber)) {
-								/* Management Auth */
-								if (empty($data['cookieauth'])) {
-									$Auth -> set_emailcookie($subscriber -> email);
-									$subscriberauth = $Auth -> gen_subscriberauth();
-									$Db -> model = $Subscriber -> model;
-									$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
-									$Auth -> set_cookie($subscriberauth);
-								}
-							
-								$subscriber -> mailinglists = $mailinglists;
+								if (empty($subscriber -> mandatory) || $subscriber -> mandatory == "N") {
+									/* Management Auth */
+									if (empty($data['cookieauth'])) {
+										$Auth -> set_emailcookie($subscriber -> email);
+										$subscriberauth = $Auth -> gen_subscriberauth();
+										$Db -> model = $Subscriber -> model;
+										$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
+										$Auth -> set_cookie($subscriberauth);
+									}
 								
-								if (empty($subscriber -> mailinglists)) {
-									$errors[] = __('This email was not sent to any lists.', $this -> plugin_name);
+									$subscriber -> mailinglists = $mailinglists;
+									
+									if (empty($subscriber -> mailinglists)) {
+										$errors[] = __('This email was not sent to any lists.', $this -> plugin_name);
+									}
+								} else {
+									$dorender = false;
+									$errors[] = __('You are a mandatory subscriber and cannot unsubscribe', $this -> plugin_name);
 								}
 							} else {
 								$errors[] = __('Your subscriber record cannot be read, please try again.', $this -> plugin_name);
@@ -2353,7 +2359,7 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 				
-					$this -> render('unsubscribe' . $userfile, array('subscriber' => $subscriber, 'user' => $user, 'data' => $data, 'errors' => $errors, 'success' => $success, 'deleted' => $deleted), true, 'default');
+					$this -> render('unsubscribe' . $userfile, array('subscriber' => $subscriber, 'dorender' => $dorender, 'user' => $user, 'data' => $data, 'errors' => $errors, 'success' => $success, 'deleted' => $deleted), true, 'default');
 					break;
 				case 'logout'				:
 					global $wpmljavascript;
@@ -2673,6 +2679,10 @@ if (!class_exists('wpMailPlugin')) {
 					$newsletters_languageplugin = "qtranslate";
 					return true;
 				} elseif ($this -> is_plugin_active('wpml')) {
+					if (!empty($_GET['lang']) && $_GET['lang'] == "all") {
+						return false;
+					}
+				
 					$newsletters_languageplugin = "wpml";
 					return true;
 				}
@@ -2860,13 +2870,17 @@ if (!class_exists('wpMailPlugin')) {
 		
 			switch ($newsletters_languageplugin) {
 				case 'qtranslate'					:
-					$languages = qtrans_getSortedLanguages();
+					if (function_exists('qtrans_getSortedLanguages')) {
+						$languages = qtrans_getSortedLanguages();
+					}
 					break;
 				case 'wpml'							:
-					$icl_languages = icl_get_languages();
-					$languages = array();
-					foreach ($icl_languages as $lang => $icl_language) {
-						$languages[] = $lang;
+					if (function_exists('icl_get_languages')) {
+						$icl_languages = icl_get_languages();
+						$languages = array();
+						foreach ($icl_languages as $lang => $icl_language) {
+							$languages[] = $lang;
+						}
 					}
 					break;
 			}
@@ -5742,6 +5756,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['latestposts_number'] = 10;
 			$options['latestposts_language'] = "en";
 			$options['latestposts_categories'] = false;
+			$options['latestposts_groupbycategory'] = "Y";
 			$options['latestposts_exclude'] = "";
 			$options['latestposts_order'] = "DESC";
 			$options['latestposts_orderby'] = "post_date";

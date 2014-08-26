@@ -32,6 +32,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		'authkey'		=>	"VARCHAR(32) NOT NULL DEFAULT ''",
 		'authinprog'	=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
         'bouncecount'   =>  "INT(1) NOT NULL DEFAULT '0'",
+        'mandatory'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'key'			=>	"PRIMARY KEY (`id`)",
@@ -49,6 +50,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		'authkey'		=>	array("VARCHAR(32)", "NOT NULL DEFAULT ''"),
 		'authinprog'	=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
         'bouncecount'   =>  array("INT(1)", "NOT NULL DEFAULT '0'"),
+        'mandatory'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'			=>	"PRIMARY KEY (`id`)",					   
@@ -672,7 +674,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			elseif ($curr_id = $this -> email_exists($email)) { 
 				if ($email != $subscriber -> email) {
 					$id = $curr_id;
-					$Subscriber -> id = $curr_id;
+					$this -> id = $curr_id;
 					$this -> data[$this -> model] -> id = $curr_id;					
 					$this -> data[$this -> model] -> mailinglists = $this -> mailinglists($subscriber_id);
 					

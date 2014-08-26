@@ -273,6 +273,11 @@ if (!class_exists('wpMail')) {
 					$this -> render_error(stripslashes(urldecode($_GET[$this -> pre . 'message'])));
 				}
 				
+				if (!empty($_GET['newsletters_exportlink'])) {
+					$message = sprintf(__('Your export is ready. %s', $this -> plugin_name), '<a href="' . $Html -> retainquery('wpmlmethod=exportdownload&file=' . $_GET['newsletters_exportlink'], $this -> url) . '">' . __('Download', $this -> plugin_name) . '</a>');
+					$this -> render_message($message);
+				}
+				
 				if (current_user_can('edit_plugins')) {
 					$folder = $Html -> uploads_path();
 					if (file_exists($folder)) {
@@ -296,10 +301,13 @@ if (!class_exists('wpMail')) {
 					}
 				}
 				
-				if ($this -> has_update() && (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates))) {
-					$update = $this -> vendor('update');
-					$update_info = $update -> get_version_info(true);
-					$this -> render('update', array('update_info' => $update_info), true, 'admin');
+				if (current_user_can('edit_plugins') && $this -> has_update() && (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates))) {
+					$hideupdate = $this -> get_option('hideupdate');
+					if (empty($hideupdate) || (!empty($hideupdate) && version_compare($this -> version, $hideupdate, '>'))) {
+						$update = $this -> vendor('update');
+						$update_info = $update -> get_version_info(true);
+						$this -> render('update', array('update_info' => $update_info), true, 'admin');	
+					}
 				}
 				
 				flush();
@@ -341,43 +349,65 @@ if (!class_exists('wpMail')) {
 					}
 				}
 			}
+			
+			if (!empty($_GET['newsletters_method'])) {
+				switch ($_GET['newsletters_method']) {
+					case 'hideupdate'					:
+						if (!empty($_GET['version'])) {
+							$this -> update_option('hideupdate', $_GET['version']);
+							$this -> redirect($this -> referer);
+						}
+						break;
+				}
+			}
 		
 			if (!empty($method)) {
 				switch ($method) {
-					case 'exportdownload'					:					
-						if (!empty($_GET['file'])) {
-							$filename = urldecode($_GET['file']);
-							$filepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
-							$filefull = $filepath . $filename;
-						
-							if (file_exists($filefull)) {
-								if(ini_get('zlib.output_compression')) { 
-									ini_set('zlib.output_compression', 'Off'); 
-								}	
-								
-								$contenttype = (function_exists('mime_content_type')) ? mime_content_type($filefull) : "text/csv";								
-								header("Pragma: public");
-								header("Expires: 0");
-								header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-								header("Cache-Control: public", false);
-								header("Content-Description: File Transfer");
-								header("Content-Type: text/csv");
-								header("Accept-Ranges: bytes");
-								header("Content-Disposition: attachment; filename=\"" . $filename . "\";");
-								header("Content-Transfer-Encoding: binary");
-								header("Content-Length: " . filesize($filefull));
-								
-								if ($fh = fopen($filefull, 'rb')){
-									while (!feof($fh) && connection_status() == 0) {
-										@set_time_limit(0);
-										print(fread($fh, (1024 * 8)));
-										flush();
-									}
+					case 'exportdownload'					:		
+						if (current_user_can('newsletters_welcome')) {			
+							if (!empty($_GET['file'])) {
+								$filename = urldecode($_GET['file']);
+								$filepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
+								$filefull = $filepath . $filename;
+							
+								if (file_exists($filefull)) {
+									if(ini_get('zlib.output_compression')) { 
+										ini_set('zlib.output_compression', 'Off'); 
+									}	
 									
-									fclose($fh);
-									exit();
+									$contenttype = (function_exists('mime_content_type')) ? mime_content_type($filefull) : "text/csv";								
+									header("Pragma: public");
+									header("Expires: 0");
+									header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+									header("Cache-Control: public", false);
+									header("Content-Description: File Transfer");
+									header("Content-Type: text/csv");
+									header("Accept-Ranges: bytes");
+									header("Content-Disposition: attachment; filename=\"" . $filename . "\";");
+									header("Content-Transfer-Encoding: binary");
+									header("Content-Length: " . filesize($filefull));
+									
+									if ($fh = fopen($filefull, 'rb')){
+										while (!feof($fh) && connection_status() == 0) {
+											@set_time_limit(0);
+											print(fread($fh, (1024 * 8)));
+											flush();
+										}
+										
+										fclose($fh);
+									}
+								} else {
+									$error = __('Export file could not be created', $this -> plugin_name);
 								}
+							} else {
+								$error = __('No export file was specified', $this -> plugin_name);
 							}
+						} else {
+							$error = __('You do not have permission to access exports', $this -> plugin_name);
+						}
+						
+						if (!empty($error)) {
+							wp_die($error);
 						}
 						break;
 					case 'ajaxupload'						:					
@@ -1125,9 +1155,42 @@ if (!class_exists('wpMail')) {
 			header("HTTP/1.1 200 OK");
 			global $wpdb, $post, $user_ID, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			
-			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {					
-				if ($posts = get_posts($post_criteria)) {					
-					if (!empty($posts)) {
+			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {
+				$latestposts_groupbycategory = $this -> get_option('latestposts_groupbycategory');
+				
+				if (!empty($latestposts_groupbycategory) && $latestposts_groupbycategory == "Y") {
+					$categories_args = array(
+						'type'						=>	'post',
+						'child_of'					=>	false,
+						'parent'					=>	false,
+						'orderby'					=>	"name",
+						'order'						=>	"asc",
+						'hide_empty'				=>	true,
+						'hierarchical'				=>	true,
+						'exclude'					=>	false,
+						'include'					=>	$post_criteria['category'],
+						
+					);
+					
+					$categories_args = apply_filters('newsletters_latest_posts_categories_args', $categories_args);
+					
+					if ($categories = get_categories($categories_args)) {
+						global $shortcode_categories;
+						$c = 0;
+					
+						foreach ($categories as $category) {
+							$shortcode_categories[$c]['category'] = $category;
+							$post_criteria['category'] = $category -> cat_ID;
+							$posts = get_posts($post_criteria);							
+							$shortcode_categories[$c]['posts'] = $posts;
+							
+							$c++;
+						}
+					}
+				}
+					
+				if (!empty($shortcode_categories) || $posts = get_posts($post_criteria)) {					
+					if (!empty($posts) || !empty($shortcode_categories)) {
 						/* multilingual */
 						if ($this -> language_do()) {
 							$latestposts_language = $this -> get_option('latestposts_language');
@@ -1583,6 +1646,17 @@ if (!class_exists('wpMail')) {
 		
 		function screen_settings($current, $screen) {					
 			if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> subscribers) {
+			
+				if (!empty($_POST['screenoptions'])) {
+					if (!empty($_POST['fields']) && is_array($_POST['fields'])) {
+						$this -> update_option('screenoptions_subscribers_fields', $_POST['fields']);	
+					} else { delete_option($this -> pre . 'screenoptions_subscribers_fields'); }
+					
+					if (!empty($_POST['custom']) && is_array($_POST['custom'])) {
+						$this -> update_option('screenoptions_subscribers_custom', $_POST['custom']);
+					} else { delete_option($this -> pre . 'screenoptions_subscribers_custom'); }
+				}
+			
 				global $Db, $Field;
 				$Db -> model = $Field -> model;
 				$conditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
@@ -1607,12 +1681,12 @@ if (!class_exists('wpMail')) {
 		
 		function init_textdomain() {
 			$locale = get_locale();
+			
 			if (!empty($locale)) { 
 				if ($locale == "ja" || $locale == "ja_JP") { setlocale(LC_ALL, "ja_JP.UTF8"); }
 			} else { setlocale(LC_ALL, $locale); }
 				
-			if (function_exists('load_plugin_textdomain')) {
-			
+			if (function_exists('load_plugin_textdomain')) {			
 				$mofile = $this -> plugin_name . '-' . $locale . '.mo';
 				$mofullfull = WP_PLUGIN_DIR . DS . 'wp-mailinglist-languages' . DS . $mofile;
 				$mofull = 'wp-mailinglist-languages' . DS;
@@ -1621,7 +1695,8 @@ if (!class_exists('wpMail')) {
 				if (!empty($language_external) && file_exists($mofullfull)) {
 					load_plugin_textdomain($this -> plugin_name, false, $mofull);
 				} else {
-					load_plugin_textdomain($this -> plugin_name, false, dirname(plugin_basename(__FILE__)) . DS . 'languages' . DS);
+					$mofull = dirname(plugin_basename(__FILE__)) . DS . 'languages' . DS;
+					load_plugin_textdomain($this -> plugin_name, false, $mofull);
 				}
 			}	
 		}
@@ -3600,6 +3675,17 @@ if (!class_exists('wpMail')) {
 									$msg_type = 'message';
 									$message = __('Selected subscribers have been removed', $this -> plugin_name);
 									break;
+								case 'mandatory'		:
+								case 'notmandatory'		:
+									$mandatory = ($_POST['action'] == "mandatory") ? "Y" : "N";
+									foreach ($subscribers as $subscriber_id) {
+										$Db -> model = $Subscriber -> model;
+										$Db -> save_field('mandatory', $mandatory, array('id' => $subscriber_id));
+									}
+									
+									$msg_type = 'message';
+									$message = __('Mandatory status has been changed', $this -> plugin_name);
+									break;
 								case 'active'			:
 									if (!empty($subscribers)) {
 										foreach ($subscribers as $subscriber_id) {
@@ -4016,7 +4102,7 @@ if (!class_exists('wpMail')) {
 						if (empty($_POST['export_filetype'])) { $errors[] = __('Please select an export filetype', $this -> plugin_name); }
 						
 						$exportfilename = 'subscribers-' . date_i18n("Ymd", time()) . '.csv';
-						$exportfilepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
+						$exportfilepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
 						$exportfilefull = $exportfilepath . $exportfilename;
 						if (!$fh = fopen($exportfilefull, "w")) { $errors[] = sprintf(__('Export file could not be created, please check permissions on <b>%s</b> to make sure it is writable.', $this -> plugin_name), $Html -> uploads_path() . "/wp-mailinglist/export/"); }
 						else { fclose($fh); }
@@ -4622,6 +4708,116 @@ if (!class_exists('wpMail')) {
 									$msg_type = 'message';
 									$message = count($histories) . ' ' . __('history record(s) have been removed', $this -> plugin_name);
 									break;
+								case 'export'				:
+									global $Db, $Html, $Email, $History, $Mailinglist, $Theme;
+									$Db -> model = $History -> model;
+									
+									if ($emails = $Db -> find_all(false, false, array('modified', "DESC"))) {
+										$data = "";
+										$data .= '"' . __('Id', $this -> plugin_name) . '",';
+										$data .= '"' . __('Subject', $this -> plugin_name) . '",';
+										$data .= '"' . __('Lists', $this -> plugin_name) . '",';
+										$data .= '"' . __('Theme', $this -> plugin_name) . '",';
+										$data .= '"' . __('Author', $this -> plugin_name) . '",';
+										$data .= '"' . __('Read %', $this -> plugin_name) . '",';
+										$data .= '"' . __('Emails Sent', $this -> plugin_name) . '",';
+										$data .= '"' . __('Emails Read', $this -> plugin_name) . '",';
+										$data .= '"' . __('Created', $this -> plugin_name) . '",';
+										$data .= '"' . __('Modified', $this -> plugin_name) . '",';
+										$data .= "\r\n";
+										
+										foreach ($emails as $email) {
+											$this -> remove_server_limits();			//remove the server resource limits
+											
+											$data .= '"' . $email -> id . '",';
+											$data .= '"' . $email -> subject . '",';						
+											
+											/* Mailing lists */
+											if (!empty($email -> mailinglists)) {
+												$data .= '"';
+												$m = 1;
+												
+												foreach ($email -> mailinglists as $mailinglist_id) {
+													$mailinglist = $Mailinglist -> get($mailinglist_id);	
+													$data .= __($mailinglist -> title);
+													
+													if ($m < count($email -> mailinglists)) {
+														$data .= ', ';
+													}
+													
+													$m++;
+												}
+												
+												$data .= '",';
+											} else { 
+												$data .= '"",';
+											}
+											
+											/* Theme */
+											if (!empty($email -> theme_id)) {
+												$Db -> model = $Theme -> model;
+												
+												if ($theme = $Db -> find(array('id' => $email -> theme_id))) {
+													$data .= '"' . $theme -> title . '",';
+												} else {
+													$data .= '"",';	
+												}
+											} else {
+												$data .= '"",';	
+											}
+											
+											/* Author */
+											if (!empty($email -> user_id)) {
+												if ($user = get_userdata($email -> user_id)) {
+													$data .= '"' . $user -> display_name . '",';
+												} else {
+													$data .= '"",';	
+												}
+											} else {
+												$data .= '"",';	
+											}
+											
+											/* read % */
+											$Db -> model = $Email -> model;
+											$etotal = $Db -> count(array('history_id' => $email -> id));
+											$eread = $Db -> count(array('history_id' => $email -> id, 'read' => "Y"));
+											$eperc = (!empty($etotal)) ? (($eread / $etotal) * 100) : 0;
+											$data .= '"' . number_format($eperc, 2, '.', '') . '% ' . __('read', $this -> plugin_name) . '",';
+											
+											$data .= '"' . $etotal . '",'; 					// emails sent
+											$data .= '"' . $eread . '",';					// emails read
+											$data .= '"' . $email -> created . '",';		// created date
+											$data .= '"' . $email -> modified . '",';		// modified date
+											
+											$data .= "\r\n";
+										}
+										
+										if (!empty($data)) {
+											$filename = "history-" . date_i18n("Ymd", time()) . ".csv";
+											$filepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
+											$filefull = $filepath . $filename;
+											
+											if ($fh = fopen($filefull, "w")) {
+												fwrite($fh, $data);
+												fclose($fh);
+												
+												//$fileabs = $Html -> uploads_url() . '/' . $filename;	
+												//$message = __('CSV has been exported with filename "' . $filename . '".', $this -> plugin_name) . ' <a href="' . $fileabs . '" title="' . __('Download the CSV', $this -> plugin_name) . '">' . __('Download the CSV', $this -> plugin_name) . '</a>';
+												//$message = __('Sent and draft emails have been exported and your download will begin shortly', $this -> plugin_name); 
+												$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> history . '&newsletters_exportlink=' . $filename));
+											} else {
+												$message = sprintf(__('CSV file could not be created, please check write permissions on "%s" folder.', $this -> plugin_name), $filepath);
+												$this -> redirect($this -> url, "error", $message);	
+											}
+										} else {
+											$message = __('CSV data could not be formulated, no emails maybe? Please try again', $this -> plugin_name);
+											$this -> redirect($this -> url, "error", $message);
+										}
+									} else {
+										$message = __('No history/draft emails are available to export!', $this -> plugin_name);
+										$this -> redirect($this -> url, "error", $message);
+									}
+									break;
 							}
 						} else {
 							$msg_type = 'error';
@@ -4715,8 +4911,8 @@ if (!class_exists('wpMail')) {
 							}
 							
 							if (!empty($data)) {
-								$exportfile = 'history' . $_GET['history_id'] . '_emails.csv';
-								$exportpath = $Html -> uploads_path() . '/';
+								$exportfile = 'history' . $_GET['history_id'] . '-emails-' . date_i18n("Ymd", time()) . '.csv';
+								$exportpath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
 								$exportfull = $exportpath . $exportfile;
 								
 								if ($fh = fopen($exportfull, "w")) {
@@ -4726,7 +4922,8 @@ if (!class_exists('wpMail')) {
 									
 									$exportfileabs = $Html -> uploads_url() . '/' . $exportfile;	
 									$msg_type = 'message';
-									$message = __('CSV has been exported with filename "' . $exportfile . '".', $this -> plugin_name) . ' <a href="' . $exportfileabs . '" title="' . __('Download the CSV', $this -> plugin_name) . '">' . __('Download the CSV', $this -> plugin_name) . '</a>';
+									//$message = __('CSV has been exported with filename "' . $exportfile . '".', $this -> plugin_name) . ' <a href="' . $exportfileabs . '" title="' . __('Download the CSV', $this -> plugin_name) . '">' . __('Download the CSV', $this -> plugin_name) . '</a>';
+									$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $_GET['history_id'] . '&newsletters_exportlink=' . $exportfile));
 								} else {
 									$msg_type = 'error';
 									$message = sprintf(__('CSV file could not be created, please check write permissions on "%s" folder.', $this -> plugin_name), $exportpath);	
@@ -4745,115 +4942,6 @@ if (!class_exists('wpMail')) {
 					}
 					
 					$this -> redirect("?page=" . $this -> sections -> history . "&method=view&id=" . $_GET['history_id'], $msg_type, $message);
-					break;
-				case 'export'			:
-					global $Db, $Html, $Email, $History, $Mailinglist, $Theme;
-					$Db -> model = $History -> model;
-					
-					if ($emails = $Db -> find_all(false, false, array('modified', "DESC"))) {
-						$data = "";
-						$data .= '"' . __('Id', $this -> plugin_name) . '",';
-						$data .= '"' . __('Subject', $this -> plugin_name) . '",';
-						$data .= '"' . __('Lists', $this -> plugin_name) . '",';
-						$data .= '"' . __('Theme', $this -> plugin_name) . '",';
-						$data .= '"' . __('Author', $this -> plugin_name) . '",';
-						$data .= '"' . __('Read %', $this -> plugin_name) . '",';
-						$data .= '"' . __('Emails Sent', $this -> plugin_name) . '",';
-						$data .= '"' . __('Emails Read', $this -> plugin_name) . '",';
-						$data .= '"' . __('Created', $this -> plugin_name) . '",';
-						$data .= '"' . __('Modified', $this -> plugin_name) . '",';
-						$data .= "\r\n";
-						
-						foreach ($emails as $email) {
-							$this -> remove_server_limits();			//remove the server resource limits
-							
-							$data .= '"' . $email -> id . '",';
-							$data .= '"' . $email -> subject . '",';						
-							
-							/* Mailing lists */
-							if (!empty($email -> mailinglists)) {
-								$data .= '"';
-								$m = 1;
-								
-								foreach ($email -> mailinglists as $mailinglist_id) {
-									$mailinglist = $Mailinglist -> get($mailinglist_id);	
-									$data .= __($mailinglist -> title);
-									
-									if ($m < count($email -> mailinglists)) {
-										$data .= ', ';
-									}
-									
-									$m++;
-								}
-								
-								$data .= '",';
-							} else { 
-								$data .= '"",';
-							}
-							
-							/* Theme */
-							if (!empty($email -> theme_id)) {
-								$Db -> model = $Theme -> model;
-								
-								if ($theme = $Db -> find(array('id' => $email -> theme_id))) {
-									$data .= '"' . $theme -> title . '",';
-								} else {
-									$data .= '"",';	
-								}
-							} else {
-								$data .= '"",';	
-							}
-							
-							/* Author */
-							if (!empty($email -> user_id)) {
-								if ($user = get_userdata($email -> user_id)) {
-									$data .= '"' . $user -> display_name . '",';
-								} else {
-									$data .= '"",';	
-								}
-							} else {
-								$data .= '"",';	
-							}
-							
-							/* read % */
-							$Db -> model = $Email -> model;
-							$etotal = $Db -> count(array('history_id' => $email -> id));
-							$eread = $Db -> count(array('history_id' => $email -> id, 'read' => "Y"));
-							$eperc = (($eread/$etotal) * 100);
-							$data .= '"' . number_format($eperc, 2, '.', '') . '% ' . __('read', $this -> plugin_name) . '",';
-							
-							$data .= '"' . $etotal . '",'; 					// emails sent
-							$data .= '"' . $eread . '",';					// emails read
-							$data .= '"' . $email -> created . '",';		// created date
-							$data .= '"' . $email -> modified . '",';		// modified date
-							
-							$data .= "\r\n";
-						}
-						
-						if (!empty($data)) {
-							$filename = "emails-history.csv";
-							$filepath = $Html -> uploads_path() . '/';
-							$filefull = $filepath . $filename;
-							
-							if ($fh = fopen($filefull, "w")) {
-								fwrite($fh, $data);
-								fclose($fh);
-								
-								$fileabs = $Html -> uploads_url() . '/' . $filename;	
-								$message = __('CSV has been exported with filename "' . $filename . '".', $this -> plugin_name) . ' <a href="' . $fileabs . '" title="' . __('Download the CSV', $this -> plugin_name) . '">' . __('Download the CSV', $this -> plugin_name) . '</a>';
-								$this -> redirect($this -> url, "message", $message);
-							} else {
-								$message = sprintf(__('CSV file could not be created, please check write permissions on "%s" folder.', $this -> plugin_name), $filepath);
-								$this -> redirect($this -> url, "error", $message);	
-							}
-						} else {
-							$message = __('CSV data could not be formulated, no emails maybe? Please try again', $this -> plugin_name);
-							$this -> redirect($this -> url, "error", $message);
-						}
-					} else {
-						$message = __('No history/draft emails are available to export!', $this -> plugin_name);
-						$this -> redirect($this -> url, "error", $message);
-					}
 					break;
 				default					:
 					$perpage = (isset($_COOKIE[$this -> pre . 'historiesperpage'])) ? $_COOKIE[$this -> pre . 'historiesperpage'] : 15;
@@ -5662,7 +5750,7 @@ if (!class_exists('wpMail')) {
 		
 		function activation_hook() {
 			$this -> add_option('activation_redirect', true);
-			//wp_redirect(admin_url('index.php') . "?page=newsletters-about");
+			wp_redirect(admin_url('index.php') . "?page=newsletters-about");
 		}
 		
 		function custom_redirect() {

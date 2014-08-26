@@ -9,6 +9,10 @@
 				<select class="widefat" style="width:auto;" name="action" onchange="action_change(this.value);">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
+					<optgroup label="<?php _e('Mandatory Status', $this -> plugin_name); ?>">
+						<option value="mandatory"><?php _e('Set as Mandatory', $this -> plugin_name); ?></option>
+						<option value="notmandatory"><?php _e('Set as not Mandatory', $this -> plugin_name);?></option>
+					</optgroup>
 					<optgroup label="<?php _e('Status', $this -> plugin_name); ?>">
 						<option value="active"><?php _e('Activate', $this -> plugin_name); ?></option>
 						<option value="inactive"><?php _e('Deactivate', $this -> plugin_name); ?></option>
@@ -89,6 +93,15 @@
 						</th>
 						<?php $colspan++; ?>
 					<?php endif; ?>
+					<?php if (!empty($screen_custom) && in_array('mandatory', $screen_custom)) : ?>
+						<th class="column-mandatory <?php echo ($orderby == "mandatory") ? 'sorted ' . $order : 'sortable desc'; ?>">
+							<a href="<?php echo $Html -> retainquery('orderby=mandatory&order=' . (($orderby == "mandatory") ? $otherorder : "asc")); ?>">
+								<span><?php _e('Mandatory', $this -> plugin_name); ?></span>
+								<span class="sorting-indicator"></span>
+							</a>
+						</th>
+						<?php $colspan++; ?>
+					<?php endif; ?>
 					<th class="column-mailinglists" style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
 					<?php $colspan++; ?>
                     <th class="column-bouncecount <?php echo ($orderby == "bouncecount") ? 'sorted ' . $order : 'sortable desc'; ?>">
@@ -144,6 +157,14 @@
 							</a>
 						</th>
 					<?php endif; ?>
+					<?php if (!empty($screen_custom) && in_array('mandatory', $screen_custom)) : ?>
+						<th class="column-mandatory <?php echo ($orderby == "mandatory") ? 'sorted ' . $order : 'sortable desc'; ?>">
+							<a href="<?php echo $Html -> retainquery('orderby=mandatory&order=' . (($orderby == "mandatory") ? $otherorder : "asc")); ?>">
+								<span><?php _e('Mandatory', $this -> plugin_name); ?></span>
+								<span class="sorting-indicator"></span>
+							</a>
+						</th>
+					<?php endif; ?>
 					<th class="column-mailinglists" style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
                     <th class="column-bouncecount <?php echo ($orderby == "bouncecount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=bouncecount&order=' . (($orderby == "bouncecount") ? $otherorder : "asc")); ?>">
@@ -186,13 +207,24 @@
 								</div>
 							</td>
 							<?php if (apply_filters($this -> pre . '_admin_subscribers_registeredcolumn', true)) : ?>
-								<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> registered) || $subscriber -> registered == "N") ? '<span style="color:red;">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
+								<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> registered) || $subscriber -> registered == "N") ? '<span class="newsletters_error">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
+							<?php endif; ?>
+							<?php if (!empty($screen_custom) && in_array('mandatory', $screen_custom)) : ?>
+								<td>
+									<label for="checklist<?php echo $subscriber -> id; ?>">
+										<?php if (!empty($subscriber -> mandatory) && $subscriber -> mandatory == "Y") : ?>
+											<span class="newsletters_error"><?php _e('Yes', $this -> plugin_name); ?></span>
+										<?php else : ?>
+											<span class="newsletters_success"><?php _e('No', $this -> plugin_name); ?></span>
+										<?php endif; ?>
+									</label>
+								</td>
 							<?php endif; ?>
 							<td>
 								<?php if (!empty($subscriber -> Mailinglist)) : ?>
 									<?php $m = 1; ?>
 									<?php foreach ($subscriber -> Mailinglist as $list) : ?>
-										<?php echo $Html -> link(__($list -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span style="color:red;">' . __('inactive', $this -> plugin_name); ?></span>)
+										<?php echo $Html -> link(__($list -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span class="newsletters_error">' . __('inactive', $this -> plugin_name); ?></span>)
 										<?php if ($m < count($subscriber -> Mailinglist)) : ?>
 											<?php echo ', '; ?>
 										<?php endif; ?>
