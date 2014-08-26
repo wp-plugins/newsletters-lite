@@ -1,4 +1,4 @@
-<?php if (!empty($autoresponders)) : ?>
+
 	<form action="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=mass" onsubmit="if (!confirm('<?php _e('Are you sure you want to execute this action on the selected autoresponders?', $this -> plugin_name); ?>')) { return false; }" method="post">
     	<div class="tablenav">
         	<div class="alignleft actions">
@@ -21,6 +21,8 @@
         $orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		
+		$colspan = 9;
         
         ?>
     
@@ -122,65 +124,71 @@
                 </tr>
             </tfoot>
         	<tbody>
-            	<?php foreach ($autoresponders as $autoresponder) : ?>
-					<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-                    	<th class="check-column"><input type="checkbox" name="autoresponderslist[]" value="<?php echo $autoresponder -> id; ?>" id="checklist<?php echo $autoresponder -> id; ?>" /></th>
-                        <td><label for="checklist<?php echo $autoresponder -> id; ?>"><?php echo $autoresponder -> id; ?></label></td>
-                        <td>
-                        	<strong><a class="row-title" href="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save&amp;id=<?php echo $autoresponder -> id; ?>" title="<?php echo $autoresponder -> title; ?>"><?php echo $autoresponder -> title; ?></a></strong>
-                            <?php if (!empty($autoresponder -> pending)) : ?><small>(<?php echo $Html -> link($autoresponder -> pending, '?page=' . $this -> sections -> autoresponderemails . '&amp;id=' . $autoresponder -> id . '&amp;status=unsent'); ?> <?php _e('pending emails', $this -> plugin_name); ?>)</small><?php endif; ?>
-                            <div class="row-actions">
-                            	<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> autoresponders . '&amp;method=save&amp;id=' . $autoresponder -> id); ?> |</span>
-                                <span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> autoresponders . '&amp;method=delete&amp;id=' . $autoresponder -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this autoresponder?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
-                                <span class="view"><?php echo $Html -> link(__('Emails', $this -> plugin_name), '?page=' . $this -> sections -> autoresponderemails . '&amp;status=all&amp;id=' . $autoresponder -> id); ?></span>
-                            </div>
-                        </td>
-                        <td>
-                        	<?php if (!empty($autoresponder -> mailinglists)) : ?>
-                            	<?php $m = 1; ?>
-                            	<?php foreach ($autoresponder -> mailinglists as $mailinglist) : ?>
-                                	<?php echo $Html -> link($mailinglist -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?>
-                                    <?php if ($m < count($autoresponder -> mailinglists)) : ?>
-										<?php echo ', '; ?>
-                                    <?php endif; ?>
-                                    <?php $m++; ?>
-                                <?php endforeach; ?>
-                            <?php else : ?>
-                            
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                        	<?php $Db -> model = $History -> model; ?>
-                        	<?php if ($history = $Db -> find(array('id' => $autoresponder -> history_id))) : ?>
-                            	<?php echo $Html -> link(__($history -> subject), '?page=' . $this -> sections -> history . '&amp;method=view&amp;id=' . $history -> id); ?>
-							<?php else : ?>
-                            	<?php _e('None', $this -> plugin_name); ?>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                        	<?php if (!empty($autoresponder -> alwayssend) && $autoresponder -> alwayssend == "Y") : ?>
-                        		<span class="newsletters_success"><?php _e('Yes', $this -> plugin_name); ?></span>
-                        	<?php else : ?>
-                        		<span class="newsletters_error"><?php _e('No', $this -> plugin_name); ?></span>
-                        	<?php endif; ?>
-                        </td>
-                        <td>
-                        	<?php if (empty($autoresponder -> delay)) : ?>
-                            	<?php _e('Immediately', $this -> plugin_name); ?>
-                            <?php else : ?>
-                            	<?php echo $autoresponder -> delay; ?> <?php echo $autoresponder -> delayinterval; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                        	<?php if (!empty($autoresponder -> status) && $autoresponder -> status == "inactive") : ?>
-                            	<span class="<?php echo $this -> pre; ?>error"><?php _e('Inactive', $this -> plugin_name); ?></span>
-                            <?php else : ?>
-                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Active', $this -> plugin_name); ?></span>
-                            <?php endif; ?>
-                        </td>
-                        <td><abbr title="<?php echo $autoresponder -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($autoresponder -> modified)); ?></abbr></td>
-                    </tr>
-                <?php endforeach; ?>
+        		<?php if (empty($autoresponders)) : ?>
+        			<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No autoresponders found', $this -> plugin_name); ?></td>
+					</tr>
+        		<?php else : ?>
+	            	<?php foreach ($autoresponders as $autoresponder) : ?>
+						<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+	                    	<th class="check-column"><input type="checkbox" name="autoresponderslist[]" value="<?php echo $autoresponder -> id; ?>" id="checklist<?php echo $autoresponder -> id; ?>" /></th>
+	                        <td><label for="checklist<?php echo $autoresponder -> id; ?>"><?php echo $autoresponder -> id; ?></label></td>
+	                        <td>
+	                        	<strong><a class="row-title" href="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save&amp;id=<?php echo $autoresponder -> id; ?>" title="<?php echo $autoresponder -> title; ?>"><?php echo $autoresponder -> title; ?></a></strong>
+	                            <?php if (!empty($autoresponder -> pending)) : ?><small>(<?php echo $Html -> link($autoresponder -> pending, '?page=' . $this -> sections -> autoresponderemails . '&amp;id=' . $autoresponder -> id . '&amp;status=unsent'); ?> <?php _e('pending emails', $this -> plugin_name); ?>)</small><?php endif; ?>
+	                            <div class="row-actions">
+	                            	<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> autoresponders . '&amp;method=save&amp;id=' . $autoresponder -> id); ?> |</span>
+	                                <span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> autoresponders . '&amp;method=delete&amp;id=' . $autoresponder -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this autoresponder?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
+	                                <span class="view"><?php echo $Html -> link(__('Emails', $this -> plugin_name), '?page=' . $this -> sections -> autoresponderemails . '&amp;status=all&amp;id=' . $autoresponder -> id); ?></span>
+	                            </div>
+	                        </td>
+	                        <td>
+	                        	<?php if (!empty($autoresponder -> mailinglists)) : ?>
+	                            	<?php $m = 1; ?>
+	                            	<?php foreach ($autoresponder -> mailinglists as $mailinglist) : ?>
+	                                	<?php echo $Html -> link($mailinglist -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?>
+	                                    <?php if ($m < count($autoresponder -> mailinglists)) : ?>
+											<?php echo ', '; ?>
+	                                    <?php endif; ?>
+	                                    <?php $m++; ?>
+	                                <?php endforeach; ?>
+	                            <?php else : ?>
+	                            
+	                            <?php endif; ?>
+	                        </td>
+	                        <td>
+	                        	<?php $Db -> model = $History -> model; ?>
+	                        	<?php if ($history = $Db -> find(array('id' => $autoresponder -> history_id))) : ?>
+	                            	<?php echo $Html -> link(__($history -> subject), '?page=' . $this -> sections -> history . '&amp;method=view&amp;id=' . $history -> id); ?>
+								<?php else : ?>
+	                            	<?php _e('None', $this -> plugin_name); ?>
+	                            <?php endif; ?>
+	                        </td>
+	                        <td>
+	                        	<?php if (!empty($autoresponder -> alwayssend) && $autoresponder -> alwayssend == "Y") : ?>
+	                        		<span class="newsletters_success"><?php _e('Yes', $this -> plugin_name); ?></span>
+	                        	<?php else : ?>
+	                        		<span class="newsletters_error"><?php _e('No', $this -> plugin_name); ?></span>
+	                        	<?php endif; ?>
+	                        </td>
+	                        <td>
+	                        	<?php if (empty($autoresponder -> delay)) : ?>
+	                            	<?php _e('Immediately', $this -> plugin_name); ?>
+	                            <?php else : ?>
+	                            	<?php echo $autoresponder -> delay; ?> <?php echo $autoresponder -> delayinterval; ?>
+	                            <?php endif; ?>
+	                        </td>
+	                        <td>
+	                        	<?php if (!empty($autoresponder -> status) && $autoresponder -> status == "inactive") : ?>
+	                            	<span class="<?php echo $this -> pre; ?>error"><?php _e('Inactive', $this -> plugin_name); ?></span>
+	                            <?php else : ?>
+	                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Active', $this -> plugin_name); ?></span>
+	                            <?php endif; ?>
+	                        </td>
+	                        <td><abbr title="<?php echo $autoresponder -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($autoresponder -> modified)); ?></abbr></td>
+	                    </tr>
+	                <?php endforeach; ?>
+	            <?php endif; ?>
             </tbody>
         </table>
         
@@ -215,6 +223,3 @@
         	<?php $this -> render('pagination', array('paginate' => $paginate), true, 'admin'); ?>
         </div>
     </form>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No autoresponders found, please add one.', $this -> plugin_name); ?></p>
-<?php endif; ?>

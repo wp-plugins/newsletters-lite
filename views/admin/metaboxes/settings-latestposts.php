@@ -32,13 +32,16 @@
         		<?php
         		
         		global $wpdb;
+        		$objectcache = $this -> get_option('objectcache');
         		$countquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Latestpost -> table . "";
         		$query_hash = md5($countquery);
-        		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+        		if (!empty($objectcache) && $oc_count = wp_cache_get($query_hash, 'newsletters')) {
 	        		$count = $oc_count;
         		} else {
 	        		$count = $wpdb -> get_var($countquery);
-	        		wp_cache_set($query_hash, $count, 'newsletters', 0);
+	        		if (!empty($objectcache)) {
+	        			wp_cache_set($query_hash, $count, 'newsletters', 0);
+	        		}
         		}
         		
         		?>

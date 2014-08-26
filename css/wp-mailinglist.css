@@ -34,11 +34,20 @@
 	display: none;
 }
 
+.newsletters #tableofcontentsdiv .savebutton {
+	display: none;
+	text-align: center;
+}
+
 .newsletters #tableofcontentsdiv.fixed {
 	position : fixed;
 	right    : 0;
 	bottom   : 55%;
 	z-index  : 2;
+}
+
+.newsletters #tableofcontentsdiv.fixed .savebutton {
+	display: block;
 }
 
 /* BEG Dashboard Widget */
@@ -232,6 +241,11 @@ table tbody tr.arow {
 	vertical-align: middle;
 }
 
+.newsletters .tablenav-pages .paging-input {
+	margin: 0 4px;
+}
+
+/*
 .wpml .tablenav-pages .page-numbers {
 	margin: 0 2px 0 0;
 }
@@ -241,6 +255,7 @@ table tbody tr.arow {
 	font-size: 16px;
 	font-weight: 400;
 }
+*/
 
 .wpml table.form-table th {
 	/*white-space: nowrap;*/
@@ -616,14 +631,14 @@ ul#wpmlsubmenu a.current {
 
 /* TABLES */
 
-.sorting-indicator{ display:block; visibility:hidden; width:7px;height:4px;margin-top:8px;margin-left:7px;background-image:url(../images/sort.gif);background-repeat:no-repeat}
+/*.sorting-indicator{ display:block; visibility:hidden; width:7px;height:4px;margin-top:8px;margin-left:7px;background-image:url(../images/sort.gif);background-repeat:no-repeat}
 .fixed .column-comments .sorting-indicator{margin-top:3px}
 .widefat th.sortable,.widefat th.sorted{padding:0}
 th.sortable a,th.sorted a{ display:block; visibility:visible; overflow:hidden; padding:7px 7px 8px; }
 .fixed .column-comments.sortable a,.fixed .column-comments.sorted a{ padding:8px 0; }
 th.sortable a span,th.sorted a span{float:left;cursor:pointer}
-th.sorted.asc .sorting-indicator,th.desc:hover span.sorting-indicator{ display:block; visibility:visible; background-position:0 0}
-th.sorted.desc .sorting-indicator,th.asc:hover span.sorting-indicator{ display:block; visibility:visible; background-position:-7px 0}
+/*th.sorted.asc .sorting-indicator,th.desc:hover span.sorting-indicator{ display:block; visibility:visible; background-position:0 0}
+th.sorted.desc .sorting-indicator,th.asc:hover span.sorting-indicator{ display:block; visibility:visible; background-position:-7px 0}*/
 
 /* TABS */
 

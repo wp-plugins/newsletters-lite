@@ -83,12 +83,15 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					<?php 
 					
 					$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'";
+					$objectcache = $this -> get_option('objectcache');
 					$query_hash = md5($query);
-					if ($oc_ebounced = wp_cache_get($query_hash, 'newsletters')) {
+					if (!empty($objectcache) && $oc_ebounced = wp_cache_get($query_hash, 'newsletters')) {
 						$ebounced = $oc_ebounced;
 					} else {
 						$ebounced = $wpdb -> get_var($query); 
-						wp_cache_set($query_hash, $ebounced, 'newsletters', 0);
+						if (!empty($objectcache)) {
+							wp_cache_set($query_hash, $ebounced, 'newsletters', 0);
+						}
 					}
 					
 					?>
@@ -97,11 +100,13 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					
 					$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'";
 					$query_hash = md5($query);
-					if ($oc_eunsubscribed = wp_cache_get($query_hash, 'newsletters')) {
+					if (!empty($objectcache) && $oc_eunsubscribed = wp_cache_get($query_hash, 'newsletters')) {
 						$eunsubscribed = $oc_eunsubscribed;
 					} else {
 						$eunsubscribed = $wpdb -> get_var($query);
-						wp_cache_set($query_hash, $eunsubscribed, 'newsletters', 0);
+						if (!empty($objectcache)) {
+							wp_cache_set($query_hash, $eunsubscribed, 'newsletters', 0);
+						}
 					}
 					
 					$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;

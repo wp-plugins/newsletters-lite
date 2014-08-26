@@ -1,4 +1,4 @@
-<?php if (!empty($queues)) : ?>	
+
 	<form action="?page=<?php echo $this -> sections -> queue; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action?', $this -> plugin_name); ?>')) { return false; }">
 		<div class="tablenav">
 			<div class="alignleft actions">
@@ -22,6 +22,8 @@
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
 		
+		$colspan = 9;
+		
 		?>
 		
 		<table class="widefat">
@@ -36,6 +38,7 @@
 					</th>
 					<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
 						<th><?php _e('Image', $this -> plugin_name); ?></th>
+						<?php $colspan++; ?>
 					<?php endif; ?>
 					<th class="column-subscriber_id <?php echo ($orderby == "subscriber_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=subscriber_id&order=' . (($orderby == "subscriber_id") ? $otherorder : "asc")); ?>">
@@ -128,78 +131,84 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php foreach ($queues as $queue) : ?>
-				<?php 
-				
-				if (!empty($queue -> subscriber_id)) {
-					$subscriber = $Subscriber -> get($queue -> subscriber_id); 
-				} elseif (!empty($queue -> user_id)) {
-					$user = $this -> userdata($queue -> user_id);
-				}
-				
-				?>
-				<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
-				<tr id="queuerow<?php echo $queue -> id; ?>" class="<?php echo $class; ?>">
-					<th class="check-column"><input type="checkbox" id="checklist<?php echo $queue -> id; ?>" name="Queue[checklist][]" value="<?php echo $queue -> id; ?>" /></th>
-					<td><label for="checklist<?php echo $queue -> id; ?>"><?php echo $queue -> id; ?></label></td>
-					<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
-						<td>
-							<?php if (!empty($subscriber)) : ?>
-								<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($subscriber -> email); ?></label>
-							<?php elseif (!empty($user)) : ?>
-								<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($user -> user_email); ?></label>
+				<?php if (empty($queues)) : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No queued emails found', $this -> plugin_name); ?></td>
+					</tr>
+				<?php else : ?>
+					<?php foreach ($queues as $queue) : ?>
+						<?php 
+						
+						if (!empty($queue -> subscriber_id)) {
+							$subscriber = $Subscriber -> get($queue -> subscriber_id); 
+						} elseif (!empty($queue -> user_id)) {
+							$user = $this -> userdata($queue -> user_id);
+						}
+						
+						?>
+						<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
+						<tr id="queuerow<?php echo $queue -> id; ?>" class="<?php echo $class; ?>">
+							<th class="check-column"><input type="checkbox" id="checklist<?php echo $queue -> id; ?>" name="Queue[checklist][]" value="<?php echo $queue -> id; ?>" /></th>
+							<td><label for="checklist<?php echo $queue -> id; ?>"><?php echo $queue -> id; ?></label></td>
+							<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
+								<td>
+									<?php if (!empty($subscriber)) : ?>
+										<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($subscriber -> email); ?></label>
+									<?php elseif (!empty($user)) : ?>
+										<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($user -> user_email); ?></label>
+									<?php endif; ?>
+								</td>
 							<?php endif; ?>
-						</td>
-					<?php endif; ?>
-					<td>
-						<?php if (!empty($subscriber)) : ?>
-							<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" class="row-title" title="<?php _e('View this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a>
-						<?php elseif (!empty($user)) : ?>
-							<a href="<?php echo get_edit_user_link($user -> ID); ?>" class="row-title"><?php echo $user -> display_name; ?></a>
-						<?php endif; ?>
-						<div class="row-actions">
-							<span class="delete"><a onclick="if (!confirm('<?php _e('Are you sure you want to delete this queued email?', $this -> plugin_name); ?>')) { return false; }" class="submitdelete" href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=delete&amp;id=<?php echo $queue -> id; ?>"><?php _e('Delete', $this -> plugin_name); ?></a> |</span>
-							<span class="edit"><a href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=send&amp;id=<?php echo $queue -> id; ?>"><?php _e('Send Now', $this -> plugin_name); ?></a></span>
-						</div>
-					</td>
-					<td><label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> link(__($queue -> subject), "?page=" . $this -> sections -> history . "&amp;method=view&amp;id=" . $queue -> history_id, array('title' => $queue -> subject)); ?></label></td>
-                    <td>
-                    	<?php $Db -> model = $Theme -> model; ?>
-                    	<?php if (!empty($queue -> theme_id) && $theme = $Db -> find(array('id' => $queue -> theme_id))) : ?>
-                        	<a href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Theme Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
-                        <?php else : ?>
-                        	<?php _e('None', $this -> plugin_name); ?>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                    	<?php if (!empty($queue -> attachments)) : ?>
-                        	<?php $queue -> attachments = maybe_unserialize($queue -> attachments); ?>
-                        	<ul style="padding:0; margin:0;">
-                            	<?php foreach ($queue -> attachments as $attachment) : ?>
-                                	<li class="<?php echo $this -> pre; ?>attachment">
-                                    	<?php echo $Html -> attachment_link($attachment); ?>
-                                        
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php else : ?>
-                        	<?php _e('None', $this -> plugin_name); ?>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                    	<?php if (!empty($queue -> error)) : ?>
-                    		<span class="wpmlerror"><?php _e('Yes', $this -> plugin_name); ?></span>
-                    		<?php echo $Html -> help($queue -> error); ?>
-                    	<?php else : ?>
-                    		<span class="wpmlsuccess"><?php _e('No', $this -> plugin_name); ?></span>
-                    	<?php endif; ?>
-                    </td>
-                    <td>
-                    	<?php echo $queue -> senddate; ?>
-                    </td>
-					<td><label for="checklist<?php echo $queue -> id; ?>"><abbr title="<?php echo $queue -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($queue -> modified)); ?></abbr></label></td>
-				</tr>
-				<?php endforeach; ?>
+							<td>
+								<?php if (!empty($subscriber)) : ?>
+									<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" class="row-title" title="<?php _e('View this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a>
+								<?php elseif (!empty($user)) : ?>
+									<a href="<?php echo get_edit_user_link($user -> ID); ?>" class="row-title"><?php echo $user -> display_name; ?></a>
+								<?php endif; ?>
+								<div class="row-actions">
+									<span class="delete"><a onclick="if (!confirm('<?php _e('Are you sure you want to delete this queued email?', $this -> plugin_name); ?>')) { return false; }" class="submitdelete" href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=delete&amp;id=<?php echo $queue -> id; ?>"><?php _e('Delete', $this -> plugin_name); ?></a> |</span>
+									<span class="edit"><a href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=send&amp;id=<?php echo $queue -> id; ?>"><?php _e('Send Now', $this -> plugin_name); ?></a></span>
+								</div>
+							</td>
+							<td><label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> link(__($queue -> subject), "?page=" . $this -> sections -> history . "&amp;method=view&amp;id=" . $queue -> history_id, array('title' => $queue -> subject)); ?></label></td>
+		                    <td>
+		                    	<?php $Db -> model = $Theme -> model; ?>
+		                    	<?php if (!empty($queue -> theme_id) && $theme = $Db -> find(array('id' => $queue -> theme_id))) : ?>
+		                        	<a href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Theme Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
+		                        <?php else : ?>
+		                        	<?php _e('None', $this -> plugin_name); ?>
+		                        <?php endif; ?>
+		                    </td>
+		                    <td>
+		                    	<?php if (!empty($queue -> attachments)) : ?>
+		                        	<?php $queue -> attachments = maybe_unserialize($queue -> attachments); ?>
+		                        	<ul style="padding:0; margin:0;">
+		                            	<?php foreach ($queue -> attachments as $attachment) : ?>
+		                                	<li class="<?php echo $this -> pre; ?>attachment">
+		                                    	<?php echo $Html -> attachment_link($attachment); ?>
+		                                        
+		                                    </li>
+		                                <?php endforeach; ?>
+		                            </ul>
+		                        <?php else : ?>
+		                        	<?php _e('None', $this -> plugin_name); ?>
+		                        <?php endif; ?>
+		                    </td>
+		                    <td>
+		                    	<?php if (!empty($queue -> error)) : ?>
+		                    		<span class="wpmlerror"><?php _e('Yes', $this -> plugin_name); ?></span>
+		                    		<?php echo $Html -> help($queue -> error); ?>
+		                    	<?php else : ?>
+		                    		<span class="wpmlsuccess"><?php _e('No', $this -> plugin_name); ?></span>
+		                    	<?php endif; ?>
+		                    </td>
+		                    <td>
+		                    	<?php echo $queue -> senddate; ?>
+		                    </td>
+							<td><label for="checklist<?php echo $queue -> id; ?>"><abbr title="<?php echo $queue -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($queue -> modified)); ?></abbr></label></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -232,6 +241,3 @@
 			window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 		}
 		</script>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No emails found in the queue', $this -> plugin_name); ?></p>
-<?php endif; ?>

@@ -76,12 +76,15 @@ class wpmlBounce extends wpMailPlugin {
 		
 		$alltotalquery = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $this -> table . "`";
 		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($alltotalquery);
-		if ($oc_alltotal = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_alltotal = wp_cache_get($query_hash, 'newsletters')) {
 			$alltotal = $oc_alltotal;
 		} else {
 			$alltotal = $wpdb -> get_var($alltotalquery);
-			wp_cache_set($query_hash, $alltotal, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $alltotal, 'newsletters', 0);
+			}
 		}
 		
 		if (!empty($alltotal)) {
@@ -108,8 +111,11 @@ class wpmlBounce extends wpMailPlugin {
 			if (empty($this -> errors)) {
 				$bouncequery = "SELECT * FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `email` = '" . $email . "' AND `history_id` = '" . $history_id . "'";
 				
+				$objectcache = $this -> get_option('objectcache');
 				$query_hash = md5($bouncequery);
-				$oc_bounce = wp_cache_get($query_hash, 'newsletters');
+				if (!empty($objectcache)) {
+					$oc_bounce = wp_cache_get($query_hash, 'newsletters');
+				}
 				
 				if (!empty($oc_bounce) || $bounce = $wpdb -> get_row($bouncequery)) {
 					$query = "UPDATE `" . $wpdb -> prefix . $this -> table . "` "

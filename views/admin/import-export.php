@@ -114,13 +114,16 @@
 			<?php 
 			
 			global $wpdb;
+			$objectcache = $this -> get_option('objectcache');
 			$fieldsquery = "SELECT `id`, `title`, `slug` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 			$query_hash = md5($fieldsquery);
-			if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+			if (!empty($objectcache) && $oc_fields = wp_cache_get($query_hash, 'newsletters')) {
 				$fields = $oc_fields;
 			} else {
 				$fields = $wpdb -> get_results($fieldsquery);
-				wp_cache_set($query_hash, $fields, 'newsletters', 0);
+				if (!empty($objectcache)) {
+					wp_cache_set($query_hash, $fields, 'newsletters', 0);
+				}
 			}
 			
 			?>

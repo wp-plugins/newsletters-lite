@@ -83,8 +83,9 @@ class wpmlGroup extends wpMailPlugin {
 		global $wpdb, $Html;
         $query = "SELECT `id`, `title` FROM `" . $wpdb -> prefix . "" . $this -> table . "` ORDER BY `title` ASC";
         
+        $objectcache = $this -> get_option('objectcache');
         $query_hash = md5($query);
-        if ($groupsselect = wp_cache_get($query_hash, 'newsletters')) {
+        if (!empty($objectcache) && $groupsselect = wp_cache_get($query_hash, 'newsletters')) {
 	        return $groupsselect;
         }
 
@@ -96,7 +97,9 @@ class wpmlGroup extends wpMailPlugin {
 					$groupsselect[$group -> id] = $group -> title;
 				}
 				
-				wp_cache_set($query_hash, $groupsselect, 'newsletters', 0);
+				if (!empty($objectcache)) {
+					wp_cache_set($query_hash, $groupsselect, 'newsletters', 0);
+				}
 				return $groupsselect;
 			}
 		}

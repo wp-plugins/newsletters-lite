@@ -1,9 +1,5 @@
 <?php
 
-//turn off display_errors
-error_reporting(0);
-@ini_set('display_errors', 0);
-
 $root = __FILE__;
 for ($i = 0; $i < 6; $i++) $root = dirname($root);
 for ($i = 0; $i < 5; $i++) $rootup = dirname($root);
@@ -503,16 +499,10 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 							<tr>
 								<td nowrap="nowrap" valign="top"><label for="template"><?php _e('Snippet:', $wpMail -> plugin_name); ?></label></td>
 								<td>
-									<?php $templatesquery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " ORDER BY title ASC"; ?>
 									<?php
 									
-									$query_hash = md5($templatesquery);
-									if ($oc_templates = wp_cache_get($query_hash, 'newsletters')) {
-										$templates = $oc_templates;
-									} else {
-										$templates = $wpdb -> get_results($templatesquery);
-										wp_cache_set($query_hash, $templates, 'newsletters', 0);
-									}
+									$templatesquery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " ORDER BY title ASC";
+									$templates = $wpdb -> get_results($templatesquery);
 									
 									?>
 									<?php if (!empty($templates)) : ?>

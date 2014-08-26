@@ -7,34 +7,34 @@ $email_templates = array();
 $email_templates['posts'] = array(
 	'subject'					=>	false,
 	'message'					=>	'<div class="wpmlposts">
-	[post_loop]
+	[newsletters_post_loop]
 		<div class="wpmlpost">
-			<h3><a href="[post_link]" title="[post_title]">[post_title]</a></h3>
-			[post_date_wrapper]<p><small>Posted on [post_date format="F jS, Y"] by [post_author]</small></p>[/post_date_wrapper]
+			<h3><a href="[newsletters_post_link]" title="[newsletters_post_title]">[newsletters_post_title]</a></h3>
+			[newsletters_post_date_wrapper]<p><small>Posted on [newsletters_post_date format="F jS, Y"] by [newsletters_post_author]</small></p>[/newsletters_post_date_wrapper]
 			<div class="wpmlpost_content">
-				[post_thumbnail]
-				<p>[post_excerpt]</p>
+				[newsletters_post_thumbnail]
+				<p>[newsletters_post_excerpt]</p>
 			</div>
 		</div>
 		<hr style="visibility:hidden; clear:both;" />
-	[/post_loop]
+	[/newsletters_post_loop]
 </div>',
 );
 
 $email_templates['latestposts'] = array(
 	'subject'					=>	false,
 	'message'					=>	'<div class="wpmlposts">
-	[post_loop]
+	[newsletters_post_loop]
 		<div class="wpmlpost">
-			<h3><a href="[post_link]" title="[post_title]">[post_title]</a></h3>
-			[post_date_wrapper]<p><small>Posted on [post_date format="F jS, Y"] by [post_author]</small></p>[/post_date_wrapper]
+			<h3><a href="[newsletters_post_link]" title="[newsletters_post_title]">[newsletters_post_title]</a></h3>
+			[newsletters_post_date_wrapper]<p><small>Posted on [newsletters_post_date format="F jS, Y"] by [newsletters_post_author]</small></p>[/newsletters_post_date_wrapper]
 			<div class="wpmlpost_content">
-				[post_thumbnail]
-				<p>[post_excerpt]</p>
+				[newsletters_post_thumbnail]
+				<p>[newsletters_post_excerpt]</p>
 			</div>
 		</div>
 		<hr style="visibility:hidden; clear:both;" />
-	[/post_loop]
+	[/newsletters_post_loop]
 </div>',
 );
 

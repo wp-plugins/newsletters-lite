@@ -299,13 +299,16 @@ class wpmlDbHelper extends wpMailPlugin {
 					$c++;
 				}
 				
+				$objectcache = $this -> get_option('objectcache');
 				$query_hash = md5($query);
-				if ($value = wp_cache_get($query_hash, 'newsletters')) {
+				if (!empty($objectcache) && $value = wp_cache_get($query_hash, 'newsletters')) {
 					return $value;
 				}
 				
 				if ($value = $wpdb -> get_var($query)) {
-					wp_cache_set($query_hash, $value, 'newsletters', 0);
+					if (!empty($objectcache)) {
+						wp_cache_set($query_hash, $value, 'newsletters', 0);
+					}
 					return $value;
 				}
 			}
@@ -463,14 +466,17 @@ class wpmlDbHelper extends wpMailPlugin {
 				}
 			}
 			
+			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if ($count = wp_cache_get($query_hash, 'newsletters')) {
+			if (!empty($objectcache) && $count = wp_cache_get($query_hash, 'newsletters')) {
 				return $count;
 			}
 			
 			if (!empty($query)) {
 				$count = $wpdb -> get_var($query);
-				wp_cache_set($query_hash, $count, 'newsletters', 0);
+				if (!empty($objectcache)) {
+					wp_cache_set($query_hash, $count, 'newsletters', 0);
+				}
 			}
 		}
 		
@@ -506,8 +512,9 @@ class wpmlDbHelper extends wpMailPlugin {
 			$query .= " ORDER BY `" . $ofield . "` " . $odir . "";
 			$query .= " LIMIT 1";
 			
+			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if ($data = wp_cache_get($query_hash, 'newsletters')) {
+			if (!empty($objectcache) && $data = wp_cache_get($query_hash, 'newsletters')) {
 				return $data;
 			}
 			
@@ -520,7 +527,9 @@ class wpmlDbHelper extends wpMailPlugin {
 						$object -> data = $data;
 					}
 					
-					wp_cache_set($query_hash, $data, 'newsletters', 0);
+					if (!empty($objectcache)) {
+						wp_cache_set($query_hash, $data, 'newsletters', 0);
+					}
 					return $data;
 				}
 			}
@@ -567,8 +576,9 @@ class wpmlDbHelper extends wpMailPlugin {
 			$query .= " ORDER BY `" . $ofield . "` " . $odir . "";
 			$query .= (empty($limit)) ? '' : " LIMIT " . $limit . "";
 			
+			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if ($data = wp_cache_get($query_hash, 'newsletters')) {
+			if (!empty($objectcache) && $data = wp_cache_get($query_hash, 'newsletters')) {
 				return $data;
 			}
 			
@@ -581,7 +591,9 @@ class wpmlDbHelper extends wpMailPlugin {
 						$data[] = $this -> init_class($object -> model, $record);
 					}
 					
-					wp_cache_set($query_hash, $data, 'newsletters', 0);
+					if (!empty($objectcache)) {
+						wp_cache_set($query_hash, $data, 'newsletters', 0);
+					}
 					return $data;
 				}
 			}

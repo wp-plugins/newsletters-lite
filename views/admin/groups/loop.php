@@ -1,4 +1,4 @@
-<?php if (!empty($groups)) : ?>
+
 	<form onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected groups?', $this -> plugin_name); ?>')) { return false; }" action="?page=<?php echo $this -> sections -> groups; ?>&amp;method=mass" method="post">
 		<div class="tablenav">
 			<div class="alignleft actions">
@@ -16,6 +16,8 @@
 		$orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		
+		$colspan = 5;
 		
 		?>
 		
@@ -69,25 +71,31 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php foreach ($groups as $group) : ?>
-				<?php $class = ($class == 'alternate') ? '' : 'alternate'; ?>
-				<tr class="<?php echo $class; ?>" id="grouprow<?php echo $group -> id; ?>">
-					<th class="check-column"><input id="checklist<?php echo $group -> id; ?>" type="checkbox" name="groupslist[]" value="<?php echo $group -> id; ?>" /></th>
-					<td><label for="checklist<?php echo $group -> id; ?>"><?php echo $group -> id; ?></label></td>
-					<td>
-						<strong><a class="row-title" href="?page=<?php echo $this -> sections -> groups; ?>&amp;method=view&amp;id=<?php echo $group -> id; ?>" title="<?php _e('View the details of this group.', $this -> plugin_name); ?>"><?php echo $group -> title; ?></a></strong>
-						<div class="row-actions">
-							<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> groups . '&amp;method=save&amp;id=' . $group -> id); ?> |</span>
-							<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> groups . '&amp;method=delete&amp;id=' . $group -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this group?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
-							<span class="view"><?php echo $Html -> link(__('View', $this -> plugin_name), '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $group -> id); ?></span>
-						</div>
-					</td>
-                    <td>
-                    	<?php echo $Html -> link($Mailinglist -> count(array('group_id' => $group -> id)), '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $group -> id . '#mailinglists'); ?>
-                    </td>
-					<td><abbr title="<?php echo date_i18n("Y-m-d H:i:s", strtotime($group -> modified)); ?>"><?php echo date_i18n("Y-m-d", strtotime($group -> modified)); ?></abbr></td>
-				</tr>
-				<?php endforeach; ?>
+				<?php if (empty($groups)) : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No groups were found', $this -> plugin_name); ?></td>
+					</tr>
+				<?php else : ?>
+					<?php foreach ($groups as $group) : ?>
+					<?php $class = ($class == 'alternate') ? '' : 'alternate'; ?>
+						<tr class="<?php echo $class; ?>" id="grouprow<?php echo $group -> id; ?>">
+							<th class="check-column"><input id="checklist<?php echo $group -> id; ?>" type="checkbox" name="groupslist[]" value="<?php echo $group -> id; ?>" /></th>
+							<td><label for="checklist<?php echo $group -> id; ?>"><?php echo $group -> id; ?></label></td>
+							<td>
+								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> groups; ?>&amp;method=view&amp;id=<?php echo $group -> id; ?>" title="<?php _e('View the details of this group.', $this -> plugin_name); ?>"><?php echo $group -> title; ?></a></strong>
+								<div class="row-actions">
+									<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> groups . '&amp;method=save&amp;id=' . $group -> id); ?> |</span>
+									<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> groups . '&amp;method=delete&amp;id=' . $group -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this group?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
+									<span class="view"><?php echo $Html -> link(__('View', $this -> plugin_name), '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $group -> id); ?></span>
+								</div>
+							</td>
+		                    <td>
+		                    	<?php echo $Html -> link($Mailinglist -> count(array('group_id' => $group -> id)), '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $group -> id . '#mailinglists'); ?>
+		                    </td>
+							<td><abbr title="<?php echo date_i18n("Y-m-d H:i:s", strtotime($group -> modified)); ?>"><?php echo date_i18n("Y-m-d", strtotime($group -> modified)); ?></abbr></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -121,6 +129,3 @@
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
 	</form>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No groups were found', $this -> plugin_name); ?></p>
-<?php endif; ?>

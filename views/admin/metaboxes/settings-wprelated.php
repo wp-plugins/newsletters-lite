@@ -2,15 +2,25 @@
 
 <?php
 
+$objectcache = $this -> get_option('objectcache');
+
 $locale = get_locale();
 $mofile = $this -> plugin_name . '-' . $locale . '.mo';
-$mofull = WP_LANG_DIR . '/plugins/' . $mofile;
+$mofull = 'wp-mailinglist-languages' . DS;
 $language_external = $this -> get_option('language_external');
 
 ?>
 
 <table class="form-table">
 	<tbody>
+		<tr>
+			<th><label for="objectcache"><?php _e('Object Cache', $this -> plugin_name); ?></label>
+			<?php echo $Html -> help(__('Tick/check this to use the WordPress Object Cache API to cache data for performance. It is recommended that you turn this off if your PHP memory_limit is very low since large data parts may use up all the memory.', $this -> plugin_name)); ?></th>
+			<td>
+				<label><input <?php echo (!empty($objectcache)) ? 'checked="checked"' : ''; ?> type="checkbox" name="objectcache" value="1" id="objectcache" /> <?php _e('Yes, turn on object cache for performance', $this -> plugin_name); ?></label>
+				<span class="howto"><?php _e('Turn on for performance. Turn this off if your PHP memory_limit is low', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
 		<tr>
 			<th><label for="tinymcebtnY"><?php _e('TinyMCE Editor Button', $this -> plugin_name); ?></label></th>
 			<td>
@@ -21,10 +31,11 @@ $language_external = $this -> get_option('language_external');
 		</tr>
 		<tr>
 			<th><label for="language_external"><?php _e('Load External Language', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(sprintf(__('When turning this on, ensure that the following file exists: %s', $this -> plugin_name), $mofull)); ?></th>
+			<?php echo $Html -> help(sprintf(__('When turning this on, ensure that the following file exists: %s . Get language files at %s', $this -> plugin_name), 'wp-content/plugins/' . $mofull, '<a href="https://github.com/tribulant/wp-mailinglist-languages" target="_blank">' . __('wp-mailinglist-languages Github', $this -> plugin_name) . '</a>')); ?></th>
 			<td>
 				<label><input <?php echo (!empty($language_external) && $language_external == 1) ? 'checked="checked"' : ''; ?> type="checkbox" name="language_external" value="1" id="language_external" /> <?php _e('Yes, load external language file', $this -> plugin_name); ?></label>
-				<span class="howto"><?php _e('Place the .mo file inside wp-content/languages/plugins/ with the correct file name', $this -> plugin_name); ?></span>
+				(<a href="https://github.com/tribulant/wp-mailinglist-languages" target="_blank"><?php _e('language files', $this -> plugin_name); ?></a>)
+				<span class="howto"><?php _e('Place the .mo file inside wp-content/plugins/wp-mailinglist-languages/ with the correct file name', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
 		<tr>

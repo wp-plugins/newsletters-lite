@@ -82,12 +82,15 @@ $count_users = count_users();
 	        <?php $fieldsquery = "SELECT `id`, `title`, `type`, `validation`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `type` = 'text' OR `type` = 'radio' OR `type` = 'select' OR `type` = 'pre_country' OR `type` = 'pre_gender' ORDER BY `order` ASC"; ?>
 	        <?php
 	        
+	        $objectcache = $this -> get_option('objectcache');
 	        $query_hash = md5($fieldsquery);
-	        if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+	        if (!empty($objectcache) && $oc_fields = wp_cache_get($query_hash, 'newsletters')) {
 		        $fields = $oc_fields;
 	        } else {
 		        $fields = $wpdb -> get_results($fieldsquery);
-		        wp_cache_set($query_hash, $fields, 'newsletters', 0);
+		        if (!empty($objectcache)) {
+		        	wp_cache_set($query_hash, $fields, 'newsletters', 0);
+		        }
 	        }
 	        
 	        ?>

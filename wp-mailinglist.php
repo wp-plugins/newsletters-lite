@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.1
+Version: 4.3.2
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -537,6 +537,10 @@ if (!class_exists('wpMail')) {
 										
 										if ($Subscriber -> optin($_POST)) {
 											$success = true;
+											
+											if ($this -> get_option('subscriberedirect') == "Y") {
+												$this -> redirect($this -> get_option('subscriberedirecturl'), false, false, true);
+											}
 										}
 									}
 									
@@ -1463,9 +1467,14 @@ if (!class_exists('wpMail')) {
 			if ($transient = get_transient('newsletters_cron')) {
 				echo __('No emails sent out. Cron is already running, please wait a while', $this -> plugin_name);
 			} else {
-				$schedules = $this -> cron_schedules($schedules);
-				$interval = $this -> get_option('scheduleinterval');
-				$expiration = $schedules[$interval]['interval'];
+				$schedulecrontype = $this -> get_option('schedulecrontype');
+				if (empty($schedulecrontype) || $schedulecrontype == "wp") {
+					$schedules = $this -> cron_schedules($schedules);
+					$interval = $this -> get_option('scheduleinterval');
+					$expiration = $schedules[$interval]['interval'];
+				} else {
+					$expiration = 150;
+				}					
 				set_transient('newsletters_cron', true, ($expiration * 2));
 			
 				global $wpdb, $Db, $Email, $History, $Subscriber, $SubscribersList, $Queue;
@@ -1659,15 +1668,14 @@ if (!class_exists('wpMail')) {
 			if (function_exists('load_plugin_textdomain')) {
 			
 				$mofile = $this -> plugin_name . '-' . $locale . '.mo';
-				$mofull = WP_LANG_DIR . '/plugins/' . $mofile;
+				$mofullfull = WP_PLUGIN_DIR . DS . 'wp-mailinglist-languages' . DS . $mofile;
+				$mofull = 'wp-mailinglist-languages' . DS;
 				$language_external = $this -> get_option('language_external');
 			
-				if (!empty($language_external) && file_exists($mofull)) {
-					//load_plugin_textdomain($this -> plugin_name, $mofull);
-					load_textdomain($this -> plugin_name, $mofull);
+				if (!empty($language_external) && file_exists($mofullfull)) {
+					load_plugin_textdomain($this -> plugin_name, false, $mofull);
 				} else {
-					load_textdomain($this -> plugin_name, $this -> plugin_base() . DS . 'languages' . DS . $mofile);
-					//load_plugin_textdomain($this -> plugin_name, $this -> plugin_name . DS . 'languages', dirname(plugin_basename(__FILE__)) . DS . 'languages');	
+					load_plugin_textdomain($this -> plugin_name, false, dirname(plugin_basename(__FILE__)) . DS . 'languages' . DS);
 				}
 			}	
 		}
@@ -3252,6 +3260,24 @@ if (!class_exists('wpMail')) {
 							$lists = $_POST['mailinglistslist'];
 							
 							switch ($_POST['action']) {
+								case 'singleopt'		:
+									foreach ($lists as $list_id) {
+										$Db -> model = $Mailinglist -> model;
+										$Db -> save_field('doubleopt', "N", array('id' => $list_id));
+									}
+									
+									$msg_type = 'message';
+									$message = __('Selected lists set as single opt-in', $this -> plugin_name);
+									break;
+								case 'doubleopt'		:
+									foreach ($lists as $list_id) {
+										$Db -> model = $Mailinglist -> model;
+										$Db -> save_field('doubleopt', "Y", array('id' => $list_id));
+									}
+									
+									$msg_type = 'message';
+									$message = __('Selected lists set as doublt opt-in', $this -> plugin_name);
+									break;
 								case 'setgroup'			:
 									if (!empty($_POST['setgroup_id'])) {
 										foreach ($lists as $list_id) {
@@ -3392,10 +3418,11 @@ if (!class_exists('wpMail')) {
 						$data[$Mailinglist -> model] = $lists;
 						$data['Paginate'] = false;
 					} else {
-						$data = $Mailinglist -> get_all_paginated($conditions, $searchterm, $this -> sections -> lists, $perpage, $order);
+						//$data = $Mailinglist -> get_all_paginated($conditions, $searchterm, $this -> sections -> lists, $perpage, $order);
+						$data = $this -> paginate($Mailinglist -> model, null, $this -> sections -> lists, $conditions, $searchterm, $perpage, $order);
 					}
 					
-					$this -> render_admin('mailinglists' . DS . 'index', array('mailinglists' => $data[$Mailinglist -> model], 'paginate' => $data['Pagination']));
+					$this -> render_admin('mailinglists' . DS . 'index', array('mailinglists' => $data[$Mailinglist -> model], 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
@@ -3502,17 +3529,15 @@ if (!class_exists('wpMail')) {
 					$data = array();
 					if (!empty($_GET['showall'])) {
 						$Db -> model = $wpmlGroup -> model;
-						$lists = $Db -> find_all(false, "*", $order);
-						$data[$wpmlGroup -> model] = $lists;
+						$groups = $Db -> find_all(false, "*", $order);
+						$data[$wpmlGroup -> model] = $groups;
 						$data['Paginate'] = false;
 					} else {
-						$data = $wpmlGroup -> get_all_paginated($conditions, $searchterm, $this -> sections -> groups, $perpage, $order);
+						//$data = $wpmlGroup -> get_all_paginated($conditions, $searchterm, $this -> sections -> groups, $perpage, $order);
+						$data = $this -> paginate($wpmlGroup -> model, null, $this -> sections -> groups, $conditions, $searchterm, $perpage, $order);
 					}
-				
-					if (!empty($data['wpmlGroup'][0])) { $groups = (object) $data['wpmlGroup']; }
-					else { $groups = false; }
 					
-					$this -> render('groups' . DS . 'index', array('groups' => $groups, 'paginate' => $data['Pagination']), true, 'admin');
+					$this -> render('groups' . DS . 'index', array('groups' => $data[$wpmlGroup -> model], 'paginate' => $data['Paginate']), true, 'admin');
 					break;	
 			}
 		}
@@ -3593,7 +3618,7 @@ if (!class_exists('wpMail')) {
 					
 					$this -> redirect('?page=' . $this -> sections -> subscribers, $message_type, $message);
 					break;
-				case 'mass'			:			
+				case 'mass'			:					
 					if (!empty($_POST['subscriberslist'])) {
 						if (!empty($_POST['action'])) {
 							$subscribers = $_POST['subscriberslist'];
@@ -3762,7 +3787,6 @@ if (!class_exists('wpMail')) {
 						$data[$Subscriber -> model] = $subscribers;
 						$data['Paginate'] = false;
 					} else {
-						//$data = $Subscriber -> get_all_paginated($conditions, $searchterm, $this -> sections -> subscribers, $perpage, $order);						
 						$data = $this -> paginate($Subscriber -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -4315,10 +4339,11 @@ if (!class_exists('wpMail')) {
 						$data[$Theme -> model] = $themes;
 						$data['Paginate'] = false;
 					} else {
-						$data = $Theme -> get_all_paginated($conditions, $searchterm, $this -> sections -> themes, $perpage, $order);
+						//$data = $Theme -> get_all_paginated($conditions, $searchterm, $this -> sections -> themes, $perpage, $order);
+						$data = $this -> paginate($Theme -> model, null, $this -> sections -> themes, $conditions, $searchterm, $perpage, $order);
 					}
 					
-					$this -> render_admin('themes' . DS . 'index', array('themes' => $data[$Theme -> model], 'paginate' => $data['Pagination']));
+					$this -> render_admin('themes' . DS . 'index', array('themes' => $data[$Theme -> model], 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
@@ -4418,10 +4443,11 @@ if (!class_exists('wpMail')) {
 						$data[$Template -> model] = $templates;
 						$data['Paginate'] = false;
 					} else {
-						$data = $Template -> get_all_paginated($conditions, $searchterm, $this -> sections -> templates, $perpage, $order);
+						//$data = $Template -> get_all_paginated($conditions, $searchterm, $this -> sections -> templates, $perpage, $order);
+						$data = $this -> paginate($Template -> model, null, $this -> sections -> templates, $conditions, $searchterm, $perpage, $order);
 					}
 					
-					$this -> render_admin('templates' . DS . 'index', array('templates' => $data[$Template -> model], 'paginate' => $data['Pagination']));	
+					$this -> render_admin('templates' . DS . 'index', array('templates' => $data[$Template -> model], 'paginate' => $data['Paginate']));	
 					break;
 			}
 		}
@@ -4563,10 +4589,11 @@ if (!class_exists('wpMail')) {
 						$data[$Queue -> model] = $emails;
 						$data['Paginate'] = false;
 					} else {
-						$data = $Queue -> get_all_paginated(false, false, $this -> sections -> queue, $perpage, $order);
+						//$data = $Queue -> get_all_paginated(false, false, $this -> sections -> queue, $perpage, $order);
+						$data = $this -> paginate($Queue -> model, null, $this -> sections -> queue, $conditions, $searchterm, $perpage, $order);
 					}
 					
-					$this -> render_admin('queues' . DS . 'index', array('queues' => $data[$Queue -> model], 'paginate' => $data['Pagination']));
+					$this -> render_admin('queues' . DS . 'index', array('queues' => $data[$Queue -> model], 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
@@ -4906,10 +4933,12 @@ if (!class_exists('wpMail')) {
 						$data[$History -> model] = $histories;
 						$data['Paginate'] = false;
 					} else {	
-						$data = $History -> get_all_paginated($conditions, $searchterm, $this -> sections -> history, $perpage, $order);
+						//$data = $History -> get_all_paginated($conditions, $searchterm, $this -> sections -> history, $perpage, $order);
+						$data = $this -> paginate($History -> model, null, $this -> sections -> history, $conditions, $searchterm, $perpage, $order);
+						
 					}
 					
-					$this -> render_admin('history' . DS . 'index', array('histories' => $data[$History -> model], 'paginate' => $data['Pagination']));			
+					$this -> render_admin('history' . DS . 'index', array('histories' => $data[$History -> model], 'paginate' => $data['Paginate']));			
 					break;
 			}
 		}
@@ -5093,10 +5122,6 @@ if (!class_exists('wpMail')) {
 					
 					$conditions = (!empty($searchterm)) ? array('subscriber_id' => "LIKE '%" . $searchterm . "%'") : false;		
 					
-					/*$ofield = (isset($_COOKIE[$this -> pre . 'orderssorting'])) ? $_COOKIE[$this -> pre . 'orderssorting'] : "modified";
-					$odir = (isset($_COOKIE[$this -> pre . 'orders' . $ofield . 'dir'])) ? $_COOKIE[$this -> pre . 'orders' . $ofield . 'dir'] : "DESC";
-					$order = array($ofield, $odir);*/
-					
 					$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
@@ -5107,10 +5132,11 @@ if (!class_exists('wpMail')) {
 						$data[$wpmlOrder -> model] = $orders;
 						$data['Paginate'] = false;
 					} else {	
-						$data = $wpmlOrder -> get_all_paginated($conditions, $searchterm, $this -> sections -> orders, $perpage, $order);
+						//$data = $wpmlOrder -> get_all_paginated($conditions, $searchterm, $this -> sections -> orders, $perpage, $order);
+						$data = $this -> paginate($wpmlOrder -> model, null, $this -> sections -> orders, $conditions, $searchterm, $perpage, $order);
 					}
 					
-					$this -> render_admin('orders' . DS . 'index', array('orders' => $data[$wpmlOrder -> model], 'paginate' => $data['Pagination']));
+					$this -> render_admin('orders' . DS . 'index', array('orders' => $data[$wpmlOrder -> model], 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
@@ -5215,11 +5241,7 @@ if (!class_exists('wpMail')) {
 					$fields = $Db -> find_all(false, false, array('order', "ASC"));				
 					$this -> render_admin('fields' . DS . 'order', array('fields' => $fields));
 					break;
-				default					:
-					/*$ofield = (isset($_COOKIE[$this -> pre . 'fieldssorting'])) ? $_COOKIE[$this -> pre . 'fieldssorting'] : "modified";
-					$odir = (isset($_COOKIE[$this -> pre . 'fields' . $ofield . 'dir'])) ? $_COOKIE[$this -> pre . 'fields' . $ofield . 'dir'] : "DESC";
-					$order = array($ofield, $odir);*/
-					
+				default					:					
 					$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
@@ -5227,7 +5249,6 @@ if (!class_exists('wpMail')) {
 					$data = array();
 					if (!empty($_GET['showall'])) {
 						$Db -> model = $Field -> model;
-						//$conditions['1'] = "1 AND `slug` != 'email'";
 						$data[$Field -> model] = $Db -> find_all($conditions, "*", $order);
 						$data['Paginate'] = false;
 					} else {
@@ -5243,10 +5264,10 @@ if (!class_exists('wpMail')) {
 							$conditions[] = "`title` LIKE '%" . $searchterm . "%' OR `slug` LIKE '%" . $searchterm . "%'";	
 						}
 						
-						$data = $Field -> get_all_paginated($conditions, $searchterm, $this -> sections -> fields, $perpage, $order);
+						$data = $this -> paginate($Field -> model, null, $this -> sections -> fields, $conditions, $searchterm, $perpage, $order);
 					}
 						
-					$this -> render_admin('fields' . DS . 'index', array('fields' => $data[$Field -> model], 'paginate' => $data['Pagination']));
+					$this -> render_admin('fields' . DS . 'index', array('fields' => $data[$Field -> model], 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
@@ -5450,6 +5471,7 @@ if (!class_exists('wpMail')) {
 						case 'activationlinktext'			:
 						case 'unsubscribetext'				:
 						case 'unsubscribealltext'			:
+						case 'resubscribetext'				:
 							if ($this -> is_plugin_active('qtranslate')) {
 								$this -> update_option($key, qtrans_join($val));
 							} else {
@@ -5504,6 +5526,7 @@ if (!class_exists('wpMail')) {
 			if (!empty($_POST)) {
 				delete_option('tridebugging');
 				$this -> delete_option('language_external');
+				$this -> delete_option('objectcache');
 			
 				foreach ($_POST as $key => $val) {				
 					$this -> update_option($key, $val);

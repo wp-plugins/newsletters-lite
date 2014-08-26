@@ -1,4 +1,4 @@
-<?php if (!empty($links)) : ?>
+
 	<form action="?page=<?php echo $this -> sections -> links; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you want to apply this action to the selected links?', $this -> plugin_name); ?>')) { return false; }">
 		<div class="tablenav">
 			<div class="alignleft actions">
@@ -16,6 +16,8 @@
 		$orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		
+		$colspan = 4;
 		
 		?>
 		<table class="widefat">
@@ -56,25 +58,31 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php $class = false; ?>
-				<?php foreach ($links as $link) : ?>
-					<tr class="<?php $class = (empty($class)) ? 'alternate' : false; ?>">
-						<th class="check-column"><input type="checkbox" name="links[]" value="<?php echo $link -> id; ?>" id="links_<?php echo $link -> id; ?>" /></th>
-						<td>
-							<a href="" class="row-title"><?php echo $Html -> link($link -> link, $link -> link, array('target' => "_blank")); ?></a>
-							<div class="row-actions">
-								<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> links . '&amp;method=delete&amp;id=' . $link -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this link?', $this -> plugin_name) . "')) { return false; }", 'class' => "delete")); ?> |</span>
-								<span class="view"><?php echo $Html -> link(__('Open Link', $this -> plugin_name), $link -> link, array('target' => "_blank")); ?></span>
-							</div>
-						</td>
-						<td>
-							<?php echo $this -> Click -> count(array('link_id' => $link -> id)); ?>
-						</td>
-						<td>
-							<abbr title="<?php echo $link -> created; ?>"><?php echo $Html -> gen_date("Y-m-d", strtotime($link -> created)); ?></abbr>
-						</td>
+				<?php if (empty($links)) : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No links were found', $this -> plugin_name); ?></td>
 					</tr>
-				<?php endforeach; ?>
+				<?php else : ?>
+					<?php $class = false; ?>
+					<?php foreach ($links as $link) : ?>
+						<tr class="<?php $class = (empty($class)) ? 'alternate' : false; ?>">
+							<th class="check-column"><input type="checkbox" name="links[]" value="<?php echo $link -> id; ?>" id="links_<?php echo $link -> id; ?>" /></th>
+							<td>
+								<a href="" class="row-title"><?php echo $Html -> link($link -> link, $link -> link, array('target' => "_blank")); ?></a>
+								<div class="row-actions">
+									<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> links . '&amp;method=delete&amp;id=' . $link -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this link?', $this -> plugin_name) . "')) { return false; }", 'class' => "delete")); ?> |</span>
+									<span class="view"><?php echo $Html -> link(__('Open Link', $this -> plugin_name), $link -> link, array('target' => "_blank")); ?></span>
+								</div>
+							</td>
+							<td>
+								<?php echo $this -> Click -> count(array('link_id' => $link -> id)); ?>
+							</td>
+							<td>
+								<abbr title="<?php echo $link -> created; ?>"><?php echo $Html -> gen_date("Y-m-d", strtotime($link -> created)); ?></abbr>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -102,6 +110,3 @@
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
 	</form>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No links are available', $this -> plugin_name); ?></p>
-<?php endif; ?>

@@ -1,4 +1,4 @@
-<?php if (!empty($templates)) : ?>
+
 	<form action="?page=<?php echo $this -> sections -> templates; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected snippets?', $this -> plugin_name); ?>')) { return false; }" id="templatesform" name="templatesform">
 		<div class="tablenav">
 			<div class="alignleft actions">
@@ -16,6 +16,8 @@
 		$orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		
+		$colspan = 6;
 		
 		?>
 		
@@ -81,26 +83,32 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php foreach ($templates as $template) : ?>
-				<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
-				<tr class="<?php echo $class; ?>" id="templaterow<?php echo $template -> id; ?>">
-					<th class="check-column"><input id="checklist<?php echo $template -> id; ?>" type="checkbox" name="templateslist[]" value="<?php echo $template -> id; ?>" /></th>
-					<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> id; ?></label></td>
-					<td>
-						<strong><a class="row-title" href="?page=<?php echo $this -> sections -> templates; ?>&amp;method=view&amp;id=<?php echo $template -> id; ?>" title="<?php _e('View this template', $this -> plugin_name); ?>"><?php echo __($template -> title); ?></a></strong>
-						<div class="row-actions">
-							<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> templates_save . '&amp;id=' . $template -> id); ?> |</span>
-							<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), $this -> url . '&amp;method=delete&amp;id=' . $template -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this template?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
-							<span class="view"><?php echo $Html -> link(__('View', $this -> plugin_name), $this -> url . '&amp;method=view&amp;id=' . $template -> id); ?></span>
-						</div>
-					</td>
-					<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> sent; ?></label></td>
-					<td>
-						<code>[wpmlsnippet id="<?php echo $template -> id; ?>"]</code>
-					</td>
-					<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> modified; ?></label></td>
-				</tr>
-				<?php endforeach; ?>
+				<?php if (empty($templates)) : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No snippets were found', $this -> plugin_name); ?></td>
+					</tr>
+				<?php else : ?>
+					<?php foreach ($templates as $template) : ?>
+					<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
+						<tr class="<?php echo $class; ?>" id="templaterow<?php echo $template -> id; ?>">
+							<th class="check-column"><input id="checklist<?php echo $template -> id; ?>" type="checkbox" name="templateslist[]" value="<?php echo $template -> id; ?>" /></th>
+							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> id; ?></label></td>
+							<td>
+								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> templates; ?>&amp;method=view&amp;id=<?php echo $template -> id; ?>" title="<?php _e('View this template', $this -> plugin_name); ?>"><?php echo __($template -> title); ?></a></strong>
+								<div class="row-actions">
+									<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> templates_save . '&amp;id=' . $template -> id); ?> |</span>
+									<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), $this -> url . '&amp;method=delete&amp;id=' . $template -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this template?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
+									<span class="view"><?php echo $Html -> link(__('View', $this -> plugin_name), $this -> url . '&amp;method=view&amp;id=' . $template -> id); ?></span>
+								</div>
+							</td>
+							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> sent; ?></label></td>
+							<td>
+								<code>[wpmlsnippet id="<?php echo $template -> id; ?>"]</code>
+							</td>
+							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> modified; ?></label></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -132,6 +140,3 @@
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
 	</form>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No newsletter snippets were found', $this -> plugin_name); ?></p>
-<?php endif; ?>

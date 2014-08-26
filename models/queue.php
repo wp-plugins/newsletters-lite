@@ -104,13 +104,16 @@ class wpmlQueue extends wpMailPlugin {
 			}
 		}
 		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if ($count = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $count = wp_cache_get($query_hash, 'newsletters')) {
 			return $count;
 		}
 		
 		if ($count = $wpdb -> get_var($query)) {
-			wp_cache_set($query_hash, $count, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
+			}
 			return $count;
 		}
 		
@@ -121,13 +124,15 @@ class wpmlQueue extends wpMailPlugin {
 		global $wpdb;
 		
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "mailqueue` LIMIT " . $limit . "";
-		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if ($oc_emails = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_emails = wp_cache_get($query_hash, 'newsletters')) {
 			$emails = $oc_emails;
 		} else {
 			$emails = $wpdb -> get_results($query);
-			wp_cache_set($query_hash, $emails, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $emails, 'newsletters', 0);
+			}
 		}
 		
 		if (!empty($emails)) {
@@ -189,13 +194,15 @@ class wpmlQueue extends wpMailPlugin {
 		}
 		
 		if (!empty($limit)) { $query .= " LIMIT " . $limit . ""; }
-		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if ($oc_emails = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_emails = wp_cache_get($query_hash, 'newsletters')) {
 			$emails = $oc_emails;
 		} else {
 			$emails = $wpdb -> get_results($query);
-			wp_cache_set($query_hash, $emails, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $emails, 'newsletters', 0);
+			}
 		}
 		
 		if (!empty($emails)) {

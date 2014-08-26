@@ -1,5 +1,4 @@
 <!-- Emails -->
-<?php if (!empty($emails)) : ?>
 	<div class="tablenav">
 		<?php if ($_GET['page'] == $this -> sections -> history) : ?>
 	    	<div class="alignleft actions">
@@ -15,6 +14,8 @@
     $orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 	$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 	$otherorder = ($order == "desc") ? 'asc' : 'desc';
+	
+	$colspan = 7;
     
     ?>
 
@@ -120,91 +121,97 @@
             </tr>
         </tfoot>
     	<tbody>
-        	<?php $class = false; ?>
-        	<?php foreach ($emails as $email) : ?>
-            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-            		<?php if ($_GET['page'] == $this -> sections -> history) : ?>
-	                	<td>
-	                		<?php
-	                		
-	                		if (!empty($email -> subscriber_id)) {
-		                		$Db -> model = $Subscriber -> model;
-		                		$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
-	                		} elseif (!empty($email -> user_id)) {
-		                		$user = $this -> userdata($email -> user_id);
-	                		}
-	                		
-	                		?>
-	                        
-	                        <?php if (!empty($subscriber)) : ?>
-	                        	<strong><a class="row-title" href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $email -> subscriber_id; ?>"><?php echo $subscriber -> email; ?></a></strong>
-	                        <?php elseif (!empty($user)) : ?>
-	                        	<strong><a class="row-title" href="<?php echo get_edit_user_link($user -> ID); ?>"><?php echo $user -> user_email; ?></a></strong>
-	                        <?php endif; ?>
-	                    </td>
-	                <?php elseif ($_GET['page'] == $this -> sections -> subscribers) : ?>
-	                	<td>
-	                		<?php
-	                		
-	                		$Db -> model = $History -> model;
-	                		$history = $Db -> find(array('id' => $email -> history_id)); 
-	                		
-	                		?>
-	                		<?php echo $Html -> link(__($history -> subject), '?page=' . $this -> sections -> history . '&amp;method=view&amp;id=' . $history -> id, array('class' => "row-title")); ?>
-	                	</td>
-	                <?php endif; ?>
-                    <td>
-                    	<?php if (!empty($subscriber)) : ?>
-	                    	<?php if (empty($email -> mailinglists)) : ?>
-	                    		<?php $Db -> model = $Mailinglist -> model; ?>
-								<?php $mailinglist = $Db -> find(array('id' => $email -> mailinglist_id)); ?>
-								<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $email -> mailinglist_id; ?>"><?php echo __($mailinglist -> title); ?></a>
-							<?php else : ?>
-								<?php
-								
-								$mailinglists = maybe_unserialize($email -> mailinglists);
-								$m = 1;
-								foreach ($mailinglists as $list_id) {
-									$Db -> model = $Mailinglist -> model;
-									$mailinglist = $Db -> find(array('id' => $list_id));
-									echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list_id);
-									if ($m < count($mailinglists)) { echo ', '; }
-									$m++;
-								}
-								
-								?>
+    		<?php if (empty($emails)) : ?>
+    			<tr class="no-items">
+					<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No emails found', $this -> plugin_name); ?></td>
+				</tr>
+    		<?php else : ?>
+	        	<?php $class = false; ?>
+	        	<?php foreach ($emails as $email) : ?>
+	            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+	            		<?php if ($_GET['page'] == $this -> sections -> history) : ?>
+		                	<td>
+		                		<?php
+		                		
+		                		if (!empty($email -> subscriber_id)) {
+			                		$Db -> model = $Subscriber -> model;
+			                		$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
+		                		} elseif (!empty($email -> user_id)) {
+			                		$user = $this -> userdata($email -> user_id);
+		                		}
+		                		
+		                		?>
+		                        
+		                        <?php if (!empty($subscriber)) : ?>
+		                        	<strong><a class="row-title" href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $email -> subscriber_id; ?>"><?php echo $subscriber -> email; ?></a></strong>
+		                        <?php elseif (!empty($user)) : ?>
+		                        	<strong><a class="row-title" href="<?php echo get_edit_user_link($user -> ID); ?>"><?php echo $user -> user_email; ?></a></strong>
+		                        <?php endif; ?>
+		                    </td>
+		                <?php elseif ($_GET['page'] == $this -> sections -> subscribers) : ?>
+		                	<td>
+		                		<?php
+		                		
+		                		$Db -> model = $History -> model;
+		                		$history = $Db -> find(array('id' => $email -> history_id)); 
+		                		
+		                		?>
+		                		<?php echo $Html -> link(__($history -> subject), '?page=' . $this -> sections -> history . '&amp;method=view&amp;id=' . $history -> id, array('class' => "row-title")); ?>
+		                	</td>
+		                <?php endif; ?>
+	                    <td>
+	                    	<?php if (!empty($subscriber)) : ?>
+		                    	<?php if (empty($email -> mailinglists)) : ?>
+		                    		<?php $Db -> model = $Mailinglist -> model; ?>
+									<?php $mailinglist = $Db -> find(array('id' => $email -> mailinglist_id)); ?>
+									<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $email -> mailinglist_id; ?>"><?php echo __($mailinglist -> title); ?></a>
+								<?php else : ?>
+									<?php
+									
+									$mailinglists = maybe_unserialize($email -> mailinglists);
+									$m = 1;
+									foreach ($mailinglists as $list_id) {
+										$Db -> model = $Mailinglist -> model;
+										$mailinglist = $Db -> find(array('id' => $list_id));
+										echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list_id);
+										if ($m < count($mailinglists)) { echo ', '; }
+										$m++;
+									}
+									
+									?>
+								<?php endif; ?>
+							<?php elseif (!empty($user)) : ?>
+								<?php _e('None', $this -> plugin_name); ?>
 							<?php endif; ?>
-						<?php elseif (!empty($user)) : ?>
-							<?php _e('None', $this -> plugin_name); ?>
-						<?php endif; ?>
-                    </td>
-                    <td>
-                    	<span class="<?php echo $this -> pre; ?><?php echo ($email -> status == "sent") ? 'success' : 'error'; ?>"><?php echo ($email -> status == "sent") ? __('Sent', $this -> plugin_name) : __('Unsent', $this -> plugin_name); ?></span>
-                    </td>
-                    <td>
-                    	<?php echo (!empty($email -> read) && $email -> read == "Y") ? '<span style="color:green;">' . __('Yes', $this -> plugin_name) : '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name); ?></span>
-                    </td>
-                    <td>
-                    	<?php
-                    	
-                    	if (!empty($subscriber)) {
-                    		$clicked = $this -> Click -> count(array('history_id' => $history -> id, 'subscriber_id' => $email -> subscriber_id));
-						} elseif (!empty($user)) {
-							$clicked = $this -> Click -> count(array('history_id' => $history -> id, 'user_id' => $email -> user_id));
-						}
-						
-						echo (empty($clicked)) ? '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name) . '</span>' : '<span class="' . $this -> pre . 'success">' . __('Yes', $this -> plugin_name) . '</span> (' . $clicked . ')'; 
-                    	
-                    	?>
-                    </td>
-                    <td>
-                    	<?php echo (!empty($email -> bounced) && $email -> bounced == "Y") ? '<span class="' . $this -> pre . 'error">' . __('Yes', $this -> plugin_name) . '</span>' : '<span style="color:green;">' . __('No', $this -> plugin_name) . '</span>'; ?>
-                    </td>
-                    <td>
-                    	<abbr title="<?php echo $email -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> modified)); ?></abbr>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
+	                    </td>
+	                    <td>
+	                    	<span class="<?php echo $this -> pre; ?><?php echo ($email -> status == "sent") ? 'success' : 'error'; ?>"><?php echo ($email -> status == "sent") ? __('Sent', $this -> plugin_name) : __('Unsent', $this -> plugin_name); ?></span>
+	                    </td>
+	                    <td>
+	                    	<?php echo (!empty($email -> read) && $email -> read == "Y") ? '<span style="color:green;">' . __('Yes', $this -> plugin_name) : '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name); ?></span>
+	                    </td>
+	                    <td>
+	                    	<?php
+	                    	
+	                    	if (!empty($subscriber)) {
+	                    		$clicked = $this -> Click -> count(array('history_id' => $history -> id, 'subscriber_id' => $email -> subscriber_id));
+							} elseif (!empty($user)) {
+								$clicked = $this -> Click -> count(array('history_id' => $history -> id, 'user_id' => $email -> user_id));
+							}
+							
+							echo (empty($clicked)) ? '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name) . '</span>' : '<span class="' . $this -> pre . 'success">' . __('Yes', $this -> plugin_name) . '</span> (' . $clicked . ')'; 
+	                    	
+	                    	?>
+	                    </td>
+	                    <td>
+	                    	<?php echo (!empty($email -> bounced) && $email -> bounced == "Y") ? '<span class="' . $this -> pre . 'error">' . __('Yes', $this -> plugin_name) . '</span>' : '<span style="color:green;">' . __('No', $this -> plugin_name) . '</span>'; ?>
+	                    </td>
+	                    <td>
+	                    	<abbr title="<?php echo $email -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> modified)); ?></abbr>
+	                    </td>
+	                </tr>
+	            <?php endforeach; ?>
+	        <?php endif; ?>
         </tbody>
     </table>
     
@@ -232,6 +239,3 @@
 		}
 	}
 	</script>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No emails were found', $this -> plugin_name); ?></p>
-<?php endif; ?>

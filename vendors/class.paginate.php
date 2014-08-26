@@ -106,26 +106,31 @@ class wpmlpaginate extends wpMailPlugin {
 		list($ofield, $odir) = $this -> order;
 		$query .= " ORDER BY IF (`" . $ofield . "` = '' OR `" . $ofield . "` IS NULL,1,0), `" . $ofield . "` " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
 		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if ($oc_records = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
 			$records = $oc_records;
 		} else {
 			$records = $wpdb -> get_results($query);	
-			wp_cache_set($query_hash, $records, 'newsletters', 0);	
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $records, 'newsletters', 0);	
+			}
 		}
 			
 		$records_count = count($records);
 		
 		$query_hash = md5($countquery);
-		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_count = wp_cache_get($query_hash, 'newsletters')) {
 			$this -> allcount = $allRecordsCount = $oc_count;
 		} else {
 			$count = $wpdb -> get_var($countquery);
 			$this -> allcount = $allRecordsCount = $count;
-			wp_cache_set($query_hash, $count, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
+			}
 		}
 		
-		$totalpagescount = round($records_count / $this -> per_page);
+		$totalpagescount = round($this -> allcount / $this -> per_page);
 		
 		if (empty($this -> url_page)) {
 			$this -> url_page = $this -> sub;	
@@ -135,31 +140,65 @@ class wpmlpaginate extends wpMailPlugin {
 			$p = 1;
 			$k = 1;
 			$n = $this -> page;
-			$search = (empty($this -> searchterm)) ? '' : '&amp;' . $this -> pre . 'searchterm=' . urlencode($this -> searchterm);
+			$search = (empty($this -> searchterm)) ? '' : '&' . $this -> pre . 'searchterm=' . urlencode($this -> searchterm);
 			$orderby = (empty($ofield)) ? '' : '&orderby=' . $ofield;
 			$order = (empty($odir)) ? '' : '&order=' . strtolower($odir);
-			$this -> pagination .= '<span class="displaying-num">' . sprintf(__('Displaying %s - %s of %s', $this -> plugin_name), ($begRecord + 1), ($begRecord + count($records)), $allRecordsCount) . '</span>';
+			//$this -> pagination .= '<span class="displaying-num">' . sprintf(__('%s items', $this -> plugin_name), ($begRecord + 1), ($begRecord + count($records)), $allRecordsCount) . '</span>';
+			$this -> pagination .= '<span class="displaying-num">' . sprintf(__('%s items', $this -> plugin_name), $allRecordsCount) . '</span>';
 		
-			if ($this -> page > 1) {
-				$this -> pagination .= '<a class="prev page-numbers" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&laquo;</a>';
-			}
+			$this -> pagination .= '<span class="pagination-links">';
+			$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
+		
+			//if ($this -> page > 1) {
+				$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
+			//}
 			
-			while ($p <= $allRecordsCount) {			
+			$this -> pagination .= '<span class="paging-input">';
+			$this -> pagination .= '<input class="current-page" type="text" name="paged" id="paged-input" value="' . $this -> page . '" size="1"> ';
+			$this -> pagination .= __('of', $this -> plugin_name); 
+			$this -> pagination .= ' <span class="total-pages">' . $totalpagescount . '</span>';
+			$this -> pagination .= '</span>';
+			
+			/*while ($p <= $allRecordsCount) {			
 				if ($k >= ($this -> page - 5) && $k <= ($this -> page + 5)) {
 					if ($k != $this -> page) {
-						$this -> pagination .= '<a class="page-numbers" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($k) . $search . $orderby . $order . $this -> after . '" title="' . __('Page', $this -> plugin_name) . ' ' . $k . '">' . $k . '</a>';
+						//$this -> pagination .= '<a class="page-numbers" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($k) . $search . $orderby . $order . $this -> after . '" title="' . __('Page', $this -> plugin_name) . ' ' . $k . '">' . $k . '</a>';
 					} else {
-						$this -> pagination .= '<span class="page-numbers current">' . $k . '</span>';
+						//$this -> pagination .= '<span class="page-numbers current">' . $k . '</span>';
 					}
 				}
 				
 				$p = $p + $this -> per_page;
 				$k++;
-			}
+			}*/
 			
-			if ((count($records) + $begRecord) < $allRecordsCount) {
-				$this -> pagination .= '<a class="next page-numbers" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page + 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Next Page', $this -> plugin_name) . '">&raquo;</a>';
-			}
+			//if ((count($records) + $begRecord) < $allRecordsCount) {
+				$this -> pagination .= '<a class="next-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page + 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Next Page', $this -> plugin_name) . '">&#8250;</a>';
+			//}
+			
+			$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . $totalpagescount . $search . $orderby . $order . $this -> after . '" class="last-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '">&raquo;</a>';
+			$this -> pagination .= '</span>';
+			
+			ob_start();
+			
+			?>
+			
+			<script type="text/javascript">
+			jQuery(document).ready(function() {
+				jQuery('#paged-input').keypress(function(e) {
+					code = (e.keyCode ? e.keyCode : e.which);
+		            if (code == 13) {
+		            	window.location = '?page=<?php echo $this -> url_page; ?>&<?php echo $this -> pre; ?>page=' + jQuery(this).val() + '<?php echo $search . $orderby . $order . $this -> after; ?>';
+		            	e.preventDefault();
+		            }
+				});
+			});
+			</script>
+			
+			<?php
+			
+			$script = ob_get_clean();
+			$this -> pagination .= $script;
 		}
 		
 		return $records;

@@ -1,4 +1,12 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<!-- Save a Mailing List -->
+
+<?php
+
+$doubleopt = $mailinglist -> doubleopt;
+
+?>
+
+<div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Save a Mailing List', $this -> plugin_name); ?></h2>
 	<?php $this -> render_admin('error', array('errors' => $errors)); ?>
 	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=save" method="post" id="mailinglistform">
@@ -15,7 +23,8 @@
 				</tr>
 				<?php if (apply_filters('newsletters_admin_mailinglists_save_privatelist_show', true)) : ?>
 					<tr>
-						<th><label for="privatelist"><?php _e('Private List', $this -> plugin_name); ?></label></th>
+						<th><label for="privatelist"><?php _e('Private List', $this -> plugin_name); ?></label>
+						<?php echo $Html -> help(__('A private list will not be shown to users/subscribers publicly, it is for internal use. You can send to subscribers in a private list and they can still unsubscribe from it though.', $this -> plugin_name)); ?></th>
 						<td>
 							<label><input <?php echo ($mailinglist -> privatelist == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="Mailinglist[privatelist]" id="privatelist2" value="Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
 							<label><input <?php echo (empty($mailinglist -> privatelist) || $mailinglist -> privatelist == "N") ? 'checked="checked"' : ''; ?> type="radio" name="Mailinglist[privatelist]" id="privatelist" value="N" /> <?php _e('No', $this -> plugin_name); ?></label>
@@ -46,6 +55,15 @@
                         	<p class="<?php echo $this -> pre; ?>error"><?php _e('No groups are available.', $this -> plugin_name); ?></p>
                         <?php endif; ?>
                     </td>
+                </tr>
+                <tr>
+                	<th><label for="doubleopt_Y"><?php _e('Double Opt-In', $this -> plugin_name); ?></label>
+                	<?php echo $Html -> help(__('With "Require Activation?" setting turned on in configuration, this is effective. You can then specify for this specific list whether double opt-in is required or not. If you specify Yes, a subscriber will need to activate/confirm via an email with confirmation link.', $this -> plugin_name)); ?></th>
+                	<td>
+                		<label><input <?php echo (empty($doubleopt) || (!empty($doubleopt) && $doubleopt == "Y")) ? 'checked="checked"' : ''; ?> type="radio" name="Mailinglist[doubleopt]" value="Y" id="doubleopt_Y" /> <?php _e('Yes, require activation', $this -> plugin_name); ?></label>
+                		<label><input <?php echo (!empty($doubleopt) && $doubleopt == "N") ? 'checked="checked"' : ''; ?> type="radio" name="Mailinglist[doubleopt]" value="N" id="doubleopt_N" /> <?php _e('No, activate immediately', $this -> plugin_name); ?></label>
+                		<span class="howto"><?php _e('This is only effective when "Require Activation?" is turned on in configuration', $this -> plugin_name); ?></span>
+                	</td>
                 </tr>
                 <?php if (apply_filters('newsletters_admin_mailinglists_save_paidlist_show', true)) : ?>
 					<tr>

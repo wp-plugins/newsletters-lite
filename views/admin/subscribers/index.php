@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Manage Subscribers', $this -> plugin_name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save" title="<?php _e('Create a new subscriber', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
 	<?php if (true || !empty($subscribers)) : ?>
 		<form id="posts-filter" action="<?php echo $this -> url; ?>" method="post">

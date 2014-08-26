@@ -1,4 +1,4 @@
-<?php if (!empty($autoresponderemails)) : ?>
+
 	<form action="?page=<?php echo $this -> sections -> autoresponderemails; ?>&amp;method=mass" onsubmit="if (!confirm('<?php _e('Are you sure you want to execute this action on the selected autoresponder emails?', $this -> plugin_name); ?>')) { return false; }" method="post">
     	<div class="tablenav">
         	<div class="alignleft actions">
@@ -17,6 +17,7 @@
         $orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		$colspan = 0;
         
         ?>
     
@@ -24,42 +25,49 @@
         	<thead>
             	<tr>
                 	<th class="check-column"><input type="checkbox" onclick="jqCheckAll(this, '<?php echo $this -> sections -> autoresponderemails; ?>', 'autoresponderemailslist');" name="checkboxall" value="checkboxall" id="checkboxall" /></th>
+                	<?php $colspan++; ?>
 					<th class="column-id <?php echo ($orderby == "id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=id&order=' . (($orderby == "id") ? $otherorder : "asc")); ?>">
 							<span><?php _e('ID', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                     <th class="column-subscriber_id <?php echo ($orderby == "subscriber_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=subscriber_id&order=' . (($orderby == "subscriber_id") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Subscriber', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                     <th class="column-autoresponder_id <?php echo ($orderby == "autoresponder_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=autoresponder_id&order=' . (($orderby == "autoresponder_id") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Autoresponder', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                     <th class="column-status <?php echo ($orderby == "status") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=status&order=' . (($orderby == "status") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Status', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                     <th class="column-modified <?php echo ($orderby == "modified") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=modified&order=' . (($orderby == "modified") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Date', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                     <th class="column-senddate <?php echo ($orderby == "senddate") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=senddate&order=' . (($orderby == "senddate") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Send Date', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                 </tr>
             </thead>
             <tfoot>
@@ -104,59 +112,67 @@
                 </tr>
             </tfoot>
         	<tbody>
-            	<?php foreach ($autoresponderemails as $aemail) : ?>
-            		<?php
-            		
-            		if (!empty($aemail -> subscriber_id) && !empty($aemail -> list_id)) {
-	            		global $wpdb;
-	            		$query = "SELECT `active` FROM " . $wpdb -> prefix . $SubscribersList -> table . " WHERE `subscriber_id` = '" . $aemail -> subscriber_id . "' AND `list_id` = '" . $aemail -> list_id . "' LIMIT 1";
+        		<?php if (empty($autoresponderemails)) : ?>
+        			<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No autoresponder emails found', $this -> plugin_name); ?></td>
+					</tr>
+        		<?php else : ?>
+	            	<?php foreach ($autoresponderemails as $aemail) : ?>
+	            		<?php
 	            		
-	            		$query_hash = md5($query);
-	            		if ($oc_active = wp_cache_get($query_hash, 'newsletters')) {
-		            		$active = $oc_active;
-	            		} else {
-		            		$active = $wpdb -> get_var($query);
-		            		wp_cache_set($query_hash, $active, 'newsletters', 0);
+	            		if (!empty($aemail -> subscriber_id) && !empty($aemail -> list_id)) {
+		            		global $wpdb;
+		            		$query = "SELECT `active` FROM " . $wpdb -> prefix . $SubscribersList -> table . " WHERE `subscriber_id` = '" . $aemail -> subscriber_id . "' AND `list_id` = '" . $aemail -> list_id . "' LIMIT 1";
+		            		$objectcache = $this -> get_option('objectcache');
+		            		$query_hash = md5($query);
+		            		if (!empty($objectcache) && $oc_active = wp_cache_get($query_hash, 'newsletters')) {
+			            		$active = $oc_active;
+		            		} else {
+			            		$active = $wpdb -> get_var($query);
+			            		if (!empty($objectcache)) {
+			            			wp_cache_set($query_hash, $active, 'newsletters', 0);
+			            		}
+		            		}
+		            		
+		            		$aemail -> active = $active;
 	            		}
 	            		
-	            		$aemail -> active = $active;
-            		}
-            		
-            		?>
-					<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-                    	<th class="check-column"><input type="checkbox" name="autoresponderemailslist[]" value="<?php echo $aemail -> id; ?>" id="checklist<?php echo $aemail -> id; ?>" /></th>
-                        <td><label for="checklist<?php echo $aemail -> id; ?>"><?php echo $aemail -> id; ?></label></td>
-                        <td>
-                        	<?php $difference = $Html -> time_difference($aemail -> senddate, date_i18n("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
-                            <?php if ($difference >= 0) { $daysstring = __('This autoresponder email is due in ' . $difference . ' ' . $aemail -> autoresponder -> delayinterval . ' only.', $this -> plugin_name); } else { $daysstring = ""; }; ?>
-                        	<strong><?php echo $Html -> link($aemail -> subscriber -> email, '?page=' . $this -> sections -> subscribers . '&amp;method=view&amp;id=' . $aemail -> subscriber_id, array('class' => "row-title")); ?></strong>
-                        	<?php if (!empty($aemail -> active)) : ?>(<span class="<?php echo $this -> pre; ?><?php echo ($aemail -> active == "Y") ? 'success' : 'error'; ?>"><?php echo ($aemail -> active == "Y") ? __('active', $this -> plugin_name) : __('inactive', $this -> plugin_name); ?></span>)<?php endif; ?>
-                            <div class="row-actions">
-                            	<?php $sendtext = ($aemail -> status == "unsent") ? __('Send Now', $this -> plugin_name) : __('Send Again', $this -> plugin_name); ?>
-                            	<span class="edit"><?php echo $Html -> link($sendtext, '?page=' . $this -> sections -> autoresponderemails . '&amp;method=send&amp;id=' . $aemail -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to send this autoresponder email now?', $this -> plugin_name) . " " . $daysstring . "')) { return false; }")); ?> |</span>
-                                <span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> autoresponderemails . '&amp;method=delete&amp;id=' . $aemail -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this autoresponder email?', $this -> plugin_name) . "')) { return false; }")); ?></span>
-                            </div>
-                        </td>
-                        <td>
-                        	<?php echo $Html -> link($aemail -> autoresponder -> title, '?page=' . $this -> sections -> autoresponders . '&amp;method=save&amp;id=' . $aemail -> autoresponder_id); ?>
-                        </td>
-                        <td>
-                        	<?php if ($aemail -> status == "sent") : ?>
-                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Sent', $this -> plugin_name); ?></span>
-                            <?php else : ?>
-                            	<span class="<?php echo $this -> pre; ?>error"><?php _e('Unsent', $this -> plugin_name); ?></span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                        	<abbr title="<?php echo $aemail -> created; ?>"><?php echo date_i18n("Y-m-d", strtotime($aemail -> created)); ?></abbr>
-                        </td>
-                        <td>
-                        	<abbr title="<?php echo $aemail -> senddate; ?>"><?php echo date_i18n("Y-m-d", strtotime($aemail -> senddate)); ?></abbr>
-                            <?php $difference = $Html -> time_difference($aemail -> senddate, date_i18n("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
-                            <?php if ($difference >= 0) : ?>(<?php echo $difference; ?> <?php echo $aemail -> autoresponder -> delayinterval; ?>+)<?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+	            		?>
+						<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+	                    	<th class="check-column"><input type="checkbox" name="autoresponderemailslist[]" value="<?php echo $aemail -> id; ?>" id="checklist<?php echo $aemail -> id; ?>" /></th>
+	                        <td><label for="checklist<?php echo $aemail -> id; ?>"><?php echo $aemail -> id; ?></label></td>
+	                        <td>
+	                        	<?php $difference = $Html -> time_difference($aemail -> senddate, date_i18n("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
+	                            <?php if ($difference >= 0) { $daysstring = __('This autoresponder email is due in ' . $difference . ' ' . $aemail -> autoresponder -> delayinterval . ' only.', $this -> plugin_name); } else { $daysstring = ""; }; ?>
+	                        	<strong><?php echo $Html -> link($aemail -> subscriber -> email, '?page=' . $this -> sections -> subscribers . '&amp;method=view&amp;id=' . $aemail -> subscriber_id, array('class' => "row-title")); ?></strong>
+	                        	<?php if (!empty($aemail -> active)) : ?>(<span class="<?php echo $this -> pre; ?><?php echo ($aemail -> active == "Y") ? 'success' : 'error'; ?>"><?php echo ($aemail -> active == "Y") ? __('active', $this -> plugin_name) : __('inactive', $this -> plugin_name); ?></span>)<?php endif; ?>
+	                            <div class="row-actions">
+	                            	<?php $sendtext = ($aemail -> status == "unsent") ? __('Send Now', $this -> plugin_name) : __('Send Again', $this -> plugin_name); ?>
+	                            	<span class="edit"><?php echo $Html -> link($sendtext, '?page=' . $this -> sections -> autoresponderemails . '&amp;method=send&amp;id=' . $aemail -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to send this autoresponder email now?', $this -> plugin_name) . " " . $daysstring . "')) { return false; }")); ?> |</span>
+	                                <span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> autoresponderemails . '&amp;method=delete&amp;id=' . $aemail -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this autoresponder email?', $this -> plugin_name) . "')) { return false; }")); ?></span>
+	                            </div>
+	                        </td>
+	                        <td>
+	                        	<?php echo $Html -> link($aemail -> autoresponder -> title, '?page=' . $this -> sections -> autoresponders . '&amp;method=save&amp;id=' . $aemail -> autoresponder_id); ?>
+	                        </td>
+	                        <td>
+	                        	<?php if ($aemail -> status == "sent") : ?>
+	                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Sent', $this -> plugin_name); ?></span>
+	                            <?php else : ?>
+	                            	<span class="<?php echo $this -> pre; ?>error"><?php _e('Unsent', $this -> plugin_name); ?></span>
+	                            <?php endif; ?>
+	                        </td>
+	                        <td>
+	                        	<abbr title="<?php echo $aemail -> created; ?>"><?php echo date_i18n("Y-m-d", strtotime($aemail -> created)); ?></abbr>
+	                        </td>
+	                        <td>
+	                        	<abbr title="<?php echo $aemail -> senddate; ?>"><?php echo date_i18n("Y-m-d", strtotime($aemail -> senddate)); ?></abbr>
+	                            <?php $difference = $Html -> time_difference($aemail -> senddate, date_i18n("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
+	                            <?php if ($difference >= 0) : ?>(<?php echo $difference; ?> <?php echo $aemail -> autoresponder -> delayinterval; ?>+)<?php endif; ?>
+	                        </td>
+	                    </tr>
+	                <?php endforeach; ?>
+	            <?php endif; ?>
             </tbody>
         </table>
         
@@ -191,7 +207,3 @@
         	<?php $this -> render('pagination', array('paginate' => $paginate), true, 'admin'); ?>
         </div>
     </form>
-<?php else : ?>
-	<br class="clear" />
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No autoresponder emails found.', $this -> plugin_name); ?></p>
-<?php endif; ?>

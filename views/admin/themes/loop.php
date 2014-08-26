@@ -1,4 +1,4 @@
-<?php if (!empty($themes)) : ?>
+
 	<form action="?page=<?php echo $this -> sections -> themes; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected themes?', $this -> plugin_name); ?>')) { return false; }" id="themesform">
 		<div class="tablenav">
 			<div class="alignleft actions">
@@ -16,6 +16,8 @@
 		$orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		
+		$colspan = 4;
 		
 		?>
 		
@@ -67,26 +69,32 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php foreach ($themes as $theme) : ?>
-				<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
-				<tr class="<?php echo $class; ?>" id="templaterow<?php echo $theme -> id; ?>">
-					<th class="check-column"><input id="checklist<?php echo $theme -> id; ?>" type="checkbox" name="themeslist[]" value="<?php echo $theme -> id; ?>" /></th>
-					<td><label for="checklist<?php echo $theme -> id; ?>"><?php echo $theme -> id; ?></label></td>
-					<td>
-						<strong><a class="row-title" href="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save&amp;id=<?php echo $theme -> id; ?>"><?php echo $theme -> title; ?></a></strong>
-						<?php echo (!empty($theme -> defsystem) && $theme -> defsystem == "Y") ? ' <small>(' . __('System Default', $this -> plugin_name) . ')</small> ' . $Html -> help(__('This theme is used for system emails such as confirmation, unsubscribe, authentication and other system notifications.', $this -> plugin_name)) : ''; ?>
-						<?php echo (!empty($theme -> def) && $theme -> def == "Y") ? ' <small>(' . __('Send Default', $this -> plugin_name) . ')</small> ' . $Html -> help(__('This theme is used for sending and will be pre-selected under Newsletters > Create Newsletter for example.', $this -> plugin_name)) : ''; ?>
-						<div class="row-actions">
-							<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&amp;method=save&amp;id=' . $theme -> id); ?> |</span>
-                            <?php if (empty($theme -> def) || $theme -> def == "N") : ?><span class="edit"><?php echo $Html -> link(__('Set as Send Default', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&amp;method=default&amp;id=' . $theme -> id); ?> |</span><?php endif; ?>
-                            <?php if (empty($theme -> defsystem) || $theme -> defsystem == "N") : ?><span class="edit"><?php echo $Html -> link(__('Set as System Default', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&method=defaultsystem&id=' . $theme -> id); ?> |</span><?php endif; ?>
-							<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&amp;method=delete&amp;id=' . $theme -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this theme?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
-							<span class="view"><?php echo $Html -> link(__('Preview', $this -> plugin_name), "", array('onclick' => "jQuery.colorbox({href:'" . home_url() . '/?' . $this -> pre . 'method=themepreview&id=' . $theme -> id . "'}); return false;", 'title' => __('Theme Preview: ', $this -> plugin_name) . $theme -> title)); ?></span>
-						</div>
-					</td>
-					<td><label for="checklist<?php echo $theme -> id; ?>"><abbr title="<?php echo $theme -> modified; ?>"><?php echo date("Y-m-d", strtotime($theme -> modified)); ?></abbr></label></td>
-				</tr>
-				<?php endforeach; ?>
+				<?php if (empty($themes)) : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No themes were found', $this -> plugin_name); ?></td>
+					</tr>
+				<?php else : ?>
+					<?php foreach ($themes as $theme) : ?>
+					<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
+						<tr class="<?php echo $class; ?>" id="templaterow<?php echo $theme -> id; ?>">
+							<th class="check-column"><input id="checklist<?php echo $theme -> id; ?>" type="checkbox" name="themeslist[]" value="<?php echo $theme -> id; ?>" /></th>
+							<td><label for="checklist<?php echo $theme -> id; ?>"><?php echo $theme -> id; ?></label></td>
+							<td>
+								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save&amp;id=<?php echo $theme -> id; ?>"><?php echo $theme -> title; ?></a></strong>
+								<?php echo (!empty($theme -> defsystem) && $theme -> defsystem == "Y") ? ' <small>(' . __('System Default', $this -> plugin_name) . ')</small> ' . $Html -> help(__('This theme is used for system emails such as confirmation, unsubscribe, authentication and other system notifications.', $this -> plugin_name)) : ''; ?>
+								<?php echo (!empty($theme -> def) && $theme -> def == "Y") ? ' <small>(' . __('Send Default', $this -> plugin_name) . ')</small> ' . $Html -> help(__('This theme is used for sending and will be pre-selected under Newsletters > Create Newsletter for example.', $this -> plugin_name)) : ''; ?>
+								<div class="row-actions">
+									<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&amp;method=save&amp;id=' . $theme -> id); ?> |</span>
+		                            <?php if (empty($theme -> def) || $theme -> def == "N") : ?><span class="edit"><?php echo $Html -> link(__('Set as Send Default', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&amp;method=default&amp;id=' . $theme -> id); ?> |</span><?php endif; ?>
+		                            <?php if (empty($theme -> defsystem) || $theme -> defsystem == "N") : ?><span class="edit"><?php echo $Html -> link(__('Set as System Default', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&method=defaultsystem&id=' . $theme -> id); ?> |</span><?php endif; ?>
+									<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> themes . '&amp;method=delete&amp;id=' . $theme -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this theme?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?> |</span>
+									<span class="view"><?php echo $Html -> link(__('Preview', $this -> plugin_name), "", array('onclick' => "jQuery.colorbox({href:'" . home_url() . '/?' . $this -> pre . 'method=themepreview&id=' . $theme -> id . "'}); return false;", 'title' => __('Theme Preview: ', $this -> plugin_name) . $theme -> title)); ?></span>
+								</div>
+							</td>
+							<td><label for="checklist<?php echo $theme -> id; ?>"><abbr title="<?php echo $theme -> modified; ?>"><?php echo date("Y-m-d", strtotime($theme -> modified)); ?></abbr></label></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -118,6 +126,3 @@
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
 	</form>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No themes were found', $this -> plugin_name); ?></p>
-<?php endif; ?>

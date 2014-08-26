@@ -14,12 +14,15 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Subscriber -> table . "`";
 		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_count = wp_cache_get($query_hash, 'newsletters')) {
 			$count = $oc_count;
 		} else {
 			$count = $wpdb -> get_var($query);
-			wp_cache_set($query_hash, $count, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
+			}
 		}
 		
 		if (!empty($count)) {
@@ -124,7 +127,8 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		}
 		
 		switch ($tag) {
-			case 'post_loop'				:			
+			case 'post_loop'				:
+			case 'newsletters_post_loop'	:			
 				if (!empty($shortcode_posts)) {
 					$shortcode_post_row = 1;				
 					foreach ($shortcode_posts as $post) {
@@ -137,27 +141,32 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				return $return;
 				break;
 			case 'post_id'					:
+			case 'newsletters_post_id'		:
 				if (!empty($shortcode_post)) {
 					return $shortcode_post -> ID;
 				}
 				break;
-			case 'post_author'				:			
+			case 'post_author'				:	
+			case 'newsletters_post_author'	:		
 				setup_postdata($shortcode_post);
 				$return = get_the_author();
 				wp_reset_postdata();
 				return $return;
 				break;
 			case 'post_title'				:
+			case 'newsletters_post_title'	:
 				if (!empty($shortcode_post)) {
 					return $shortcode_post -> post_title;
 				}
 				break;
-			case 'post_link'				:			
+			case 'post_link'				:
+			case 'newsletters_post_link'	:			
 				if (!empty($shortcode_post)) {
 					return $this -> direct_post_permalink($shortcode_post -> ID);
 				}
 				break;
-			case 'post_date_wrapper'		:			
+			case 'post_date_wrapper'				:
+			case 'newsletters_post_date_wrapper'	:			
 				if (empty($shortcode_post_showdate) || (!empty($shortcode_post_showdate) && $shortcode_post_showdate == "Y")) {
 					return do_shortcode($content);
 				} else {
@@ -165,6 +174,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_date'				:
+			case 'newsletters_post_date'	:
 				$defaults = array('format' => "F jS, Y");
 				extract(shortcode_atts($defaults, $atts));
 			
@@ -173,6 +183,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_thumbnail'			:
+			case 'newsletters_post_thumbnail'	:
 				$defaults = array('size' => "thumbnail");
 				extract(shortcode_atts($defaults, $atts));
 				if (!empty($shortcode_post)) {
@@ -187,6 +198,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_excerpt'				:
+			case 'newsletters_post_excerpt'	:
 				if (empty($wpml_eftype) || (!empty($wpml_eftype) && $wpml_eftype != "full")) {					
 					$this -> add_filter('excerpt_length');
 					$this -> add_filter('excerpt_more');
@@ -204,6 +216,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				
 				return $return;
 			case 'post_content'				:
+			case 'newsletters_post_content'	:
 				if (empty($wpml_eftype) || (!empty($wpml_eftype) && $wpml_eftype != "excerpt")) {
 					setup_postdata($shortcode_post);
 					$return = wpautop(get_the_content());
@@ -330,12 +343,15 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		if (!empty($id)) {
 			$templatequery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " WHERE id = '" . $id . "' LIMIT 1";
 			
+			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($templatequery);
-			if ($oc_template = wp_cache_get($query_hash, 'newsletters')) {
+			if (!empty($objectcache) && $oc_template = wp_cache_get($query_hash, 'newsletters')) {
 				$template = $oc_template;
 			} else {
 				$template = $wpdb -> get_row($templatequery);
-				wp_cache_set($query_hash, $template, 'newsletters', 0);
+				if (!empty($objectcache)) {
+					wp_cache_set($query_hash, $template, 'newsletters', 0);
+				}
 			}
 		
 			if (!empty($template)) {
@@ -386,12 +402,15 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		" ORDER BY " . $wpdb -> prefix . $History -> table . "." . $orderby . " " . $order . "";
 		if (!empty($number)) { $query .= " LIMIT " . $number . ""; }	
 		
+		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if ($oc_emails = wp_cache_get($query_hash, 'newsletters')) {
+		if (!empty($objectcache) && $oc_emails = wp_cache_get($query_hash, 'newsletters')) {
 			$emails = $oc_emails;
 		} else {
 			$emails = $wpdb -> get_results($query);
-			wp_cache_set($query_hash, $emails, 'newsletters', 0);
+			if (!empty($objectcache)) {
+				wp_cache_set($query_hash, $emails, 'newsletters', 0);
+			}
 		}
 		
 		if (!empty($emails)) {

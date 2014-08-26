@@ -1,4 +1,4 @@
-<?php if (!empty($subscribers)) : ?>
+<?php /*<?php if (!empty($subscribers)) : ?>*/ ?>
 	<form action="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=mass" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected subscribers?', $this -> plugin_name); ?>')) { return false; };" method="post" id="subscribersform" name="subscribersform">
 		<div class="tablenav">
 			<div class="alignleft">
@@ -49,20 +49,25 @@
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
 		
+		$colspan = 0;
+		
 		?>
 		
 		<table class="widefat">
 			<thead>
 				<tr>
 					<th class="check-column"><input type="checkbox" name="checkboxall" value="checkboxall" id="checkboxall" /></th>
+					<?php $colspan++; ?>
 					<th class="column-id <?php echo ($orderby == "id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=id&order=' . (($orderby == "id") ? $otherorder : "asc")); ?>">
 							<span><?php _e('ID', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
 					<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
 						<th class="column-image"><?php _e('Image', $this -> plugin_name); ?></th>
+						<?php $colspan++; ?>
 					<?php endif; ?>
 					<th class="column-email <?php echo ($orderby == "email") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=email&order=' . (($orderby == "email") ? $otherorder : "asc")); ?>">
@@ -70,6 +75,7 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
 					<?php if (apply_filters($this -> pre . '_admin_subscribers_registeredcolumn', true)) : ?>
 						<th class="column-registered <?php echo ($orderby == "registered") ? 'sorted ' . $order : 'sortable desc'; ?>">
 							<a href="<?php echo $Html -> retainquery('orderby=registered&order=' . (($orderby == "registered") ? $otherorder : "asc")); ?>">
@@ -77,20 +83,17 @@
 								<span class="sorting-indicator"></span>
 							</a>
 						</th>
+						<?php $colspan++; ?>
 					<?php endif; ?>
-					<th class="column-format <?php echo ($orderby == "format") ? 'sorted ' . $order : 'sortable desc'; ?>">
-						<a href="<?php echo $Html -> retainquery('orderby=format&order=' . (($orderby == "format") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Format', $this -> plugin_name); ?></span>
-							<span class="sorting-indicator"></span>
-						</a>
-					</th>
 					<th style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
+					<?php $colspan++; ?>
                     <th class="column-bouncecount <?php echo ($orderby == "bouncecount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=bouncecount&order=' . (($orderby == "bouncecount") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Bounces', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
                     <?php if (!empty($columns)) : ?>
                     	<?php foreach ($columns as $column) : ?>
                         	<th class="column-<?php echo $column -> slug; ?> <?php echo ($orderby == $column -> slug) ? 'sorted ' . $order : 'sortable desc'; ?>">
@@ -99,6 +102,7 @@
                         			<span class="sorting-indicator"></span>
                         		</a>
                         	</th>
+                        	<?php $colspan++; ?>
                         <?php endforeach; ?>
                     <?php endif; ?>
 					<th class="column-modified <?php echo ($orderby == "modified") ? 'sorted ' . $order : 'sortable desc'; ?>">
@@ -107,6 +111,7 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<?php $colspan++; ?>
 				</tr>
 			</thead>
 			<tfoot>
@@ -135,12 +140,6 @@
 							</a>
 						</th>
 					<?php endif; ?>
-					<th class="column-format <?php echo ($orderby == "format") ? 'sorted ' . $order : 'sortable desc'; ?>">
-						<a href="<?php echo $Html -> retainquery('orderby=format&order=' . (($orderby == "format") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Format', $this -> plugin_name); ?></span>
-							<span class="sorting-indicator"></span>
-						</a>
-					</th>
 					<th style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
                     <th class="column-bouncecount <?php echo ($orderby == "bouncecount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=bouncecount&order=' . (($orderby == "bouncecount") ? $otherorder : "asc")); ?>">
@@ -162,85 +161,90 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php $class = ''; ?>
-				<?php foreach ($subscribers as $subscriber) : ?>
-				<?php $updatediv = (empty($update)) ? 'subscribers' : $update; ?>
-				<tr id="subscriberrow<?php echo $subscriber -> id; ?>" class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-					<th class="check-column"><input type="checkbox" id="checklist<?php echo $subscriber -> id; ?>" name="subscriberslist[]" value="<?php echo $subscriber -> id; ?>" /></th>
-					<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo $subscriber -> id; ?></label></td>
-					<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
-						<td>
-							<label for="checklist<?php echo $subscriber -> id; ?>"><?php echo $Html -> get_gravatar($subscriber -> email); ?></label>
-						</td>
-					<?php endif; ?>
-					<td>
-						<strong><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('View the details of this subscriber', $this -> plugin_name); ?>" class="row-title"><?php echo $subscriber -> email; ?></a></strong>
-						<div class="row-actions">
-							<span class="edit"><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save&amp;id=<?php echo $subscriber -> id; ?>"><?php _e('Edit', $this -> plugin_name); ?></a> |</span>
-							<span class="delete"><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=delete&amp;id=<?php echo $subscriber -> id; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to delete this subscriber?', $this -> plugin_name); ?>')) { return false; }" class="submitdelete"><?php _e('Delete', $this -> plugin_name); ?></a> |</span>
-							<span class="view"><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>"><?php _e('View', $this -> plugin_name); ?></a></span>
-						</div>
-					</td>
-					<?php if (apply_filters($this -> pre . '_admin_subscribers_registeredcolumn', true)) : ?>
-						<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> registered) || $subscriber -> registered == "N") ? '<span style="color:red;">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
-					<?php endif; ?>
-					<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> format) || $subscriber -> format == "html") ? __('Html', $this -> plugin_name) : __('Text', $this -> plugin_name); ?></label></td>
-					<td>
-						<?php if (!empty($subscriber -> Mailinglist)) : ?>
-							<?php $m = 1; ?>
-							<?php foreach ($subscriber -> Mailinglist as $list) : ?>
-								<?php echo $Html -> link($list -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span style="color:red;">' . __('inactive', $this -> plugin_name); ?></span>)
-								<?php if ($m < count($subscriber -> Mailinglist)) : ?>
-									<?php echo ', '; ?>
+				<?php if (!empty($subscribers)) : ?>
+					<?php $class = ''; ?>
+					<?php foreach ($subscribers as $subscriber) : ?>
+						<?php $updatediv = (empty($update)) ? 'subscribers' : $update; ?>
+						<tr id="subscriberrow<?php echo $subscriber -> id; ?>" class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+							<th class="check-column"><input type="checkbox" id="checklist<?php echo $subscriber -> id; ?>" name="subscriberslist[]" value="<?php echo $subscriber -> id; ?>" /></th>
+							<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo $subscriber -> id; ?></label></td>
+							<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
+								<td>
+									<label for="checklist<?php echo $subscriber -> id; ?>"><?php echo $Html -> get_gravatar($subscriber -> email); ?></label>
+								</td>
+							<?php endif; ?>
+							<td>
+								<strong><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('View the details of this subscriber', $this -> plugin_name); ?>" class="row-title"><?php echo $subscriber -> email; ?></a></strong>
+								<div class="row-actions">
+									<span class="edit"><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save&amp;id=<?php echo $subscriber -> id; ?>"><?php _e('Edit', $this -> plugin_name); ?></a> |</span>
+									<span class="delete"><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=delete&amp;id=<?php echo $subscriber -> id; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to delete this subscriber?', $this -> plugin_name); ?>')) { return false; }" class="submitdelete"><?php _e('Delete', $this -> plugin_name); ?></a> |</span>
+									<span class="view"><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>"><?php _e('View', $this -> plugin_name); ?></a></span>
+								</div>
+							</td>
+							<?php if (apply_filters($this -> pre . '_admin_subscribers_registeredcolumn', true)) : ?>
+								<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> registered) || $subscriber -> registered == "N") ? '<span style="color:red;">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
+							<?php endif; ?>
+							<td>
+								<?php if (!empty($subscriber -> Mailinglist)) : ?>
+									<?php $m = 1; ?>
+									<?php foreach ($subscriber -> Mailinglist as $list) : ?>
+										<?php echo $Html -> link($list -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span style="color:red;">' . __('inactive', $this -> plugin_name); ?></span>)
+										<?php if ($m < count($subscriber -> Mailinglist)) : ?>
+											<?php echo ', '; ?>
+										<?php endif; ?>
+										<?php $m++; ?>
+									<?php endforeach; ?>
+								<?php else : ?>
+									<?php _e('none', $this -> plugin_name); ?>
 								<?php endif; ?>
-								<?php $m++; ?>
-							<?php endforeach; ?>
-						<?php else : ?>
-							<?php _e('none', $this -> plugin_name); ?>
-						<?php endif; ?>
-					</td>
-                    <td><?php echo $subscriber -> bouncecount; ?></td>
-                    <?php if (!empty($columns)) : ?>
-                    	<?php foreach ($columns as $column) : ?>
-                        	<td>
-                        	<?php if (!empty($subscriber -> {$column -> slug})) : ?>
-								<?php if ($column -> type == "radio" || $column -> type == "select") : ?>
-                                    <?php $fieldoptions = unserialize($column -> fieldoptions); ?>
-                                    <?php echo __($fieldoptions[$subscriber -> {$column -> slug}]); ?>
-                                <?php elseif ($column -> type == "checkbox") : ?>
-                                    <?php $supoptions = unserialize($subscriber -> {$column -> slug}); ?>
-                                    <?php $fieldoptions = unserialize($column -> fieldoptions); ?>
-                                    <?php if (!empty($supoptions) && is_array($supoptions)) : ?>
-                                        <?php foreach ($supoptions as $supopt) : ?>
-                                            &raquo;&nbsp;<?php echo __($fieldoptions[$supopt]); ?><br/>
-                                        <?php endforeach; ?>
-                                    <?php else : ?>
-                                        <?php _e('none', $this -> plugin_name); ?>
-                                    <?php endif; ?>
-                                <?php elseif ($column -> type == "file") : ?>
-                                	<?php echo $Html -> file_custom_field($subscriber -> {$column -> slug}); ?>
-                                <?php elseif ($column -> type == "pre_country") : ?>
-                                    <?php $Db -> model = $wpmlCountry -> model; ?>
-                                    <?php echo $Db -> field('value', array('id' => $subscriber -> {$column -> slug})); ?>
-                                <?php elseif ($column -> type == "pre_date") : ?>
-                                    <?php $date = @unserialize($subscriber -> {$column -> slug}); ?>
-                                    <?php if (!empty($date) && is_array($date)) : ?>
-                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
-                                    <?php endif; ?>
-                                <?php elseif ($column -> type == "pre_gender") : ?>
-                                	<?php echo (!empty($subscriber -> {$column -> slug}) && $subscriber -> {$column -> slug} == "male") ? __('Male', $this -> plugin_name) : __('Female', $this -> plugin_name); ?>
-                                <?php else : ?>
-                                    <?php echo $subscriber -> {$column -> slug}; ?>
-                                <?php endif; ?>
-                            <?php else : ?>
-                            
-                            <?php endif; ?>
-                            </td>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-					<td><label for="checklist<?php echo $subscriber -> id; ?>"><abbr title="<?php echo $subscriber -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($subscriber -> modified)); ?></abbr></label></td>
-				</tr>
-				<?php endforeach; ?>
+							</td>
+		                    <td><?php echo $subscriber -> bouncecount; ?></td>
+		                    <?php if (!empty($columns)) : ?>
+		                    	<?php foreach ($columns as $column) : ?>
+		                        	<td>
+		                        	<?php if (!empty($subscriber -> {$column -> slug})) : ?>
+										<?php if ($column -> type == "radio" || $column -> type == "select") : ?>
+		                                    <?php $fieldoptions = unserialize($column -> fieldoptions); ?>
+		                                    <?php echo __($fieldoptions[$subscriber -> {$column -> slug}]); ?>
+		                                <?php elseif ($column -> type == "checkbox") : ?>
+		                                    <?php $supoptions = unserialize($subscriber -> {$column -> slug}); ?>
+		                                    <?php $fieldoptions = unserialize($column -> fieldoptions); ?>
+		                                    <?php if (!empty($supoptions) && is_array($supoptions)) : ?>
+		                                        <?php foreach ($supoptions as $supopt) : ?>
+		                                            &raquo;&nbsp;<?php echo __($fieldoptions[$supopt]); ?><br/>
+		                                        <?php endforeach; ?>
+		                                    <?php else : ?>
+		                                        <?php _e('none', $this -> plugin_name); ?>
+		                                    <?php endif; ?>
+		                                <?php elseif ($column -> type == "file") : ?>
+		                                	<?php echo $Html -> file_custom_field($subscriber -> {$column -> slug}); ?>
+		                                <?php elseif ($column -> type == "pre_country") : ?>
+		                                    <?php $Db -> model = $wpmlCountry -> model; ?>
+		                                    <?php echo $Db -> field('value', array('id' => $subscriber -> {$column -> slug})); ?>
+		                                <?php elseif ($column -> type == "pre_date") : ?>
+		                                    <?php $date = @unserialize($subscriber -> {$column -> slug}); ?>
+		                                    <?php if (!empty($date) && is_array($date)) : ?>
+		                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+		                                    <?php endif; ?>
+		                                <?php elseif ($column -> type == "pre_gender") : ?>
+		                                	<?php echo (!empty($subscriber -> {$column -> slug}) && $subscriber -> {$column -> slug} == "male") ? __('Male', $this -> plugin_name) : __('Female', $this -> plugin_name); ?>
+		                                <?php else : ?>
+		                                    <?php echo $subscriber -> {$column -> slug}; ?>
+		                                <?php endif; ?>
+		                            <?php else : ?>
+		                            
+		                            <?php endif; ?>
+		                            </td>
+		                        <?php endforeach; ?>
+		                    <?php endif; ?>
+							<td><label for="checklist<?php echo $subscriber -> id; ?>"><abbr title="<?php echo $subscriber -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($subscriber -> modified)); ?></abbr></label></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php else : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No subscribers were found', $this -> plugin_name); ?></td>
+					</tr>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -283,6 +287,6 @@
 			}
 		}
 		</script>
-<?php else : ?>
+<?php /*<?php else : ?>
 	<p class="<?php echo $this -> pre; ?>error"><?php _e('No subscribers were found', $this -> plugin_name); ?></p>
-<?php endif; ?>
+<?php endif; ?>*/ ?>

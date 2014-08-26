@@ -1,4 +1,4 @@
-<?php if (!empty($orders)) : ?>
+
 	<form action="?page=<?php echo $this -> sections -> orders; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action?', $this -> plugin_name); ?>')) { return false; }" id="ordersform">
 		<div class="tablenav">
 			<div class="alignleft">
@@ -16,6 +16,8 @@
 		$orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		
+		$colspan = 6;
 		
 		?>
 		
@@ -42,6 +44,7 @@
 								<span class="sorting-indicator"></span>
 							</a>
 						</th>
+						<?php $colspan++; ?>
 					<?php endif; ?>
 					<th class="column-amount <?php echo ($orderby == "amount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=amount&order=' . (($orderby == "amount") ? $otherorder : "asc")); ?>">
@@ -107,29 +110,35 @@
 				</tr>
 			</tfoot>
 			<tbody>
-				<?php $class = ''; ?>
-				<?php foreach ($orders as $order) : ?>
-				<?php $subscriber = $Subscriber -> get($order -> subscriber_id, false); ?>
-				<?php $mailinglist = $Mailinglist -> get($order -> list_id, false); ?>
-				<tr id="orderrow<?php echo $order -> id; ?>" class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-					<th class="check-column"><input type="checkbox" name="orderslist[]" value="<?php echo $order -> id; ?>" id="checklist<?php echo $order -> id; ?>" /></th>
-					<td><label for="checklist<?php echo $order -> id; ?>"><?php echo $order -> id; ?></label></td>
-					<td>
-						<strong><a class="row-title" href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $mailinglist -> id; ?>" title="<?php _e('View the details of this mailinglist', $this -> plugin_name); ?>"><?php echo $mailinglist -> title; ?></a></strong>
-						<div class="row-actions">
-							<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=save&amp;id=' . $order -> id); ?> |</span>
-							<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=delete&amp;id=' . $order -> id, array('class' => "submitdelete", 'onclick' => "if (!confirm('" . __('Are you sure you want to delete this order? Linked subscription will be removed as well.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
-							<span class="view"><?php echo $Html -> link(__('View Order', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=view&amp;id=' . $order -> id); ?></span>
-						</div>
-					</td>
-					<?php if (empty($hide_subscriber)) : ?>
-						<td><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('View the details of this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a></td>
-					<?php endif; ?>
-					<td><label for="checklist<?php echo $order -> id; ?>"><strong><?php echo $Html -> currency(); ?><?php echo number_format($order -> amount, 2, '.', ''); ?></strong></label></td>
-					<td><label for="checklist<?php echo $order -> id; ?>"><?php echo (!empty($order -> pmethod) && $order -> pmethod == "2co") ? '2CheckOut' : 'PayPal'; ?></label></td>
-					<td><label for="checklist<?php echo $order -> id; ?>"><abbr title="<?php echo $order -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($order -> modified)); ?></abbr></label></td>
-				</tr>
-				<?php endforeach; ?>
+				<?php if (empty($orders)) : ?>
+					<tr class="no-items">
+						<td class="colspanchange" colspan="<?php echo $colspan; ?>"><?php _e('No orders were found', $this -> plugin_name); ?></td>
+					</tr>
+				<?php else : ?>
+					<?php $class = ''; ?>
+					<?php foreach ($orders as $order) : ?>
+						<?php $subscriber = $Subscriber -> get($order -> subscriber_id, false); ?>
+						<?php $mailinglist = $Mailinglist -> get($order -> list_id, false); ?>
+						<tr id="orderrow<?php echo $order -> id; ?>" class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+							<th class="check-column"><input type="checkbox" name="orderslist[]" value="<?php echo $order -> id; ?>" id="checklist<?php echo $order -> id; ?>" /></th>
+							<td><label for="checklist<?php echo $order -> id; ?>"><?php echo $order -> id; ?></label></td>
+							<td>
+								<strong><a class="row-title" href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $mailinglist -> id; ?>" title="<?php _e('View the details of this mailinglist', $this -> plugin_name); ?>"><?php echo $mailinglist -> title; ?></a></strong>
+								<div class="row-actions">
+									<span class="edit"><?php echo $Html -> link(__('Edit', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=save&amp;id=' . $order -> id); ?> |</span>
+									<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=delete&amp;id=' . $order -> id, array('class' => "submitdelete", 'onclick' => "if (!confirm('" . __('Are you sure you want to delete this order? Linked subscription will be removed as well.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+									<span class="view"><?php echo $Html -> link(__('View Order', $this -> plugin_name), '?page=' . $this -> sections -> orders . '&amp;method=view&amp;id=' . $order -> id); ?></span>
+								</div>
+							</td>
+							<?php if (empty($hide_subscriber)) : ?>
+								<td><a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('View the details of this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a></td>
+							<?php endif; ?>
+							<td><label for="checklist<?php echo $order -> id; ?>"><strong><?php echo $Html -> currency(); ?><?php echo number_format($order -> amount, 2, '.', ''); ?></strong></label></td>
+							<td><label for="checklist<?php echo $order -> id; ?>"><?php echo (!empty($order -> pmethod) && $order -> pmethod == "2co") ? '2CheckOut' : 'PayPal'; ?></label></td>
+							<td><label for="checklist<?php echo $order -> id; ?>"><abbr title="<?php echo $order -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($order -> modified)); ?></abbr></label></td>
+						</tr>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</tbody>
 		</table>
 		<div class="tablenav">
@@ -163,6 +172,3 @@
 		}
 		</script>
 	</form>
-<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No subscription orders were found', $this -> plugin_name); ?></p>
-<?php endif; ?>

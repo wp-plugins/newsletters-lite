@@ -3,7 +3,7 @@
 	<tbody>
 		<tr>
 			<th><label for="excerpt_length"><?php _e('Excerpt Length', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(__('This is the length of the excerpt of posts when inserted into a newsletter. It will be the effective length when you are using the <code>[post_excerpt]</code> shortcode for example. The length is in words, not characters.', $this -> plugin_name)); ?></th>
+			<?php echo $Html -> help(__('This is the length of the excerpt of posts when inserted into a newsletter. It will be the effective length when you are using the <code>[newsletters_post_excerpt]</code> shortcode for example. The length is in words, not characters.', $this -> plugin_name)); ?></th>
 			<td>
 				<input type="text" name="excerpt_length" value="<?php echo esc_attr(stripslashes($this -> get_option('excerpt_length'))); ?>" id="excerpt_length" class="widefat" style="width:65px;" /> <?php _e('words', $this -> plugin_name); ?>
 				<span class="howto"><?php _e('Length of the excerpt in words.', $this -> plugin_name); ?></span>

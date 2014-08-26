@@ -27,7 +27,7 @@ $debugging = get_option('tridebugging');
 	</div>
 	<div id="major-publishing-actions">
 		<div id="publishing-action">
-			<input id="publish" class="button button-primary button-large" type="submit" name="save" value="<?php _e('Save Settings'); ?>" class="button button-highlighted" />	
+			<input id="publish" class="button button-primary button-large" type="submit" name="save" value="<?php _e('Save Settings', $this -> plugin_name); ?>" class="button button-highlighted" />	
 		</div>
 		<br class="clear" />
 	</div>
