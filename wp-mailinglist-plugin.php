@@ -106,6 +106,22 @@ if (!class_exists('wpMailPlugin')) {
 				require_once($this -> plugin_base() . DS . 'includes' . DS . 'extensions.php');
 				$this -> extensions = $extensions;
 			}
+			
+			$procedure = 
+			"DELIMITER // 
+			DROP PROCEDURE IF EXISTS getsubscribers // 
+			CREATE PROCEDURE getsubscribers()
+			BEGIN 
+			SELECT * FROM wp_wpmlsubscribers;
+			END // 
+			DELIMITER;";
+			
+			//$result = $wpdb -> get_results($procedure);
+			//$this -> debug($result);
+			
+			//$procedurecall = "CALL getsubscribers();";
+			//$result = $wpdb -> get_results($procedurecall);
+			//$this -> debug($result);
 		}
 		
 		function media_insert($html = null, $id = null, $attachment = null) {
