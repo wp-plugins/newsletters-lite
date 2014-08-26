@@ -538,13 +538,13 @@ class wpmlField extends wpMailPlugin {
 										break;
 								}
 								break;
-							default					:
+							default					:							
 								if (empty($field -> validation) || $field -> validation == "notempty") {
 									if (empty($data[$field -> slug])) {
 										$this -> errors[$field -> slug] = __($field -> errormessage);
 									}
 								} else {
-									if (!empty($field -> validation)) {
+									if (!empty($field -> validation)) {									
 										$regex = ($field -> validation == "custom") ? $field -> regex : $validation_rules[$field -> validation]['regex'];										
 										if (!preg_match($regex, $data[$field -> slug])) {
 											$this -> errors[$field -> slug] = __($field -> errormessage);

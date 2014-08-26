@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.2.1
+Version: 4.3
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -2211,7 +2211,7 @@ if (!class_exists('wpMail')) {
 							}
 						}
 						
-						if (!empty($_POST['sendattachment']) && $_POST['sendattachment'] == "Y") {						
+						if (!empty($_POST['sendattachment']) && $_POST['sendattachment'] == "1") {						
 							$newattachments = array();
 							
 							if (!empty($_FILES['attachments']['name'])) {								
@@ -5471,14 +5471,18 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function update_plugin_complete_actions($upgrade_actions = null, $plugin = null) {
-			$this -> add_option('activation_redirect', true);
+			$this_plugin = plugin_basename(__FILE__);
 			
-			$upgrade_actions['newsletters'] = 
-			'<script type="text/javascript">
-			jQuery("iframe").load(function() {
-				window.location = "' . admin_url('index.php') . "?page=newsletters-about" . '";
-			});
-			</script>';
+			if (!empty($plugin) && $plugin == $this_plugin) {
+				$this -> add_option('activation_redirect', true);
+				
+				$upgrade_actions['newsletters'] = 
+				'<script type="text/javascript">
+				jQuery("iframe").load(function() {
+					window.location = "' . admin_url('index.php') . "?page=newsletters-about" . '";
+				});
+				</script>';
+			}
 			
 			return $upgrade_actions;
 		}

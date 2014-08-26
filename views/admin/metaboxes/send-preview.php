@@ -59,6 +59,8 @@ function previewrunner() {
 			jQuery('#autosave').html('<?php _e('Draft saved at', $this -> plugin_name); ?> ' + autosavedate).show();
 		}
 	});
+	
+	return true;
 }
 
 jQuery(document).ready(function() {

@@ -7,15 +7,15 @@ $validation_rules = array(
 	),
 	'alphanumeric'			=>	array(
 		'title'					=>	__('Alpha-Numeric', $this -> plugin_name),
-		'regex'					=>	"/^[a-zA-Z0-9]*$/",
+		'regex'					=>	"/^[a-zA-Z0-9]+$/",
 	),
 	'alphabetic'			=>	array(
 		'title'					=>	__('Alphabetic', $this -> plugin_name),
-		'regex'					=>	"/^[a-zA-Z]*$/",
+		'regex'					=>	"/^[a-zA-Z]+$/",
 	),
 	'numeric'				=>	array(
 		'title'					=>	__('Numeric', $this -> plugin_name),
-		'regex'					=>	"/^[0-9]*$/",
+		'regex'					=>	"/^[0-9]+$/",
 	),
 	'email'					=>	array(
 		'title'					=>	__('Email', $this -> plugin_name),

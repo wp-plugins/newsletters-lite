@@ -5,8 +5,6 @@
 		<tr>
 			<th><label for="sendattachment"><?php _e('Send Attachment(s)', $this -> plugin_name); ?></label></th>
 			<td>
-				<?php /*<label><input <?php echo (!empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="jQuery('#attachmentdivinside').show();" type="radio" name="sendattachment" value="Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
-				<label><input <?php echo (empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="jQuery('#attachmentdivinside').hide();" type="radio" name="sendattachment" id="sendattachmentN" value="N" /> <?php _e('No', $this -> plugin_name); ?></label>*/ ?>
 				<label><input <?php echo (!empty($_POST['attachments'])) ? 'checked="checked"' : ''; ?> onclick="if (jQuery(this).is(':checked')) { jQuery('#attachmentdivinside').show(); } else { jQuery('#attachmentdivinside').hide(); }" type="checkbox" name="sendattachment" value="1" id="sendattachment" /> <?php _e('Yes, I want to attach files to this email', $this -> plugin_name); ?></label>
                 <span class="howto"><?php _e('You can attach files to this email for your subscribers to receive.', $this -> plugin_name); ?></span>
 			</td>

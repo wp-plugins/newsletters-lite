@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.2.1';
+		var $version = '4.3';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -1319,6 +1319,8 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if ($History -> save($history_data, false)) {
+				$history_id = $History -> insertid;
+			
 				if (!empty($_POST['contentarea'])) {
 					foreach ($_POST['contentarea'] as $number => $content) {
 						$content_data = array(
@@ -1332,9 +1334,11 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			}
 			
+			print_r($_POST);
+			
 			$history_id = $History -> insertid;
 	    	$_GET['id'] = $history_id;
-	    	ob_get_clean();
+	    	$output = ob_get_clean();
 	    	$preview = $this -> ajax_historyiframe(true);
 	    	
 	    	header("Content-Type: text/xml; charset=UTF-8");
@@ -5010,9 +5014,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.2") < 0) {
+				if (version_compare($cur_version, "4.3") < 0) {
 					$this -> update_options();
-					$version = "4.2";
+					$version = "4.3";
 				}
 			
 				//the current version is older.
@@ -5639,8 +5643,6 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function url() {
-			//$url = rtrim(site_url(), '/') . '/' . substr(str_replace("\\", "/", $this -> plugin_base()), strlen(ABSPATH));		
-			//$url = rtrim(plugin_dir_url(__FILE__), '/');
 			$url = rtrim(plugins_url(false, __FILE__));
 			return $url;
 		}
@@ -5673,7 +5675,7 @@ if (!class_exists('wpMailPlugin')) {
 				?>
 				
 				<script type="text/javascript">
-				window.location.href = '<?php echo $url; ?>';
+				window.location.href = '<?php echo addslashes($url); ?>';
 				</script>
 				
 				<?php

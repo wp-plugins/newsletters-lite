@@ -198,6 +198,18 @@
 						jQuery('#mn').val('<?php echo date_i18n("i", strtotime($senddate)); ?>');
 						update_timestamp();
 					<?php endif; ?>
+					
+					jQuery('#sendbutton').click(function() {
+						if (previewrequest) {
+							previewrequest.abort();
+						}
+					});
+					
+					jQuery('#save-post').click(function () {
+						if (previewrequest) {
+							previewrequest.abort();
+						}
+					});
 				});
 				
 				function update_timestamp() { 

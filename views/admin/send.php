@@ -187,7 +187,7 @@ function deletecontentarea(number, history_id) {
 			//all good, the request was successful
 		});
 	} else {
-		tinyMCE.execCommand("mceRemoveControl", false, 'contentarea' + number);
+		tinyMCE.execCommand("mceRemoveEditor", false, 'contentarea' + number);
 		contentarea--;
 	}
 	
@@ -221,7 +221,7 @@ function addcontentarea() {
 	wpml_scroll('#contentareabox' + contentarea);
 	
 	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
-		tinyMCE.execCommand("mceAddControl", false, 'contentarea' + contentarea);
+		tinyMCE.execCommand("mceAddEditor", false, 'contentarea' + contentarea);
 	}
 		
 	contentarea++;
