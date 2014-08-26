@@ -5466,6 +5466,7 @@ if (!class_exists('wpMail')) {
 		
 		function activation_hook() {
 			$this -> add_option('activation_redirect', true);
+			wp_redirect(admin_url('index.php') . "?page=newsletters-about");
 		}
 		
 		function custom_redirect() {
@@ -5473,8 +5474,7 @@ if (!class_exists('wpMail')) {
 			
 			if (is_admin() && !empty($activation_redirect)) {
 				$this -> delete_option('activation_redirect');
-				header("Location: " . admin_url('index.php') . "?page=newsletters-about");
-				exit();
+				wp_redirect(admin_url('index.php') . "?page=newsletters-about");
 			}
 		}
 		

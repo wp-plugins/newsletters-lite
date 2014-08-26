@@ -71,7 +71,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 			<div class="col-3 last-feature">
 				<h4><?php _e('Google Analytics', $this -> plugin_name); ?></h4>
 				<p><?php _e('Google Analytics helps you analyze visitor traffic and paint a complete picture of your audience and their needs, wherever they are along the path.', $this -> plugin_name); ?></p>
-				<p> <a href="http://tribulant.com/extensions/view/45/google-analytics" class="button button button-primary">Google Analytics</a></p>
+				<p> <a href="http://tribulant.com/extensions/view/46/google-analytics" class="button button button-primary">Google Analytics</a></p>
 			</div>
 		</div>
 	</div>
