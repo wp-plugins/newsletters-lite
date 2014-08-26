@@ -50,7 +50,7 @@
             <th><label for="bouncemethod_pop"><?php _e('Bounce Handling Method', $this -> plugin_name); ?></label></th>
             <td>
                 <label><input onclick="jQuery('#bouncemethod_pop_div').hide(); jQuery('#bouncemethod_sns_div').hide(); jQuery('#bouncemehtod_cgi_div').show();" <?php echo ($this -> get_option('bouncemethod') == "cgi") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="cgi" id="bouncemethod_cgi" /> <?php _e('Email Piping (CGI)', $this -> plugin_name); ?></label>
-                <label><input onclick="jQuery('#bouncemethod_pop_div').show(); jQuery('#bouncemethod_sns_div').hide(); jQuery('#bouncemehtod_cgi_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "pop") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="pop" id="bouncemethod_pop" /> <?php _e('POP/IMAP Email Fetch', $this -> plugin_name); ?></label>
+                <label><input onclick="jQuery('#bouncemethod_pop_div').show(); jQuery('#bouncemethod_sns_div').hide(); jQuery('#bouncemehtod_cgi_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "pop") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="pop" id="bouncemethod_pop" /> <?php _e('POP3 Email Fetch', $this -> plugin_name); ?></label>
                 <label><input onclick="jQuery('#bouncemethod_sns_div').show(); jQuery('#bouncemethod_pop_div').hide(); jQuery('#bouncemehtod_cgi_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "sns") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="sns" id="bouncemethod_sns" /> <?php _e('Amazon SNS', $this -> plugin_name); ?></label>
                 <span class="howto"><?php _e('Method to use to record bounced emails to subscribers.', $this -> plugin_name); ?></span>
             </td>
@@ -123,7 +123,7 @@
             <tr>
             	<th>&nbsp;</th>
             	<td>
-            		<a id="testbouncesettings" class="button-primary" onclick="testbouncesettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>" title="<?php _e('Test POP/IMAP bounce settings', $this -> plugin_name); ?>"><?php _e('Test POP/IMAP Settings', $this -> plugin_name); ?></a>
+            		<a id="testbouncesettings" class="button-primary" onclick="testbouncesettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>" title="<?php _e('Test POP3 bounce settings', $this -> plugin_name); ?>"><?php _e('Test POP3 Settings', $this -> plugin_name); ?></a>
             		<span id="testbouncesettingsloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" border="0" style="border:none;" /></span>
             	</td>
             </tr>

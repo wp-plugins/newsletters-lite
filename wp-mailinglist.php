@@ -218,9 +218,9 @@ if (!class_exists('wpMail')) {
 					$Html -> wp_has_current_submenu($_GET['page']);
 				}
 			
-				if (!$this -> ci_serial_valid()) {
+				if (!$this -> ci_serial_valid() && (empty($_GET['page']) || $_GET['page'] != $this -> sections -> submitserial)) {
 					$message = __('Please fill in a serial key for the Newsletter plugin to continue use.', $this -> plugin_name);
-					$message .= ' <a class="button" id="' . $this -> pre . 'submitseriallink" href="" title="Newsletter plugin - Serial Key">' . __('Submit Serial Key', $this -> plugin_name) . '</a>';
+					$message .= ' <a class="button" id="' . $this -> pre . 'submitseriallink" href="' . admin_url('admin.php') . '?page=' . $this -> sections -> submitserial . '" title="Newsletter plugin - Serial Key">' . __('Submit Serial Key', $this -> plugin_name) . '</a>';
 					$this -> render_error($message);
 					
 					?>
@@ -754,6 +754,7 @@ if (!class_exists('wpMail')) {
 									$message = __('Payment received and subscription activated', $this -> plugin_name);
 									
 									if ($this -> get_option('adminordernotify') == "Y") {
+										$subscriber -> mailinglists = array($list_id);
 										$to = null;
 										$to -> email = $this -> get_option('adminemail');
 										$subject = $this -> et_subject('order', $subscriber);
@@ -1726,6 +1727,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin() {	
+			if (!$this -> ci_serial_valid()) {
+				$this -> redirect('?page=' . $this -> sections -> submitserial);
+			}
+		
 			if ($this -> has_update()) {
 				$update = $this -> vendor('update');
 				$update_info = $update -> get_version_info(true);
@@ -1751,37 +1756,42 @@ if (!class_exists('wpMail')) {
 			$this -> check_roles();
 		
 			add_menu_page(__('Newsletters', $this -> plugin_name), __('Newsletters', $this -> plugin_name) . $update_icon, 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'), false, "26.11");
-			$this -> menus['newsletters'] = add_submenu_page($this -> sections -> welcome, __('Overview', $this -> plugin_name), __('Overview', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'));
-			$this -> menus['newsletters-settings'] = add_submenu_page($this -> sections -> welcome, __('General Configuration', $this -> plugin_name), __('Configuration', $this -> plugin_name), 'newsletters_settings', $this -> sections -> settings, array($this, 'admin_config'));
-			$this -> menus['newsletters-settings-subscribers'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Subscribers Configuration', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_settings_subscribers', $this -> sections -> settings_subscribers, array($this, 'admin_settings_subscribers'));
-			$this -> menus['newsletters-settings-templates'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Email Templates Configuration', $this -> plugin_name), __('Email Templates', $this -> plugin_name), 'newsletters_settings_templates', $this -> sections -> settings_templates, array($this, 'admin_settings_templates'));
-			$this -> menus['newsletters-settings-system'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('System Configuration', $this -> plugin_name), __('System', $this -> plugin_name), 'newsletters_settings_system', $this -> sections -> settings_system, array($this, 'admin_settings_system'));
-			$this -> menus['newsletters-settings-tasks'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Scheduled Tasks', $this -> plugin_name), __('Scheduled Tasks', $this -> plugin_name), 'newsletters_settings_tasks', $this -> sections -> settings_tasks, array($this, 'admin_settings_tasks'));
-			$this -> menus['newsletters-send'] = add_submenu_page($this -> sections -> welcome, __('Create Newsletter', $this -> plugin_name), __('Create Newsletter', $this -> plugin_name), 'newsletters_send', $this -> sections -> send, array($this, 'admin_send'));
-			$this -> menus['newsletters-history'] = add_submenu_page($this -> sections -> welcome, __('Sent &amp; Draft Emails', $this -> plugin_name), __('Sent &amp; Draft Emails', $this -> plugin_name), 'newsletters_history', $this -> sections -> history, array($this, 'admin_history'));
 			
-			if ($this -> get_option('clicktrack') == "Y") {
-				$this -> menus['newsletters-links'] = add_submenu_page($this -> sections -> welcome, __('Links &amp; Clicks', $this -> plugin_name), __('Links &amp; Clicks', $this -> plugin_name), 'newsletters_links', $this -> sections -> links, array($this, 'admin_links'));		
-			}
-			
-			$this -> menus['newsletters-autoresponders'] = add_submenu_page($this -> sections -> welcome, __('Autoresponders', $this -> plugin_name), __('Autoresponders', $this -> plugin_name), 'newsletters_autoresponders', $this -> sections -> autoresponders, array($this, 'admin_autoresponders'));
-			$this -> menus['newsletters-autoresponderemails'] = add_submenu_page("newsletters_page_" . $this -> sections -> autoresponders, __('Autoresponder Emails', $this -> plugin_name), __('Autoresponder Emails', $this -> plugin_name), 'newsletters_autoresponderemails', $this -> sections -> autoresponderemails, array($this, 'admin_autoresponderemails'));
-			$this -> menus['newsletters-lists'] = add_submenu_page($this -> sections -> welcome, __('Mailing Lists', $this -> plugin_name), __('Mailing Lists', $this -> plugin_name), 'newsletters_lists', $this -> sections -> lists, array($this, 'admin_mailinglists'));
-			$this -> menus['newsletters-groups'] = add_submenu_page($this -> sections -> welcome, __('Groups', $this -> plugin_name), __('Groups', $this -> plugin_name), 'newsletters_groups', $this -> sections -> groups, array($this, 'admin_groups'));
-			$this -> menus['newsletters-subscribers'] = add_submenu_page($this -> sections -> welcome, __('Subscribers', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_subscribers', $this -> sections -> subscribers, array($this, 'admin_subscribers'));
-			$this -> menus['newsletters-fields'] = add_submenu_page($this -> sections -> welcome, __('Custom Fields', $this -> plugin_name), __('Custom Fields', $this -> plugin_name), 'newsletters_fields', $this -> sections -> fields, array($this, 'admin_fields'));
-			$this -> menus['newsletters-import'] = add_submenu_page($this -> sections -> welcome, __('Import/Export Subscribers', $this -> plugin_name), __('Import/Export', $this -> plugin_name), 'newsletters_importexport', $this -> sections -> importexport, array($this, 'admin_importexport'));
-			$this -> menus['newsletters-themes'] = add_submenu_page($this -> sections -> welcome, __('Themes', $this -> plugin_name), __('Themes', $this -> plugin_name), 'newsletters_themes', $this -> sections -> themes, array($this, 'admin_themes')); 
-			$this -> menus['newsletters-templates'] = add_submenu_page($this -> sections -> welcome, __('Email Snippets', $this -> plugin_name), __('Email Snippets', $this -> plugin_name), 'newsletters_templates', $this -> sections -> templates, array($this, 'admin_templates'));
-			$this -> menus['newsletters-templates-save'] = add_submenu_page($this -> menus['newsletters-templates'], __('Save an Email Snippet', $this -> plugin_name), __('Save an Email Snippet', $this -> plugin_name), 'newsletters_templates_save', $this -> sections -> templates_save, array($this, 'admin_templates'));
-			$this -> menus['newsletters-queue'] = add_submenu_page($this -> sections -> welcome, __('Email Queue', $this -> plugin_name), __('Email Queue', $this -> plugin_name) . ((!empty($queue_count)) ? $queue_count_icon : ''), 'newsletters_queue', $this -> sections -> queue, array($this, 'admin_mailqueue'));
-			$this -> menus['newsletters-orders'] = add_submenu_page($this -> sections -> welcome, __('Subscription Orders', $this -> plugin_name), __('Subscription Orders', $this -> plugin_name), 'newsletters_orders', $this -> sections -> orders, array($this, 'admin_orders'));
-			$this -> menus['newsletters-extensions'] = add_submenu_page($this -> sections -> welcome, __('Extensions', $this -> plugin_name), __('Extensions', $this -> plugin_name), 'newsletters_extensions', $this -> sections -> extensions, array($this, 'admin_extensions'));
-			$this -> menus['newsletters-settings-updates'] = add_submenu_page($this -> sections -> welcome, __('Updates', $this -> plugin_name), __('Updates', $this -> plugin_name) . $update_icon, 'newsletters_settings_updates', $this -> sections -> settings_updates, array($this, 'admin_settings_updates'));
-			$this -> menus['newsletters-extensions-settings'] = add_submenu_page($this -> menus['newsletters-extensions'], __('Extensions Settings', $this -> plugin_name), __('Extensions Settings', $this -> plugin_name), 'newsletters_extensions_settings', $this -> sections -> extensions_settings, array($this, 'admin_extensions_settings'));
-			
-			if (WPML_SHOW_SUPPORT) {
-				$this -> menus['newsletters-support'] = add_submenu_page($this -> sections -> welcome, __('Support &amp; Help', $this -> plugin_name), __('Support &amp; Help', $this -> plugin_name), 'newsletters_support', $this -> sections -> support, array($this, 'admin_help'));
+			if (!$this -> ci_serial_valid()) {
+				$this -> menus['newsletters-submitserial'] = add_submenu_page($this -> sections -> welcome, __('Submit Serial', $this -> plugin_name), __('Submit Serial', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> submitserial, array($this, 'admin_submitserial'));
+			} else {
+				$this -> menus['newsletters'] = add_submenu_page($this -> sections -> welcome, __('Overview', $this -> plugin_name), __('Overview', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'));
+				$this -> menus['newsletters-settings'] = add_submenu_page($this -> sections -> welcome, __('General Configuration', $this -> plugin_name), __('Configuration', $this -> plugin_name), 'newsletters_settings', $this -> sections -> settings, array($this, 'admin_config'));
+				$this -> menus['newsletters-settings-subscribers'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Subscribers Configuration', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_settings_subscribers', $this -> sections -> settings_subscribers, array($this, 'admin_settings_subscribers'));
+				$this -> menus['newsletters-settings-templates'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Email Templates Configuration', $this -> plugin_name), __('Email Templates', $this -> plugin_name), 'newsletters_settings_templates', $this -> sections -> settings_templates, array($this, 'admin_settings_templates'));
+				$this -> menus['newsletters-settings-system'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('System Configuration', $this -> plugin_name), __('System', $this -> plugin_name), 'newsletters_settings_system', $this -> sections -> settings_system, array($this, 'admin_settings_system'));
+				$this -> menus['newsletters-settings-tasks'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Scheduled Tasks', $this -> plugin_name), __('Scheduled Tasks', $this -> plugin_name), 'newsletters_settings_tasks', $this -> sections -> settings_tasks, array($this, 'admin_settings_tasks'));
+				$this -> menus['newsletters-send'] = add_submenu_page($this -> sections -> welcome, __('Create Newsletter', $this -> plugin_name), __('Create Newsletter', $this -> plugin_name), 'newsletters_send', $this -> sections -> send, array($this, 'admin_send'));
+				$this -> menus['newsletters-history'] = add_submenu_page($this -> sections -> welcome, __('Sent &amp; Draft Emails', $this -> plugin_name), __('Sent &amp; Draft Emails', $this -> plugin_name), 'newsletters_history', $this -> sections -> history, array($this, 'admin_history'));
+				
+				if ($this -> get_option('clicktrack') == "Y") {
+					$this -> menus['newsletters-links'] = add_submenu_page($this -> sections -> welcome, __('Links &amp; Clicks', $this -> plugin_name), __('Links &amp; Clicks', $this -> plugin_name), 'newsletters_links', $this -> sections -> links, array($this, 'admin_links'));		
+				}
+				
+				$this -> menus['newsletters-autoresponders'] = add_submenu_page($this -> sections -> welcome, __('Autoresponders', $this -> plugin_name), __('Autoresponders', $this -> plugin_name), 'newsletters_autoresponders', $this -> sections -> autoresponders, array($this, 'admin_autoresponders'));
+				$this -> menus['newsletters-autoresponderemails'] = add_submenu_page("newsletters_page_" . $this -> sections -> autoresponders, __('Autoresponder Emails', $this -> plugin_name), __('Autoresponder Emails', $this -> plugin_name), 'newsletters_autoresponderemails', $this -> sections -> autoresponderemails, array($this, 'admin_autoresponderemails'));
+				$this -> menus['newsletters-lists'] = add_submenu_page($this -> sections -> welcome, __('Mailing Lists', $this -> plugin_name), __('Mailing Lists', $this -> plugin_name), 'newsletters_lists', $this -> sections -> lists, array($this, 'admin_mailinglists'));
+				$this -> menus['newsletters-groups'] = add_submenu_page($this -> sections -> welcome, __('Groups', $this -> plugin_name), __('Groups', $this -> plugin_name), 'newsletters_groups', $this -> sections -> groups, array($this, 'admin_groups'));
+				$this -> menus['newsletters-subscribers'] = add_submenu_page($this -> sections -> welcome, __('Subscribers', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_subscribers', $this -> sections -> subscribers, array($this, 'admin_subscribers'));
+				$this -> menus['newsletters-fields'] = add_submenu_page($this -> sections -> welcome, __('Custom Fields', $this -> plugin_name), __('Custom Fields', $this -> plugin_name), 'newsletters_fields', $this -> sections -> fields, array($this, 'admin_fields'));
+				$this -> menus['newsletters-import'] = add_submenu_page($this -> sections -> welcome, __('Import/Export Subscribers', $this -> plugin_name), __('Import/Export', $this -> plugin_name), 'newsletters_importexport', $this -> sections -> importexport, array($this, 'admin_importexport'));
+				$this -> menus['newsletters-themes'] = add_submenu_page($this -> sections -> welcome, __('Themes', $this -> plugin_name), __('Themes', $this -> plugin_name), 'newsletters_themes', $this -> sections -> themes, array($this, 'admin_themes')); 
+				$this -> menus['newsletters-templates'] = add_submenu_page($this -> sections -> welcome, __('Email Snippets', $this -> plugin_name), __('Email Snippets', $this -> plugin_name), 'newsletters_templates', $this -> sections -> templates, array($this, 'admin_templates'));
+				$this -> menus['newsletters-templates-save'] = add_submenu_page($this -> menus['newsletters-templates'], __('Save an Email Snippet', $this -> plugin_name), __('Save an Email Snippet', $this -> plugin_name), 'newsletters_templates_save', $this -> sections -> templates_save, array($this, 'admin_templates'));
+				$this -> menus['newsletters-queue'] = add_submenu_page($this -> sections -> welcome, __('Email Queue', $this -> plugin_name), __('Email Queue', $this -> plugin_name) . ((!empty($queue_count)) ? $queue_count_icon : ''), 'newsletters_queue', $this -> sections -> queue, array($this, 'admin_mailqueue'));
+				$this -> menus['newsletters-orders'] = add_submenu_page($this -> sections -> welcome, __('Subscription Orders', $this -> plugin_name), __('Subscription Orders', $this -> plugin_name), 'newsletters_orders', $this -> sections -> orders, array($this, 'admin_orders'));
+				$this -> menus['newsletters-extensions'] = add_submenu_page($this -> sections -> welcome, __('Extensions', $this -> plugin_name), __('Extensions', $this -> plugin_name), 'newsletters_extensions', $this -> sections -> extensions, array($this, 'admin_extensions'));
+				$this -> menus['newsletters-settings-updates'] = add_submenu_page($this -> sections -> welcome, __('Updates', $this -> plugin_name), __('Updates', $this -> plugin_name) . $update_icon, 'newsletters_settings_updates', $this -> sections -> settings_updates, array($this, 'admin_settings_updates'));
+				$this -> menus['newsletters-extensions-settings'] = add_submenu_page($this -> menus['newsletters-extensions'], __('Extensions Settings', $this -> plugin_name), __('Extensions Settings', $this -> plugin_name), 'newsletters_extensions_settings', $this -> sections -> extensions_settings, array($this, 'admin_extensions_settings'));
+				
+				if (WPML_SHOW_SUPPORT) {
+					$this -> menus['newsletters-support'] = add_submenu_page($this -> sections -> welcome, __('Support &amp; Help', $this -> plugin_name), __('Support &amp; Help', $this -> plugin_name), 'newsletters_support', $this -> sections -> support, array($this, 'admin_help'));
+				}
 			}
 			
 			add_action('admin_head-' . $this -> menus['newsletters'], array($this, 'admin_head_welcome'));
@@ -1977,6 +1987,26 @@ if (!class_exists('wpMail')) {
 		
 		function widget_register() {			
 			register_widget('Newsletters_Widget');
+		}
+		
+		function admin_submitserial() {
+			$success = false;
+		
+			if (!empty($_POST)) {
+				if (empty($_REQUEST['serial'])) { $errors[] = __('Please fill in a serial key.', $this -> plugin_name); }
+				else { 
+					$this -> update_option('serialkey', $_REQUEST['serial']);	//update the DB option
+					
+					if (!$this -> ci_serial_valid()) { $errors[] = __('Serial key is invalid, please try again.', $this -> plugin_name); }
+					else {
+						delete_transient($this -> pre . 'update_info');
+						$success = true;
+						$this -> redirect('?page=' . $this -> sections -> welcome); 
+					}
+				}
+			}
+			
+			$this -> render('settings-submitserial', array('success' => $success, 'errors' => $errors), true, 'admin');
 		}
 		
 		function admin_index() {	

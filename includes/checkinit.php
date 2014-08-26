@@ -18,12 +18,18 @@ if (!class_exists('wpMailCheckinit')) {
 			if (!is_admin() || (is_admin() && $this -> ci_serial_valid())) {
 				$this -> ci_initialization();
 			} else {				
-				wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
+				/*wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
 				wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
 				wp_enqueue_style('colorbox', plugins_url() . '/' . $this -> plugin_name . '/css/colorbox.css', false, $this -> version, "all");
 				
 				$this -> add_action('admin_notices');
-				$this -> add_action('init', 'init', 10, 1);
+				$this -> add_action('init', 'init', 10, 1);*/
+				
+				$this -> add_action('admin_print_styles', 'ci_print_styles', 10, 1);
+				$this -> add_action('admin_print_scripts', 'ci_print_scripts', 10, 1);
+				$this -> add_action('admin_notices');
+				$this -> add_action('init', 'init_getpost', 10, 1);
+				$this -> add_action('admin_menu', 'admin_menu');
 			}
 			
 			return false;

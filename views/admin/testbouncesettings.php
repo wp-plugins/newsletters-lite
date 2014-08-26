@@ -1,9 +1,9 @@
 <div style="width:400px;">
-	<h3><?php _e('Test POP/IMAP Settings', $this -> plugin_name); ?></h3>
+	<h3><?php _e('Test POP3 Settings', $this -> plugin_name); ?></h3>
 	
 	<?php if ($success == true) : ?>
 		<p>
-			<?php _e('Congratulations, your POP/IMAP settings are working!', $this -> plugin_name); ?><br/>
+			<?php _e('Congratulations, your POP3 settings are working!', $this -> plugin_name); ?><br/>
 			<?php _e('Remember to save your configuration settings.', $this -> plugin_name); ?>
 		</p>
 		
@@ -11,7 +11,7 @@
 			<p class="<?php echo $this -> pre; ?>success"><?php echo $message; ?></p>
 		<?php endif; ?>
 	<?php else : ?>
-		<p class="<?php echo $this -> pre; ?>error"><?php _e('Unfortunately a POP/IMAP error occurred:', $this -> plugin_name); ?> <?php echo stripslashes($error); ?></p>
+		<p class="<?php echo $this -> pre; ?>error"><?php _e('Unfortunately a POP3 error occurred:', $this -> plugin_name); ?> <?php echo stripslashes($error); ?></p>
 	<?php endif; ?>
 	
 	<p>

@@ -234,8 +234,10 @@ class wpmlSubscribersList extends wpMailPlugin {
 		$mailinglists_table = $wpdb -> prefix . $Mailinglist -> table;
 		$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
 		$subscriberslists_table = $wpdb -> prefix . $SubscribersList -> table;
+		
 		$query = "UPDATE " . $subscriberslists_table . " AS sl LEFT JOIN " . $mailinglists_table . " AS m ON sl.list_id = m.id SET sl.active = 'N' WHERE (sl.paid_sent >= m.maxperinterval AND m.maxperinterval != '') AND sl.active = 'Y'";
 		$updated = $wpdb -> query($query);
+		
 		return $updated;
 	}
 	
@@ -244,7 +246,6 @@ class wpmlSubscribersList extends wpMailPlugin {
 		$conditions = array('paid' => "Y");
 		
 		$updated = 0;		
-		$updated = $this -> check_maxperinterval();
 		
 		if (!empty($single) && $single == true && !empty($subscriber_id)) {
 			$conditions['subscriber_id'] = $subscriber_id;	
@@ -254,11 +255,11 @@ class wpmlSubscribersList extends wpMailPlugin {
 		
 		if (!empty($subscriberslists)) {
 			foreach ($subscriberslists as $sl) {
-				if ($sl -> paid == "Y" && $sl -> active == "Y" && $sl -> ppsubscription != "Y") {
+				if ($sl -> paid == "Y" && $sl -> active == "Y") {
 					$mailinglist = $Mailinglist -> get($sl -> list_id, false);
 					$expiry = $Mailinglist -> gen_expiration_date($sl -> subscriber_id, $sl -> list_id);
 					
-					if ($mailinglist -> interval != "once" && time() >= strtotime($expiry)) {
+					if ($mailinglist -> interval == "once" || time() >= strtotime($expiry)) {					
 						$conditions = array('subscriber_id' => $sl -> subscriber_id, 'list_id' => $sl -> list_id);
 						$this -> save_field('paid', "N", $conditions);
 						$this -> save_field('active', "N", $conditions);
@@ -268,6 +269,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 						if ($mailinglist -> paid == "Y") {						
 							$subscriber = $Subscriber -> get($sl -> subscriber_id, false);
 							$subscriber -> mailinglist_id = $sl -> list_id;
+							$subscriber -> mailinglists = array($sl -> list_id);
 							$subject = $this -> et_subject('expire');
 							$fullbody = $this -> et_message('expire');
 							$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
@@ -278,6 +280,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 			}	
 		}
 		
+		$updated += $this -> check_maxperinterval();		
 		return $updated;
 	}
 	

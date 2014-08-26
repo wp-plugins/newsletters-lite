@@ -44,7 +44,7 @@
             <!-- POP3 Scheduling = "wpml_pophook" -->
             <tr class="alternate">
             	<th>
-					<a class="row-title" href="?page=<?php echo $this -> sections -> settings; ?>#bouncediv"><?php _e('POP/IMAP Bounce Check', $this -> plugin_name); ?></a>
+					<a class="row-title" href="?page=<?php echo $this -> sections -> settings; ?>#bouncediv"><?php _e('POP3 Bounce Check', $this -> plugin_name); ?></a>
                     <div class="row-actions">
                     	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=runschedule&amp;hook=pophook', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
                         <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=reschedule&amp;hook=pophook', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
@@ -55,7 +55,7 @@
                 	<?php if ($this -> get_option('bouncemethod') == "pop") : ?>
                 		<?php echo $Html -> next_scheduled('pophook'); ?>
                     <?php else : ?>
-                    	<?php _e('POP/IMAP bounce handling is turned OFF.', $this -> plugin_name); ?>
+                    	<?php _e('POP3 bounce handling is turned OFF.', $this -> plugin_name); ?>
                     <?php endif; ?>
                 </td>
             </tr>

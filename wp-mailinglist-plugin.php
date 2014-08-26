@@ -16,6 +16,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 		var $sections = array(
 			'welcome'					=> 	"newsletters",
+			'submitserial'				=>	"newsletters-submitserial",
 			'send'						=>	"newsletters-create",
 			'autoresponders'			=>	"newsletters-autoresponders",
 			'autoresponderemails'		=>	"newsletters-autoresponderemails",
@@ -106,22 +107,6 @@ if (!class_exists('wpMailPlugin')) {
 				require_once($this -> plugin_base() . DS . 'includes' . DS . 'extensions.php');
 				$this -> extensions = $extensions;
 			}
-			
-			$procedure = 
-			"DELIMITER // 
-			DROP PROCEDURE IF EXISTS getsubscribers // 
-			CREATE PROCEDURE getsubscribers()
-			BEGIN 
-			SELECT * FROM wp_wpmlsubscribers;
-			END // 
-			DELIMITER;";
-			
-			//$result = $wpdb -> get_results($procedure);
-			//$this -> debug($result);
-			
-			//$procedurecall = "CALL getsubscribers();";
-			//$result = $wpdb -> get_results($procedurecall);
-			//$this -> debug($result);
 		}
 		
 		function media_insert($html = null, $id = null, $attachment = null) {
@@ -2365,6 +2350,16 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			return false;
+		}
+		
+		function ci_print_styles() {
+			wp_enqueue_style('newsletters', $this -> render_url('css/wp-mailinglist.css', 'admin', false), null, $this -> version, "all");
+			wp_enqueue_style('colorbox', plugins_url() . '/' . $this -> plugin_name . '/css/colorbox.css', false, $this -> version, "all");
+		}
+		
+		function ci_print_scripts() {
+			wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
+			wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
 		}
 		
 		function print_scripts() {
