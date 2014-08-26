@@ -16,6 +16,7 @@
 		<p>
 			<a onclick="if (!confirm('<?php _e('Have you backed up any custom folders/files inside the plugin? Are you sure you want to delete all the plugin files and install the latest?', $this -> plugin_name); ?>')) { return false; }" href="<?php echo $upgrade_url; ?>" title="" class="button-primary"><?php _e('Update Automatically', $this -> plugin_name); ?></a>
 			<a target="_blank" href="<?php echo $update_info['url']; ?>" title="" class="button-secondary"><?php _e('Download Update', $this -> plugin_name); ?></a>
+			<a style="color:black; text-decoration:none;" href="?page=<?php echo $this -> sections -> settings_updates; ?>&amp;method=check" class="button button-secondary"><?php _e('Check Again', $this -> plugin_name); ?></a>
 		</p>
 	</div>
 <?php else : ?>

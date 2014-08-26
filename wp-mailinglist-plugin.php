@@ -96,6 +96,7 @@ if (!class_exists('wpMailPlugin')) {
 			global $wpdb;
 			$wpdb -> query("SET sql_mode = '';");
 			$debugging = $this -> get_option('debugging');
+			$debugging = false;
 			$this -> debugging = (empty($debugging)) ? $this -> debugging : true;
 			$this -> debugging($this -> debugging);
 			add_action('plugins_loaded', array($this, 'ci_initialize'));
@@ -2113,7 +2114,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function paginate($model = null, $fields = '*', $sub = null, $conditions = false, $searchterm = null, $per_page = 10, $order = array('modified', "DESC")) {
-			global $wpdb, $Db, $Autoresponder, $Autoresponderemail, $Subscriber, $SubscribersList, 
+			global $wpdb, $Db, $Autoresponder, $Autoresponderemail, $Subscriber, $SubscribersList, $Mailinglist, 
 			${$model}, $AutorespondersList, $Mailinglist;
 			
 			$object = (!is_object(${$model})) ? $this -> {$model} : ${$model};
@@ -2140,6 +2141,16 @@ if (!class_exists('wpMailPlugin')) {
 						$newdata[$n] = $record;
 						
 						switch ($model) {
+							case 'Subscriber'					:							
+								$Db -> model = $SubscribersList -> model;
+								if ($subscriberslists = $Db -> find_all(array('subscriber_id' => $record -> id))) {
+									foreach ($subscriberslists as $sl) {
+										$listquery = "SELECT * FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE id = '" . $sl -> list_id . "' LIMIT 1";
+										$newdata[$n] -> Mailinglist[] = $wpdb -> get_row($listquery);
+										//$newdata[$n] -> subscriptions[] = $sl;
+									}
+								}
+								break;
 							case 'SubscribersList'				:
 								$Db -> model = $Subscriber -> model;
 								
@@ -3415,7 +3426,11 @@ if (!class_exists('wpMailPlugin')) {
 			$titles = array();
 			
 			if (empty($subscriber -> mailinglists)) {			
-				$subscriber -> mailinglists = $_POST['mailinglists'];
+				if (!empty($_POST['mailinglists'])) {
+					$subscriber -> mailinglists = $_POST['mailinglists'];
+				} else {
+					$subscriber -> mailinglists = array($subscriber -> mailinglist_id);
+				}
 			}
 		
 			if (!empty($subscriber -> mailinglists)) {			
@@ -3814,7 +3829,7 @@ if (!class_exists('wpMailPlugin')) {
 		function execute_mail($subscriber = array(), $subject = null, $message = null, $attachments = null, $history_id = null, $eunique = null, $shortlinks = true) {
 			global $wpdb, $Db, $Html, $Email, $History, $phpmailer, $Subscriber, $orig_message, $wpml_message, $wpml_textmessage, $fromwpml;
 			$sent = false;
-			$fromwpml = true; 
+			$fromwpml = true;
 		
 			if (empty($subscriber)) { $error[] = __("No subscriber specified", $this -> plugin_name); }
 			if (empty($subject)) { $error[] = __('No subject specified', $this -> plugin_name); }
@@ -3836,7 +3851,7 @@ if (!class_exists('wpMailPlugin')) {
 				$attachments = maybe_unserialize($attachments);
 			}
 			
-			if (empty($error)) {			
+			if (empty($error)) {
 				$Db -> model = $Email -> model;			
 				$subject = $this -> process_set_variables($subscriber, stripslashes($subject), $history_id, $eunique, true);			
 				$message = $this -> process_set_variables($subscriber, stripslashes($message), $history_id, $eunique);
@@ -5170,7 +5185,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function render($file = null, $params = array(), $output = true, $folder = 'default', $extension = null) {	
 			$this -> sections = (object) $this -> sections;
-			$this -> plugin_name = 'wp-mailinglist';
+			//$this -> plugin_name = 'wp-mailinglist';
 		
 			if (!empty($file)) {
 				if (!empty($folder) && $folder == "default") {
@@ -5181,7 +5196,7 @@ if (!class_exists('wpMailPlugin')) {
 				$filename = $file . '.php';
 				
 				if (!empty($extension)) {				
-					if ($extensions = $this -> get_extensions()) {
+					if ($extensions = $this -> get_extensions()) {					
 						foreach ($extensions as $ext) {
 							if ($extension == $ext['slug']) {
 								$extension_folder = $ext['plugin_name'];

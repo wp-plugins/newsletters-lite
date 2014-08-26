@@ -1370,6 +1370,8 @@ if (!class_exists('wpMail')) {
 		
 		function cron_hook() {
 			header("HTTP/1.1 200 OK");
+			
+			do_action('newsletters_cron_fired');
 		
 			global $wpdb, $Db, $Email, $History, $Subscriber, $SubscribersList, $Queue;
 			$emailssent = 0;
@@ -3385,10 +3387,11 @@ if (!class_exists('wpMail')) {
 						$data[$Subscriber -> model] = $subscribers;
 						$data['Paginate'] = false;
 					} else {
-						$data = $Subscriber -> get_all_paginated($conditions, $searchterm, $this -> sections -> subscribers, $perpage, $order);
+						//$data = $Subscriber -> get_all_paginated($conditions, $searchterm, $this -> sections -> subscribers, $perpage, $order);						
+						$data = $this -> paginate($Subscriber -> model, null, $this -> sections -> subscribers, $conditions, $searchterm, $perpage, $order);
 					}
 					
-					$this -> render_admin('subscribers' . DS . 'index', array('subscribers' => $data[$Subscriber -> model], 'paginate' => $data['Pagination']));
+					$this -> render_admin('subscribers' . DS . 'index', array('subscribers' => $data[$Subscriber -> model], 'paginate' => $data['Paginate']));
 					break;
 			}
 		}
