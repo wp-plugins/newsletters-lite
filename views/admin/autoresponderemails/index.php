@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Autoresponder Emails', $this -> plugin_name); ?></h2>
     
     <div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; Back to Autoresponders', $this -> plugin_name), "?page=" . $this -> sections -> autoresponders); ?></div> 

@@ -9,15 +9,13 @@ class wpmlAuthHelper extends wpMailPlugin {
 	function logged_in() {
 		global $wpdb, $Db, $Subscriber, $user_ID;
 		
-		if ($subscriberauth = $this -> read_cookie()) {
+		$Db -> model = $Subscriber -> model;
+		if ($user_ID && $subscriber = $Db -> find(array('user_id' => $user_ID))) {
+			return $subscriber;
+		} elseif ($subscriberauth = $this -> read_cookie()) {
 			$Db -> model = $Subscriber -> model;			
 			if ($subscriber = $Db -> find(array('cookieauth' => $subscriberauth))) {			
 				return $subscriber;	
-			}
-		} elseif ($user_ID) {
-			$Db -> model = $Subscriber -> model;
-			if ($subscriber = $Db -> find(array('user_id' => $user_ID))) {
-				return $subscriber;
 			}
 		}
 		
@@ -45,14 +43,22 @@ class wpmlAuthHelper extends wpMailPlugin {
 	}
 	
 	function set_emailcookie($email = null, $days = "+30 days") {
-		if (!empty($email)) {
-			$this -> delete_cookie($this -> emailcookiename, $email);
+		if (is_feed()) {
+			return false;
+		}
+	
+		if (!empty($email)) {			
+			if (!empty($_COOKIE[$this -> emailcookiename]) && $_COOKIE[$this -> emailcookiename]) {
+				return true;
+			}
 			
 			if (!headers_sent()) {
 				setcookie($this -> emailcookiename, $email, strtotime($days), '/');
 			} else {
 				$this -> javascript_cookie($this -> emailcookiename, $email);	
 			}
+			
+			$_COOKIE[$this -> emailcookiename] = $email;
 		}
 		
 		return false;
@@ -63,39 +69,32 @@ class wpmlAuthHelper extends wpMailPlugin {
 			return false;	
 		}
 		
-		$this -> delete_cookie($this -> cookiename, $value);
-		
-		if (!headers_sent()) {
-			setcookie($this -> cookiename, $value, strtotime($days), '/');
-		} else {
-			$this -> javascript_cookie($this -> cookiename, $value);	
+		if (!empty($value)) {			
+			if (!empty($_COOKIE[$this -> cookiename]) && $_COOKIE[$this -> cookiename] == $value) {
+				return true;
+			}
+			
+			if (!headers_sent()) {
+				setcookie($this -> cookiename, $value, strtotime($days), '/');
+			} else {
+				$this -> javascript_cookie($this -> cookiename, $value);	
+			}
+			
+			$_COOKIE[$this -> cookiename] = $value;
 		}
 			
 		return true;
 	}
 	
 	function delete_cookie($cookiename = null, $cookievalue = null) {
-		if (false && !headers_sent() ) {
+		if (!headers_sent() ) {
 			setcookie($cookiename, $cookievalue, time() - 3600);
 		} else {
-			global $wpmljavascript;
-			ob_start();
-			
-			?>
-			
-			<script type="text/javascript">
-			document.cookie = "<?php echo $cookiename; ?>=<?php echo $value; ?>; expires=<?php echo date_i18n($this -> get_option('cookieformat'), time() - 3600); ?> UTC; path=/";
-			</script>
-			
-			<?php	
-			
-			$newjavascript = ob_get_clean();
-			$wpmljavascript .= $newjavascript;
-			return $wpmljavascript;
+			$this -> javascript_cookie($cookiename, $cookievalue, true);
 		}
 	}
 	
-	function javascript_cookie($cookiename = null, $value = null) {
+	function javascript_cookie($cookiename = null, $value = null, $delete = false) {
 		if (!empty($cookiename) && !empty($value)) {
 			global $wpmljavascript;
 			ob_start();
@@ -104,8 +103,11 @@ class wpmlAuthHelper extends wpMailPlugin {
 			
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
-				document.cookie = "<?php echo $cookiename; ?>=<?php echo $value; ?>; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("-30 days")); ?> UTC; path=/";
-				document.cookie = "<?php echo $cookiename; ?>=<?php echo $value; ?>; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+				<?php if (!empty($delete)) : ?>
+					document.cookie = "<?php echo $cookiename; ?>=<?php echo $value; ?>; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("-30 days")); ?> UTC;";
+				<?php else : ?>
+					document.cookie = "<?php echo $cookiename; ?>=<?php echo $value; ?>; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC;";
+				<?php endif; ?>
 			});
 			</script>
 			

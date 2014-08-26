@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<div style="float:left; margin:0 10px 0 0;">
 		<?php echo $Html -> get_gravatar($subscriber -> email); ?>
 	</div>

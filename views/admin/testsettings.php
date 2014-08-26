@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<script type="text/javascript">
 	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 	</script>

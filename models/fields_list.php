@@ -62,15 +62,13 @@ class wpmlFieldsList extends wpMailPlugin {
 		$query .= " ORDER BY `" . $ofield . "` " . $odir . "";
 		$query .= (empty($limit)) ? '' : " LIMIT " . $limit . "";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_fieldslists = wp_cache_get($query_hash, 'newsletters')) {
-			$fieldslists = $oc_fieldslists;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$fieldslists = ${'newsletters_query_' . $query_hash};
 		} else {
 			$fieldslists = $wpdb -> get_results($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $fieldslists, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $fieldslists;
 		}
 		
 		if (!empty($fieldslists)) {
@@ -92,17 +90,15 @@ class wpmlFieldsList extends wpMailPlugin {
 		if (!empty($list_id)) {		
 			if ($list = $Mailinglist -> get($list_id)) {
 				$query = "SELECT COUNT(*) FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `list_id` = '" . $list_id . "'";
-			
-				$objectcache = $this -> get_option('objectcache');
+				
 				$query_hash = md5($query);
-				if (!empty($objectcache) && $count = wp_cache_get($query_hash, 'newsletters')) {
-					return $count;
+				global ${'newsletters_query_' . $query_hash};
+				if (!empty(${'newsletters_query_' . $query_hash})) {
+					return ${'newsletters_query_' . $query_hash};
 				}
 			
 				if ($count = $wpdb -> get_var($query)) {
-					if (!empty($objectcache)) {
-						wp_cache_set($query_hash, $count, 'newsletters', 0);
-					}
+					${'newsletters_query_' . $query_hash} = $count;
 					return $count;
 				}
 			}
@@ -162,15 +158,13 @@ class wpmlFieldsList extends wpMailPlugin {
 		if (!empty($field_id)) {		
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `field_id` = '" . $field_id . "'";
 			
-			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if (!empty($objectcache) && $oc_fieldslists = wp_cache_get($query_hash, 'newsletters')) {
-				$fieldslists = $oc_fieldslists;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$fieldslists = ${'newsletters_query_' . $query_hash};
 			} else {
 				$fieldslists = $wpdb -> get_results($query);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $fieldslists, 'newsletter', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $fieldslists;
 			}
 		
 			if (!empty($fieldslists)) {
@@ -226,10 +220,10 @@ class wpmlFieldsList extends wpMailPlugin {
 		$wherelistid .= " " . $wpdb -> prefix . $Field -> table . ".display = 'always'";
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table_name . " LEFT JOIN " . $wpdb -> prefix . $Field -> table . " ON " . $wpdb -> prefix . $Field -> table . ".id = " . $wpdb -> prefix . $this -> table_name . ".field_id " . $wherelistid . " ORDER BY " . $wpdb -> prefix . $Field -> table . ".order ASC";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $data = wp_cache_get($query_hash, 'newsletters')) {
-			return $data;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			return ${'newsletters_query_' . $query_hash};
 		}
 	
 		if ($fieldslists = $wpdb -> get_results($query)) {
@@ -258,9 +252,7 @@ class wpmlFieldsList extends wpMailPlugin {
 				}
 			}
 			
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $data, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $data;
 			return $data;
 		}
 		
@@ -273,15 +265,13 @@ class wpmlFieldsList extends wpMailPlugin {
 		if (!empty($field_id)) {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `field_id` = '" . $field_id . "'";
 			
-			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if (!empty($objectcache) && $oc_fieldslists = wp_cache_get($query_hash, 'newsletters')) {
-				$fieldslists = $oc_fieldslists;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$fieldslists = ${'newsletters_query_' . $query_hash};
 			} else {
 				$fieldslists = $wpdb -> get_results($query);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $fieldslists, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $fieldslists;
 			}
 		
 			if (!empty($fieldslists)) {

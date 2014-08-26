@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
     <h2><?php _e('Manage Autoresponders', $this -> plugin_name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save" title="<?php _e('Add a new autoresponder', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
     
     <form method="post" action="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=autoresponderscheduling">

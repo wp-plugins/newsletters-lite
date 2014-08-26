@@ -1,5 +1,5 @@
 <div id="queues">
-	<div class="wrap">
+	<div class="wrap newsletters">
 		<h2><?php _e('Emails Queue', $this -> name); ?></h2>
 		<div class="dbx-group" id="advancedstuff">
 			<div class="dbx-b-ox-wrapper">

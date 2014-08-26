@@ -121,7 +121,7 @@
 				</tr>
 				<tr>
 					<th><label for="<?php echo $this -> pre; ?>smtppass"><?php _e('SMTP Password', $this -> plugin_name); ?></label></th>
-					<td><input autocomplete="off" class="widefat" type="password" id="<?php echo $this -> pre; ?>smtppass" name="smtppass" value="<?php echo $this -> get_option('smtppass'); ?>" /></td>
+					<td><input autocomplete="off" class="widefat" type="text" id="<?php echo $this -> pre; ?>smtppass" name="smtppass" value="<?php echo $this -> get_option('smtppass'); ?>" /></td>
 				</tr>
 			</tbody>
 		</table>

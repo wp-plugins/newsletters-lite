@@ -9,7 +9,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Extensions Settings', $this -> plugin_name); ?></h2>
     
     <?php $this -> render('extensions' . DS . 'navigation', false, true, 'admin'); ?>

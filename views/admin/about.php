@@ -10,7 +10,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
 ?>
 
-<div class="wrap about-wrap">
+<div class="wrap newsletters about-wrap">
 	<h1><?php echo sprintf(__( 'Welcome to Newsletters %s', $this -> plugin_name), $this -> version); ?></h1>
 	<div class="about-text">
 		<?php echo sprintf(__('Thank you for installing! Newsletters %s is more powerful, reliable and versatile than before. It includes many features and improvements to make email marketing easier and more efficient for you.', $this -> plugin_name), $this -> version); ?>

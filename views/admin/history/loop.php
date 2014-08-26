@@ -49,7 +49,7 @@
 						</a>
 					</th>
 					<?php $colspan++; ?>
-					<th><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
+					<th class="column-mailinglists"><?php _e('List(s)', $this -> plugin_name); ?></th>
 					<?php $colspan++; ?>
                     <th class="column-theme <?php echo ($orderby == "theme_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=theme_id&order=' . (($orderby == "theme_id") ? $otherorder : "asc")); ?>">
@@ -58,7 +58,7 @@
 						</a>
 					</th>
 					<?php $colspan++; ?>
-					<th nowrap="nowrap"><?php _e('Open / Unsub / Bounce / Clicks', $this -> plugin_name); ?></th>
+					<th class="column-stats" nowrap="nowrap"><?php _e('Open / Unsub / Bounce / Clicks', $this -> plugin_name); ?></th>
 					<?php $colspan++; ?>
 					<th class="column-sent <?php echo ($orderby == "sent") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=sent&order=' . (($orderby == "sent") ? $otherorder : "asc")); ?>">
@@ -97,7 +97,7 @@
 						</a>
 					</th>
 					<?php $colspan++; ?>
-					<th><?php _e('Attachments', $this -> plugin_name); ?></th>
+					<th class="column-attachments"><?php _e('Attachments', $this -> plugin_name); ?></th>
 					<?php $colspan++; ?>
 				</tr>
 			</thead>
@@ -116,14 +116,14 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
+					<th><?php _e('List(s)', $this -> plugin_name); ?></th>
                     <th class="column-theme <?php echo ($orderby == "theme_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=theme_id&order=' . (($orderby == "theme_id") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Theme', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th nowrap="nowrap"><?php _e('Open / Unsub / Bounce / Clicks', $this -> plugin_name); ?></th>
+					<th class="column-stats" nowrap="nowrap"><?php _e('Open / Unsub / Bounce / Clicks', $this -> plugin_name); ?></th>
 					<th class="column-sent <?php echo ($orderby == "sent") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=sent&order=' . (($orderby == "sent") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Status', $this -> plugin_name); ?></span>
@@ -156,7 +156,7 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th><?php _e('Attachments', $this -> plugin_name); ?></th>
+					<th class="column-attachments"><?php _e('Attachments', $this -> plugin_name); ?></th>
 				</tr>
 			</tfoot>
 			<tbody>
@@ -212,28 +212,27 @@
 							$tracking = (!empty($etotal)) ? ($eread/$etotal) * 100 : 0;
 							
 							$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $email -> id . "'";
-							$objectcache = $this -> get_option('objectcache');
+							
 							$query_hash = md5($query);
-							if (!empty($objectcache) && $oc_ebounced = wp_cache_get($query_hash, 'newsletters')) {
-								$ebounced = $oc_ebounced;
+							global ${'newsletters_query_' . $query_hash};
+							if (!empty(${'newsletters_query_' . $query_hash})) {
+								$ebounced = ${'newsletters_query_' . $query_hash};
 							} else {
 								$ebounced = $wpdb -> get_var($query);
-								if (!empty($objectcache)) {
-									wp_cache_set($query_hash, $ebounced, 'newsletters', 0);
-								}
+								${'newsletters_query_' . $query_hash} = $ebounced;
 							}
 							
 							$ebouncedperc = (!empty($etotal)) ? (($ebounced / $etotal) * 100) : 0; 
 							
 							$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $email -> id . "'";
+							
 							$query_hash = md5($query);
-							if (!empty($objectcache) && $oc_eunsubscribed = wp_cache_get($query_hash, 'newsletters')) {
-								$eunsubscribed = $oc_eunsubscribed;
+							global ${'newsletters_query_' . $query_hash};
+							if (!empty(${'newsletters_query_' . $query_hash})) {
+								$eunsubscribed = ${'newsletters_query_' . $query_hash};
 							} else {
 								$eunsubscribed = $wpdb -> get_var($query);
-								if (!empty($objectcache)) {
-									wp_cache_set($query_hash, $eunsubscribed, 'newsletters', 0);
-								}
+								${'newsletters_query_' . $query_hash} = $eunsubscribed;
 							}
 							
 							$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;

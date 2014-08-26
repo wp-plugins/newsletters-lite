@@ -58,15 +58,14 @@ class wpmlPost extends wpMailPlugin {
 	
 		if (!empty($postid)) {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `post_id` = '" . $postid . "' LIMIT 1";
-			$objectcache = $this -> get_option('objectcache');
+			
 			$query_hash = md5($query);
-			if (!empty($objectcache) && $oc_post = wp_cache_get($query_hash, 'newsletters')) {
-				$post = $oc_post;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$post = ${'newsletters_query_' . $query_hash};
 			} else {
 				$post = $wpdb -> get_row($query);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $post, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $post;
 			}
 		
 			if (!empty($post)) {

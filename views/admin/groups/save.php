@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Save a Group', $this -> plugin_name); ?></h2>
 	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> groups; ?>&amp;method=save" method="post" id="groupform">
 		<?php echo $Form -> hidden('wpmlGroup[id]'); ?>

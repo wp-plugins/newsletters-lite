@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Manage Extensions', $this -> plugin_name); ?></h2>
     <?php $this -> render('extensions' . DS . 'navigation', false, true, 'admin'); ?>
     <p><?php _e('These are extensions which extend the functionality of the Newsletter plugin.', $this -> plugin_name); ?></p>

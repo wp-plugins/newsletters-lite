@@ -62,31 +62,14 @@ class wpmlGroup extends wpMailPlugin {
 		return $this -> errors;
 	}
 	
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-groups', $perpage = 15, $order = array('modified', "DESC")) {
-		global $wpdb;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . "" . $this -> table, "*", $sub);
-		$paginate -> per_page = $perpage;
-		$paginate -> searchterm = (empty($searchterm)) ? false : $searchterm;
-		$paginate -> where = (empty($conditions)) ? false : $conditions;
-		$paginate -> order = $order;
-		$groups = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		$data[$this -> model] = $groups;
-		
-		return $data;
-	}
-	
 	function select() {
 		global $wpdb, $Html;
         $query = "SELECT `id`, `title` FROM `" . $wpdb -> prefix . "" . $this -> table . "` ORDER BY `title` ASC";
         
-        $objectcache = $this -> get_option('objectcache');
         $query_hash = md5($query);
-        if (!empty($objectcache) && $groupsselect = wp_cache_get($query_hash, 'newsletters')) {
-	        return $groupsselect;
+        global ${'newsletters_query_' . $query_hash};
+        if (!empty(${'newsletters_query_' . $query_hash})) {
+	        return ${'newsletters_query_' . $query_hash};
         }
 
 		if ($groups = $wpdb -> get_results($query)) {
@@ -97,9 +80,7 @@ class wpmlGroup extends wpMailPlugin {
 					$groupsselect[$group -> id] = $group -> title;
 				}
 				
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $groupsselect, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $groupsselect;
 				return $groupsselect;
 			}
 		}

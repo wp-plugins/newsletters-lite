@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Manage Lists', $this -> plugin_name); ?> <a class="add-new-h2" href="<?php echo $this -> url; ?>&amp;method=save" title="<?php _e('Create a new mailing list', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
 	<?php if (!empty($mailinglists)) : ?>
 		<form id="posts-filter" action="?page=<?php echo $this -> sections -> lists; ?>" method="post">

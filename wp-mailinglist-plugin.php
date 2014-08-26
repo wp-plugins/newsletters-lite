@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.2';
+		var $version = '4.3.3';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -89,7 +89,7 @@ if (!class_exists('wpMailPlugin')) {
 			$this -> api_key = $this -> get_option('api_key');
 			$this -> plugin_name = $name;
 			$this -> plugin_base = rtrim(dirname($base), DS);
-			define("NEWSLETTERS_LOG_FILE", $this -> plugin_base() . DS . "newsletters.log");
+			if (!defined('NEWSLETTERS_LOG_FILE')) { define("NEWSLETTERS_LOG_FILE", $this -> plugin_base() . DS . "newsletters.log"); }
 			$this -> sections = (object) $this -> sections;
 			$this -> set_timezone();
 			$this -> extensions = $this -> get_extensions();
@@ -311,7 +311,6 @@ if (!class_exists('wpMailPlugin')) {
 	    function ajax_welcomestats() {
 	    	define('DOING_AJAX', true);
 			define('SHORTINIT', true);
-			$objectcache = $this -> get_option('objectcache');
 		    global $wpdb, $Html, $Subscriber, $Email, $Bounce, $Unsubscribe;
 		    
 		    $type = (empty($_GET['type'])) ? "days" : $_GET['type'];
@@ -321,16 +320,7 @@ if (!class_exists('wpMailPlugin')) {
 			switch ($type) {
 				case 'years'			:
 					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`created`)";
-				    $subscribers_array = array();
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
 				    
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -343,15 +333,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`created`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-						if (!empty($objectcache)) {
-					   		wp_cache_set($query_hash, $records, 'newsletters', 0);
-					   	}
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $emails_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -364,15 +347,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`modified`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $bounces_array = array();
 				    if (!empty($records)) {	    
 					    foreach ($records as $record) {
@@ -385,15 +361,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(`id`) AS `unsubscribescount`, DATE(`modified`) AS `date` FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`modified`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $unsubscribes_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -499,15 +468,8 @@ if (!class_exists('wpMailPlugin')) {
 					break;
 				case 'months'			:
 					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`created`)";
-					$query_hash = md5($query);
-					if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-						$records = $oc_records;
-					} else {
-						$records = $wpdb -> get_results($query);
-						if (!empty($objectcache)) {
-							wp_cache_set($query_hash, $records, 'newsletters', 0);
-						}
-					}
+					$records = $wpdb -> get_results($query);
+					
 				    $subscribers_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -520,15 +482,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`created`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $emails_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -541,15 +496,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`modified`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $bounces_array = array();
 				    if (!empty($records)) {	    
 					    foreach ($records as $record) {
@@ -562,15 +510,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(`id`) AS `unsubscribescount`, DATE(`modified`) AS `date` FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`modified`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $unsubscribes_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -676,15 +617,8 @@ if (!class_exists('wpMailPlugin')) {
 					break;
 				case 'days'				:
 					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
-					$query_hash = md5($query);
-					if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-						$records = $oc_records;
-					} else {
-						$records = $wpdb -> get_results($query);
-						if (!empty($objectcache)) {
-							wp_cache_set($query_hash, $records, 'newsletters', 0);
-						}
-					}
+					$records = $wpdb -> get_results($query);
+					
 				    $subscribers_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -697,15 +631,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $emails_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -718,15 +645,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`modified`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $bounces_array = array();
 				    if (!empty($records)) {	    
 					    foreach ($records as $record) {
@@ -739,15 +659,8 @@ if (!class_exists('wpMailPlugin')) {
 				    }
 				    
 				    $query = "SELECT COUNT(`id`) AS `unsubscribescount`, DATE(`modified`) AS `date` FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`modified`)";
-				    $query_hash = md5($query);
-				    if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-					    $records = $oc_records;
-				    } else {
-					    $records = $wpdb -> get_results($query);
-					    if (!empty($objectcache)) {
-					    	wp_cache_set($query_hash, $records, 'newsletters', 0);
-					    }
-				    }
+				    $records = $wpdb -> get_results($query);
+				    
 				    $unsubscribes_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
@@ -874,16 +787,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($_REQUEST)) {
 				$historyquery = "SELECT id, message, subject FROM " . $wpdb -> prefix . $History -> table . " WHERE id = '" . $_REQUEST['history_id'] . "' LIMIT 1";
-				$objectcache = $this -> get_option('objectcache');
-				$query_hash = md5($historyquery);
-				if (!empty($objectcache) && $oc_history = wp_cache_get($query_hash, 'newsletters')) {
-					$history = $oc_history;
-				} else {
-					$history = $wpdb -> get_row($historyquery);
-					if (!empty($objectcache)) {
-						wp_cache_set($query_hash, $history, 'newsletters', 0);
-					}
-				}
+				$history = $wpdb -> get_row($historyquery);
 			
 				if (!empty($history)) {
 					$subscriber_request = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));								
@@ -939,16 +843,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($_REQUEST)) {
 				$historyquery = "SELECT id, message, subject FROM " . $wpdb -> prefix . $History -> table . " WHERE id = '" . $_REQUEST['history_id'] . "' LIMIT 1";
-				$objectcache = $this -> get_option('objectcache');
-				$query_hash = md5($historyquery);
-				if (!empty($objectcache) && $oc_history = wp_cache_get($query_hash, 'newsletters')) {
-					$history = $oc_history;
-				} else {
-					$history = $wpdb -> get_row($historyquery);
-					if (!empty($objectcache)) {
-						wp_cache_set($query_hash, $history, 'newsletters', 0);
-					}
-				}
+				$history = $wpdb -> get_row($historyquery);
 			
 				if (!empty($history)) {
 					$subscriber_request = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));								
@@ -1622,7 +1517,10 @@ if (!class_exists('wpMailPlugin')) {
 						$this -> update_option('serialkey', $_REQUEST['serialkey']);	//update the DB option
 						
 						if (!$this -> ci_serial_valid()) { $errors[] = __('Serial key is invalid, please try again.', $this -> plugin_name); }
-						else { $success = true; }
+						else {
+							delete_transient($this -> pre . 'update_info');
+							$success = true; 
+						}
 					}
 				}
 			}
@@ -1907,11 +1805,12 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				$query_hash = md5($query);
-				if ($oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
-					$subscribers = $oc_subscribers;
+				global ${'newsletters_query_' . $query_hash};
+				if (!empty(${'newsletters_query_' . $query_hash})) {
+					$subscribers = ${'newsletters_query_' . $query_hash};
 				} else {
 					$subscribers = $wpdb -> get_results($query);
-					wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
+					${'newsletters_query_' . $query_hash} = $subscribers;
 				}
 				
 				if (!empty($subscribers)) {
@@ -2017,14 +1916,7 @@ if (!class_exists('wpMailPlugin')) {
 						if ($subscriber -> id == $_POST['subscriber_id']) {
 							$Db -> model = $Mailinglist -> model;
 							
-							$query = "SELECT * FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE id = '" . $_POST['mailinglist_id'] . "'";
-							$query_hash = md5($query);
-							if ($oc_mailinglist = wp_cache_get($query_hash, 'newsletters')) {
-								$mailinglist = $oc_mailinglist;
-							} else {
-								$mailinglist = $wpdb -> get_row($query);
-								wp_cache_set($query_hash, $mailinglist, 'newsletters', 0);
-							}
+							$mailinglist = $wpdb -> get_row($query);
 							
 							$paid = $mailinglist -> paid;
 							$subscriber -> mailinglist_id = $mailinglist -> id;
@@ -2047,7 +1939,7 @@ if (!class_exists('wpMailPlugin')) {
 										}
 									}
 									
-									$this -> admin_unsubscription_notification($subscriber, $mailinglist);
+									$this -> admin_unsubscription_notification($subscriber, $mailinglist -> id);
 								
 									if (!empty($deleted) || $deleted == true) {
 										$message = __('Subscription removed and subscriber record deleted', $this -> plugin_name);
@@ -2120,21 +2012,14 @@ if (!class_exists('wpMailPlugin')) {
 										$history -> attachments = array();
 										$attachmentsquery = "SELECT id, title, filename FROM " . $wpdb -> prefix . $HistoriesAttachment -> table . " WHERE history_id = '" . $history -> id . "'";
 										
-										$query_hash = md5($attachmentsquery);
-										if ($oc_attachments = wp_cache_get($query_hash, 'newsletters')) {			
-											$history -> attachments = $oc_attachments;
-										} else {
-											if ($attachments =  $wpdb -> get_results($attachmentsquery)) {
-												foreach ($attachments as $attachment) {
-													$history -> attachments[] = array(
-														'id'					=>	$attachment -> id,
-														'title'					=>	$attachment -> title,
-														'filename'				=>	$attachment -> filename,
-													);	
-												}
+										if ($attachments =  $wpdb -> get_results($attachmentsquery)) {
+											foreach ($attachments as $attachment) {
+												$history -> attachments[] = array(
+													'id'					=>	$attachment -> id,
+													'title'					=>	$attachment -> title,
+													'filename'				=>	$attachment -> filename,
+												);	
 											}
-											
-											wp_cache_set($query_hash, $history -> attachments, 'newsletters', 0);
 										}
 										
 										$subscriber -> mailinglist_id = $mailinglist -> id;
@@ -2265,7 +2150,9 @@ if (!class_exists('wpMailPlugin')) {
 			
 			ob_start();
 			
-			switch ($_GET['method']) {
+			$method = (!empty($_GET['method'])) ? $_GET['method'] : false;
+			
+			switch ($method) {
 				case 'paidsubscriptionsuccess'	:
 					$message = __('Thank you for your payment!<br/><br/>Please allow a moment for the subscription to be activated.', $this -> plugin_name);
 					$this -> redirect($this -> get_managementpost(true), "success", $message);
@@ -2325,13 +2212,7 @@ if (!class_exists('wpMailPlugin')) {
 						if (!empty($data[$this -> pre . 'subscriber_id'])) {
 							$subscriber_query = "SELECT * FROM " . $wpdb -> prefix . $Subscriber -> table . " WHERE id = '" . $data[$this -> pre . 'subscriber_id'] . "'";
 							
-							$query_hash = md5($subscriber_query);
-							if ($oc_subscriber = wp_cache_get($query_hash, 'newsletters')) {
-								$subscriber = $oc_subscriber;
-							} else {
-								$subscriber = $wpdb -> get_row($subscriber_query);
-								wp_cache_set($query_hash, $subscriber, 'newsletters', 0);
-							}
+							$subscriber = $wpdb -> get_row($subscriber_query);
 									
 							if (!empty($subscriber)) {
 								/* Management Auth */
@@ -2366,6 +2247,9 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					if (!empty($data['confirm']) || $this -> get_option('unsubscribeconfirmation') == "N") {					
+						$unsubscribeemails = $this -> get_option('unsubscribeemails');
+						$unsubscribelists = $data['unsubscribelists'];
+					
 						if (!empty($data[$this -> pre . 'subscriber_id'])) {
 							if ($this -> get_option('unsubscribeconfirmation') == "N") {
 								$data['unsubscribelists'] = $mailinglists;
@@ -2378,7 +2262,10 @@ if (!class_exists('wpMailPlugin')) {
 									$Db -> model = $Mailinglist -> model;
 									$mailinglist = $Db -> find(array('id' => $unsubscribelist_id));
 									$subscriber -> mailinglist_id = $unsubscribelist_id;
-									$this -> admin_unsubscription_notification($subscriber, $mailinglist);
+									
+									if (!empty($unsubscribeemails) && $unsubscribeemails == "multiple") {
+										$this -> admin_unsubscription_notification($subscriber, $unsubscribelist_id);
+									}
 									
 									if (!empty($subscriber -> id) && !empty($unsubscribelist_id)) {
 										$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $unsubscribelist_id));
@@ -2414,7 +2301,9 @@ if (!class_exists('wpMailPlugin')) {
 									}
 								}
 								
-								//$this -> admin_unsubscription_notification($subscriber, $unsubscribelists);						
+								if (!empty($unsubscribeemails) && $unsubscribeemails == "single") {
+									$this -> admin_unsubscription_notification($subscriber, $unsubscribelists);						
+								}
 								$success = true;
 							} else {
 								$errors[] = __('You did not select any list(s) to unsubscribe from.', $this -> plugin_name); 
@@ -2442,7 +2331,7 @@ if (!class_exists('wpMailPlugin')) {
 					echo $wpmljavascript;
 					$this -> render('management' . DS . 'logout-auth', false, true, 'default');
 					break;
-				case 'loginauth'			:
+				case 'loginauth'			:				
 					if (empty($_GET['email'])) {
 						$subscriberemailauth = $_POST['email'] = $Auth -> read_emailcookie();
 					} else {
@@ -2456,12 +2345,8 @@ if (!class_exists('wpMailPlugin')) {
 							$Db -> model = $Subscriber -> model;							
 							if ($subscriber = $Db -> find(array('email' => $subscriberemailauth, 'cookieauth' => $subscriberauth))) {
 								global $wpmljavascript;
-							
-								if ($Auth -> set_cookie($subscriberauth)) {
-									$Auth -> set_emailcookie($subscriberemailauth);
-								} else {
-									$errors[] = __('Please ensure that you have cookies enabled in your browser.', $this -> plugin_name);
-								}
+								$Auth -> set_cookie($subscriber -> cookieauth);
+								$Auth -> set_emailcookie($subscriberemailauth);
 							} else {
 								$errors[] = __('Authentication failed, please try again.', $this -> plugin_name);
 							}
@@ -2473,7 +2358,7 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					if (empty($errors)) {
-						$this -> render('management' . DS . 'login-auth', false, true, 'default');
+						$this -> render('management' . DS . 'login-auth', array('subscriberauth' => $subscriberauth, 'subscriberemailauth' => $subscriberemailauth), true, 'default');
 					} else {
 						$this -> render('management' . DS . 'login', array('errors' => $errors), true, 'default');	
 					}
@@ -2521,7 +2406,11 @@ if (!class_exists('wpMailPlugin')) {
 						$this -> render('management' . DS . 'login', array('errors' => $errors), true, 'default');	
 					}
 					break;
-				default						:				
+				default						:						
+					if (!empty($_GET['subscriberauth'])) {
+						$_COOKIE['subscriberauth'] = $_GET['subscriberauth'];
+					}
+							
 					if ($subscriber = $Auth -> logged_in()) {
 						if ($this -> get_option('subscriptions') == "Y") {
 							$SubscribersList -> check_expirations(false, false, true, $subscriber -> id);
@@ -2564,7 +2453,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function paginate($model = null, $fields = '*', $sub = null, $conditions = false, $searchterm = null, $per_page = 10, $order = array('modified', "DESC")) {
 			global $wpdb, $Db, $Autoresponder, $Autoresponderemail, $Subscriber, $SubscribersList, $Mailinglist, 
-			${$model}, $AutorespondersList, $Mailinglist;
+			${$model}, $AutorespondersList, $Mailinglist, $History;
 			
 			$object = (!is_object(${$model})) ? $this -> {$model} : ${$model};
 		
@@ -2591,21 +2480,16 @@ if (!class_exists('wpMailPlugin')) {
 						$newdata[$n] = $record;
 						
 						switch ($model) {
+							case 'History'						:
+								$newdata[$n] = $this -> init_class($History -> model, $record);
+								break;
 							case 'Subscriber'					:							
 								$Db -> model = $SubscribersList -> model;
 								if ($subscriberslists = $Db -> find_all(array('subscriber_id' => $record -> id))) {
 									foreach ($subscriberslists as $sl) {
 										$listquery = "SELECT * FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE id = '" . $sl -> list_id . "' LIMIT 1";
-										$query_hash = md5($listquery);
-										if ($oc_list = wp_cache_get($query_hash, 'newsletters')) {
-											$list = $oc_list;
-										} else {
-											$list = $wpdb -> get_row($listquery);
-											wp_cache_set($query_hash, $list, 'newsletters', 0);
-										}
-										
+										$list = $wpdb -> get_row($listquery);
 										$newdata[$n] -> Mailinglist[] = $list;
-										//$newdata[$n] -> subscriptions[] = $sl;
 									}
 								}
 								break;
@@ -3747,22 +3631,17 @@ if (!class_exists('wpMailPlugin')) {
 				$authkey = $this -> gen_auth($auth_id, $auth_string);
 				
 				if (!empty($theme_id)) {
-					global $wpdb, $Theme, ${'newsletters_acolor'};
+					global $wpdb, $Theme;
 					
-					if (empty(${'newsletters_acolor'})) {
-						$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
-						
-						$query_hash = md5($acolorquery);
-						if ($oc_acolor = wp_cache_get($query_hash, 'newsletters')) {
-							$acolor = $oc_acolor;
-						} else {
-							$acolor = $wpdb -> get_var($acolorquery);
-							wp_cache_set($query_hash, $acolor, 'newsletters', 0);
-						}
-						
-						${'newsletters_acolor'} = $acolor;
+					$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
+					
+					$query_hash = md5($acolorquery);
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$acolor = ${'newsletters_query_' . $query_hash};
 					} else {
-						$acolor = ${'newsletters_acolor'};
+						$acolor = $wpdb -> get_var($acolorquery);
+						${'newsletters_query_' . $query_hash} = $acolor;
 					}
 					
 					$style = "color:" . $acolor . ";";
@@ -3830,22 +3709,17 @@ if (!class_exists('wpMailPlugin')) {
 				$url = $Html -> retainquery('method=loginauth&email=' . $subscriber -> email . '&subscriberauth=' . $subscriberauth, $this -> get_managementpost(true));
 				
 				if (!empty($theme_id)) {
-					global $wpdb, $Theme, ${'newsletters_acolor'};
+					global $wpdb, $Theme;
 					
-					if (empty(${'newsletters_acolor'})) {
-						$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
-						
-						$query_hash = md5($acolorquery);
-						if ($oc_acolor = wp_cache_get($query_hash, 'newsletters')) {
-							$acolor = $oc_acolor;
-						} else {
-							$acolor = $wpdb -> get_var($acolorquery);
-							wp_cache_set($query_hash, $acolor, 'newsletters', 0);
-						}
-						
-						${'newsletters_acolor'} = $acolor;
+					$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
+					
+					$query_hash = md5($acolorquery);
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$acolor = ${'newsletters_query_' . $query_hash};
 					} else {
-						$acolor = ${'newsletters_acolor'};
+						$acolor = $wpdb -> get_var($acolorquery);
+						${'newsletters_query_' . $query_hash} = $acolor;
 					}
 						
 					$style = "color:" . $acolor . ";";
@@ -3880,22 +3754,17 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					if (!empty($theme_id)) {
-						global $wpdb, $Theme, ${'newsletters_acolor'};
+						global $wpdb, $Theme;
 						
-						if (empty(${'newsletters_acolor'})) {
-							$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
-							
-							$query_hash = md5($acolorquery);
-							if ($oc_acolor = wp_cache_get($query_hash, 'newsletters')) {
-								$acolor = $oc_acolor;
-							} else {
-								$acolor = $wpdb -> get_var($acolorquery);
-								wp_cache_set($query_hash, $acolor, 'newsletters', 0);
-							}
-							
-							${'newsletters_acolor'} = $acolor;
+						$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
+						
+						$query_hash = md5($acolorquery);
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$acolor = ${'newsletters_query_' . $query_hash};
 						} else {
-							$acolor = ${'newsletters_acolor'};
+							$acolor = $wpdb -> get_var($acolorquery);
+							${'newsletters_query_' . $query_hash} = $acolor;
 						}
 						
 						$style = "color:" . $acolor . ";";
@@ -3926,22 +3795,17 @@ if (!class_exists('wpMailPlugin')) {
 				$authkey = $this -> gen_auth($subscriber -> id, $subscriber -> mailinglist_id);
 				
 				if (!empty($theme_id)) {
-					global $wpdb, $Theme, ${'newsletters_acolor'};
+					global $wpdb, $Theme;
 					
-					if (empty(${'newsletters_acolor'})) {
-						$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
-						
-						$query_hash = md5($acolorquery);
-						if ($oc_acolor = wp_cache_get($query_hash, 'newsletters')) {
-							$acolor = $oc_acolor;
-						} else {
-							$acolor = $wpdb -> get_var($acolorquery);
-							wp_cache_set($query_hash, $acolor, 'newsletters', 0);
-						}
-						
-						${'newsletters_acolor'} = $acolor;
+					$acolorquery = "SELECT `acolor` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `id` = '" . $theme_id . "' LIMIT 1";
+					
+					$query_hash = md5($acolorquery);
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$acolor = ${'newsletters_query_' . $query_hash};
 					} else {
-						$acolor = ${'newsletters_acolor'};	
+						$acolor = $wpdb -> get_var($acolorquery);
+						${'newsletters_query_' . $query_hash} = $acolor;
 					}
 					
 					$style = "color:" . $acolor . ";";
@@ -4083,21 +3947,25 @@ if (!class_exists('wpMailPlugin')) {
 						}
 						
 						$themeidquery = "SELECT `theme_id` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
+						
 						$query_hash = md5($themeidquery);
-						if ($oc_theme_id = wp_cache_get($query_hash, 'newsletters')) {
-							$theme_id = $oc_theme_id;
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$theme_id = ${'newsletters_query_' . $query_hash};
 						} else {
 							$theme_id = $wpdb -> get_var($themeidquery);
-							wp_cache_set($query_hash, $theme_id, 'newsletters', 0);
+							${'newsletters_query_' . $query_hash} = $theme_id;
 						}
 					} else {
 						$themeidquery = "SELECT `id` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `def` = 'Y' LIMIT 1";
+						
 						$query_hash = md5($themeidquery);
-						if ($oc_theme_id = wp_cache_get($query_hash, 'newsletters')) {
-							$theme_id = $oc_theme_id;
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$theme_id = ${'newsletters_query_' . $query_hash};
 						} else {
 							$theme_id = $wpdb -> get_var($themeidquery);
-							wp_cache_set($query_hash, $theme_id, 'newsletters', 0);
+							${'newsletters_query_' . $query_hash} = $theme_id;
 						}
 					}
 					
@@ -4210,21 +4078,25 @@ if (!class_exists('wpMailPlugin')) {
 						}
 						
 						$themeidquery = "SELECT `theme_id` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
+						
 						$query_hash = md5($themeidquery);
-						if ($oc_theme_id = wp_cache_get($query_hash, 'newsletters')) {
-							$theme_id = $oc_theme_id;
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$theme_id = ${'newsletters_query_' . $query_hash};
 						} else {
 							$theme_id = $wpdb -> get_var($themeidquery);
-							wp_cache_set($query_hash, $theme_id, 'newsletters', 0);
+							${'newsletters_query_' . $query_hash} = $theme_id;
 						}
 					} else {
 						$themeidquery = "SELECT `id` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `def` = 'Y' LIMIT 1";
+						
 						$query_hash = md5($themeidquery);
-						if ($oc_theme_id = wp_cache_get($query_hash, 'newsletters')) {
-							$theme_id = $oc_theme_id;
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$theme_id = ${'newsletters_query_' . $query_hash};
 						} else {
 							$theme_id = $wpdb -> get_var($themeidquery);
-							wp_cache_set($query_hash, $theme_id, 'newsletters', 0);
+							${'newsletters_query_' . $query_hash} = $theme_id;
 						}
 					}
 					
@@ -4362,12 +4234,14 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($subscriber -> mailinglist_id)) {
 						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
+						
 						$query_hash = md5($adminemailquery);
-						if ($oc_email = wp_cache_get($query_hash, 'newsletters')) {
-							$email = $oc_email;
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$email = ${'newsletters_query_' . $query_hash};
 						} else {
 							$email = $wpdb -> get_var($adminemailquery);
-							wp_cache_set($query_hash, $email, 'newsletters', 0);
+							${'newsletters_query_' . $query_hash} = $email;
 						}
 						
 						if (!empty($email)) {
@@ -4416,18 +4290,25 @@ if (!class_exists('wpMailPlugin')) {
 					$adminemail = $this -> get_option('adminemail');
 					
 					if (!empty($subscriber -> mailinglist_id)) {
-						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
+						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
 						$query_hash = md5($adminemailquery);
-						if ($oc_email = wp_cache_get($query_hash, 'newsletters')) {
-							$email = $oc_email;
+						global ${'newsletters_query_' . $query_hash};
+						if (!empty(${'newsletters_query_' . $query_hash})) {
+							$email = ${'newsletters_query_' . $query_hash};
 						} else {
 							$email = $wpdb -> get_var($adminemailquery);
-							wp_cache_set($query_hash, $email, 'newsletters', 0);
+							${'newsletters_query_' . $query_hash} = $email;
 						}
 						
 						if (!empty($email)) {
 							$adminemail = $email;
 						}
+					}
+					
+					if (is_array($mailinglist)) {
+						$subscriber -> mailinglists = $mailinglist;
+					} else {
+						$subscriber -> mailinglists = array($mailinglist);
 					}
 					
 					$to -> id = $Subscriber -> admin_subscriber_id();
@@ -4592,13 +4473,7 @@ if (!class_exists('wpMailPlugin')) {
 			global $wpdb, $History;
 			if (!empty($history_id)) { 
 				$query = "SELECT `from`, `fromname`, `text` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "'";
-				$query_hash = md5($query);
-				if ($oc_his = wp_cache_get($query_hash, 'newsletters')) {
-					$his = $oc_his;
-				} else {
-					$his = $wpdb -> get_row($query);
-					wp_cache_set($query_hash, $his, 'newsletters', 0);
-				}
+				$his = $wpdb -> get_row($query);
 				$history = stripslashes_deep($his); 
 			}
 			
@@ -4625,13 +4500,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($subscriber -> mailinglists)) {
 					foreach ($subscriber -> mailinglists as $mailinglist_id) {
 						$query = "SELECT `paid` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $mailinglist_id . "' LIMIT 1";
-						$query_hash = md5($query);
-						if ($oc_paid = wp_cache_get($query_hash, 'newsletters')) {
-							$paid = $oc_paid;
-						} else {
-							$paid = $wpdb -> get_var($query);
-							wp_cache_set($query_hash, $paid, 'newsletters', 0);
-						}
+						$paid = $wpdb -> get_var($query);
 						
 						if (!empty($paid) && $paid == "Y") {
 							$query = "UPDATE `" . $wpdb -> prefix . $SubscribersList -> table . "` SET `paid_sent` = (`paid_sent` + 1) WHERE `subscriber_id` = '" . $subscriber -> id . "' AND `list_id` = '" . $mailinglist_id . "' LIMIT 1";
@@ -4862,12 +4731,14 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$managementpost = get_option($this -> pre . 'managementpost');
 			$query = "SELECT `ID` FROM `" . $wpdb -> posts . "` WHERE `ID` = '" . $managementpost . "' AND `post_status` = 'publish'";
+			
 			$query_hash = md5($query);
-			if ($oc_post = wp_cache_get($query_hash, 'newsletters')) {
-				$post = $oc_post;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$post = ${'newsletters_query_' . $query_hash};
 			} else {
 				$post = $wpdb -> get_row($query);
-				wp_cache_set($query_hash, $post, 'newsletters', 0);
+				${'newsletters_query_' . $query_hash} = $post;
 			}
 			
 			if (empty($managementpost) || !$post) {
@@ -4913,12 +4784,14 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$imagespost = get_option($this -> pre . 'imagespost');
 			$query = "SELECT `ID` FROM `" . $wpdb -> posts . "` WHERE `ID` = '" . $imagespost . "'";
+			
 			$query_hash = md5($query);
-			if ($oc_post = wp_cache_get($query_hash, 'newsletters')) {
-				$post = $oc_post;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$post = ${'newsletters_query_' . $query_hash};
 			} else {
 				$post = $wpdb -> get_row($query);
-				wp_cache_set($query_hash, $post, 'newsletters', 0);
+				${'newsletters_query_' . $query_hash} = $post;
 			}
 			
 			if (empty($imagespost) || !$post) {
@@ -4949,19 +4822,21 @@ if (!class_exists('wpMailPlugin')) {
 					break;	
 			}
 			
+			global ${'newsletters_option_' . $name};
+			if (!empty(${'newsletters_option_' . $name})) {
+				return ${'newsletters_option_' . $name};
+			}
+			
 			if ($option = get_option($this -> pre . $name)) {
-				if (!is_array($option)) {
-					$data = @unserialize($option);
-				
-					if ($data !== false) {
-						return unserialize($option);
-					}
+				if (maybe_unserialize($option) !== false) {
+					$option = maybe_unserialize($option);
 				}
 				
 				if ($stripslashes == true) {
 					$option = stripslashes_deep($option);
 				}
 				
+				${'newsletters_option_' . $name} = $option;
 				return $option;
 			}
 			
@@ -5053,13 +4928,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				$latestpostsquery = "SELECT id, post_id FROM " . $wpdb -> prefix . $Latestpost -> table . "";
-				$query_hash = md5($latestpostsquery);
-				if ($oc_latestposts = wp_cache_get($query_hash, 'newsletters')) {
-					$latestposts = $oc_latestposts;
-				} else {
-					$latestposts = $wpdb -> get_results($latestpostsquery);
-					wp_cache_set($query_hash, $latestposts, 'newsletters', 0);
-				}
+				$latestposts = $wpdb -> get_results($latestpostsquery);
 				
 				if (!empty($latestposts)) {
 					foreach ($latestposts as $latestpost) {
@@ -5072,13 +4941,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				$olderthanquery = "SELECT ID FROM " . $wpdb -> posts . " WHERE post_date < '" . date_i18n("Y-m-d H:i:s", strtotime($this -> get_option('latestposts_olderthan'))) . "'";
-				$query_hash = md5($olderthanquery);
-				if ($oc_olderthan = wp_cache_get($query_hash, 'newsletters')) {
-					$olderthan = $oc_olderthan;
-				} else {
-					$olderthan = $wpdb -> get_results($olderthanquery);
-					wp_cache_set($query_hash, $olderthan, 'newsletters', 0);
-				}
+				$olderthan = $wpdb -> get_results($olderthanquery);
 				
 				if (!empty($olderthan)) {
 					foreach ($olderthan as $olderthanpost) {
@@ -5296,9 +5159,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.2") < 0) {
+				if (version_compare($cur_version, "4.3.3") < 0) {
 					$this -> update_options();
-					$version = "4.3.2";
+					$version = "4.3.3";
 				}
 			
 				//the current version is older.
@@ -5391,7 +5254,6 @@ if (!class_exists('wpMailPlugin')) {
 			$options['emailsperinterval'] = 20;
 			$options['autoresponderscheduling'] = "hourly";
 			$options['tinymcebtn'] = "Y";
-			$options['objectcache'] = 1;
 			$options['sendasnewsletterbox'] = "Y";
 			$options['subscriberegister'] = "N";
 			$options['importusers'] = "N";

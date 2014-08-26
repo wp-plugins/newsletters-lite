@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Save Subscription Order', $this -> plugin_name); ?></h2>
 
 	<form action="?page=<?php echo $this -> sections -> orders; ?>&amp;method=save&amp;id=<?php echo $order -> id; ?>" method="post">

@@ -63,8 +63,8 @@ include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th><?php _e('List(s)', $this -> plugin_name); ?></th>
-					<th><?php _e('Shortcode', $this -> plugin_name); ?></th>
+					<th class="column-mailinglists"><?php _e('List(s)', $this -> plugin_name); ?></th>
+					<th class="column-shortcode"><?php _e('Shortcode', $this -> plugin_name); ?></th>
 					<th class="column-required <?php echo ($orderby == "required") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=required&order=' . (($orderby == "required") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Required', $this -> plugin_name); ?></span>

@@ -2,8 +2,6 @@
 
 <?php
 
-$objectcache = $this -> get_option('objectcache');
-
 $locale = get_locale();
 $mofile = $this -> plugin_name . '-' . $locale . '.mo';
 $mofull = 'wp-mailinglist-languages' . DS;
@@ -13,14 +11,6 @@ $language_external = $this -> get_option('language_external');
 
 <table class="form-table">
 	<tbody>
-		<tr>
-			<th><label for="objectcache"><?php _e('Object Cache', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(__('Tick/check this to use the WordPress Object Cache API to cache data for performance. It is recommended that you turn this off if your PHP memory_limit is very low since large data parts may use up all the memory.', $this -> plugin_name)); ?></th>
-			<td>
-				<label><input <?php echo (!empty($objectcache)) ? 'checked="checked"' : ''; ?> type="checkbox" name="objectcache" value="1" id="objectcache" /> <?php _e('Yes, turn on object cache for performance', $this -> plugin_name); ?></label>
-				<span class="howto"><?php _e('Turn on for performance. Turn this off if your PHP memory_limit is low', $this -> plugin_name); ?></span>
-			</td>
-		</tr>
 		<tr>
 			<th><label for="tinymcebtnY"><?php _e('TinyMCE Editor Button', $this -> plugin_name); ?></label></th>
 			<td>

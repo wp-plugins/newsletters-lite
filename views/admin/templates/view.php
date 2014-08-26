@@ -1,5 +1,5 @@
 <div id="templates">
-	<div class="wrap">
+	<div class="wrap newsletters">
 		<h2><?php _e('View Snippet', $this -> plugin_name); ?> : <?php echo $template -> title; ?></h2>
 		
 		<div style="float:none;" class="subsubsub">

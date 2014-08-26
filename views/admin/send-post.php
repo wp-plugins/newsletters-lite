@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<?php if (empty($_POST['sendtype']) || $_POST['sendtype'] == "send") : ?>
 		<h2 id="pageheading"><?php _e('Sending Newsletter', $this -> plugin_name); ?></h2>
 	<?php else : ?>

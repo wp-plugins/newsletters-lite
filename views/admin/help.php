@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Support &amp; Help', $this -> plugin_name); ?></h2>
 	
 	<h3><?php _e('Useful Links', $this -> plugin_name); ?></h3>

@@ -11,7 +11,7 @@ $post_ID = $this -> get_option('imagespost');
 <?php wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false ); ?>
 <?php global $errors; ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
     <h2><?php _e('Save a Snippet', $this -> plugin_name); ?></h2>
     <form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> templates_save; ?>" method="post" onsubmit="">
         <?php wp_nonce_field($this -> sections -> templates_save); ?>

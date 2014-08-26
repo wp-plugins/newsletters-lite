@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('View Order: ' . $order -> order_number, $this -> name); ?></h2>
 	
 	<div class="subsubsub" style="float:none;">

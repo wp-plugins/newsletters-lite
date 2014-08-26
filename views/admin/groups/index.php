@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Manage Groups', $this -> plugin_name); ?> <a class="add-new-h2" href="<?php echo $this -> url; ?>&amp;method=save" title="<?php _e('Create a new group', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
 	<?php if (!empty($mailinglists)) : ?>
 		<form id="posts-filter" action="?page=<?php echo $this -> sections -> groups; ?>" method="post">

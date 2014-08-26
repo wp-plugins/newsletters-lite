@@ -105,32 +105,10 @@ class wpmlpaginate extends wpMailPlugin {
 		$endRecord = $begRecord + $this -> per_page;
 		list($ofield, $odir) = $this -> order;
 		$query .= " ORDER BY IF (`" . $ofield . "` = '' OR `" . $ofield . "` IS NULL,1,0), `" . $ofield . "` " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
-		
-		$objectcache = $this -> get_option('objectcache');
-		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_records = wp_cache_get($query_hash, 'newsletters')) {
-			$records = $oc_records;
-		} else {
-			$records = $wpdb -> get_results($query);	
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $records, 'newsletters', 0);	
-			}
-		}
-			
+		$records = $wpdb -> get_results($query);	
 		$records_count = count($records);
-		
-		$query_hash = md5($countquery);
-		if (!empty($objectcache) && $oc_count = wp_cache_get($query_hash, 'newsletters')) {
-			$this -> allcount = $allRecordsCount = $oc_count;
-		} else {
-			$count = $wpdb -> get_var($countquery);
-			$this -> allcount = $allRecordsCount = $count;
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $count, 'newsletters', 0);
-			}
-		}
-		
-		$totalpagescount = round($this -> allcount / $this -> per_page);
+		$this -> allcount = $allRecordsCount = $count = $wpdb -> get_var($countquery);		
+		$totalpagescount = ceil($this -> allcount / $this -> per_page);
 		
 		if (empty($this -> url_page)) {
 			$this -> url_page = $this -> sub;	

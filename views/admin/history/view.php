@@ -6,7 +6,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?> newsletters">
+<div class="wrap newsletters <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Sent/Draft:', $this -> plugin_name); ?> <?php echo $history -> subject; ?> <a href="?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history -> id; ?>" class="add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a></h2>
 	
 	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Sent &amp; Drafts', $this -> plugin_name), $this -> url); ?></div>
@@ -83,15 +83,14 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					<?php 
 					
 					$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'";
-					$objectcache = $this -> get_option('objectcache');
+					
 					$query_hash = md5($query);
-					if (!empty($objectcache) && $oc_ebounced = wp_cache_get($query_hash, 'newsletters')) {
-						$ebounced = $oc_ebounced;
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$ebounced = ${'newsletters_query_' . $query_hash};
 					} else {
-						$ebounced = $wpdb -> get_var($query); 
-						if (!empty($objectcache)) {
-							wp_cache_set($query_hash, $ebounced, 'newsletters', 0);
-						}
+						$ebounced = $wpdb -> get_var($query);
+						${'newsletters_query_' . $query_hash} = $ebounced;
 					}
 					
 					?>
@@ -99,14 +98,14 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					<?php 
 					
 					$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'";
+					
 					$query_hash = md5($query);
-					if (!empty($objectcache) && $oc_eunsubscribed = wp_cache_get($query_hash, 'newsletters')) {
-						$eunsubscribed = $oc_eunsubscribed;
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$eunsubscribed = ${'newsletters_query_' . $query_hash};
 					} else {
 						$eunsubscribed = $wpdb -> get_var($query);
-						if (!empty($objectcache)) {
-							wp_cache_set($query_hash, $eunsubscribed, 'newsletters', 0);
-						}
+						${'newsletters_query_' . $query_hash} = $eunsubscribed;
 					}
 					
 					$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;

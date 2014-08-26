@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Export Subscribers', $this -> plugin_name); ?></h2>
 	
 	<?php if (!empty($subscribers)) : ?>

@@ -148,30 +148,6 @@ class wpmlTheme extends wpMailPlugin {
 		return $this -> errors;
 	}
 	
-	function get_all_paginated($conditions = array(), $searchterm = false, $sub = 'newsletters-themes', $perpage = 15, $order = array('modified', "DESC")) {
-		global $wpdb;
-		$this -> sections = (object) $this -> sections;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . "" . $this -> table_name, "*", $this -> controller, $this -> controller);
-		$paginate -> searchterm = (empty($searchterm)) ? false : $searchterm;
-		$paginate -> where = (empty($conditions)) ? false : $conditions;		
-		$paginate -> per_page = $perpage;
-		$paginate -> order = $order;
-		$paginate -> url_page = $this -> sections -> themes;
-		$themes = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		
-		if (!empty($themes)) {
-			foreach ($themes as $theme) {
-				$data['Theme'][] = $this -> init_class('wpmlTheme', $theme);
-			}
-		}
-		
-		return $data;
-	}
-	
 	function select() {
 		global $Db;
 		$Db -> model = $this -> model;

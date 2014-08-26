@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Order Custom Fields', $this -> name); ?></h2>
 	
 	<div class="subsubsub" style="float:none;"><?php echo $Html -> link(__('&larr; Manage All Fields', $this -> plugin_name), $this -> url); ?></div>

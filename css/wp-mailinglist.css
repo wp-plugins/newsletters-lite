@@ -20,6 +20,40 @@
 	box-shadow: 0 1px 3px rgba(0,0,0,.2);
 }
 
+.newsletters th.column-id,
+.newsletters th.column-image {
+	width: 4em;
+}
+
+.newsletters th.column-shortcode,
+.newsletters th.column-stats {
+	width: 20%;
+}
+
+.newsletters th.column-attachments {
+	width: 15%;
+}
+
+.newsletters th.column-modified,
+.newsletters th.column-created,
+.newsletters th.column-bouncecount,
+.newsletters th.column-recurring {
+	width: 7em;
+}
+
+.newsletters th.column-registered {
+	width: 8em;
+}
+
+.newsletters th.column-mailinglists {
+	width: 30%;
+}
+
+.newsletters th.column-theme,
+.newsletters th.column-slug {
+	width: 10%;
+}
+
 .newsletters #tableofcontentsdiv .inside {
 	padding-top: 6px;
 }

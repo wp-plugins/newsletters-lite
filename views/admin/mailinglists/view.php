@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('View List:', $this -> plugin_name); ?> <?php echo $mailinglist -> title; ?></h2>
 	
 	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Mailing Lists', $this -> plugin_name), $this -> url, array('title' => __('Manage All Mailing Lists', $this -> plugin_name))); ?></div>

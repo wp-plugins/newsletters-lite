@@ -1,7 +1,10 @@
 <h3><?php _e('Additional Data', $this -> plugin_name); ?></h3>
 <p><?php _e('Manage your subscriber profile data in the fields below.', $this -> plugin_name); ?></p>
 
-<?php $this -> render('error', array('errors' => $errors), true, 'default'); ?>
+<?php if (!empty($errors)) : ?>
+	<?php $this -> render('error', array('errors' => $errors), true, 'default'); ?>
+<?php endif; ?>
+	
 <?php if (!empty($success) && $success == true) : ?>
 	<p class="<?php echo $this -> pre; ?>error"><?php echo $successmessage; ?></p>
 <?php endif; ?>

@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.2
+Version: 4.3.3
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -102,13 +102,7 @@ if (!class_exists('wpMail')) {
 				
 				if (!empty($wpmlhistory_id)) { 
 					$query = "SELECT `from`, `fromname`, `text` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $wpmlhistory_id . "'";
-					$query_hash = md5($query);
-					if ($oc_his = wp_cache_get($query_hash, 'newsletters')) {
-						$his = $oc_his;
-					} else {
-						$his = $wpdb -> get_row($query);
-						wp_cache_set($query_hash, $his, 'newsletters', 0);
-					}
+					$his = $wpdb -> get_row($query);
 					$history = stripslashes_deep($his); 
 				}
 				
@@ -1211,13 +1205,7 @@ if (!class_exists('wpMail')) {
 								. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id WHERE "
 								. $mailinglistscondition . ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y'";
 								
-								$query_hash = md5($query);
-								if ($oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
-									$subscribers = $oc_subscribers;
-								} else {
-									$subscribers = $wpdb -> get_results($query);
-									wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
-								}
+								$subscribers = $wpdb -> get_results($query);
 								
 								if (!empty($subscribers)) {
 									foreach ($subscribers as $subscriber) {
@@ -1273,14 +1261,7 @@ if (!class_exists('wpMail')) {
 			
 			if (!empty($importuserslists)) {			
 				$userslistquery = "SELECT GROUP_CONCAT(`user_id`) FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `user_id` != '0'";
-				$query_hash = md5($userslistquery);
-				
-				if ($oc_userslist = wp_cache_get($query_hash, 'newsletters')) {
-					$userslist = $oc_userslist;
-				} else {
-					$userslist = $wpdb -> get_var($userslistquery);
-					wp_cache_set($query_hash, $userslist, 'newsletters', 0);
-				}
+				$userslist = $wpdb -> get_var($userslistquery);
 						
 				$users_arguments = array(
 					'blog_id'				=>	$GLOBALS['blog_id'],
@@ -1315,13 +1296,7 @@ if (!class_exists('wpMail')) {
 									);
 									
 									$fieldsquery = "SELECT `id`, `slug` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
-									$query_hash = md5($fieldsquery);
-									if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
-										$fields = $oc_fields;
-									} else {
-										$fields = $wpdb -> get_results($fieldsquery);
-										wp_cache_set($query_hash, $fields, 'newsletters', 0);
-									}
+									$fields = $wpdb -> get_results($fieldsquery);
 									
 									if (!empty($fields)) {
 										$importusersfields = $this -> get_option('importusersfields');
@@ -1375,13 +1350,7 @@ if (!class_exists('wpMail')) {
 			WHERE sl.active = 'Y' AND ae.status = 'unsent' 
 			AND ae.senddate <= '" . date_i18n("Y-m-d H:i:s", time()) . "';";
 			
-			$query_hash = md5($query);
-			if ($oc_autoresponderemails = wp_cache_get($query_hash, 'newsletters')) {
-				$autoresponderemails = $oc_autoresponderemails;
-			} else {
-				$autoresponderemails = $wpdb -> get_results($query);
-				wp_cache_set($query_hash, $autoresponderemails, 'newsletters', 0);
-			}
+			$autoresponderemails = $wpdb -> get_results($query);
 			
 			if (!empty($autoresponderemails)) {					
 				foreach ($autoresponderemails as $ae) {				
@@ -1394,34 +1363,20 @@ if (!class_exists('wpMail')) {
 					. $wpdb -> prefix . $Autoresponder -> table . " ON " . $wpdb -> prefix . $History -> table . ".id = " . $wpdb -> prefix . $Autoresponder -> table . ".history_id WHERE " 
 					. $wpdb -> prefix . $Autoresponder -> table . ".id = '" . $ae -> autoresponder_id . "' LIMIT 1;";
 					
-					$query_hash = md5($query);
-					if ($oc_history = wp_cache_get($query_hash, 'newsletters')) {
-						$history = $oc_history;
-					} else {
-						$history = $wpdb -> get_row($query);
-						wp_cache_set($query_hash, $history, 'newsletters', 0);
-					}
-					
+					$history = $wpdb -> get_row($query);					
 					$history -> attachments = array();
 					
 					/* Attachments */
 					$attachmentsquery = "SELECT id, title, filename FROM " . $wpdb -> prefix . $HistoriesAttachment -> table . " WHERE history_id = '" . $history -> id . "'";
 					
-					$query_hash = md5($attachmentsquery);
-					if ($oc_attachments = wp_cache_get($query_hash, 'newsletters')) {			
-						$history -> attachments = $oc_attachments;
-					} else {
-						if ($attachments =  $wpdb -> get_results($attachmentsquery)) {
-							foreach ($attachments as $attachment) {
-								$history -> attachments[] = array(
-									'id'					=>	$attachment -> id,
-									'title'					=>	$attachment -> title,
-									'filename'				=>	$attachment -> filename,
-								);	
-							}
+					if ($attachments =  $wpdb -> get_results($attachmentsquery)) {
+						foreach ($attachments as $attachment) {
+							$history -> attachments[] = array(
+								'id'					=>	$attachment -> id,
+								'title'					=>	$attachment -> title,
+								'filename'				=>	$attachment -> filename,
+							);	
 						}
-						
-						wp_cache_set($query_hash, $history -> attachments, 'newsletters', 0);
 					}
 					
 					/* The Subscriber */
@@ -1520,13 +1475,7 @@ if (!class_exists('wpMail')) {
 							$this -> remove_server_limits();
 							
 							$historyquery = "SELECT `post_id` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $email -> history_id . "'";
-							$query_hash = md5($historyquery);
-							if ($oc_history_post_id = wp_cache_get($query_hash, 'newsletters')) {
-								$history_post_id = $oc_history_post_id;
-							} else {
-								$history_post_id = $wpdb -> get_var($historyquery);
-								wp_cache_set($query_hash, $history_post_id, 'newsletters', 0);
-							}
+							$history_post_id = $wpdb -> get_var($historyquery);
 							
 							if (!empty($history_post_id)) {
 								if ($getpost = get_post($history_post_id)) {
@@ -2499,13 +2448,7 @@ if (!class_exists('wpMail')) {
 												if (!empty($_POST['roles'])) {
 													$users = array();
 													$exclude_users_query = "SELECT GROUP_CONCAT(`user_id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `user_id` != '0'";
-													$query_hash = md5($exclude_users_query);
-													if ($oc_exclude_users = wp_cache_get($query_hash, 'newsletters')) {
-														$exclude_users = $oc_exclude_users;
-													} else {
-														$exclude_users = $wpdb -> get_var($exclude_users_query);
-														wp_cache_set($query_hash, $exclude_users, 'newsletters', 0);
-													}
+													$exclude_users = $wpdb -> get_var($exclude_users_query);
 													
 													foreach ($_POST['roles'] as $role_key) {
 														$users_arguments = array(
@@ -2554,13 +2497,7 @@ if (!class_exists('wpMail')) {
 													}
 												}
 												
-												$query_hash = md5($query);
-												if ($oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
-													$subscribers = $oc_subscribers;
-												} else {
-													$subscribers = $wpdb -> get_results($query);
-													wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
-												}
+												$subscribers = $wpdb -> get_results($query);
 												
 												if (!empty($subscribers)) {													
 													foreach ($subscribers as $subscriber) {
@@ -2978,13 +2915,7 @@ if (!class_exists('wpMail')) {
 						. $wpdb -> prefix . $SubscribersList -> table . " ON " . $wpdb -> prefix . $Autoresponderemail -> table . ".subscriber_id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id 
 						WHERE " . $wpdb -> prefix . $Autoresponderemail -> table . ".id = '" . $_GET['id'] . "' LIMIT 1";
 						
-						$query_hash = md5($query);
-						if ($oc_ae = wp_cache_get($query_hash, 'newsletters')) {
-							$ae = $oc_ae;
-						} else {
-							$ae = $wpdb -> get_row($query);
-							wp_cache_set($query_hash, $ae, 'newsletters', 0);
-						}
+						$ae = $wpdb -> get_row($query);
 						
 						if (!empty($ae)) {						
 							$query = "SELECT " . $wpdb -> prefix . $History -> table . ".id, " 
@@ -2995,13 +2926,8 @@ if (!class_exists('wpMail')) {
 							. $wpdb -> prefix . $Autoresponder -> table . " ON " . $wpdb -> prefix . $History -> table . ".id = " . $wpdb -> prefix . $Autoresponder -> table . ".history_id WHERE " 
 							. $wpdb -> prefix . $Autoresponder -> table . ".id = '" . $ae -> autoresponder_id . "' LIMIT 1;";
 							
-							$query_hash = md5($query);
-							if ($oc_history = wp_cache_get($query_hash, 'newsletters')) {
-								$history = $oc_history;
-							} else {
-								$history = $wpdb -> get_row($query);
-								wp_cache_set($query_hash, $history, 'newsletters', 0);
-							}
+							$history = $wpdb -> get_row($query);
+						
 					
 							/* The Subscriber */
 							$Db -> model = $Subscriber -> model;
@@ -3088,13 +3014,7 @@ if (!class_exists('wpMail')) {
 											. $wpdb -> prefix . $Autoresponder -> table . " ON " . $wpdb -> prefix . $History -> table . ".id = " . $wpdb -> prefix . $Autoresponder -> table . ".history_id WHERE " 
 											. $wpdb -> prefix . $Autoresponder -> table . ".id = '" . $ae -> autoresponder_id . "' LIMIT 1;";
 											
-											$query_hash = md5($query);
-											if ($oc_history = wp_cache_get($query_hash, 'newsletters')) {
-												$history = $oc_history;
-											} else {
-												$history = $wpdb -> get_row($query);
-												wp_cache_set($query_hash, $history, 'newsletters', 0);
-											}
+											$history = $wpdb -> get_row($query);
 									
 											/* The Subscriber */
 											$Db -> model = $Subscriber -> model;
@@ -3418,7 +3338,6 @@ if (!class_exists('wpMail')) {
 						$data[$Mailinglist -> model] = $lists;
 						$data['Paginate'] = false;
 					} else {
-						//$data = $Mailinglist -> get_all_paginated($conditions, $searchterm, $this -> sections -> lists, $perpage, $order);
 						$data = $this -> paginate($Mailinglist -> model, null, $this -> sections -> lists, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -3533,7 +3452,6 @@ if (!class_exists('wpMail')) {
 						$data[$wpmlGroup -> model] = $groups;
 						$data['Paginate'] = false;
 					} else {
-						//$data = $wpmlGroup -> get_all_paginated($conditions, $searchterm, $this -> sections -> groups, $perpage, $order);
 						$data = $this -> paginate($wpmlGroup -> model, null, $this -> sections -> groups, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -3854,12 +3772,14 @@ if (!class_exists('wpMail')) {
 								if (!empty($_POST['importlists'])) {								
 									foreach ($_POST['importlists'] as $importlist_id) {
 										$query = "SELECT `id`, `paid` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $importlist_id . "'";
+										
 										$query_hash = md5($query);
-										if ($oc_mailinglist = wp_cache_get($query_hash, 'newsletters')) {
-											$mailinglist = $oc_mailinglist;
+										global ${'newsletters_query_' . $query_hash};
+										if (!empty(${'newsletters_query_' . $query_hash})) {
+											$mailinglist = ${'newsletters_query_' . $query_hash};
 										} else {
 											$mailinglist = $wpdb -> get_row($query);
-											wp_cache_set($query_hash, $mailinglist, 'newsletters', 0);
+											${'newsletters_query_' . $query_hash} = $mailinglist;
 										}
 									
 										if (!empty($mailinglist)) {
@@ -3938,12 +3858,14 @@ if (!class_exists('wpMail')) {
 																		$mailinglists[] = $mailinglist_id;
 																		
 																		$query = "SELECT `id`, `paid` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $mailinglist_id . "'";
+																		
 																		$query_hash = md5($query);
-																		if ($oc_mailinglist = wp_cache_get($query_hash, 'newsletters')) {
-																			$mailinglist = $oc_mailinglist;
+																		global ${'newsletters_query_' . $query_hash};
+																		if (!empty(${'newsletters_query_' . $query_hash})) {
+																			$mailinglist = ${'newsletters_query_' . $query_hash};
 																		} else {
 																			$mailinglist = $wpdb -> get_row($query);
-																			wp_cache_set($query_hash, $mailinglist, 'newsletters', 0);
+																			${'newsletters_query_' . $query_hash} = $mailinglist;
 																		}
 																		
 																		if (!empty($mailinglist)) {
@@ -4079,26 +4001,21 @@ if (!class_exists('wpMail')) {
 							}
 							
 							$query .= " GROUP BY " . $wpdb -> prefix . $Subscriber -> table . ".email"; 
-							
-							$query_hash = md5($query);
-							if ($oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
-								$subscribers = $oc_subscribers;
-							} else {
-								$subscribers = $wpdb -> get_results($query);
-								wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
-							}
+							$subscribers = $wpdb -> get_results($query);
 							
 							$datasets = array();
 							if (!empty($subscribers)) {
 								$d = 0;
 								
 								$fieldsquery = "SELECT * FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
+								
 								$query_hash = md5($fieldsquery);
-								if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
-									$fields = $oc_fields;
+								global ${'newsletters_query_' . $query_hash};
+								if (!empty(${'newsletters_query_' . $query_hash})) {
+									$fields = ${'newsletters_query_' . $query_hash};
 								} else {
 									$fields = $wpdb -> get_results($fieldsquery);
-									wp_cache_set($query_hash, $fields, 'newsletters', 0);
+									${'newsletters_query_' . $query_hash} = $fields;
 								}
 								
 								$headings = array();
@@ -4150,13 +4067,7 @@ if (!class_exists('wpMail')) {
 															break;
 														case 'pre_country'			:
 															$query = "SELECT `value` FROM " . $wpdb -> prefix . $wpmlCountry -> table . " WHERE `id` = '" . $subscriber -> {$field -> slug} . "'";
-															$query_hash = md5($query);
-															if ($oc_country = wp_cache_get($query_hash, 'newsletters')) {
-																$country = $oc_country;
-															} else {
-																$country = $wpdb -> get_var($query);
-																wp_cache_set($query_hash, $country, 'newsletters', 0);
-															}
+															$country = $wpdb -> get_var($query);
 															
 															$datasets[$d][$field -> slug] = (!empty($country)) ? $country : '';
 															break;
@@ -4339,7 +4250,6 @@ if (!class_exists('wpMail')) {
 						$data[$Theme -> model] = $themes;
 						$data['Paginate'] = false;
 					} else {
-						//$data = $Theme -> get_all_paginated($conditions, $searchterm, $this -> sections -> themes, $perpage, $order);
 						$data = $this -> paginate($Theme -> model, null, $this -> sections -> themes, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -4443,7 +4353,6 @@ if (!class_exists('wpMail')) {
 						$data[$Template -> model] = $templates;
 						$data['Paginate'] = false;
 					} else {
-						//$data = $Template -> get_all_paginated($conditions, $searchterm, $this -> sections -> templates, $perpage, $order);
 						$data = $this -> paginate($Template -> model, null, $this -> sections -> templates, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -4578,18 +4487,11 @@ if (!class_exists('wpMail')) {
 					
 					if (!empty($_GET['showall'])) {						
 						$emailsquery = "SELECT * FROM " . $wpdb -> prefix . $Queue -> table . "";
-						$query_hash = md5($emailsquery);
-						if ($oc_emails = wp_cache_get($query_hash, 'newsletters')) {
-							$emails = $oc_emails;
-						} else {
-							$emails = $wpdb -> get_results($emailsquery);
-							wp_cache_set($query_hash, $emails, 'newsletters', 0);
-						}
+						$emails = $wpdb -> get_results($emailsquery);
 						
 						$data[$Queue -> model] = $emails;
 						$data['Paginate'] = false;
 					} else {
-						//$data = $Queue -> get_all_paginated(false, false, $this -> sections -> queue, $perpage, $order);
 						$data = $this -> paginate($Queue -> model, null, $this -> sections -> queue, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -4933,9 +4835,7 @@ if (!class_exists('wpMail')) {
 						$data[$History -> model] = $histories;
 						$data['Paginate'] = false;
 					} else {	
-						//$data = $History -> get_all_paginated($conditions, $searchterm, $this -> sections -> history, $perpage, $order);
 						$data = $this -> paginate($History -> model, null, $this -> sections -> history, $conditions, $searchterm, $perpage, $order);
-						
 					}
 					
 					$this -> render_admin('history' . DS . 'index', array('histories' => $data[$History -> model], 'paginate' => $data['Paginate']));			
@@ -5017,7 +4917,6 @@ if (!class_exists('wpMail')) {
 						$data['Paginate'] = false;
 					} else {	
 						$data = $this -> paginate($this -> Link -> model, "*", $sub, $conditions, $searchterm, $perpage, $order);
-						//$data = $History -> get_all_paginated($conditions, $searchterm, $this -> sections -> history, $perpage, $order);
 					}
 					$this -> render('links' . DS . 'index', array('links' => $data[$this -> Link -> model], 'paginate' => $data['Paginate']), true, 'admin');
 					break;
@@ -5132,7 +5031,6 @@ if (!class_exists('wpMail')) {
 						$data[$wpmlOrder -> model] = $orders;
 						$data['Paginate'] = false;
 					} else {	
-						//$data = $wpmlOrder -> get_all_paginated($conditions, $searchterm, $this -> sections -> orders, $perpage, $order);
 						$data = $this -> paginate($wpmlOrder -> model, null, $this -> sections -> orders, $conditions, $searchterm, $perpage, $order);
 					}
 					
@@ -5526,7 +5424,6 @@ if (!class_exists('wpMail')) {
 			if (!empty($_POST)) {
 				delete_option('tridebugging');
 				$this -> delete_option('language_external');
-				$this -> delete_option('objectcache');
 			
 				foreach ($_POST as $key => $val) {				
 					$this -> update_option($key, $val);

@@ -85,7 +85,7 @@
 						</th>
 						<?php $colspan++; ?>
 					<?php endif; ?>
-					<th style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
+					<th class="column-mailinglists" style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
 					<?php $colspan++; ?>
                     <th class="column-bouncecount <?php echo ($orderby == "bouncecount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=bouncecount&order=' . (($orderby == "bouncecount") ? $otherorder : "asc")); ?>">
@@ -140,7 +140,7 @@
 							</a>
 						</th>
 					<?php endif; ?>
-					<th style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
+					<th class="column-mailinglists" style="width:400px;"><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
                     <th class="column-bouncecount <?php echo ($orderby == "bouncecount") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=bouncecount&order=' . (($orderby == "bouncecount") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Bounces', $this -> plugin_name); ?></span>

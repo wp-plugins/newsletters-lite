@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Offsite HTML Code', $this -> plugin_name); ?></h2>
 	<div>
 		<p><?php _e('Put the code below in the <code><HEAD></HEAD></code> section of your site', $this -> plugin_name); ?></p>

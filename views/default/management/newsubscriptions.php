@@ -5,7 +5,9 @@
 	<p class="<?php echo $this -> pre; ?>error"><?php echo $successmessage; ?></p>
 <?php endif; ?>
 
-<?php $this -> render('error', array('errors' => $errors), true, 'default'); ?>
+<?php if (!empty($errors)) : ?>
+	<?php $this -> render('error', array('errors' => $errors), true, 'default'); ?>
+<?php endif; ?>
 
 <?php if (!empty($otherlists)) : ?>
     <table>

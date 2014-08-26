@@ -10,7 +10,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Save an Autoresponder', $this -> plugin_name); ?></h2>
     
     <form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save" method="post">

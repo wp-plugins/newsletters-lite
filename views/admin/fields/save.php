@@ -11,7 +11,7 @@ $regex = $Html -> field_value('Field[regex]');
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Save a Custom Field', $this -> plugin_name); ?></h2>
 	<?php $this -> render_admin('error', array('errors' => $errors)); ?>
 	<?php $slug = $Html -> field_value('Field[slug]'); ?>

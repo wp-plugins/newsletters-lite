@@ -5,4 +5,4 @@
 
 <p><a href="<?php echo get_permalink($this -> get_option('managementpost')); ?>"><?php _e('Manage Subscriptions', $this -> plugin_name); ?></a></p>
 
-<script type="text/javascript">jQuery(document).ready(function() { window.location = "<?php echo get_permalink($this -> get_option('managementpost')); ?>"; });</script>
+<script type="text/javascript">jQuery(document).ready(function() { window.location = "<?php echo $Html -> retainquery('subscriberauth=' . $subscriberauth, get_permalink($this -> get_option('managementpost'))); ?>"; });</script>

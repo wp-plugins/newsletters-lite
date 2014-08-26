@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<div style="width:600px;">
 		<h2><?php _e('Posts Logged', $this -> plugin_name); ?></h2>
 		

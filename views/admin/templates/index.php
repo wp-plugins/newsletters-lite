@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Manage Snippets', $this -> plugin_name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> templates_save; ?>" title="<?php _e('Create a new newsletter template', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
 	<?php if (!empty($templates)) : ?>
 		<form id="posts-filter" method="post" action="?page=<?php echo $this -> sections -> templates; ?>">

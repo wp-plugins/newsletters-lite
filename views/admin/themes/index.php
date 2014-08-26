@@ -1,4 +1,4 @@
-<div class="wrap">
+<div class="wrap newsletters">
 	<h2><?php _e('Manage Themes', $this -> plugin_name); ?> <a class="add-new-h2" href="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save" title="<?php _e('Add a new theme', $this -> plugin_name); ?>"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
     
     <?php if (!empty($themes)) : ?>

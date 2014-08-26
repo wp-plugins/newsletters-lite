@@ -47,15 +47,14 @@ $active = $Db -> count(array('active' => "Y"));
 $Db -> model = $Unsubscribe -> model;
 $unsubscribes = $Db -> count();
 $query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "`";
-$objectcache = $this -> get_option('objectcache');
+
 $query_hash = md5($query);
-if (!empty($objectcache) && $oc_bounces = wp_cache_get($query_hash, 'newsletters')) {
-	$bounces = $oc_bounces;
+global ${'newsletters_query_' . $query_hash};
+if (!empty(${'newsletters_query_' . $query_hash})) {
+	$bounces = ${'newsletters_query_' . $query_hash};
 } else {
 	$bounces = $wpdb -> get_var($query);
-	if (!empty($objectcache)) {
-		wp_cache_set($query_hash, $bounces, 'newsletters', 0);
-	}
+	${'newsletters_query_' . $query_hash} = $bounces;
 }
 
 ?>

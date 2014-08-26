@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Offsite Wizard', $this -> plugin_name); ?></h2>
 	<form action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=offsitewizard" method="post">
 		<table class="form-table">

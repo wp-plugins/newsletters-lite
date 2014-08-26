@@ -98,10 +98,10 @@ class wpmlField extends wpMailPlugin {
 			
 			$efieldslistquery = "SELECT * FROM " . $wpdb -> prefix . $FieldsList -> table . " WHERE `special` = 'email'";
 			
-			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($efieldslistquery);
-			if (!empty($objectcache)) {
-				$oc_efieldslist = wp_cache_get($query_hash, 'newsletters');
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$oc_efieldslist = ${'newsletters_query_' . $query_hash};
 			}
 			
 			if (empty($oc_efieldslist) && !$efieldslist = $wpdb -> get_row($efieldslistquery)) {
@@ -136,8 +136,12 @@ class wpmlField extends wpMailPlugin {
 			}
 			
 			$lfieldslistquery = "SELECT * FROM " . $wpdb -> prefix . $FieldsList -> table . " WHERE `special` = 'list'";
+			
 			$query_hash = md5($lfieldslistquery);
-			$oc_lfieldslist = wp_cache_get($query_hash, 'newsletters');
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$oc_lfieldslist = ${'newsletters_query_' . $query_hash};
+			}
 			
 			if (empty($oc_efieldslist) && !$lfieldslist = $wpdb -> get_row($lfieldslistquery)) {
 				$lfieldslistdata = array(
@@ -158,17 +162,15 @@ class wpmlField extends wpMailPlugin {
 		
 		$emailfieldquery = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE slug = 'email'";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($emailfieldquery);
-		if (!empty($objectcache) && $emailfield = wp_cache_get($query_hash, 'newsletters')) {
-			return $emailfield;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			return ${'newsletters_query_' . $query_hash};
 		}
 		
 		if ($emailfield = $wpdb -> get_row($emailfieldquery)) {
 			$emailfield -> error = $emailfield -> errormessage;
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $emailfield, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $emailfield;
 			return $emailfield;
 		}
 		
@@ -187,17 +189,15 @@ class wpmlField extends wpMailPlugin {
 		global $wpdb;
 		$listfieldquery = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE slug = 'list'";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($listfieldquery);
-		if (!empty($objectcache) && $listfield = wp_cache_get($query_hash, 'newsletters')) {
-			return $listfield;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			return ${'newsletters_query_' . $query_hash};
 		}
 		
 		if ($listfield = $wpdb -> get_row($listfieldquery)) {
 			$listfield -> error = $listfield -> errormessage;
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $listfield, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $listfield;
 			return $listfield;
 		}
 		
@@ -234,18 +234,16 @@ class wpmlField extends wpMailPlugin {
 		
 		$query .= " LIMIT 1";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $data = wp_cache_get($query_hash, 'newsletters')) {
-			return $data;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			return ${'newsletters_query_' . $query_hash};
 		}
 		
 		if ($field = $wpdb -> get_row($query)) {
 			if (!empty($field)) {
 				$data = $this -> init_class('wpmlField', $field);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $data, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $data;
 				return $data;
 			}
 		}
@@ -623,18 +621,16 @@ class wpmlField extends wpMailPlugin {
 		if (!empty($field_id)) {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `id` = '" . $field_id . "' LIMIT 1";
 			
-			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if (!empty($objectcache) && $data = wp_cache_get($query_hash, 'newsletters')) {
-				return $data;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				return ${'newsletters_query_' . $query_hash};
 			}
 		
 			if ($field = $wpdb -> get_row($query)) {
 				$this -> data = (array) $this -> data;
 				$this -> data[$this -> model] = $this -> init_class($this -> model, $field);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $this -> data[$this -> model], 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $this -> data[$this -> model];
 				return $this -> data[$this -> model];
 			}
 		}
@@ -670,10 +666,10 @@ class wpmlField extends wpMailPlugin {
 		
 		$query = "SELECT " . $selectfields . " FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $data = wp_cache_get($query_hash, 'newsletters')) {
-			return $data;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			return ${'newsletters_query_' . $query_hash};
 		}
 		
 		if ($fields = $wpdb -> get_results($query)) {
@@ -684,42 +680,12 @@ class wpmlField extends wpMailPlugin {
 					$data[] = $this -> init_class($this -> model, $field);
 				}
 				
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $data, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $data;
 				return $data;
 			}
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * Retrieve all fields in a paginated fashion
-	 * @param $conditions ARRAY conditions passed on to the pagination class.
-	 * @return $data ARRAY an array of order objects retrieved from the database
-	 *
-	 **/
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = "newsletters-fields", $perpage = 15, $order = array('modified', "DESC")) {
-		global $wpdb;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . "" . $this -> table, '*', $sub, $sub);
-		$paginate -> where = (empty($conditions)) ? false : $conditions;
-		$paginate -> searchterm = (empty($searchterm)) ? false : $searchterm;
-		$paginate -> per_page = $perpage;
-		$paginate -> order = $order;
-		$fields = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		
-		if (!empty($fields)) {
-			foreach ($fields as $field) {
-				$data[$this -> model][] = $this -> init_class($this -> model, $field);
-			}
-		}
-		
-		return $data;
 	}
 }
 

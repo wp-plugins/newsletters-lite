@@ -49,15 +49,13 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		global $wpdb, $Subscriber;
 		$subscribersquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Subscriber -> table . "";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($subscribersquery);
-		if (!empty($objectcache) && $oc_subscriberstotal = wp_cache_get($query_hash, 'newsletters')) {
-			$subscriberstotal = $oc_subscriberstotal;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$subscriberstotal = ${'newsletters_query_' . $query_hash};
 		} else {
 			$subscriberstotal = $wpdb -> get_var($subscribersquery);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $subscriberstotal, 'newsletters', 0);	
-			}
+			${'newsletters_query_' . $query_hash} = $subscriberstotal;
 		}
 		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'subscribers', array('total' => $subscriberstotal), true, 'admin');
@@ -67,28 +65,24 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		global $wpdb, $Mailinglist;
 		$publicquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `privatelist` = 'N'";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($publicquery);
-		if (!empty($objectcache) && $oc_total_public = wp_cache_get($query_hash, 'newsletters')) {
-			$total_public = $oc_total_public;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$total_public = ${'newsletters_query_' . $query_hash};
 		} else {
 			$total_public = $wpdb -> get_var($publicquery);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $total_public, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $total_public;
 		}
 		
 		$privatequery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `privatelist` = 'Y'";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($privatequery);
-		if (!empty($objectcache) && $oc_total_private = wp_cache_get($query_hash, 'newsletters')) {
-			$total_private = $oc_total_private;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$total_private = ${'newsletters_query_' . $query_hash};
 		} else {
 			$total_private = $wpdb -> get_var($privatequery);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $total_private, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $total_private;
 		}
 		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'lists', array('total_public' => $total_public, 'total_private' => $total_private), true, 'admin');
@@ -98,15 +92,13 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		global $wpdb, $Email;
 		$emailsquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Email -> table . "";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($emailsquery);
-		if (!empty($objectcache) && $oc_emailstotal = wp_cache_get($query_hash, 'newsletters')) {
-			$emailstotal = $oc_emailstotal;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$emailstotal = ${'newsletters_query_' . $query_hash};
 		} else {
 			$emailstotal = $wpdb -> get_var($emailsquery);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $emailstotal, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $emailstotal;
 		}
 		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'emails', array('total' => $emailstotal), true, 'admin');

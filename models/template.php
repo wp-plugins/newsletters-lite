@@ -90,15 +90,14 @@ class wpmlTemplate extends wpMailPlugin {
 		
 		if (!empty($template_id)) {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` WHERE `id` = '" . $template_id . "'";
-			$objectcache = $this -> get_option('objectcache');
+			
 			$query_hash = md5($query);
-			if (!empty($objectcache) && $oc_template = wp_cache_get($query_hash, 'newsletters')) {
-				$template = $oc_template;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$template = ${'newsletters_query_' . $query_hash};
 			} else {
 				$template = $wpdb -> get_row($query);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $template, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $template;
 			}
 		
 			if (!empty($template)) {
@@ -119,15 +118,14 @@ class wpmlTemplate extends wpMailPlugin {
 		global $wpdb;
 		
 		$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` ORDER BY `title` ASC";
-		$objectcache = $this -> get_option('objectcache');
+		
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_templates = wp_cache_get($query_hash, 'newsletters')) {
-			$templates = $oc_templates;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$templates = ${'newsletters_query_' . $query_hash};
 		} else {
 			$templates = $wpdb -> get_results($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $templates, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $templates;
 		}
 		
 		if (!empty($templates)) {
@@ -141,30 +139,6 @@ class wpmlTemplate extends wpMailPlugin {
 		}
 		
 		return false;
-	}
-	
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-templates', $perpage = 15, $order = array('modified', "DESC")) {
-		global $wpdb;
-		$this -> sections = (object) $this -> sections;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . "" . $this -> table_name, "*", $this -> controller, $this -> controller);
-		$paginate -> searchterm = (empty($searchterm)) ? false : $searchterm;
-		$paginate -> where = (empty($conditions)) ? false : $conditions;		
-		$paginate -> per_page = $perpage;
-		$paginate -> order = $order;
-		$paginate -> url_page = $this -> sections -> templates;
-		$templates = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		
-		if (!empty($templates)) {
-			foreach ($templates as $template) {
-				$data['Template'][] = $this -> init_class('wpmlTemplate', $template);
-			}
-		}
-		
-		return $data;
 	}
 	
 	function save($data = array(), $validate = true) {

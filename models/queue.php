@@ -104,16 +104,14 @@ class wpmlQueue extends wpMailPlugin {
 			}
 		}
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $count = wp_cache_get($query_hash, 'newsletters')) {
-			return $count;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			return ${'newsletters_query_' . $query_hash};
 		}
 		
 		if ($count = $wpdb -> get_var($query)) {
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $count, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $count;
 			return $count;
 		}
 		
@@ -124,15 +122,14 @@ class wpmlQueue extends wpMailPlugin {
 		global $wpdb;
 		
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "mailqueue` LIMIT " . $limit . "";
-		$objectcache = $this -> get_option('objectcache');
+		
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_emails = wp_cache_get($query_hash, 'newsletters')) {
-			$emails = $oc_emails;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$emails = ${'newsletters_query_' . $query_hash};
 		} else {
 			$emails = $wpdb -> get_results($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $emails, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $emails;
 		}
 		
 		if (!empty($emails)) {
@@ -146,26 +143,6 @@ class wpmlQueue extends wpMailPlugin {
 		}
 				
 		return false;
-	}
-	
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-queue', $perpage = 15, $order = array('modified', "DESC")) {
-		global $wpdb;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . $this -> table_name, "*", $sub, $sub);
-		$paginate -> per_page = $perpage;
-		$paginate -> order = $order;
-		$queues = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		
-		if (!empty($queues)) {
-			foreach ($queues as $queue) {
-				$data[$this -> model][] = $this -> init_class($this -> model, $queue);
-			}
-		}
-		
-		return $data;
 	}
 	
 	function find_all($conditions = array(), $fields = '', $order = array('created', "DESC"), $limit = false) {
@@ -194,15 +171,14 @@ class wpmlQueue extends wpMailPlugin {
 		}
 		
 		if (!empty($limit)) { $query .= " LIMIT " . $limit . ""; }
-		$objectcache = $this -> get_option('objectcache');
+		
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_emails = wp_cache_get($query_hash, 'newsletters')) {
-			$emails = $oc_emails;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$emails = ${'newsletters_query_' . $query_hash};
 		} else {
 			$emails = $wpdb -> get_results($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $emails, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $emails;
 		}
 		
 		if (!empty($emails)) {

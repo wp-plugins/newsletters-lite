@@ -103,27 +103,6 @@ class wpmlAutoresponder extends wpMailPlugin {
 		return $this -> errors;
 	}
 	
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-autoresponders', $perpage = 15, $order = array('modified', "DESC")) {
-		global $wpdb;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . $this -> table, "*", $sub, $sub);
-		$paginate -> per_page = $perpage;
-		$paginate -> where = $conditions;
-		$paginate -> order = $order;
-		$queues = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		
-		if (!empty($queues)) {
-			foreach ($queues as $queue) {
-				$data[$this -> model][] = $this -> init_class($this -> model, $queue);
-			}
-		}
-		
-		return $data;
-	}
-	
 	function select() {
 		global $Db;		
 		$select = array();		

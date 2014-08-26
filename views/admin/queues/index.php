@@ -1,4 +1,4 @@
-<div class="wrap <?php echo $this -> pre; ?> <?php echo $this -> sections -> queue; ?>">
+<div class="wrap newsletters <?php echo $this -> pre; ?> <?php echo $this -> sections -> queue; ?>">
 	<h2><?php _e('Email Queue', $this -> plugin_name); ?> <a href="?page=<?php echo $this -> sections -> queue; ?>" class="add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a></h2>
 	<h3><?php _e('Schedule Details', $this -> plugin_name); ?></h3>
 	

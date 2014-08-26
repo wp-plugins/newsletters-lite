@@ -84,7 +84,7 @@ class wpmlHistory extends wpMailPlugin {
 	function wpmlHistory($data = array()) {
 		global $Db, $HistoriesList, $Mailinglist, $HistoriesAttachment;
 	
-		$this -> table = $this -> pre . $this -> controller;	
+		$this -> table = $this -> pre . $this -> controller;
 	
 		if (!empty($data)) {
 			foreach ($data as $key => $val) {
@@ -137,16 +137,13 @@ class wpmlHistory extends wpMailPlugin {
 		AND (`recurringlimit` = '' OR `recurringlimit` = '0' OR `recurringlimit` > `recurringsent`) 
 		AND (`recurringdate` <= NOW())";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		
-		if (!empty($objectcache) && $oc_histories = wp_cache_get($query_hash, 'newsletters')) {
-			$histories = $oc_histories;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$histories = ${'newsletters_query_' . $query_hash};
 		} else {
 			$histories = $wpdb -> get_results($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $histories, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $histories;
 		}
 		
 		do_action('newsletters_queue_recurring_start', $histories);
@@ -230,15 +227,13 @@ class wpmlHistory extends wpMailPlugin {
 					$sentmailscount = 0;
 					$q_queries = array();
 					
-					$objectcache = $this -> get_option('objectcache');
 					$query_hash = md5($query);
-					if (!empty($objectcache) && $oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
-						$subscribers = $oc_subscribers;
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$subscribers = ${'newsletters_query_' . $query_hash};
 					} else {
 						$subscribers = $wpdb -> get_results($query);
-						if (!empty($objectcache)) {
-							wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
-						}
+						${'newsletters_query_' . $query_hash} = $subscribers;
 					}
 					
 					if (!empty($subscribers)) {				
@@ -296,15 +291,13 @@ class wpmlHistory extends wpMailPlugin {
 		
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE `senddate` <= '" . date_i18n("Y-m-d H:i:s", time()) . "' AND `scheduled` = 'Y' LIMIT 1";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_histories = wp_cache_get($query_hash, 'newsletters')) {
-			$histories = $oc_histories;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$histories = ${'newsletters_query_' . $query_hash};
 		} else {
 			$histories = $wpdb -> get_results($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $histories, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $histories;
 		}
 		
 		if (!empty($histories)) {		
@@ -395,15 +388,13 @@ class wpmlHistory extends wpMailPlugin {
 					$sentmailscount = 0;
 					$q_queries = array();
 					
-					$objectcache = $this -> get_option('objectcache');
 					$query_hash = md5($query);
-					if (!empty($objectcache) && $oc_subscribers = wp_cache_get($query_hash, 'newsletters')) {
-						$subscribers = $oc_subscribers;
+					global ${'newsletters_query_' . $query_hash};
+					if (!empty(${'newsletters_query_' . $query_hash})) {
+						$subscribers = ${'newsletters_query_' . $query_hash};
 					} else {
 						$subscribers = $wpdb -> get_results($query);
-						if (!empty($objectcache)) {
-							wp_cache_set($query_hash, $subscribers, 'newsletters', 0);
-						}
+						${'newsletters_query_' . $query_hash} = $subscribers;
 					}
 					
 					if (!empty($subscribers)) {				
@@ -461,15 +452,13 @@ class wpmlHistory extends wpMailPlugin {
 		
 		$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table_name . "`";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_count = wp_cache_get($query_hash, 'newsletters')) {
-			$count = $oc_count;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$count = ${'newsletters_query_' . $query_hash};
 		} else {
 			$count = $wpdb -> get_var($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $count, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $count;
 		}
 		
 		if (!empty($count)) {
@@ -645,15 +634,13 @@ class wpmlHistory extends wpMailPlugin {
 		if (!empty($history_id)) {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
 			
-			$objectcache = $this -> get_option('objectcache');
 			$query_hash = md5($query);
-			if (!empty($objectcache) && $oc_history = wp_cache_get($query_hash, 'newsletters')) {
-				$history = $oc_history;
+			global ${'newsletters_query_' . $query_hash};
+			if (!empty(${'newsletters_query_' . $query_hash})) {
+				$history = ${'newsletters_query_' . $query_hash};
 			} else {
 				$history = $wpdb -> get_row($query);
-				if (!empty($objectcache)) {
-					wp_cache_set($query_hash, $history, 'newsletters', 0);
-				}
+				${'newsletters_query_' . $query_hash} = $history;
 			}
 		
 			if (!empty($history)) {
@@ -682,15 +669,13 @@ class wpmlHistory extends wpMailPlugin {
 		
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` ASC LIMIT 1";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_email = wp_cache_get($query_hash, 'newsletters')) {
-			$email = $oc_email;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$email = ${'newsletters_query_' . $query_hash};
 		} else {
 			$email = $wpdb -> get_row($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $email, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $email;
 		}
 		
 		if (!empty($email)) {
@@ -713,15 +698,13 @@ class wpmlHistory extends wpMailPlugin {
 		
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` DESC LIMIT 1";
 		
-		$objectcache = $this -> get_option('objectcache');
 		$query_hash = md5($query);
-		if (!empty($objectcache) && $oc_email = wp_cache_get($query_hash, 'newsletters')) {
-			$email = $oc_email;
+		global ${'newsletters_query_' . $query_hash};
+		if (!empty(${'newsletters_query_' . $query_hash})) {
+			$email = ${'newsletters_query_' . $query_hash};
 		} else {
 			$email = $wpdb -> get_row($query);
-			if (!empty($objectcache)) {
-				wp_cache_set($query_hash, $email, 'newsletters', 0);
-			}
+			${'newsletters_query_' . $query_hash} = $email;
 		}
 		
 		if (!empty($email)) {
@@ -735,34 +718,6 @@ class wpmlHistory extends wpMailPlugin {
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * Retrieve all history emails in a paginated manner.
-	 * Checks for $_GET['wpmlpage'] to control pagination
-	 * @return $data ARRAY an array with history Objects.
-	 *
-	 */
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-history', $perpage = 15, $order = array('created', "DESC")) {
-		global $wpdb;
-		
-		$paginate = new wpMailPaginate($wpdb -> prefix . "" . $this -> table_name . "", "*", $sub, $sub);
-		$paginate -> per_page = $perpage;
-		$paginate -> where = (empty($conditions)) ? false : $conditions;
-		$paginate -> searchterm = (empty($searchterm)) ? false : $searchterm;
-		$paginate -> order = $order;
-		$histories = $paginate -> start_paging($_GET[$this -> pre . 'page']);
-		
-		$data = array();
-		$data['Pagination'] = $paginate;
-		
-		if (!empty($histories)) {
-			foreach ($histories as $email) {
-				$data[$this -> model][] = $this -> init_class($this -> model, $email);
-			}
-		}
-		
-		return $data;
 	}
 	
 	/**
