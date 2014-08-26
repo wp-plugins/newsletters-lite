@@ -1,0 +1,121 @@
+<div class="wrap <?php echo $this -> pre; ?>">
+	<h2><?php _e('Sent/Draft:', $this -> plugin_name); ?> <?php echo $history -> subject; ?> <a href="?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history -> id; ?>" class="button add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a></h2>
+	
+	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Sent &amp; Drafts', $this -> plugin_name), $this -> url); ?></div>
+	
+	<div class="tablenav">
+		<div class="alignleft actions">
+			<a href="?page=<?php echo $this -> sections -> send; ?>&amp;method=history&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Send this history email again or edit the draft', $this -> plugin_name); ?>" class="button button-primary"><?php _e('Send/Edit', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=delete&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Remove this history email permanently', $this -> plugin_name); ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this history email?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
+		</div>
+	</div>
+	<?php $class = ''; ?>
+	<div class="postbox" style="padding:10px;">
+	<table class="widefat queuetable">
+		<tbody>
+			<?php if (!empty($history -> from) || !empty($history -> fromname)) : ?>
+				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+					<th><?php _e('From', $this -> plugin_name); ?></th>
+					<td>
+						<?php echo (empty($history -> fromname)) ? $this -> get_option('smtpfromname') : $history -> fromname; ?>; <?php echo (empty($history -> from)) ? $this -> get_option('smtpfrom') : $history -> from; ?>
+					</td>
+				</tr>
+			<?php endif; ?>
+			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+				<th><?php _e('Email Subject', $this -> plugin_name); ?></th>
+				<td><?php echo __($history -> subject); ?></td>
+			</tr>
+			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+				<th><?php _e('Mailing List(s)', $this -> plugin_name); ?></th>
+				<td>
+					<?php if (!empty($history -> mailinglists)) : ?>
+						<?php $mailinglists = $history -> mailinglists; ?>
+						<?php $m = 1; ?>
+						<?php if (is_array($mailinglists) || is_object($mailinglists)) : ?>
+							<?php foreach ($mailinglists as $mailinglist_id) : ?>
+								<?php $mailinglist = $Mailinglist -> get($mailinglist_id, false); ?>
+								<?php echo $Html -> link($mailinglist -> title, '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $mailinglist -> id); ?><?php echo ($m < count($mailinglists)) ? ', ' : ''; ?>
+								<?php $m++; ?>
+							<?php endforeach; ?>
+						<?php endif; ?>
+					<?php endif; ?>
+				</td>
+			</tr>
+            <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+            	<th><?php _e('Theme', $this -> plugin_name); ?></th>
+                <td>
+                	<?php $Db -> model = $Theme -> model; ?>
+                    <?php if (!empty($history -> theme_id) && $theme = $Db -> find(array('id' => $history -> theme_id))) : ?>
+                    	<a href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Theme Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
+                    <?php else : ?>
+                    	<?php _e('None', $this -> plugin_name); ?>
+                    <?php endif; ?>
+                </td>
+            </tr>
+			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+				<th><?php _e('Tracking', $this -> plugin_name); ?></th>
+				<td>
+					<?php global $wpdb; $Db -> model = $Email -> model; ?>
+					<?php $etotal = $Db -> count(array('history_id' => $history -> id)); ?>
+					<?php $eread = $Db -> count(array('read' => "Y", 'history_id' => $history -> id)); ?>
+					<?php $ebounced = $wpdb -> get_var("SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'"); ?>
+					<?php $ebouncedperc = (!empty($etotal)) ? number_format((($ebounced/$etotal) * 100), 2, '.', '') : 0; ?>
+					<?php 
+					
+					$eunsubscribed = $wpdb -> get_var("SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'");
+					$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;
+					$clicks = $this -> Click -> count(array('history_id' => $history -> id));
+					
+					?>
+					<?php echo sprintf(__('%s opened %s, %s unsubscribes %s, %s bounces %s and %s clicks out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . $ebouncedperc . '&#37;)', '<strong>' . $clicks . '</strong>', '<strong>' . $etotal . '</strong>'); ?>
+				</td>
+			</tr>
+            <?php if (!empty($history -> attachments)) : ?>
+            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+                	<th><?php _e('Attachments', $this -> plugin_name); ?></th>
+                    <td>
+                    	<ul style="padding:0; margin:0;">
+							<?php foreach ($history -> attachments as $attachment) : ?>
+                            	<li class="<?php echo $this -> pre; ?>attachment">
+                                	<?php echo $Html -> attachment_link($attachment['filename'], false); ?>
+                                    <a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"><img border="0" style="border:none;" src="<?php echo $this -> url(); ?>/images/icons/delete-16.png" alt="delete" /></a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </td>
+                </tr>
+            <?php endif; ?>
+			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+				<th><?php _e('Created', $this -> plugin_name); ?></th>
+				<td><?php echo $history -> created; ?></td>
+			</tr>
+			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+				<th><?php _e('Modified', $this -> plugin_name); ?></th>
+				<td><?php echo $history -> modified; ?></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+    
+    <!-- Individual Emails -->
+    <h3 id="emailssent"><?php _e('Emails Sent', $this -> plugin_name); ?></h3>
+    <?php $this -> render('emails' . DS . 'loop', array('history' => $history, 'emails' => $emails, 'paginate' => $paginate), true, 'admin'); ?>
+    
+    <!-- History Preview -->
+    <h3><?php _e('Preview', $this -> plugin_name); ?></h3>
+	<?php $multimime = $this -> get_option('multimime'); ?>
+	<?php if (!empty($history -> text) && $multimime == "Y") : ?>  
+		<h4><?php _e('TEXT Version', $this -> plugin_name); ?></h4>  
+	    <div class="scroll-list">
+	    	<?php echo nl2br($history -> text); ?>
+	    </div>
+	    
+	    <h4><?php _e('HTML Version', $this -> plugin_name); ?></h4>
+	<?php endif; ?>
+    
+	<iframe width="100%" frameborder="0" scrolling="no" class="autoHeight widefat" style="width:100%; margin:15px 0 0 0;" src="<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>history_iframe&id=<?php echo $history -> id; ?>&rand=<?php echo rand(1,999); ?>" id="historypreview<?php echo $history -> id; ?>"></iframe>
+    
+	<div class="tablenav">
+	
+	</div>
+</div>

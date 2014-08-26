@@ -1,0 +1,36 @@
+<?php
+
+global $ID, $user_ID, $post, $post_ID, $wp_meta_boxes;
+$ID = $this -> get_option('imagespost');
+$post_ID = $this -> get_option('imagespost');
+
+wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false);
+wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false); 
+
+?>
+
+<div class="wrap <?php echo $this -> pre; ?>">
+	<h2><?php _e('Email Templates Configuration', $this -> plugin_name); ?></h2>
+    <?php $this -> render('settings-navigation', false, true, 'admin'); ?>
+    <p>
+    	<?php _e('Email templates are messages sent as notifications to users/admins on events.', $this -> plugin_name); ?><br/>
+    	<?php _e('You can configure each email template individually according to your needs.', $this -> plugin_name); ?><br/>
+    	<?php _e('You may use any of the', $this -> plugin_name); ?> <a class="button button-secondary" title="<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>" href="" onclick="jQuery.colorbox({title:'<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>', maxHeight:'80%', maxWidth:'80%', href:'<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>setvariables'}); return false;"> <?php _e('shortcodes/variables', $this -> plugin_name); ?></a> <?php _e('inside the subjects/messages of email templates.', $this -> plugin_name); ?><br/>
+    	<?php _e('Each template is inserted where the <code>[wpmlcontent]</code> tag is in the default theme chosen under Newsletters > Themes.', $this -> plugin_name); ?>
+    </p>
+	<form action="?page=<?php echo $this -> sections -> settings_templates; ?>" method="post">
+		<?php wp_nonce_field($this -> sections -> settings); ?>
+		<div id="poststuff">
+			<div id="post-body" class="metabox-holder columns-2">
+				<div id="postbox-container-1" class="postbox-container">
+					<?php do_action('submitpage_box'); ?>
+					<?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'side', false); ?>
+				</div>
+				<div id="postbox-container-2" class="postbox-container">
+					<?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'normal', false); ?>
+                    <?php do_meta_boxes("newsletters_page_" . $this -> sections -> settings_templates, 'advanced', false); ?>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

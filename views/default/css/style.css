@@ -1,0 +1,339 @@
+/** General CSS **/
+
+div.newslettername-wrapper,
+input.newslettername {
+	display:none;
+}
+
+#recaptcha_table, #recaptcha_area {
+	line-height: 1px !important;
+}
+
+.wpmlerror, .wpmlrequired,
+ul.wpmlerror li {
+	color: #CC0000;	
+}
+
+.wpmlsuccess {
+	color: green;
+}
+
+.wpml form {
+	display: inline-block;
+}
+
+.wpmlsmall {
+	font-size: 11px;
+}
+
+/** Subscribe Form **/
+
+.wpmlwidget, .widget_newsletters {
+	/*padding: 0 0 15px 0;*/
+	margin: 0 0 0 0;
+}
+
+.wpmlwidget .wpmlerror,
+.widget_newsletters .wpmlerror {
+	margin: 20px 0 10px 0;
+	padding: 0 0 0 0;
+	list-style: none;
+}
+
+.widget_newsletters .wpmlerror li {
+	padding: 0;
+	margin: 0;
+}
+
+.wpmlwidget .wpmlfielderror,
+.widget_newsletters .wpmlfielderror {
+	border: 1px #CC0000 solid !important;
+}
+
+.wpmlwidget fieldset, .wpmlwidget .wpmlfieldholder,
+.widget_newsletters .newsletters-fieldholder,
+.widget_newsletters fieldset, 
+.widget_newsletters .wpmlfieldholder {
+    margin: 10px 0 15px 0;
+    border: none;
+    background: none;
+    padding: 0 0 0 0;
+}
+
+.wpml fieldset legend, .wpmlfieldholder label.wpmlcustomfield,
+.newsletters-fieldholder label.wpmlcustomfield,
+.widget_newsletters label.wpmlcustomfield {
+    font-weight: bold;
+    padding: 0 0 4px 0;
+}
+
+.wpmlfieldholder label.wpmlcustomfield,
+.newsletters-fieldholder label.wpmlcustomfield {
+	/*float:left;*/
+	display: block;
+	width:100%;
+}
+
+select.wpml {
+	width: auto;
+	height: 30px;
+}
+
+.wpmlwidget .wpmlcustomfieldcaption,
+.widget_newsletters .wpmlcustomfieldcaption {
+    font-size: 12px;
+	padding-top:3px;
+	display:block;
+}
+
+.wpmlcheckboxlabel, .wpmlradiolabel {
+	display:block;
+	padding-bottom:2px;
+}
+
+.wpmlwidget label.wpml,
+#savefields label.wpml,
+.wpmlunsubscribe label.wpml,
+.widget_newsletters label.wpml {
+	cursor: pointer;
+}
+
+.wpmlcaptcha label, 
+.wpmlcaptcha input,
+.wpmlcaptcha img {
+	display: block !important;
+}
+
+.wpmlcaptcha img {
+	box-shadow: none;
+	border: 0;
+	border-radius: 0;
+}
+
+.wpmlwidget .wpmlloading img,
+.widget_newsletters .newsletters_loading img {
+	background: none;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+/** Subscriber Management Forms/Fields **/
+
+.wpmlsubmitholder {
+	clear:both;
+	position:relative;
+}
+
+.wpml fieldset, .wpmlfieldholder, .newsletters-fieldholder {
+	clear:both;
+}
+
+#subscriberauthloginformdiv {
+	float:left;
+	width:100%;
+	padding-bottom:15px;
+}
+
+.wpml input.ui-button, .wpml a.ui-button {
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background: #DDD;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFFFFF), to(#ececec));
+	background: -moz-linear-gradient(#FFFFFF, #ececec);
+	background: linear-gradient(#FFFFFF, #ececec);
+	-pie-background: linear-gradient(#FFFFFF, #ececec);	
+	text-align: center;
+	text-decoration: none !important;
+	color: #666;
+	font-size: 14px;
+	border: 1px solid #D3D3D3;
+	cursor: pointer;
+	padding:7px;
+	margin: 0 0 0 0;
+}
+
+.wpml input.ui-button:hover, .wpml a.ui-button:hover {
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ececec), to(#FFFFFF));
+	background: -moz-linear-gradient(#ececec, #FFFFFF);
+	background: linear-gradient(#ececec, #FFFFFF);
+	-pie-background: linear-gradient(#ececec, #FFFFFF);
+	text-decoration: none;
+}
+
+.wpml input.ui-button-disabled, .wpml a.ui-button-disabled {
+	background: #ececec !important;
+	color: #999999 !important;
+}
+
+.wpml .currentfile a img {
+	border: 1px #CCCCCC solid;
+	padding: 2px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+
+.wpml .currentfile a:hover img {
+	border: 1px #515151 solid !important;
+}
+
+#subscriberauthloginform label {
+	display:block;
+	width:100%;
+	clear:both;
+	padding-bottom:4px;
+	padding-right:4px;
+}
+
+#savefields {
+
+}
+
+#savefields fieldset {
+    float: left;
+    width: 50%;
+    margin: 0 0 15px 0;
+}
+
+#savefields fieldset span.wpmlcustomfieldcaption,
+#currentsubscriptions span.wpmlcustomfieldcaption,
+#newsubscriptions span.wpmlcustomfieldcaption {
+    font-size: 90%;
+    color: #999999;
+    display: block;
+}
+
+#savefields fieldset input, #savefields fieldset textarea, 
+#savefields fieldset select, #subscriberauthloginformdiv input#email,
+.wpmlwidget input.wpmltext, .wpmlwidget input.wpmlcheckbox, .wpmlwidget input.wpmlradio, 
+.wpmlwidget textarea, .wpml textarea, .wpmlwidget select,
+.wpmlunsubscribe input.wpmltext, .wpmlunsubscribe input.wpmlcheckbox, .wpmlunsubscribe input.wpmlradio, 
+.wpmlunsubscribe textarea, .wpmlunsubscribe select,
+.widget_newsletters input.wpmltext, .widget_newsletters input.wpmlcheckbox, .widget_newsletters input.wpmlradio, 
+.widget_newsletters textarea, .widget_newsletters select {
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    padding: 7px 8px;
+    background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #DDDDDD;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) inset;
+    color: #888888;
+    margin: 0px !important;
+}
+
+#savefields fieldset input[type=checkbox] {
+	border:0;
+	background:none;
+}
+
+.wpmlwidget input.wpml,
+.widget_newsletters input.wpml {
+	width: auto !important;
+}
+
+#savefields p.submit {
+    clear: both;
+    display: block;
+}
+
+#savefields p.submit span#savefieldsloading {
+    margin: 0 0 0 20px;
+}
+
+.wpml .listfieldsdiv {
+	margin: 0 0 0 0;
+	padding: 1px 0 0 0;
+}
+
+/* TABS */
+
+.wpml .ui-tabs { position: relative; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+.wpml .ui-tabs .ui-tabs-nav { margin: 0; padding:0; }
+
+.wpml .ui-tabs .ui-tabs-nav li { 
+	list-style: none; 
+	float: left; 
+	width: auto; 
+	position: relative; 
+	top: 1px; 
+	margin: 0; 
+	border-bottom: 0 !important; 
+	padding: 0; 
+	white-space: nowrap;
+	padding-right:3px;
+}
+
+.wpml .ui-tabs .ui-tabs-nav li a { 
+	float: left;
+	padding:0 15px; 
+	line-height:30px; 
+	height:30px; 
+	text-decoration: none;
+	border:1px solid #DDD;		
+	-moz-border-radius:5px 5px 0 0;
+	-webkit-border-radius:5px 5px 0 0;
+	border-radius:5px 5px 0 0;		
+	border-bottom:0 none;
+	background: #DDD;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#FFFFFF), to(#ececec));
+	background: -moz-linear-gradient(#FFFFFF, #ececec);
+	background: linear-gradient(#FFFFFF, #ececec);
+	-pie-background: linear-gradient(#FFFFFF, #ececec);	
+	color:#666666;
+}
+
+.wpml .ui-tabs .ui-tabs-nav li a:hover {
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#ececec), to(#FFFFFF));
+	background: -moz-linear-gradient(#ececec, #FFFFFF);
+	background: linear-gradient(#ececec, #FFFFFF);
+	-pie-background: linear-gradient(#ececec, #FFFFFF);	
+}
+
+.wpml .ui-tabs .ui-tabs-nav li.ui-state-active a { 
+	border-bottom:1px solid #FFF;
+	background:#FFF;
+}
+.wpml .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
+.wpml .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+
+.wpml .ui-tabs .ui-tabs-panel { 
+	float:left;
+	display: block;
+	border-width: 0;
+	padding: 3%; 
+	width:93%;
+	border:1px solid #DDD;
+	-moz-border-radius:0 5px 5px 5px;
+	-webkit-border-radius:0 5px 5px 5px;
+	border-radius:0 5px 5px 5px;		
+	background: none; 
+	margin-bottom:20px;
+}
+
+.wpml .ui-tabs .ui-tabs-hide { display: none !important; }
+
+.wpml .clear, .wpmlclear {
+	clear: both;
+	height: 1px;
+	visibility: hidden;
+	display: block;
+	width: 100%;
+}
+
+/* TABLES */
+
+.wpml table {
+	border-collapse:collapse;
+	border-spacing:0;
+	border:1px solid #DDD;
+}
+
+.wpml caption, .wpml table th, .wpml table td {
+	font-weight:normal;
+	text-align:left;
+	border:1px solid #DDD;
+	padding: 10px;
+}
