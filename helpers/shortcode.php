@@ -120,6 +120,59 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		return $output;
 	}
 	
+	function posts_multiple($atts = array(), $content = null) {
+		global $shortcode_posts, $shortcode_post_language, $shortcode_post_showdate;
+		$output = "";
+		
+		$defaults = array(
+			'numberposts' 			=> 	10, 
+			'showdate'				=>	"Y",
+			'orderby' 				=> 	"post_date", 
+			'order' 				=> 	"DESC", 
+			'category' 				=> 	null,
+			'language'				=>	false,
+			'post_type'				=>	"post",
+			'eftype'				=>	"excerpt",
+			'target'				=>	"_self",
+		);
+		
+		$arguments = shortcode_atts($defaults, $atts);
+		if (empty($arguments['category'])) { $arguments['category'] = false; }
+		
+		if (!empty($arguments['post_type'])) {
+			if (($new_post_types = @explode(",", $arguments['post_type'])) !== false) {
+				$arguments['post_type'] = $new_post_types;
+			}
+		}
+		
+		global $wpml_eftype, $wpml_target;
+		$wpml_eftype = $eftype;
+		$wpml_target = $target;
+		
+		extract($arguments);
+							   
+		if ($posts = get_posts($arguments)) {	
+			$shortcode_post_showdate = $showdate;
+			
+			if ($this -> is_plugin_active('qtranslate')) {
+				$shortcode_post_language = $arguments['language'];
+			
+				foreach ($posts as $pkey => $post) {
+					$posts[$pkey] = $this -> language_use($arguments['language'], $post, false);
+				}
+				
+				$shortcode_posts = $posts;
+				$output = do_shortcode($this -> et_message('posts', false, $language));
+			} else {
+				$shortcode_posts = $posts;
+				$output = do_shortcode($this -> et_message('posts'));
+			}
+		}
+		
+		wp_reset_query();
+		return $output;
+	}
+	
 	function shortcode_posts($atts = array(), $content = null, $tag = null) {
 		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate;
 		$return = "";
@@ -168,7 +221,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_date_wrapper'				:
-			case 'newsletters_post_date_wrapper'	:			
+			case 'newsletters_post_date_wrapper'	:							
 				if (empty($shortcode_post_showdate) || (!empty($shortcode_post_showdate) && $shortcode_post_showdate == "Y")) {
 					return do_shortcode($content);
 				} else {
@@ -176,7 +229,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_date'				:
-			case 'newsletters_post_date'	:
+			case 'newsletters_post_date'	:			
 				$defaults = array('format' => "F jS, Y");
 				extract(shortcode_atts($defaults, $atts));
 			
@@ -277,57 +330,6 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		$more = ' <a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a>';
 		return $more;
-	}
-	
-	function posts_multiple($atts = array(), $content = null) {
-		global $shortcode_posts, $shortcode_post_language, $shortcode_post_showdate;
-		$output = "";
-		
-		$defaults = array(
-			'numberposts' 			=> 	10, 
-			'showdate'				=>	"Y",
-			'orderby' 				=> 	"post_date", 
-			'order' 				=> 	"DESC", 
-			'category' 				=> 	null,
-			'language'				=>	false,
-			'post_type'				=>	"post",
-			'eftype'				=>	"excerpt",
-			'target'				=>	"_self",
-		);
-		
-		$arguments = shortcode_atts($defaults, $atts);
-		if (empty($arguments['category'])) { $arguments['category'] = false; }
-		
-		if (!empty($arguments['post_type'])) {
-			if (($new_post_types = @explode(",", $arguments['post_type'])) !== false) {
-				$arguments['post_type'] = $new_post_types;
-			}
-		}
-		
-		global $wpml_eftype, $wpml_target;
-		$wpml_eftype = $eftype;
-		$wpml_target = $target;
-							   
-		if ($posts = get_posts($arguments)) {	
-			$shortcode_post_showdate = $showdate;
-			
-			if ($this -> language_do()) {
-				$shortcode_post_language = $arguments['language'];
-			
-				foreach ($posts as $pkey => $post) {
-					$posts[$pkey] = $this -> language_use($arguments['language'], $post, false);
-				}
-				
-				$shortcode_posts = $posts;
-				$output = do_shortcode($this -> et_message('posts', false, $language));
-			} else {
-				$shortcode_posts = $posts;
-				$output = do_shortcode($this -> et_message('posts'));
-			}
-		}
-		
-		wp_reset_query();
-		return $output;
 	}
 	
 	function datestring($atts = array(), $content = null) {	

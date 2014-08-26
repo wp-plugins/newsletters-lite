@@ -42,7 +42,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 			</p>
 			
 			<div id="ptypeglobal" style="display:block;">
-				<?php if ($this -> language_do()) : ?>
+				<?php if ($this -> is_plugin_active('qtranslate')) : ?>
 					<label for=""><?php _e('Language:', $this -> plugin_name); ?></label>
 		        	<?php if ($el = $this -> language_getlanguages()) : ?>
 		                <?php foreach ($el as $language) : ?>

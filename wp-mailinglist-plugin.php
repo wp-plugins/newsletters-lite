@@ -2539,6 +2539,11 @@ if (!class_exists('wpMailPlugin')) {
 			
 			// get content
 			$content = $this -> language_split($text);
+			
+			if (!is_array($content)) {
+				return $content;
+			}
+			
 			// find available languages
 			$available_languages = array();
 			foreach($content as $language => $lang_text) {
@@ -4294,7 +4299,7 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 				
-				$message = preg_replace($patterns, "", $message);
+				//$message = preg_replace($patterns, "", $message);
 				$message = preg_replace($newpatterns, "", $message);
 				return $message;
 			}
@@ -4425,7 +4430,7 @@ if (!class_exists('wpMailPlugin')) {
 						$this -> gen_online_link($subscriber, false, $history_id, false, $theme_id), 
 						$this -> gen_tracking_link($eunique), 
 						$this -> gen_mailinglist_names($subscriber),
-						stripslashes($subject),
+						stripslashes(str_replace("$", "&#36;", $subject)),
 						$history_id,
 						$this -> gen_unsubscribe_comments(),
 						$subscriber -> bouncecount,
@@ -4437,24 +4442,20 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($fields)) {
 						foreach ($fields as $field) {
-							$search[] = "/\{" . $field -> slug . "\}/";
 							$newsearch[] = '/\[' . $this -> pre . 'field name="' . $field -> slug . '"\]/';
 							
 							switch ($field -> type) {
 								case 'pre_country'		:
 									$Db -> model = $wpmlCountry -> model;
-									$replace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
 									$newreplace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
 									break;
 								case 'pre_date'			:
 									$date = @unserialize($subscriber -> {$field -> slug});
 									if (!empty($date) && is_array($date)) {
-										$replace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
 										$newreplace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
 									}
 									break;
 								case 'pre_gender'		:
-									$replace[] = $Html -> gender($subscriber -> {$field -> slug});
 									$newreplace[] = $Html -> gender($subscriber -> {$field -> slug});
 									break;
 								case 'radio'			:
@@ -4462,7 +4463,6 @@ if (!class_exists('wpMailPlugin')) {
 									$value = $subscriber -> {$field -> slug};
 									$fieldoptions = maybe_unserialize($field -> fieldoptions);
 									
-									$replace[] = __($fieldoptions[$value]);
 									$newreplace[] = __($fieldoptions[$value]);
 									break;
 								default					:
@@ -4478,7 +4478,6 @@ if (!class_exists('wpMailPlugin')) {
 										}
 									}
 								
-									$replace[] = $subscriber -> {$field -> slug};
 									$newreplace[] = $subscriber -> {$field -> slug};
 									break;
 							}

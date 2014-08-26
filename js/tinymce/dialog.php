@@ -226,9 +226,6 @@ global $wpdb, $Mailinglist, $Template;
 										<optgroup label="<?php _e('Multiple Choice', "wp-mailinglist"); ?>">
 											<option value="select"><?php _e('Show Select Drop Down', "wp-mailinglist"); ?></option>
 											<option value="checkboxes"><?php _e('Show Checkbox List', "wp-mailinglist"); ?></option>
-											<?php /*<?php if ($wpMail -> language_ready()) : ?>
-												<option value="language"><?php _e('Auto by Language', "wp-mailinglist"); ?></option>
-											<?php endif; ?>*/ ?>
 										</optgroup>
 										
 										<?php if ($lists = $Mailinglist -> select($private = true)) : ?>
@@ -258,7 +255,7 @@ global $wpdb, $Mailinglist, $Template;
                 	<br/>
                     <table cellpadding="4" cellspacing="4" border="0">
                     	<tbody>
-                        	<?php if ($wpMail -> language_do()) : ?>
+                        	<?php if ($wpMail -> is_plugin_active('qtranslate')) : ?>
                                 <tr>
                                     <td nowrap="nowrap" valign="top"><label for=""><?php _e('Language:', $wpMail -> plugin_name); ?></label></td>
                                     <td>

@@ -1,5 +1,5 @@
 <div class="<?php echo $this -> pre; ?> newsletters">
-	<?php if ($this -> language_do()) : ?>
+	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
 		<div class="misc-pub-section">
 		<p><strong><?php _e('Language', $this -> plugin_name); ?></strong></h4>
 	    <p><?php _e('Choose which title/content in the editor above should be sent to the mailing list(s) chosen below.', $this -> plugin_name); ?></p>

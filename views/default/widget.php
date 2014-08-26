@@ -3,8 +3,12 @@
 <?php do_action('newsletters_subscribe_before_form', $instance); ?>
 
 <form action="<?php echo $action; ?>" onsubmit="jQuery.Watermark.HideAll();" method="post" id="<?php echo $widget_id; ?>-form" class="newsletters-form">
+
+	<?php $hidden_values = array('ajax', 'scroll', 'captcha', 'list'); ?>
 	<?php foreach ($instance as $ikey => $ival) : ?>
-		<input type="hidden" name="instance[<?php echo $ikey; ?>]" value="<?php echo esc_attr(stripslashes($ival)); ?>" />
+		<?php if (!empty($ikey) && in_array($ikey, $hidden_values)) : ?>
+			<input type="hidden" name="instance[<?php echo $ikey; ?>]" value="<?php echo esc_attr(stripslashes(__($ival))); ?>" />
+		<?php endif; ?>
 	<?php endforeach; ?>
 	
 	<?php do_action('newsletters_subscribe_inside_form_top', $instance); ?>

@@ -1,7 +1,8 @@
 <?php $src = (!empty($_POST['ishistory'])) ? admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'history_iframe&id=' . $_POST['ishistory'] : false; ?>
 
 <p>
-	<a href="" id="previewrunnerbutton" onclick="previewrunner(); return false;" class="button button-secondary"><?php _e('Update Preview', $this -> plugin_name); ?></a>
+	<a href="<?php echo $src; ?>" target="_blank" class="button button-secondary"><?php _e('Open in New Window', $this -> plugin_name); ?></a>
+	<a href="" id="previewrunnerbutton" onclick="previewrunner(); return false;" class="button button-primary"><?php _e('Update Preview', $this -> plugin_name); ?></a>
 	<span id="previewrunnerloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" /></span>
 </p>
 
