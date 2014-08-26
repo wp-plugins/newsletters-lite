@@ -140,6 +140,7 @@ class wpmlTheme extends wpMailPlugin {
 					curl_setopt($ch, CURLOPT_HEADER, false);
 					$result = curl_exec($ch);
 					$this -> data -> content = trim(html_entity_decode(urldecode($result)));
+					curl_close($ch);
 				}
 			}
 		}

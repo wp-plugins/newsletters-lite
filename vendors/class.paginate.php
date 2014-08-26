@@ -77,7 +77,7 @@ class wpmlpaginate extends wpMailPlugin {
 			$c = 1;
 			
 			foreach ($this -> where as $key => $val) {
-				if (ereg("LIKE", $val)) {
+				if (preg_match("/(LIKE)/si", $val)) {
 					$query .= " `" . $key . "` " . $val . "";	
 					$countquery .= " `" . $key . "` " . $val . "";
 				} else {

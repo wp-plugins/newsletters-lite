@@ -8,33 +8,35 @@ class wpmlMailinglist extends wpMailPlugin {
 	var $table_name = 'wpmlmailinglists';
 	
 	var $fields = array(
-		'id'			=>	"INT(11) NOT NULL AUTO_INCREMENT",
-		'title'			=>	"VARCHAR(100) NOT NULL DEFAULT ''",
-		'privatelist'	=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
-		'paid'			=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
-		'price'			=>	"FLOAT NOT NULL DEFAULT '0.00'",
-		'tcoproduct'	=>	"INT(11) NOT NULL DEFAULT '0'",
-		'interval'		=>	"ENUM('daily', 'weekly', 'monthly', '2months', '3months', 'biannually', '9months', 'yearly', 'once') NOT NULL DEFAULT 'monthly'",
-		'group_id'		=>	"INT(11) NOT NULL DEFAULT '0'",
-		'adminemail'	=>	"VARCHAR(100) NOT NULL DEFAULT ''",
-		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`)",
+		'id'				=>	"INT(11) NOT NULL AUTO_INCREMENT",
+		'title'				=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'privatelist'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
+		'paid'				=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
+		'price'				=>	"FLOAT NOT NULL DEFAULT '0.00'",
+		'tcoproduct'		=>	"INT(11) NOT NULL DEFAULT '0'",
+		'interval'			=>	"ENUM('daily', 'weekly', 'monthly', '2months', '3months', 'biannually', '9months', 'yearly', 'once') NOT NULL DEFAULT 'monthly'",
+		'maxperinterval'	=>	"INT(11) NOT NULL DEFAULT '0'",
+		'group_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
+		'adminemail'		=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
+		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
+		'key'				=>	"PRIMARY KEY (`id`)",
 	);
 	
 	var $tv_fields = array(
-		'id'			=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
-		'title'			=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
-		'privatelist'	=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
-		'paid'			=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
-		'price'			=>	array("FLOAT", "NOT NULL DEFAULT '0.00'"),
-		'tcoproduct'	=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
-		'interval'		=>	array("ENUM('daily', 'weekly', 'monthly', '2months', '3months', 'biannually', '9months', 'yearly', 'once')", "NOT NULL DEFAULT 'monthly'"),
-		'group_id'		=> 	array("INT(11)", "NOT NULL DEFAULT '0'"),
-		'adminemail'	=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
-		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`)",					   
+		'id'				=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
+		'title'				=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'privatelist'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
+		'paid'				=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
+		'price'				=>	array("FLOAT", "NOT NULL DEFAULT '0.00'"),
+		'tcoproduct'		=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'interval'			=>	array("ENUM('daily', 'weekly', 'monthly', '2months', '3months', 'biannually', '9months', 'yearly', 'once')", "NOT NULL DEFAULT 'monthly'"),
+		'maxperinterval'	=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'group_id'			=> 	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'adminemail'		=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
+		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
+		'key'				=>	"PRIMARY KEY (`id`)",					   
 	);
 	
 	var $id = 0;
@@ -303,8 +305,8 @@ class wpmlMailinglist extends wpMailPlugin {
 				$created = $modified = $this -> gen_date();
 			
 				$query = (!empty($id)) ?
-				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :
-				"INSERT INTO `" . $wpdb -> prefix . "" . $this -> table_name . "` (`title`, `group_id`, `adminemail`, `privatelist`, `paid`, `tcoproduct`, `price`, `interval`, `created`, `modified`) VALUES ('" . $title . "', '" . $group_id . "', '" . $adminemail . "', '" . $privatelist . "', '" . $paid . "', '" . $tcoproduct . "', '" . $price . "', '" . $interval . "', '" . $created . "', '" . $modified . "');";
+				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `maxperinterval` = '" . $maxperinterval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :
+				"INSERT INTO `" . $wpdb -> prefix . "" . $this -> table_name . "` (`title`, `group_id`, `adminemail`, `privatelist`, `paid`, `tcoproduct`, `price`, `interval`, `maxperinterval`, `created`, `modified`) VALUES ('" . $title . "', '" . $group_id . "', '" . $adminemail . "', '" . $privatelist . "', '" . $paid . "', '" . $tcoproduct . "', '" . $price . "', '" . $interval . "', '" . $maxperinterval . "', '" . $created . "', '" . $modified . "');";
 				
 				if ($wpdb -> query($query)) {
 					$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;

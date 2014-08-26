@@ -86,6 +86,7 @@ if (!class_exists('wpMailPlugin')) {
 		function register_plugin($name = null, $base = null) {
 			$this -> plugin_name = $name;
 			$this -> plugin_base = rtrim(dirname($base), DS);
+			define("NEWSLETTERS_LOG_FILE", $this -> plugin_base() . DS . "newsletters.log");
 			$this -> sections = (object) $this -> sections;
 			$this -> set_timezone();
 			$this -> extensions = $this -> get_extensions();
@@ -1602,7 +1603,8 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($_POST['mailinglists'])) {
 				$query = "SELECT DISTINCT " . $wpdb -> prefix . $Subscriber -> table . ".id FROM " . $wpdb -> prefix . "" . $SubscribersList -> table . " LEFT JOIN 
 				" . $wpdb -> prefix . "" . $Subscriber -> table . " ON 
-				" . $wpdb -> prefix . "" . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . "" . $Subscriber -> table . ".id WHERE (";
+				" . $wpdb -> prefix . "" . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . "" . $Subscriber -> table . ".id LEFT JOIN 
+				" . $wpdb -> prefix . $Mailinglist -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".list_id = " . $wpdb -> prefix . $Mailinglist -> table . ".id WHERE (";
 				
 				$m = 1;
 				foreach ($_POST['mailinglists'] as $mailinglist_id) {
@@ -1616,6 +1618,8 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				$query .= ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y'";
+				$query .= " AND (" . $wpdb -> prefix . $SubscribersList -> table . ".paid_sent < " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval 
+				OR " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval IS NULL OR " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval = '')";
 				
 				if (!empty($_POST['fields'])) {	
 					$query .= " AND (";			
@@ -4060,7 +4064,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function execute_mail($subscriber = null, $user = null, $subject = null, $message = null, $attachments = null, $history_id = null, $eunique = null, $shortlinks = true) {
-			global $wpdb, $Db, $Html, $Email, $History, $phpmailer, $Subscriber, $orig_message, $wpml_message, $wpml_textmessage, $fromwpml;
+			global $wpdb, $Db, $Html, $Email, $History, $phpmailer, $Mailinglist, $Subscriber, $SubscribersList, $orig_message, $wpml_message, $wpml_textmessage, $fromwpml;
 			$sent = false;
 			$fromwpml = true;
 		
@@ -4092,6 +4096,18 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if (!empty($subscriber -> id)) {
 					$Subscriber -> inc_sent($subscriber -> id);
+				}
+				
+				if (!empty($subscriber -> mailinglists)) {
+					foreach ($subscriber -> mailinglists as $mailinglist_id) {
+						$query = "SELECT `paid` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $mailinglist_id . "' LIMIT 1";
+						$paid = $wpdb -> get_var($query);
+						
+						if (!empty($paid) && $paid == "Y") {
+							$query = "UPDATE `" . $wpdb -> prefix . $SubscribersList -> table . "` SET `paid_sent` = (`paid_sent` + 1) WHERE `subscriber_id` = '" . $subscriber -> id . "' AND `list_id` = '" . $mailinglist_id . "' LIMIT 1";
+							$wpdb -> query($query);
+						}
+					}
 				}
 				
 				$mailtype = $this -> get_option('mailtype');

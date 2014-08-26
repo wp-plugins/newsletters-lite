@@ -1,7 +1,5 @@
 <?php
 
-/* Version 3.9.5.1 */
-
 if (!class_exists('wpMailCheckinit')) {
 	class wpMailCheckinit {
 	
@@ -9,7 +7,7 @@ if (!class_exists('wpMailCheckinit')) {
 			return true;	
 		}
 		
-		function ci_initialize() {
+		function ci_initialize() {				
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			if (!is_plugin_active(plugin_basename('wp-mailinglist/wp-mailinglist.php'))) {
 				return;

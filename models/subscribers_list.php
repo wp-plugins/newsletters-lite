@@ -21,6 +21,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 		'authinprog'			=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'paid_date'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00'",
 		'ppsubscription'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
+		'paid_sent'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'reminded'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
@@ -37,6 +38,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 		'authinprog'			=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'paid_date'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00'"),
 		'ppsubscription'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
+		'paid_sent'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'reminded'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
@@ -226,11 +228,24 @@ class wpmlSubscribersList extends wpMailPlugin {
 		return false;
 	}
 	
+	function check_maxperinterval() {
+		global $wpdb, $Mailinglist, $Subscriber, $SubscribersList;
+		
+		$mailinglists_table = $wpdb -> prefix . $Mailinglist -> table;
+		$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
+		$subscriberslists_table = $wpdb -> prefix . $SubscribersList -> table;
 	
+		$query = "UPDATE " . $subscriberslists_table . " AS sl LEFT JOIN " . $mailinglists_table . " AS m ON sl.list_id = m.id SET sl.active = 'N' WHERE (sl.paid_sent >= m.maxperinterval AND m.maxperinterval != '') AND sl.active = 'Y'";
+		$wpdb -> query($query);
+		
+		return;
+	}
 	
 	function check_expirations($field = null, $value = null, $single = false, $subsriber_id = false) {
 		global $wpdb, $Db, $SubscribersList, $Subscriber, $Mailinglist;
 		$conditions = array('paid' => "Y");
+		
+		$this -> check_maxperinterval();
 		
 		if (!empty($single) && $single == true && !empty($subscriber_id)) {
 			$conditions['subscriber_id'] = $subscriber_id;	

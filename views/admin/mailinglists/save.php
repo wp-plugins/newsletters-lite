@@ -77,6 +77,14 @@
                         	<span class="howto"><?php _e('Interval at which to charge the payment price above.', $this -> plugin_name); ?></span>    
                         </td>
 					</tr>
+					<tr>
+						<th><label for="Mailinglist.maxperinterval"><?php _e('Max Emails per Interval', $this -> plugin_name); ?></label>
+						<?php echo $Html -> help(__('Specify the maximum number of emails/newsletters the subscriber may receive on this paid mailing list before it stops sending. Leave it zero (0) or empty for no limit.', $this -> plugin_name)); ?></th>
+						<td>
+							<?php echo $Form -> text('Mailinglist[maxperinterval]', array('width' => "65px")); ?>
+							<span class="howto"><?php _e('Maximum allowed emails per interval set above.', $this -> plugin_name); ?></span>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

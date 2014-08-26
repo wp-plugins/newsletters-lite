@@ -740,6 +740,7 @@ if (!class_exists('wpMail')) {
 									$SubscribersList -> save_field('active', "Y", $sl_conditions);
 									$SubscribersList -> save_field('paid', "Y", $sl_conditions);
 									$SubscribersList -> save_field('paid_date', $Html -> gen_date(), $sl_conditions);
+									$SubscribersList -> save_field('paid_sent', "0", $sl_conditions);
 									$SubscribersList -> save_field('modified', $Html -> gen_date(), $sl_conditions);
 									
 									if ($this -> get_option('paypalsubscriptions') == "Y") {
@@ -820,6 +821,7 @@ if (!class_exists('wpMail')) {
 									$SubscribersList -> save_field('active', "Y", $sl_conditions);
 									$SubscribersList -> save_field('paid', "Y", $sl_conditions);
 									$SubscribersList -> save_field('paid_date', $this -> gen_date(), $sl_conditions);
+									$SubscribersList -> save_field('paid_sent', "0", $sl_conditions);
 									
 									$orderdata = array(
 										'list_id'				=>	$mailinglist_id,
@@ -1847,9 +1849,9 @@ if (!class_exists('wpMail')) {
 				add_meta_box('previewdiv', __('Preview', $this -> plugin_name) . $Html -> help(__('The preview section below shows a preview of what the newsletter will look like with the theme, content and other elements. It updates automatically every few seconds or you can click the "Update Preview" button to manually update it. Please note that this is a browser preview and some email/webmail clients render emails differently than browsers.', $this -> plugin_name)), array($Metabox, 'send_preview'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core');
 			}
 			
-			add_meta_box('setvariablesdiv', __('Variables &amp; Custom Fields', $this -> plugin_name) . $Html -> help(__('These are shortcodes which can be used inside of the newsletter theme or content where needed and as many of them as needed. The shortcodes will be replaced with their respective values for each subscriber individually. You can use this to personalize your newsletters to your subscribers easily.', $this -> plugin_name)), array($Metabox, 'send_setvariables'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core');
-			add_meta_box('attachmentdiv', __('Email Attachment', $this -> plugin_name) . $Html -> help(__('Attach files to your newsletter. It is possible to attach multiple files of any filetype and size to newsletters which will be sent to the subscribers. Try to keep attachments small to prevent emails from becoming too large.', $this -> plugin_name)), array($Metabox, 'send_attachment'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core');
-			add_meta_box('publishdiv', __('Publish as Post', $this -> plugin_name) . $Html -> help(__('When you queue/send this newsletter you can publish it as a post on your website. Configure these settings to publish this newsletter as a post according to your needs.', $this -> plugin_name)), array($Metabox, 'send_publish'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core');
+			if (apply_filters('newsletters_admin_createnewsletter_variables_show', true)) { add_meta_box('setvariablesdiv', __('Variables &amp; Custom Fields', $this -> plugin_name) . $Html -> help(__('These are shortcodes which can be used inside of the newsletter theme or content where needed and as many of them as needed. The shortcodes will be replaced with their respective values for each subscriber individually. You can use this to personalize your newsletters to your subscribers easily.', $this -> plugin_name)), array($Metabox, 'send_setvariables'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
+			if (apply_filters('newsletters_admin_createnewsletter_emailattachments_show', true)) { add_meta_box('attachmentdiv', __('Email Attachment', $this -> plugin_name) . $Html -> help(__('Attach files to your newsletter. It is possible to attach multiple files of any filetype and size to newsletters which will be sent to the subscribers. Try to keep attachments small to prevent emails from becoming too large.', $this -> plugin_name)), array($Metabox, 'send_attachment'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
+			if (apply_filters('newsletters_admin_createnewsletter_publishpost_show', true)) { add_meta_box('publishdiv', __('Publish as Post', $this -> plugin_name) . $Html -> help(__('When you queue/send this newsletter you can publish it as a post on your website. Configure these settings to publish this newsletter as a post according to your needs.', $this -> plugin_name)), array($Metabox, 'send_publish'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
 			
 			do_action('do_meta_boxes', "newsletters_page_" . $this -> sections -> send, 'side');
 			do_action('do_meta_boxes', "newsletters_page_" . $this -> sections -> send, 'normal');
@@ -2312,8 +2314,12 @@ if (!class_exists('wpMail')) {
 												. $wpdb -> prefix . $Subscriber -> table . ".email FROM " 
 												. $wpdb -> prefix . $Subscriber -> table . " LEFT JOIN "
 												. $wpdb -> prefix . $SubscribersList -> table . " ON "
-												. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id WHERE "
-												. $mailinglistscondition . ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y'"
+												. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id 
+												LEFT JOIN " . $wpdb -> prefix . $Mailinglist -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".list_id = 
+												" . $wpdb -> prefix . $Mailinglist -> table . ".id WHERE "
+												. $mailinglistscondition . ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y' 
+												AND (" . $wpdb -> prefix . $SubscribersList -> table . ".paid_sent < " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval 
+												OR " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval IS NULL OR " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval = '')"
 												. str_replace(" AND ()", "", $fieldsquery);
 												
 												$sentmailscount = 0;
@@ -5324,7 +5330,7 @@ if (!class_exists('wpMail')) {
 }
 
 /* Include the necessary class files */
-require_once(ABSPATH . '/wp-load.php');
+require_once(ABSPATH . DS . 'wp-load.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'mailinglist.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'subscriber.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'bounce.php');
