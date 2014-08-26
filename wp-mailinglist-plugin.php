@@ -7,7 +7,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.1.1';
+		var $version = '4.1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -2435,6 +2435,8 @@ if (!class_exists('wpMailPlugin')) {
 			$theme_folder = $this -> get_option('theme_folder');
 			
 			if (is_admin()) {
+				wp_register_style( 'newsletters_dashicons', plugins_url() . '/' . $this -> plugin_name . '/css/newsletters_dashicons.css', false, '1.0.0' );
+			
 				if (true || !empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
 					$load = true;	
 					$stylesource = plugins_url() . '/' . $this -> plugin_name . '/css/' . $this -> plugin_name . '.css';
@@ -4659,9 +4661,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.1.1") < 0) {
+				if (version_compare($cur_version, "4.1.2") < 0) {
 					$this -> update_options();
-					$version = "4.1.1";
+					$version = "4.1.2";
 				}
 			
 				//the current version is older.

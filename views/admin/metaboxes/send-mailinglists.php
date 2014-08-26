@@ -82,10 +82,10 @@ $count_users = count_users();
 	        <?php $fieldsquery = "SELECT `id`, `title`, `type`, `validation`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `type` = 'text' OR `type` = 'radio' OR `type` = 'select' OR `type` = 'pre_country' OR `type` = 'pre_gender' ORDER BY `order` ASC"; ?>
 	        <?php if ($fields = $wpdb -> get_results($fieldsquery)) : ?>
 	        	<div class="misc-pub-section">
-	                <h4><label><input <?php echo (!empty($_POST['dofieldsconditions']) || !empty($_POST['conditions'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="dofieldsconditions" value="1" id="dofieldsconditions" onclick="update_subscribers(); if (this.checked == true) { jQuery('#fieldsconditions').show(); } else { jQuery('#fieldsconditions').hide(); }" /> <?php _e('Fields Conditions', $this -> plugin_name); ?></label>
+	                <h4><label><input <?php echo (!empty($_POST['dofieldsconditions']) && !empty($_POST['conditions'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="dofieldsconditions" value="1" id="dofieldsconditions" onclick="update_subscribers(); if (this.checked == true) { jQuery('#fieldsconditions').show(); } else { jQuery('#fieldsconditions').hide(); }" /> <?php _e('Fields Conditions', $this -> plugin_name); ?></label>
 	                <?php echo $Html -> help(__('The fields conditions work on the custom fields of your subscribers. You can filter or segment the subscribers in the chosen mailing list(s) to queue/send to subscribers with specific custom field values only. For example, with a "Gender" custom field, you can choose "Male" here under fields conditions to send only to male subscribers.', $this -> plugin_name)); ?></h4>
 	                
-	                <div id="fieldsconditions" style="display:<?php echo (!empty($_POST['dofieldsconditions']) || !empty($_POST['conditions'])) ? 'block' : 'none'; ?>;">
+	                <div id="fieldsconditions" style="display:<?php echo (!empty($_POST['dofieldsconditions']) && !empty($_POST['conditions'])) ? 'block' : 'none'; ?>;">
 	                	<p>
 		                	<?php _e('Match', $this -> plugin_name); ?>
 		                	<select onchange="update_subscribers();" name="fieldsconditionsscope" id="fieldsconditionsscope">

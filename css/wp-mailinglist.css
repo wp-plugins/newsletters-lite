@@ -424,19 +424,22 @@ ul#wpmlsubmenu a.current {
 
 /* Admin Menu BEG */
 
-#adminmenu li.toplevel_page_banners div.wp-menu-image a img {
-	display: none;
+#adminmenu .toplevel_page_newsletters div.wp-menu-image:before {
+    font-family: 'newsletters_dashicons' !important;
+	content: '\f466';
 }
 
-#adminmenu li.toplevel_page_banners div.wp-menu-image {
-	background: transparent url('../images/menu.png');	
-	background-position: 0px -33px;
+@font-face {
+  font-family: 'newsletters_dashicons';
+  src: url('../fonts/newsletters_dashicons.eot'); // this is for IE
 }
-
-#adminmenu li.toplevel_page_banners:hover div.wp-menu-image,
-#adminmenu li.toplevel_page_banners.current div.wp-menu-image,
-#adminmenu li.toplevel_page_banners.wp-has-current-submenu div.wp-menu-image {
-	background-position: 0px -1px;
+@font-face {
+  font-family: 'newsletters_dashicons';
+  src: url('../fonts/newsletters_dashicons.woff') format('woff'), 
+    url('../fonts/newsletters_dashicons.ttf') format('truetype'), 
+    url('../fonts/newsletters_dashicons.svn') format('svg');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* Admin Menu END */
