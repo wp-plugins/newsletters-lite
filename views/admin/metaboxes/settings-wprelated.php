@@ -1,5 +1,14 @@
 <!-- WordPress Related Settings -->
 
+<?php
+
+$locale = get_locale();
+$mofile = $this -> plugin_name . '-' . $locale . '.mo';
+$mofull = WP_LANG_DIR . '/plugins/' . $mofile;
+$language_external = $this -> get_option('language_external');
+
+?>
+
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -8,6 +17,14 @@
 				<label><input <?php echo ($this -> get_option('tinymcebtn') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="tinymcebtn" value="Y" id="tinymcebtnY" /> <?php _e('Show', $this -> plugin_name); ?></label>
 				<label><input <?php echo ($this -> get_option('tinymcebtn') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="tinymcebtn" value="N" id="tinymcebtnN" /> <?php _e('Hide', $this -> plugin_name); ?></label>
 				<span class="howto"><?php _e('Would you like to show or hide the plugin button in the TinyMCE editor?', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<th><label for="language_external"><?php _e('Load External Language', $this -> plugin_name); ?></label>
+			<?php echo $Html -> help(sprintf(__('When turning this on, ensure that the following file exists: %s', $this -> plugin_name), $mofull)); ?></th>
+			<td>
+				<label><input <?php echo (!empty($language_external) && $language_external == 1) ? 'checked="checked"' : ''; ?> type="checkbox" name="language_external" value="1" id="language_external" /> <?php _e('Yes, load external language file', $this -> plugin_name); ?></label>
+				<span class="howto"><?php _e('Place the .mo file inside wp-content/languages/plugins/ with the correct file name', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
 		<tr>

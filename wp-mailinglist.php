@@ -1657,7 +1657,18 @@ if (!class_exists('wpMail')) {
 			} else { setlocale(LC_ALL, $locale); }
 				
 			if (function_exists('load_plugin_textdomain')) {
-				load_plugin_textdomain($this -> plugin_name, $this -> plugin_name . DS . 'languages', dirname(plugin_basename(__FILE__)) . DS . 'languages');
+			
+				$mofile = $this -> plugin_name . '-' . $locale . '.mo';
+				$mofull = WP_LANG_DIR . '/plugins/' . $mofile;
+				$language_external = $this -> get_option('language_external');
+			
+				if (!empty($language_external) && file_exists($mofull)) {
+					//load_plugin_textdomain($this -> plugin_name, $mofull);
+					load_textdomain($this -> plugin_name, $mofull);
+				} else {
+					load_textdomain($this -> plugin_name, $this -> plugin_base() . DS . 'languages' . DS . $mofile);
+					//load_plugin_textdomain($this -> plugin_name, $this -> plugin_name . DS . 'languages', dirname(plugin_basename(__FILE__)) . DS . 'languages');	
+				}
 			}	
 		}
 		
@@ -5492,6 +5503,7 @@ if (!class_exists('wpMail')) {
 		function admin_settings_system() {
 			if (!empty($_POST)) {
 				delete_option('tridebugging');
+				$this -> delete_option('language_external');
 			
 				foreach ($_POST as $key => $val) {				
 					$this -> update_option($key, $val);
