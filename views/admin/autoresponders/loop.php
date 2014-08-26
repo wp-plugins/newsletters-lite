@@ -47,6 +47,12 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<th class="column-alwayssend <?php echo ($orderby == "alwayssend") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=alwayssend&order=' . (($orderby == "alwayssend") ? $otherorder : "asc")); ?>">
+							<span><?php _e('Always Send', $this -> plugin_name); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
                     <th class="column-delay <?php echo ($orderby == "delay") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=delay&order=' . (($orderby == "delay") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Send Delay', $this -> plugin_name); ?></span>
@@ -86,6 +92,12 @@
                     <th class="column-history_id <?php echo ($orderby == "history_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=history_id&order=' . (($orderby == "history_id") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Newsletter', $this -> plugin_name); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
+					<th class="column-alwayssend <?php echo ($orderby == "alwayssend") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=alwayssend&order=' . (($orderby == "alwayssend") ? $otherorder : "asc")); ?>">
+							<span><?php _e('Always Send', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -144,6 +156,13 @@
 							<?php else : ?>
                             	<?php _e('None', $this -> plugin_name); ?>
                             <?php endif; ?>
+                        </td>
+                        <td>
+                        	<?php if (!empty($autoresponder -> alwayssend) && $autoresponder -> alwayssend == "Y") : ?>
+                        		<span class="newsletters_success"><?php _e('Yes', $this -> plugin_name); ?></span>
+                        	<?php else : ?>
+                        		<span class="newsletters_error"><?php _e('No', $this -> plugin_name); ?></span>
+                        	<?php endif; ?>
                         </td>
                         <td>
                         	<?php if (empty($autoresponder -> delay)) : ?>

@@ -1741,7 +1741,7 @@ if (!class_exists('wpMailPlugin')) {
 								$subscriberslist = $Db -> find(array('subscriber_id' => $subscriber -> id, 'list_id' => $mailinglist -> id));								
 								if (!empty($subscriberslist -> active) && $subscriberslist -> active == "Y") {								
 									$Db -> model = $Autoresponderemail -> model;
-									if (!$Db -> find(array('subscriber_id' => $subscriber -> id, 'autoresponder_id' => $autoresponder -> id))) {									
+									if ((!empty($autoresponder -> alwayssend) && $autoresponder -> alwayssend == "Y") || (!$Db -> find(array('subscriber_id' => $subscriber -> id, 'autoresponder_id' => $autoresponder -> id)))) {									
 										$Db -> model = $History -> model;
 										$history = $Db -> find(array('id' => $autoresponder -> history_id));
 										$history -> attachments = array();
@@ -5092,7 +5092,7 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if (!empty($message) && is_admin()) {
-				$url = $Html -> retainquery($this -> pre . 'message=' . urlencode(addslashes($message)), $url);
+				$url = $Html -> retainquery($this -> pre . 'message=' . urlencode($message), $url);
 			}
 			
 			if (headers_sent() || $jsredirect == true) {

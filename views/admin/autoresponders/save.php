@@ -1,8 +1,12 @@
+<!-- Save an Autoresponder -->
+
 <?php
 
 global $ID, $post_ID, $post, $user_ID;
 $ID = $this -> get_option('imagespost');
 $post_ID = $this -> get_option('imagespost');
+
+$alwayssend = $Autoresponder -> data -> alwayssend;
 
 ?>
 
@@ -58,6 +62,15 @@ $post_ID = $this -> get_option('imagespost');
                             <?php _e('The send delay will be applied from the current date/time.', $this -> plugin_name); ?>
                         </span>
                     </td>
+                </tr>
+                <tr>
+                	<th><label for="Autoresponder_alwayssend_N"><?php _e('Always Send?', $this -> plugin_name); ?></label>
+                	<?php echo $Html -> help(__('You may want an autoresponder to always send/queue when a subscriber subscribes, even if they are already subscribed and if they have already received this autoresponder email. Set this to Yes to always send and to No to ensure that each subscriber gets and autoresponder email only once.', $this -> plugin_name)); ?></th>
+                	<td>
+                		<label><input <?php echo (!empty($alwayssend) && $alwayssend == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="Autoresponder[alwayssend]" value="Y" id="Autoresponder_alwayssend_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+                		<label><input <?php echo ((empty($alwayssend)) || (!empty($alwayssend) && $alwayssend == "N")) ? 'checked="checked"' : ''; ?> type="radio" name="Autoresponder[alwayssend]" value="N" id="Autoresponder_alwayssend_N" /> <?php _e('No', $this -> plugin_name); ?></label>
+                		<span class="howto"><?php _e('Should this autoresponder always be sent to a subscriber, disregarding if it has been sent before?', $this -> plugin_name); ?></span>
+                	</td>
                 </tr>
                 <tr>
                 	<th><label for="Autoresponder.newsletter.exi"><?php _e('Newsletter', $this -> plugin_name); ?></label>
