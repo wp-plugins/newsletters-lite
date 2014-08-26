@@ -2,7 +2,6 @@
 
 if (!class_exists('wpmlClick')) {
 	class wpmlClick extends wpmlDbHelper {
-	
 		var $model = 'Click';
 		var $controller = 'clicks';
 		
