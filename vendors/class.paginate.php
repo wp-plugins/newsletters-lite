@@ -60,7 +60,7 @@ class wpmlpaginate extends wpMailPlugin {
 	}
 	
 	function start_paging($page = null) {
-		global $wpdb;
+		global $wpdb, $Subscriber, $SubscribersList;
 	
 		$page = (empty($page)) ? 1 : $page;
 	
@@ -70,6 +70,12 @@ class wpmlpaginate extends wpMailPlugin {
 		
 		$query = "SELECT " . $this -> fields . " FROM `" . $this -> table . "`";
 		$countquery = "SELECT COUNT(*) FROM `" . $this -> table . "`";
+		
+		switch ($this -> model) {
+			case 'SubscribersList'				:
+				$query .= " LEFT JOIN " . $wpdb -> prefix . $Subscriber -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . $Subscriber -> table . ".id";	
+				break;
+		}
 		
 		if (!empty($this -> where)) {
 			$query .= " WHERE";
@@ -104,7 +110,8 @@ class wpmlpaginate extends wpMailPlugin {
 			
 		$endRecord = $begRecord + $this -> per_page;
 		list($ofield, $odir) = $this -> order;
-		$query .= " ORDER BY IF (`" . $ofield . "` = '' OR `" . $ofield . "` IS NULL,1,0), `" . $ofield . "` " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
+		$query .= " ORDER BY IF (" . $ofield . " = '' OR " . $ofield . " IS NULL,1,0), " . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
+		
 		$records = $wpdb -> get_results($query);	
 		$records_count = count($records);
 		$this -> allcount = $allRecordsCount = $count = $wpdb -> get_var($countquery);		
@@ -121,39 +128,16 @@ class wpmlpaginate extends wpMailPlugin {
 			$search = (empty($this -> searchterm)) ? '' : '&' . $this -> pre . 'searchterm=' . urlencode($this -> searchterm);
 			$orderby = (empty($ofield)) ? '' : '&orderby=' . $ofield;
 			$order = (empty($odir)) ? '' : '&order=' . strtolower($odir);
-			//$this -> pagination .= '<span class="displaying-num">' . sprintf(__('%s items', $this -> plugin_name), ($begRecord + 1), ($begRecord + count($records)), $allRecordsCount) . '</span>';
 			$this -> pagination .= '<span class="displaying-num">' . sprintf(__('%s items', $this -> plugin_name), $allRecordsCount) . '</span>';
-		
 			$this -> pagination .= '<span class="pagination-links">';
 			$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
-		
-			//if ($this -> page > 1) {
-				$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
-			//}
-			
+			$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
 			$this -> pagination .= '<span class="paging-input">';
 			$this -> pagination .= '<input class="current-page" type="text" name="paged" id="paged-input" value="' . $this -> page . '" size="1"> ';
 			$this -> pagination .= __('of', $this -> plugin_name); 
 			$this -> pagination .= ' <span class="total-pages">' . $totalpagescount . '</span>';
 			$this -> pagination .= '</span>';
-			
-			/*while ($p <= $allRecordsCount) {			
-				if ($k >= ($this -> page - 5) && $k <= ($this -> page + 5)) {
-					if ($k != $this -> page) {
-						//$this -> pagination .= '<a class="page-numbers" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($k) . $search . $orderby . $order . $this -> after . '" title="' . __('Page', $this -> plugin_name) . ' ' . $k . '">' . $k . '</a>';
-					} else {
-						//$this -> pagination .= '<span class="page-numbers current">' . $k . '</span>';
-					}
-				}
-				
-				$p = $p + $this -> per_page;
-				$k++;
-			}*/
-			
-			//if ((count($records) + $begRecord) < $allRecordsCount) {
-				$this -> pagination .= '<a class="next-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page + 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Next Page', $this -> plugin_name) . '">&#8250;</a>';
-			//}
-			
+			$this -> pagination .= '<a class="next-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page + 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Next Page', $this -> plugin_name) . '">&#8250;</a>';
 			$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . $totalpagescount . $search . $orderby . $order . $this -> after . '" class="last-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '">&raquo;</a>';
 			$this -> pagination .= '</span>';
 			

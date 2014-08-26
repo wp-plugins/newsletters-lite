@@ -301,6 +301,8 @@ if (!class_exists('wpMail')) {
 					$update_info = $update -> get_version_info(true);
 					$this -> render('update', array('update_info' => $update_info), true, 'admin');
 				}
+				
+				flush();
 			}
 		}
 		
@@ -345,7 +347,7 @@ if (!class_exists('wpMail')) {
 					case 'exportdownload'					:					
 						if (!empty($_GET['file'])) {
 							$filename = urldecode($_GET['file']);
-							$filepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
+							$filepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
 							$filefull = $filepath . $filename;
 						
 							if (file_exists($filefull)) {
@@ -618,7 +620,7 @@ if (!class_exists('wpMail')) {
 							$mailinglists = @explode(",", $_GET[$this -> pre . 'mailinglist_id']);
 							$mailinglistsstring = $_GET[$this -> pre . 'mailinglist_id'];
 							$subscriber = $Subscriber -> get($subscriber_id, false);
-							$Auth -> set_emailcookie($subscriber -> email, "+30 days", true);
+							$Auth -> set_emailcookie($subscriber -> email, "+30 days");
 							
 							if (empty($subscriber -> cookieauth)) {
 								$subscriberauth = $Auth -> gen_subscriberauth();
@@ -1563,8 +1565,9 @@ if (!class_exists('wpMail')) {
 			/* Check qTranslate Support */
 			if (is_admin()) {
 				if ($this -> is_plugin_active('qtranslate')) {
-					if ($this -> is_plugin_screen('send')) {					
+					if ($this -> is_plugin_screen('send')) {		
 						remove_filter('the_editor', 'qtrans_modifyRichEditor');	
+						remove_action('wp_tiny_mce_init', 'qtrans_TinyMCE_init');
 					}
 				}
 			}
@@ -2239,6 +2242,13 @@ if (!class_exists('wpMail')) {
 						if (!empty($_POST['sendattachment']) && $_POST['sendattachment'] == "1") {						
 							$newattachments = array();
 							
+							if (!empty($_POST['ishistory'])) {
+								$Db -> model = $History -> model;
+								if ($history = $Db -> find(array('id' => $_POST['ishistory']))) {
+									$newattachments = $history -> attachments;
+								}
+							}
+							
 							if (!empty($_FILES['attachments']['name'])) {								
 								foreach ($_FILES['attachments']['name'] as $fkey => $attachmentfile) {
 									if ($_FILES['attachments']['error'][$fkey] == 0) {
@@ -2247,22 +2257,15 @@ if (!class_exists('wpMail')) {
 										$attfile = $name . substr(time(), 0, 4) . '.' . $ext;
 										$attpath = $Html -> uploads_path();
 										$attsub = $Html -> uploads_subdir();
-										$attfull = $attpath . $attsub . DS . $attfile;
+										$attfull = $attpath . $attsub . "/" . $attfile;
 										
 										if (move_uploaded_file($_FILES['attachments']['tmp_name'][$fkey], $attfull)) {
 											$newattachments[] = array(
 												'title'					=>	$_FILES['attachments']['name'][$fkey],
-												'filename'				=>	$attfull,
+												'filename'				=>	str_replace("\\", "/", $attfull),
 												'subdir'				=>	$attsub,
 											);	
 										}
-									}
-								}
-							} else {
-								if (!empty($_POST['ishistory'])) {
-									$Db -> model = $History -> model;
-									if ($history = $Db -> find(array('id' => $_POST['ishistory']))) {
-										$newattachments = $history -> attachments;
 									}
 								}
 							}
@@ -2422,7 +2425,7 @@ if (!class_exists('wpMail')) {
 													if (!empty($_POST['daterangefrom']) && !empty($_POST['daterangeto'])) {
 														$daterangefrom = date_i18n("Y-m-d", strtotime($_POST['daterangefrom']));
 														$daterangeto = date_i18n("Y-m-d", strtotime($_POST['daterangeto']));
-														$fieldsquery .= " AND (`created` >= '" . $daterangefrom . "' AND `created` <= '" . $daterangeto . "')";
+														$fieldsquery .= " AND (" . $wpdb -> prefix . $Subscriber -> table . ".created >= '" . $daterangefrom . "' AND " . $wpdb -> prefix . $Subscriber -> table . ".created <= '" . $daterangeto . "')";
 													}
 												}
 												
@@ -3146,9 +3149,9 @@ if (!class_exists('wpMail')) {
 							$conditions = array('list_id' => $_GET['id']);
 							$searchterm = false;
 							$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
-							//$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
-							//$order = array($orderfield, $orderdirection);
-							$order = array('modified', 'DESC');
+							$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
+							$order = array($wpdb -> prefix . $Subscriber -> table . "." . $orderfield, $orderdirection);
+							//$order = array('modified', 'DESC');
 							$data = $this -> paginate($SubscribersList -> model, false, $sub, $conditions, $searchterm, $perpage, $order);
 							$subscribers = $data[$SubscribersList -> model];
 							
@@ -3745,7 +3748,7 @@ if (!class_exists('wpMail')) {
 								$data = $conv -> toCSV(',', false, false, null);
 								
 								$fileName = time() . '.csv';
-								$filePath = $Html -> uploads_path() . DS;
+								$filePath = $Html -> uploads_path() . '/';
 								$fileFull = $filePath . $fileName;
 								$fh = fopen($fileFull, "w");
 								
@@ -3971,7 +3974,7 @@ if (!class_exists('wpMail')) {
 						if (empty($_POST['export_filetype'])) { $errors[] = __('Please select an export filetype', $this -> plugin_name); }
 						
 						$exportfilename = 'subscribers-' . date_i18n("Ymd", time()) . '.csv';
-						$exportfilepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
+						$exportfilepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
 						$exportfilefull = $exportfilepath . $exportfilename;
 						if (!$fh = fopen($exportfilefull, "w")) { $errors[] = sprintf(__('Export file could not be created, please check permissions on <b>%s</b> to make sure it is writable.', $this -> plugin_name), $Html -> uploads_path() . "/wp-mailinglist/export/"); }
 						else { fclose($fh); }
@@ -4671,7 +4674,7 @@ if (!class_exists('wpMail')) {
 							
 							if (!empty($data)) {
 								$exportfile = 'history' . $_GET['history_id'] . '_emails.csv';
-								$exportpath = $Html -> uploads_path() . DS;
+								$exportpath = $Html -> uploads_path() . '/';
 								$exportfull = $exportpath . $exportfile;
 								
 								if ($fh = fopen($exportfull, "w")) {
@@ -4787,7 +4790,7 @@ if (!class_exists('wpMail')) {
 						
 						if (!empty($data)) {
 							$filename = "emails-history.csv";
-							$filepath = $Html -> uploads_path() . DS;
+							$filepath = $Html -> uploads_path() . '/';
 							$filefull = $filepath . $filename;
 							
 							if ($fh = fopen($filefull, "w")) {
@@ -5300,6 +5303,7 @@ if (!class_exists('wpMail')) {
 						//unset values that are not required
 						unset($_POST['save']);
 						delete_option('tridebugging');
+						$this -> delete_option('themeintextversion');
 						
 						foreach ($_POST as $key => $val) {				
 							$this -> update_option($key, $val);

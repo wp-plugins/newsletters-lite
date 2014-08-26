@@ -485,6 +485,10 @@ class wpmlDbHelper extends wpMailPlugin {
 			
 			$object = (!is_object(${$this -> model})) ? $this : ${$this -> model};
 			
+			if (empty($object -> table)) {
+				return false;
+			}
+			
 			$fields = (empty($fields)) ? "*" : implode(", ", $fields);
 			$query = "SELECT " . $fields . " FROM `" . $wpdb -> prefix . "" . $object -> table . "`";
 			

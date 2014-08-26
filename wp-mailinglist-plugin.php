@@ -894,7 +894,7 @@ if (!class_exists('wpMailPlugin')) {
 			define('SHORTINIT', true);
 			global $Html;
 			$exportfilename = $_REQUEST['exportfile'];
-			$exportfilepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
+			$exportfilepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
 			$exportfilefull = $exportfilepath . $exportfilename;
 			
 			if ($fh = fopen($exportfilefull, "a")) {
@@ -1238,6 +1238,31 @@ if (!class_exists('wpMailPlugin')) {
 			die();
 		}
 		
+		function ajax_order_fields() {
+			global $Db, $Field, $FieldsList;
+	
+			if (!empty($_REQUEST)) {				
+				if (!empty($_REQUEST['fields'])) {
+					foreach ($_REQUEST['fields'] as $order => $field_id) {
+						$Db -> model = $Field -> model;
+						$Db -> save_field('order', $order, array('id' => $field_id));
+						
+						$Db -> model = $FieldsList -> model;
+						$Db -> save_field('order', $order, array('field_id' => $field_id));
+					}
+					
+					_e('Custom fields order has been successfully saved', $this -> name);
+				} else {
+					_e('No fields are available', $this -> plugin_name);
+				}
+			} else {
+				_e('No data posted', $this -> plugin_name);
+			}
+			
+			exit();
+			die();
+		}
+		
 		function ajax_themeedit() {
 			global $Db, $Theme;
 			$success = false;
@@ -1394,7 +1419,7 @@ if (!class_exists('wpMailPlugin')) {
 			ob_start();
 			?>
 			
-			<p style="text-align:center;"><a href="#spamscore_report" onclick="jQuery.colorbox({inline:true, href:'#spamscore_report'}); return false;"><?php _e('See Report', $this -> plugin_name); ?></a></p>
+			<p style="text-align:center;"><a href="#spamscore_report" onclick="jQuery.colorbox({inline:true, href:'#spamscore_report', maxWidth:'80%', maxHeight:'80%'}); return false;"><?php _e('See Report', $this -> plugin_name); ?></a></p>
 			<iframe width="100%" style="width:100%;" frameborder="0" scrolling="no" class="autoHeight widefat" src="<?php echo admin_url('admin-ajax.php'); ?>?action=newsletters_gauge&value=<?php echo $spamscore -> score; ?>"></iframe>
 			
 			<div style="display:none;">
@@ -1427,6 +1452,13 @@ if (!class_exists('wpMailPlugin')) {
 			</result>
 	    	
 	    	<?php
+		    
+		    exit();
+		    die();
+	    }
+	    
+	    function ajax_tinymce_dialog() {
+		    $this -> render('tinymce-dialog', false, true, 'admin');
 		    
 		    exit();
 		    die();
@@ -2174,7 +2206,7 @@ if (!class_exists('wpMailPlugin')) {
 							$Db -> model = $Subscriber -> model;
 							$subscriber = $Db -> find(array('email' => $_GET['email']));
 							
-							$Auth -> set_emailcookie($subscriber -> email, "+30 days", true);
+							$Auth -> set_emailcookie($subscriber -> email, "+30 days");
 							if (empty($subscriber -> cookieauth)) {
 								$subscriberauth = $Auth -> gen_subscriberauth();
 								$Db -> model = $Subscriber -> model;
@@ -2377,7 +2409,7 @@ if (!class_exists('wpMailPlugin')) {
 										$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
 										
 										$subject = __($this -> get_option('managementloginsubject'));
-										$message = $this -> render_email('management-login', array('subscriberauth' => $subscriberauth), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false);
+										$message = $this -> render_email('management-login', array('email' => $_POST['email'], 'subscriberauth' => $subscriberauth), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false);
 										
 										if ($this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false)) {
 											$errors[] = __('Authentication email has been sent, please check your inbox.', $this -> plugin_name);
@@ -3652,7 +3684,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($alllists) && $alllists == true) {				
 						$slists = $Subscriber -> mailinglists($subscriber -> id);
-						$mailinglists = implode(",", $slists);
+						$mailinglists = @implode(",", $slists);
 						$linktext = __($this -> get_option('unsubscribealltext'));
 					} else {										
 						$slists = maybe_unserialize($subscriber -> mailinglists);
@@ -4608,8 +4640,6 @@ if (!class_exists('wpMailPlugin')) {
 					global $newsletters_presend, $newsletters_emailraw;
 					if (!empty($newsletters_presend) && $newsletters_presend == true) {
 						$phpmailer -> PreSend();
-						//$header = $phpmailer -> CreateHeader();
-						//$body = $phpmailer -> CreateBody();
 						$header = $phpmailer -> MIMEHeader;
 						$body = $phpmailer -> MIMEBody;
 						$emailraw = $header . $body;
@@ -4760,7 +4790,7 @@ if (!class_exists('wpMailPlugin')) {
 						return $post_id;
 					}
 				} else {
-					if (is_admin()) {
+					if (is_admin() && $this -> ci_serial_valid()) {
 						if (!$newsletters_managementpost_error) {
 							$error = sprintf(__('Newsletter plugin subscriber management post/page does not exist %s', $this -> plugin_name), '<a href="' . admin_url('admin.php') . '?page=' . $this -> sections -> settings . '&method=managementpost" class="button button-secondary">' . __('Create it Now', $this -> plugin_name) . '</a>');
 							$this -> render_error($error);
@@ -4837,7 +4867,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				${'newsletters_option_' . $name} = $option;
-				return $option;
+				return apply_filters('newsletters_get_option', $option, $name);
 			}
 			
 			return false;
@@ -4910,12 +4940,17 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 				}
+				
+				$latestposts_order = $this -> get_option('latestposts_order');
+				$order = (!empty($latestposts_order)) ? $latestposts_order : "DESC";
+				$latestposts_orderby = $this -> get_option('latestposts_orderby');
+				$orderby = (!empty($latestposts_orderby)) ? $latestposts_orderby : "date";
 						
 				$post_criteria = array(
 					'numberposts'			=>	$this -> get_option('latestposts_number'),
 					'category'				=>	implode(",", $this -> get_option('latestposts_categories')),
-					'orderby'				=>	"post_date",
-					'order'					=>	"ASC",
+					'orderby'				=>	$orderby,
+					'order'					=>	$order,
 					'exclude'				=>	$exclude,
 					'post_type'				=>	"post",
 					'post_status'			=>	"publish",
@@ -5316,6 +5351,8 @@ if (!class_exists('wpMailPlugin')) {
 			$options['latestposts_language'] = "en";
 			$options['latestposts_categories'] = false;
 			$options['latestposts_exclude'] = "";
+			$options['latestposts_order'] = "DESC";
+			$options['latestposts_orderby'] = "post_date";
 			global $wpdb;
 			$olderthanquery = "SELECT post_date FROM " . $wpdb -> posts . " ORDER BY post_date ASC LIMIT 1";
 			$olderthan = $wpdb -> get_var($olderthanquery);
@@ -5817,7 +5854,7 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if (!empty($message) && is_admin()) {
-				$url = $Html -> retainquery($this -> pre . 'message=' . urlencode($message), $url);
+				$url = $Html -> retainquery($this -> pre . 'message=' . ($message), $url);
 			}
 			
 			if (headers_sent() || $jsredirect == true) {
@@ -6160,8 +6197,11 @@ if (!class_exists('wpMailPlugin')) {
 				$body = do_shortcode($body);
 				$body = str_replace("$", "&#36;", $body);
 				
-				global $wpml_textmessage;
-				$wpml_textmessage = $body;
+				$themeintextversion = $this -> get_option('themeintextversion');
+				if (empty($themeintextversion)) {
+					global $wpml_textmessage;
+					$wpml_textmessage = $body;
+				}
 				
 				$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';				
 				if (preg_match_all($pattern, $body, $regs)) {				
@@ -6226,9 +6266,14 @@ if (!class_exists('wpMailPlugin')) {
 							$body = do_shortcode($head) . $body . do_shortcode($foot);
 						}
 					}
+					
+					if (!empty($themeintextversion)) {
+						global $wpml_textmessage;
+						$wpml_textmessage = $body;
+					}
 				
 					return $body;
-				} else {
+				} else {				
 					return true;
 				}
 			}
@@ -6256,7 +6301,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (!is_admin()) return;
 		
 			global $uploaddir, $Html;
-			$uploaddir = $Html -> uploads_path() . DS . $this -> plugin_name . DS;
+			$uploaddir = $Html -> uploads_path() . '/' . $this -> plugin_name . '/';
 			
 			if (file_exists($uploaddir)) {
 				/* Export subscribers folder */

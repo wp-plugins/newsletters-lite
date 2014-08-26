@@ -35,6 +35,8 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 		
 			<p>
 				<label><input type="radio" name="ptype" checked="checked" value="single" id="ptype_single" /> <?php _e('Single', $this -> plugin_name); ?></label>
+				<label><input type="radio" name="ptype" value="page" id="ptype_page" /> <?php _e('Page', $this -> plugin_name); ?></label>
+				<br/>
 				<label><input type="radio" name="ptype" value="multiple" id="ptype_multiple" /> <?php _e('Multiple', $this -> plugin_name); ?></label>
 				<label><input type="radio" name="ptype" value="thumbnail" id="ptype_thumbnail" /> <?php _e('Thumbnail', $this -> plugin_name); ?></label>
 			</p>
@@ -105,6 +107,15 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 						</div>
 					</p>
 				</div>
+			</div>
+			
+			<div id="ptypediv_page" style="display:none;">
+				<p>
+					<label for="page_id"><?php _e('Page:', $this -> plugin_name); ?></label>
+					<?php wp_dropdown_pages(array('depth' => 0, 'child_of' => 0, 'echo' => 1, 'name' => "page_id", 'show_option_none' => false)); ?>
+				</p>
+				
+				<input type="button" class="button button-secondary" onclick="insert_post(jQuery('#page_id').val(), false);" name="insertpage" value="<?php _e('Insert Page', $this -> plugin_name); ?>" />
 			</div>
 			
 			<div id="ptypediv_multiple" style="display:none;">
@@ -203,16 +214,26 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 				
 				if (ptype == "single") {
 					var shortcode = "";
-					shortcode += '[wpmlpost post_id="' + post_id + '"';					
+					shortcode += '[newsletters_post post_id="' + post_id + '"';					
 					var post_showdate = jQuery('input[name="post_showdate"]:checked').val();
 					var post_eftype = jQuery('input[name="post_eftype"]:checked').val();
 					shortcode += ' showdate="' + post_showdate + '"';
 					shortcode += ' eftype="' + post_eftype + '"';
 					if (postslanguage) { shortcode += ' language="' + postslanguage + '"'; }
 					shortcode += ']';	
+				} else if (ptype == "page") {
+					var page_id = post_id;
+					var shortcode = "";
+					shortcode += '[newsletters_post post_id="' + page_id + '"';					
+					var post_showdate = jQuery('input[name="post_showdate"]:checked').val();
+					var post_eftype = jQuery('input[name="post_eftype"]:checked').val();
+					shortcode += ' showdate="' + post_showdate + '"';
+					shortcode += ' eftype="' + post_eftype + '"';
+					if (postslanguage) { shortcode += ' language="' + postslanguage + '"'; }
+					shortcode += ']';
 				} else if (ptype == "multiple") {
 					var shortcode = "";
-					shortcode += '[wpmlposts';
+					shortcode += '[newsletters_posts';
 					if (postslanguage) { shortcode += ' language="' + postslanguage + '"'; }
 					shortcode += ' numberposts="' + jQuery('#posts_number').val() + '"';
 					shortcode += ' showdate="' + jQuery('input[name="post_showdate"]:checked').val() + '"';
@@ -233,7 +254,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 					var shortcode = "";
 					var thumbnail_post_id = jQuery('#thumbnail_post_id').val();
 					var thumbnail_size = jQuery('#thumbnail_size').val();
-					shortcode += '[wpmlpost_thumbnail';
+					shortcode += '[newsletters_post_thumbnail';
 					
 					if (thumbnail_post_id != "") {
 						shortcode += ' post_id="' + thumbnail_post_id + '"';

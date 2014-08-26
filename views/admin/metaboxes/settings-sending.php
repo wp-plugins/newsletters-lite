@@ -4,6 +4,7 @@
 
 $createpreview = $this -> get_option('createpreview');
 $createspamscore = $this -> get_option('createspamscore');
+$themeintextversion = $this -> get_option('themeintextversion');
 
 ?>
 
@@ -64,6 +65,12 @@ $createspamscore = $this -> get_option('createspamscore');
                 <label><input <?php echo ($this -> get_option('multimime') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="multimime" value="N" id="multimime_N" /> <?php _e('No', $this -> plugin_name); ?></label>
             	<span class="howto"><?php _e('Send emails in both plain text and HTML mime types to let the client software decide which to use.', $this -> plugin_name); ?></span>
             </td>
+        </tr>
+        <tr>
+        	<th><label for="themeintextversion"><?php _e('Theme In TEXT Version', $this -> plugin_name); ?></label></th>
+        	<td>
+        		<label><input <?php echo (!empty($themeintextversion)) ? 'checked="checked"' : ''; ?> type="checkbox" name="themeintextversion" value="1" id="themeintextversion" /> <?php _e('Yes, include the theme content into TEXT version emails', $this -> plugin_name); ?></label>
+        	</td>
         </tr>
         <tr>
             <th><label for="mailpriority"><?php _e('Email Priority', $this -> plugin_name); ?></label></th>

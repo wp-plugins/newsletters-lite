@@ -137,6 +137,8 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_tinymce_dialog', array($this, 'ajax_tinymce_dialog'));
+				add_action('wp_ajax_newsletters_order_fields', array($this, 'ajax_order_fields'));
 				add_action('wp_ajax_newsletters_themeedit', array($this, 'ajax_themeedit'));
 				add_action('wp_ajax_newsletters_addcontentarea', array($this, 'ajax_addcontentarea'));
 				add_action('wp_ajax_newsletters_deletecontentarea', array($this, 'ajax_deletecontentarea'));

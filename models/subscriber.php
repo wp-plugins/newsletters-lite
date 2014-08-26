@@ -600,12 +600,12 @@ class wpmlSubscriber extends wpMailPlugin {
 				if ($this -> save($data, false, false)) {					
 					$subscriber = $this -> get($this -> insertid, false);
 					
+					if (!is_admin()) {
+						$Auth -> set_emailcookie($subscriber -> email);
+					}
+					
 					/* Management Auth */
-					if (empty($data['cookieauth'])) {
-						if (!is_admin()) {
-							$Auth -> set_emailcookie($subscriber -> email);
-						}
-							
+					if (empty($data['cookieauth'])) {							
 						$subscriberauth = $Auth -> gen_subscriberauth();
 						$Db -> model = $this -> model;
 						$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));

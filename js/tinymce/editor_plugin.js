@@ -12,7 +12,8 @@
 		
 			ed.addCommand('mceNewsletters', function() {			
 				ed.windowManager.open({
-					file : url + '/dialog.php',
+					//file : url + '/dialog.php',
+					file: ajaxurl + '?action=newsletters_tinymce_dialog',
 					width : 440,
 					height : 400,
 					inline : 1

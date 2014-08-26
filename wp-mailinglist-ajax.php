@@ -343,27 +343,6 @@ class wpMailAjax extends wpMailPlugin {
 
 		return true;		
 	}
-	
-	function fields_order() {
-		global $Db, $Field, $FieldsList;
-	
-		if (!empty($_REQUEST)) {				
-			if (!empty($_REQUEST['fields'])) {
-				foreach ($_REQUEST['fields'] as $order => $field_id) {
-					$Db -> model = $Field -> model;
-					$Db -> save_field('order', $order, array('id' => $field_id));
-					
-					$Db -> model = $FieldsList -> model;
-					$Db -> save_field('order', $order, array('field_id' => $field_id));
-				}
-				
-				_e('Custom fields order has been successfully saved', $this -> name);
-				return true;
-			}
-		}
-		
-		return false;
-	}
 }
 
 $cmd = $_GET['cmd'];

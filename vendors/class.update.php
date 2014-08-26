@@ -58,7 +58,7 @@ class wpmlupdate extends wpMailPlugin {
 	
 	function get_remote_request_params(){
         global $wpdb;
-        return sprintf("p:%s/key:%s/v:%s/wp:%s/php:%s/mysql:%s", urlencode('1'), urlencode($this -> get_option('serialkey')), urlencode($this -> version), urlencode(get_bloginfo("version")), urlencode(phpversion()), urlencode($wpdb -> db_version()));
+        return sprintf("p:%s/key:%s/v:%s/wp:%s/php:%s/mysql:%s", urlencode('1'), urlencode(apply_filters('newsletters_get_option', $this -> get_option('serialkey'), 'serialkey')), urlencode($this -> version), urlencode(get_bloginfo("version")), urlencode(phpversion()), urlencode($wpdb -> db_version()));
     }
 }
 

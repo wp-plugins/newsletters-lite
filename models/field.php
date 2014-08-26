@@ -465,12 +465,14 @@ class wpmlField extends wpMailPlugin {
 					unset($this -> table_fields['id']);
 					
 					foreach (array_keys($this -> table_fields) as $field) {
-						$query1 .= "`" . $field . "`";
-						$query2 .= "'" . ${$field} . "'";
-						
-						if ($c < count($this -> table_fields)) {
-							$query1 .= ", ";
-							$query2 .= ", ";
+						if (!empty(${$field}) && ${$field} != "0") {
+							$query1 .= "`" . $field . "`";
+							$query2 .= "'" . ${$field} . "'";
+							
+							if ($c < count($this -> table_fields)) {
+								$query1 .= ", ";
+								$query2 .= ", ";
+							}
 						}
 						
 						$c++;

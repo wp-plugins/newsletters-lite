@@ -168,6 +168,40 @@
                 </td>
             </tr>
             <tr>
+            	<th><label for="latestposts_order"><?php _e('Order Posts', $this -> plugin_name); ?></label></th>
+            	<td>
+            		<?php
+            		
+            		$latestposts_order = $this -> get_option('latestposts_order');
+            		$latestposts_orderby = $this -> get_option('latestposts_orderby');
+            		
+            		?>
+            		<select name="latestposts_order">
+            			<option <?php echo (!empty($latestposts_order) && $latestposts_order == "ASC") ? 'selected="selected"' : ''; ?> value="ASC"><?php _e('Ascending', $this -> plugin_name); ?></option>
+            			<option <?php echo (!empty($latestposts_order) && $latestposts_order == "DESC") ? 'selected="selected"' : ''; ?> value="DESC"><?php _e('Descending', $this -> plugin_name); ?></option>
+            		</select>
+            		<?php _e('by', $this -> plugin_name); ?>
+            		<?php 
+            		
+            		$orderby = array(
+            			'ID'			=>	__('ID', $this -> plugin),
+            			'date'			=>	__('Date', $this -> plugin_name),
+            			'author'		=>	__('Author', $this -> plugin_name),
+            			'title'			=>	__('Title', $this -> plugin_name),
+            			'parent'		=>	__('Parent', $this -> plugin_name),
+            			'comment_count'	=>	__('Comment Count', $this -> plugin_name),
+            			'menu_order'	=>	__('Menu Order', $this -> plugin_name)
+            		); 
+            		
+            		?>
+            		<select name="latestposts_orderby" id="latestposts_orderby">
+            			<?php foreach ($orderby as $okey => $oval) : ?>
+            				<option <?php echo (!empty($latestposts_orderby) && $latestposts_orderby == $okey) ? 'selected="selected"' : ''; ?> value="<?php echo $okey; ?>"><?php echo $oval; ?></option>
+            			<?php endforeach; ?>
+            		</select>
+            	</td>
+            </tr>
+            <tr>
             	<th><label for="latestposts_olderthan"><?php _e('Oldest Post Date/Time', $this -> plugin_name); ?></label></th>
             	<td>
             		<input type="text" name="latestposts_olderthan" value="<?php echo esc_attr(stripslashes(date("Y-m-d H:i:s", strtotime($this -> get_option('latestposts_olderthan'))))); ?>" id="latestposts_olderthan" />

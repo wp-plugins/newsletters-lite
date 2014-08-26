@@ -206,7 +206,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 			$currentfile = '<p class="currentfile">';						
 			$imagetypes = array('jpg','jpeg','gif','png');
 			$imagename = $value;
-			$imagepath = $this -> uploads_path() . '/' . $this -> plugin_name . DS . 'uploadify' . DS . $imagename;
+			$imagepath = $this -> uploads_path() . '/' . $this -> plugin_name . '/uploadify/' . $imagename;
 			$imageurl = $this -> uploads_url() . '/' . $this -> plugin_name . '/uploadify/' . $imagename;
 			$imageinfo = pathinfo($imagepath);
 			$ajaxuploadurl = site_url() . '/?' . $this -> pre . 'method=ajaxupload&file=' . urlencode($imagename);
@@ -312,7 +312,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		}
 		
 		$attachmentfile .= basename($attachment['filename']);
-		$attachmentfile = ltrim($attachmentfile, DS);
+		$attachmentfile = ltrim($attachmentfile, "/");
 	
 		if (!empty($attachmentfile)) {			
 			if ($icononly == false) {
@@ -680,7 +680,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return false;
 	}
 	
-	function truncate($text = null, $length = 100, $ending = '...', $exact = false, $considerHtml = false) {
+	function truncate($text = null, $length = 100, $ending = '...', $exact = true, $considerHtml = false) {
 		if (is_array($ending)) {
 			extract($ending);
 		}

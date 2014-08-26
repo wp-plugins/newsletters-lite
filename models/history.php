@@ -208,7 +208,7 @@ class wpmlHistory extends wpMailPlugin {
 						if (!empty($history -> daterangefrom) && !empty($history -> daterangeto)) {
 							$daterangefrom = date_i18n("Y-m-d", strtotime($history -> daterangefrom));
 							$daterangeto = date_i18n("Y-m-d", strtotime($history -> daterangeto));
-							$fieldsquery .= " AND (`created` >= '" . $daterangefrom . "' AND `created` <= '" . $daterangeto . "')";
+							$fieldsquery .= " AND (" . $wpdb -> prefix . $Subscriber -> table . ".created >= '" . $daterangefrom . "' AND " . $wpdb -> prefix . $Subscriber -> table . ".created <= '" . $daterangeto . "')";
 						}
 					}
 					
