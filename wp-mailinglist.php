@@ -300,6 +300,7 @@ if (!class_exists('wpMail')) {
 					$click_data = array(
 						'link_id'			=>	$link -> id,
 						'history_id'		=>	$_GET['history_id'],
+						'user_id'			=>	$_GET['user_id'],
 						'subscriber_id'		=>	$_GET['subscriber_id'],
 					);
 					
@@ -1136,7 +1137,7 @@ if (!class_exists('wpMail')) {
 						$Db -> model = $History -> model;
 						$history_data['sent'] = 1;
 						$History -> save($history_data, false);
-						$history_id = $History -> insertid;
+						$history_id = $History -> insertid;						
 						$this -> update_option('latestposts_historyid', $history_id);
 						
 						if (!empty($preview) && $preview == true) {
@@ -1459,7 +1460,9 @@ if (!class_exists('wpMail')) {
 							}
 						} elseif (!empty($email -> user_id)) {
 							if ($user = $this -> userdata($email -> user_id)) {
+								$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
 								if ((empty($userids[$email -> history_id]) || (!empty($userids[$email -> history_id]) && !in_array($user -> ID, $userids[$email -> history_id])))) {
+									$userids[$email -> history_id][] = $user -> ID;
 									$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => false, 'user' => $user, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id), false, 'html', true, $email -> theme_id);
 									
 									if ($this -> execute_mail(false, $user, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
@@ -1660,8 +1663,7 @@ if (!class_exists('wpMail')) {
 										);
 										
 										$History -> save($history_data, false);
-										$history_id = $History -> insertid;
-										
+										$history_id = $History -> insertid;										
 										$subscriberids = array();
 										$subscriberemails = array();
 										
@@ -2217,6 +2219,17 @@ if (!class_exists('wpMail')) {
 										
 										$History -> save($history_data, false);
 										$history_id = $History -> insertid;
+										if (!empty($_POST['contentarea'])) {
+											foreach ($_POST['contentarea'] as $number => $content) {
+												$content_data = array(
+													'number'			=>	$number,
+													'history_id'		=>	$history_id,
+													'content'			=>	$content,
+												);
+											
+												$this -> Content -> save($content_data, true);
+											}
+										}
 									
 										if (empty($_POST['sendtype']) || $_POST['sendtype'] == "queue" || $_POST['sendtype'] == "send") {
 											if ($this -> get_option('subscriptions') == "Y") {
@@ -2472,7 +2485,6 @@ if (!class_exists('wpMail')) {
 								}
 								
 								if ($History -> save($history_data, false)) {
-								
 									if (!empty($_POST['contentarea'])) {
 										$history_id = $History -> insertid;
 										
@@ -2523,6 +2535,17 @@ if (!class_exists('wpMail')) {
 								
 								$History -> save($history_data, false);
 								$history_id = $History -> insertid;
+								if (!empty($_POST['contentarea'])) {
+									foreach ($_POST['contentarea'] as $number => $content) {
+										$content_data = array(
+											'number'			=>	$number,
+											'history_id'		=>	$history_id,
+											'content'			=>	$content,
+										);
+									
+										$this -> Content -> save($content_data, true);
+									}
+								}
 								$Db -> model = $History -> model;
 								$history = $Db -> find(array('id' => $history_id));
 							
@@ -4398,15 +4421,23 @@ if (!class_exists('wpMail')) {
 							foreach ($emails as $email) {
 								$this -> remove_server_limits();
 								
-								/* Subscriber */
-								$Db -> model = $Subscriber -> model;
-	                        	$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
-								$data .= '"' . $subscriber -> email . '",';
-								
-								/* Mailing List */
-								$Db -> model = $Mailinglist -> model;
-	                        	$mailinglist = $Db -> find(array('id' => $email -> mailinglist_id));
-								$data .= '"' . $mailinglist -> title . '",';
+								if (!empty($email -> subscriber_id)) {
+									$Db -> model = $Subscriber -> model;
+									$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
+									/* Subscriber */
+									$Db -> model = $Subscriber -> model;
+		                        	$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
+									$data .= '"' . $subscriber -> email . '",';
+									
+									/* Mailing List */
+									$Db -> model = $Mailinglist -> model;
+		                        	$mailinglist = $Db -> find(array('id' => $email -> mailinglist_id));
+									$data .= '"' . $mailinglist -> title . '",';
+								} elseif (!empty($email -> user_id)) {
+									$user = $this -> userdata($email -> user_id);
+									$data .= '"' . $user -> user_email . '",';
+									$data .= '"' . '' . '",';
+								}
 								
 								/* Read/Opened Status */
 								$data .= '"' . ((!empty($email -> read) && $email -> read == "Y") ? __('Yes', $this -> plugin_name) : __('No', $this -> plugin_name)) . '",';

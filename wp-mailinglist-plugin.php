@@ -1272,7 +1272,20 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			}
 			
-			$History -> save($history_data, false);
+			if ($History -> save($history_data, false)) {
+				if (!empty($_POST['contentarea'])) {
+					foreach ($_POST['contentarea'] as $number => $content) {
+						$content_data = array(
+							'number'			=>	$number,
+							'history_id'		=>	$history_id,
+							'content'			=>	$content,
+						);
+					
+						$this -> Content -> save($content_data, true);
+					}	
+				}
+			}
+			
 			$history_id = $History -> insertid;
 	    	$_GET['id'] = $history_id;
 	    	ob_get_clean();
@@ -5502,7 +5515,7 @@ if (!class_exists('wpMailPlugin')) {
 			return $url;
 		}
 		
-		function hashlink($link = null, $history_id = null, $subscriber_id = null) {
+		function hashlink($link = null, $history_id = null, $subscriber_id = null, $user_id = null) {
 			global $Html, $wpmlLink;
 			$hashlink = $link;
 		
@@ -5510,7 +5523,13 @@ if (!class_exists('wpMailPlugin')) {
 				if (!preg_match("/(manage\-subscriptions|loginauth|wpml|wpmlmethod|jpg|png|gif|jpeg|bmp|wpmltrack|wpmllink)/si", $link)) {
 					if (preg_match("/^http\:\/\//si", $link) || preg_match("/^https\:\/\//si", $link)) {					
 						$hash = md5($text . $link);
-						$hashlink = $Html -> retainquery($this -> pre . 'link=' . $hash . '&history_id=' . $history_id . '&subscriber_id=' . $subscriber_id, home_url());
+						
+						$query = $this -> pre . 'link=' . $hash . '&history_id=' . $history_id;
+						
+						if (!empty($subscriber_id)) { $query .= '&subscriber_id=' . $subscriber_id; }
+						if (!empty($user_id)) { $query .= '&user_id=' . $user_id; }
+						
+						$hashlink = $Html -> retainquery($query, home_url());
 						
 						if (!$curlink = $wpmlLink -> find(array('hash' => $hash))) {
 							$link_data = array(
@@ -5631,7 +5650,7 @@ if (!class_exists('wpMailPlugin')) {
 							$results = $regs[1];
 							foreach ($results as $rkey => $result) {
 								if (apply_filters('wpml_hashlink_loop', true, $result, $regs)) {
-									$hashlink = $this -> hashlink($result, $history_id, $subscriber -> id);								
+									$hashlink = $this -> hashlink($result, $history_id, $subscriber -> id, $user -> id);								
 									$pattern = '/[\'"](' . preg_quote($result, '/') . ')[\'"]/si';									
 									$body = preg_replace($pattern, '"' . $hashlink . '"', $body);
 								}
