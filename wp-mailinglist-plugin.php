@@ -853,7 +853,7 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 					
-					if ($Queue -> save($subscriber, $subject, $content, $newattachments, $post_id, $history_id, false, $theme_id, $senddate)) {
+					if ($Queue -> save($subscriber, false, $subject, $content, $newattachments, $post_id, $history_id, false, $theme_id, $senddate)) {
 						$success = "Y<|>" . $subscriber -> email . "<|>" . __('Success', $this -> plugin_name);
 					} else {
 						$success = "N<|>" . $subscriber -> email . "<|>" . $Queue -> errors[0];
@@ -933,7 +933,8 @@ if (!class_exists('wpMailPlugin')) {
 										$message = $confirmation_email;
 										
 										$Queue -> save(
-											$subscriber, 
+											$subscriber,
+											false, 
 											$subject, 
 											$message, 
 											false, 

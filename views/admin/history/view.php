@@ -61,6 +61,17 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
                     <?php endif; ?>
                 </td>
             </tr>
+            <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+            	<th><?php _e('Author', $this -> plugin_name); ?></th>
+            	<td>
+            		<?php if (!empty($history -> user_id)) : ?>
+            			<?php $user = $this -> userdata($history -> user_id); ?>
+            			<a href="<?php echo get_edit_user_link($user -> ID); ?>"><?php echo $user -> display_name; ?></a>
+            		<?php else : ?>
+            			<?php _e('None', $this -> plugin_name); ?></td>
+            		<?php endif; ?>
+            	</td>
+            </tr>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Tracking', $this -> plugin_name); ?></th>
 				<td>

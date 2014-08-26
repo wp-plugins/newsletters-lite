@@ -214,7 +214,7 @@
                     <?php if (apply_filters($this -> pre . '_admin_history_authorcolumn', true)) : ?>
                     <td>
                     	<?php if ($user = get_userdata($email -> user_id)) : ?>
-                        	<?php echo $Html -> link($user -> display_name, site_url() . "/wp-admin/user-edit.php?user_id=" . $user -> ID . "&wp_http_referer=/wp-admin/?page=" . $this -> sections -> history); ?>
+                        	<?php echo $Html -> link($user -> display_name, get_edit_user_link($user -> ID)); ?>
                         <?php else : ?>
                         	<?php _e('None', $this -> plugin_name); ?>
                         <?php endif; ?>

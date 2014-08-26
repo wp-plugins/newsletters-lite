@@ -129,18 +129,34 @@
 			</tfoot>
 			<tbody>
 				<?php foreach ($queues as $queue) : ?>
-				<?php $subscriber = $Subscriber -> get($queue -> subscriber_id); ?>
+				<?php 
+				
+				if (!empty($queue -> subscriber_id)) {
+					$subscriber = $Subscriber -> get($queue -> subscriber_id); 
+				} elseif (!empty($queue -> user_id)) {
+					$user = $this -> userdata($queue -> user_id);
+				}
+				
+				?>
 				<?php $class = ($class == "alternate") ? '' : 'alternate'; ?>
 				<tr id="queuerow<?php echo $queue -> id; ?>" class="<?php echo $class; ?>">
 					<th class="check-column"><input type="checkbox" id="checklist<?php echo $queue -> id; ?>" name="Queue[checklist][]" value="<?php echo $queue -> id; ?>" /></th>
 					<td><label for="checklist<?php echo $queue -> id; ?>"><?php echo $queue -> id; ?></label></td>
 					<?php if (!empty($screen_custom) && in_array('gravatars', $screen_custom)) : ?>
 						<td>
-							<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($subscriber -> email); ?></label>
+							<?php if (!empty($subscriber)) : ?>
+								<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($subscriber -> email); ?></label>
+							<?php elseif (!empty($user)) : ?>
+								<label for="checklist<?php echo $queue -> id; ?>"><?php echo $Html -> get_gravatar($user -> user_email); ?></label>
+							<?php endif; ?>
 						</td>
 					<?php endif; ?>
 					<td>
-						<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" class="row-title" title="<?php _e('View this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a>
+						<?php if (!empty($subscriber)) : ?>
+							<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" class="row-title" title="<?php _e('View this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a>
+						<?php elseif (!empty($user)) : ?>
+							<a href="<?php echo get_edit_user_link($user -> ID); ?>" class="row-title"><?php echo $user -> display_name; ?></a>
+						<?php endif; ?>
 						<div class="row-actions">
 							<span class="delete"><a onclick="if (!confirm('<?php _e('Are you sure you want to delete this queued email?', $this -> plugin_name); ?>')) { return false; }" class="submitdelete" href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=delete&amp;id=<?php echo $queue -> id; ?>"><?php _e('Delete', $this -> plugin_name); ?></a> |</span>
 							<span class="edit"><a href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=send&amp;id=<?php echo $queue -> id; ?>"><?php _e('Send Now', $this -> plugin_name); ?></a></span>

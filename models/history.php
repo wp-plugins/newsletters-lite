@@ -223,7 +223,8 @@ class wpmlHistory extends wpMailPlugin {
 							$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $mailinglists);
 							
 							$q_queries[] = $Queue -> save(
-								$subscriber, 
+								$subscriber,
+								false,
 								$history -> subject, 
 								$history -> message, 
 								$history -> attachments, 
@@ -354,6 +355,7 @@ class wpmlHistory extends wpMailPlugin {
 							
 							$q_queries[] = $Queue -> save(
 								$subscriber, 
+								false,
 								$history -> subject, 
 								$history -> message, 
 								$history -> attachments, 
