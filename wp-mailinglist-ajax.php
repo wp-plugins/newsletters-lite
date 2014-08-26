@@ -223,7 +223,7 @@ class wpMailAjax extends wpMailPlugin {
 		ob_start();
 		echo do_shortcode(stripslashes($content));
 		$output = ob_get_clean();
-		echo $this -> process_set_variables($subscriber, $output, $email -> id);
+		echo $this -> process_set_variables($subscriber, $user, $output, $email -> id);
 	}
 	
 	function optinembed($id = null) {	

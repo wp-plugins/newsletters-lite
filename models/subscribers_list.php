@@ -256,7 +256,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 							$subject = $this -> et_subject('expire');
 							$fullbody = $this -> et_message('expire');
 							$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-							$this -> execute_mail($subscriber, $subject, $message, false, false, false, false);
+							$this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false);
 						}
 					}
 				}

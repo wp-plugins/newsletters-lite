@@ -769,7 +769,7 @@ if (!class_exists('wpMail')) {
 										$subject = $this -> et_subject('order', $subscriber);
 										$fullbody = $this -> et_message('order', $subscriber);
 										$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-										$this -> execute_mail($to, $subject, $message, $attachment = false, $history_id = false, false, false);
+										$this -> execute_mail($to, false, $subject, $message, $attachment = false, $history_id = false, false, false);
 									}
 								}
 							} else {
@@ -839,7 +839,7 @@ if (!class_exists('wpMail')) {
 										$subject = $this -> et_subject('order', $subscriber);
 										$fullbody = $this -> et_message('order', $subscriber);
 										$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-										$this -> execute_mail($to, $subject, $message, $attachment = false, $history_id = false, false, false);
+										$this -> execute_mail($to, false, $subject, $message, $attachment = false, $history_id = false, false, false);
 									}
 									
 									$msgtype = 'success';
@@ -922,7 +922,7 @@ if (!class_exists('wpMail')) {
 										$thecontent = do_shortcode(stripslashes($content));
 										echo apply_filters('wpml_online_newsletter', $thecontent, $subscriber);				
 										$output = ob_get_clean();
-										echo $this -> process_set_variables($subscriber, $output, $email -> id);
+										echo $this -> process_set_variables($subscriber, $user, $output, $email -> id);
 										exit();										
 									} else {
 										$message = __('Authentication failed, please try again.', $this -> plugin_name);
@@ -1151,7 +1151,7 @@ if (!class_exists('wpMail')) {
 							echo do_shortcode(stripslashes($message));
 							$output = ob_get_clean();
 							ob_start();
-							echo $this -> process_set_variables($subscriber, $output, $history_id);
+							echo $this -> process_set_variables($subscriber, $user, $output, $history_id);
 							$output = ob_get_clean();
 							
 							return $output;
@@ -1187,7 +1187,7 @@ if (!class_exists('wpMail')) {
 										} else {
 											$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
 											$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $this -> get_option('latestposts_theme'));
-											$this -> execute_mail($subscriber, $subject, $message, $attachment, $history_id, $eunique);
+											$this -> execute_mail($subscriber, false, $subject, $message, $attachment, $history_id, $eunique);
 											$sentmailscount++;
 										}
 									}
@@ -1346,7 +1346,7 @@ if (!class_exists('wpMail')) {
 					$Db -> model = $Email -> model;
 					$message = $this -> render_email('send', array('message' => $history -> message, 'subject' => $history -> subject, 'subscriber' => $subscriber, 'history_id' => $history -> id, 'post_id' => $history -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $history -> theme_id);
 					
-					if ($this -> execute_mail($subscriber, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
+					if ($this -> execute_mail($subscriber, false, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
 						$Db -> model = $Autoresponderemail -> model;
 						$Db -> save_field('status', "sent", array('id' => $ae -> id));
 						$addedtoqueue++;
@@ -1402,7 +1402,7 @@ if (!class_exists('wpMail')) {
 						$subject = $this -> et_subject('schedule', $subscriber);
 						$fullbody = $this -> et_message('schedule', $subscriber);	
 						$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-						$this -> execute_mail($subscriber, $subject, $message, false, false, false, false);
+						$this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false);
 					}
 					
 					$subscriber = false;
@@ -1441,7 +1441,7 @@ if (!class_exists('wpMail')) {
 											$Db -> model = $Email -> model;
 											$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $email -> theme_id);
 											
-											if ($this -> execute_mail($subscriber, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {								
+											if ($this -> execute_mail($subscriber, false, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {								
 												$Queue -> delete($email -> id);
 												$emailssent++;
 											} else {
@@ -1459,7 +1459,17 @@ if (!class_exists('wpMail')) {
 							}
 						} elseif (!empty($email -> user_id)) {
 							if ($user = $this -> userdata($email -> user_id)) {
-								
+								if ((empty($userids[$email -> history_id]) || (!empty($userids[$email -> history_id]) && !in_array($user -> ID, $userids[$email -> history_id])))) {
+									$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => false, 'user' => $user, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id), false, 'html', true, $email -> theme_id);
+									
+									if ($this -> execute_mail(false, $user, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
+										
+									} else {
+										global $mailerrors;
+										$Db -> model = $Queue -> model;
+										$Db -> save_field('error', esc_sql(trim(strip_tags($mailerrors))), array('id' => $email -> id));
+									}
+								}
 							} else {
 								$Queue -> delete($email -> id);
 							}
@@ -1689,7 +1699,7 @@ if (!class_exists('wpMail')) {
 														$q_queries[] = $Queue -> save($subscriber, false, $subject, $post_content, $attachment, $post_id, $history_id, true, $theme_id);
 													} else {
 														$message = $this -> render_email('send', array('message' => $post_content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $theme_id);
-														$this -> execute_mail($subscriber, $subject, $message, $attachment, $history_id, $eunique);
+														$this -> execute_mail($subscriber, false, $subject, $message, $attachment, $history_id, $eunique);
 													}
 												}
 												
@@ -2515,7 +2525,7 @@ if (!class_exists('wpMail')) {
 										$subject = $_POST['subject'];
 										$message = $this -> render_email('send', array('message' => $_POST['content'], 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id), false, true, true, $_POST['theme_id']);
 										
-										if (!$this -> execute_mail($subscriber, $subject, $message, $history -> attachments, $history_id, false, false)) {
+										if (!$this -> execute_mail($subscriber, false, $subject, $message, $history -> attachments, $history_id, false, false)) {
 											global $mailerrors;
 											$this -> render_error(sprintf(__('Preview cannot be sent to %s, %s.', $this -> plugin_name), $subscriber -> email, $mailerrors));
 										} else {
@@ -2738,7 +2748,7 @@ if (!class_exists('wpMail')) {
 							$Db -> model = $Email -> model;
 							$message = $this -> render_email('send', array('message' => $history -> message, 'subject' => $history -> subject, 'subscriber' => $subscriber, 'history_id' => $history -> id, 'post_id' => $history -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $history -> theme_id);
 							
-							if ($this -> execute_mail($subscriber, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
+							if ($this -> execute_mail($subscriber, false, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
 								$Db -> model = $Autoresponderemail -> model;
 								$Db -> save_field('status', "sent", array('id' => $ae -> id));
 								$addedtoqueue++;
@@ -2825,7 +2835,7 @@ if (!class_exists('wpMail')) {
 											$Db -> model = $Email -> model;
 											$message = $this -> render_email('send', array('message' => $history -> message, 'subject' => $history -> subject, 'subscriber' => $subscriber, 'history_id' => $history -> id, 'post_id' => $history -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $history -> theme_id);
 											
-											if ($this -> execute_mail($subscriber, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
+											if ($this -> execute_mail($subscriber, false, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
 												$Db -> model = $Autoresponderemail -> model;
 												$Db -> save_field('status', "sent", array('id' => $ae -> id));
 												$addedtoqueue++;
@@ -4128,7 +4138,7 @@ if (!class_exists('wpMail')) {
 												$subscriberemails[$email -> history_id][] = $subscriber -> email;
 												$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $email -> theme_id);
 												
-												if ($this -> execute_mail($subscriber, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
+												if ($this -> execute_mail($subscriber, false, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
 													$Queue -> delete($email -> id);
 													$emailssent++;	
 												}
@@ -4185,7 +4195,7 @@ if (!class_exists('wpMail')) {
 							$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
 							$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $email -> theme_id);
 							
-							if ($this -> execute_mail($subscriber, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
+							if ($this -> execute_mail($subscriber, false, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
 								$Queue -> delete($email -> id);
 								$emailssent++;	
 								$msg_type = 'message';
@@ -5273,7 +5283,6 @@ require_once(dirname(__FILE__) . DS . 'models' . DS . 'order.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'field.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'fields_list.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'subscribers_list.php');
-require_once(dirname(__FILE__) . DS . 'models' . DS . 'users_list.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'country.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'autoresponder.php');
 require_once(dirname(__FILE__) . DS . 'models' . DS . 'autoresponders_list.php');

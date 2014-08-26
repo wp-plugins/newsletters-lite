@@ -799,7 +799,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $theme_id, true);
 					
-					if ($this -> execute_mail($subscriber, $subject, $message, $newattachments, $history_id, $eunique)) {
+					if ($this -> execute_mail($subscriber, false, $subject, $message, $newattachments, $history_id, $eunique)) {
 						$success = "Y<|>" . $subscriber -> email . "<|>" . __('Success', $this -> plugin_name);
 					} else {
 						global $mailerrors;
@@ -1112,7 +1112,7 @@ if (!class_exists('wpMailPlugin')) {
 						);
 					}
 					 
-					if ($this -> execute_mail($subscriber, $subject, $message, $attachments, false, false, false)) {
+					if ($this -> execute_mail($subscriber, false, $subject, $message, $attachments, false, false, false)) {
 						$success = true;
 						$errors[] = __('Email was successfully sent, your settings are working!', $this -> plugin_name);	
 					} else {
@@ -1281,7 +1281,7 @@ if (!class_exists('wpMailPlugin')) {
 			echo do_shortcode(stripslashes($content));
 			$output = ob_get_clean();
 			ob_start();
-			echo $this -> process_set_variables($subscriber, $output, $email -> id);
+			echo $this -> process_set_variables($subscriber, $user, $output, $email -> id);
 			$output = ob_get_clean();
 			
 			if ($returnoutput) {
@@ -1796,7 +1796,7 @@ if (!class_exists('wpMailPlugin')) {
 										$Db -> model = $Email -> model;
 										$message = $this -> render_email('send', array('message' => $history -> message, 'subject' => $history -> subject, 'subscriber' => $subscriber, 'history_id' => $history -> id, 'post_id' => $history -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $history -> theme_id);
 										
-										if ($this -> execute_mail($subscriber, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
+										if ($this -> execute_mail($subscriber, false, $history -> subject, $message, $history -> attachments, $history -> id, $eunique)) {								
 											$Db -> model = $Autoresponderemail -> model;
 											$Db -> save_field('status', "sent", array('id' => $ae_id));
 										}		
@@ -2073,7 +2073,7 @@ if (!class_exists('wpMailPlugin')) {
 										$subject = __($this -> get_option('managementloginsubject'));
 										$message = $this -> render_email('management-login', array('subscriberauth' => $subscriberauth), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false);
 										
-										if ($this -> execute_mail($subscriber, $subject, $message, false, false, false, false)) {
+										if ($this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false)) {
 											$errors[] = __('Authentication email has been sent, please check your inbox.', $this -> plugin_name);
 										} else {
 											$errors[] = __('Authentication email could not be sent.', $this -> plugin_name);	
@@ -3470,129 +3470,133 @@ if (!class_exists('wpMailPlugin')) {
 			return $mailinglist_names;
 		}
 		
-		function process_set_variables($subscriber = array(), $message = null, $history_id = null, $eunique = null, $issubject = false) {
+		function process_set_variables($subscriber = null, $user = null, $message = null, $history_id = null, $eunique = null, $issubject = false) {
 			global $wpdb, $Db, $wpmlCountry, $Field, $Mailinglist, $Html, $History, $Theme;
 			
 			if (!empty($issubject) && $issubject == true) {
 				$subject = $message;
 			}
-				
-			if (!empty($message) && !empty($subscriber)) {			
-				$Db -> model = $Mailinglist -> model;
-				$mailinglist_name = $Db -> field('title', array('id' => $subscriber -> mailinglist_id));
-				
-				if (!empty($history_id)) {
-					$Db -> model = $History -> model;
-					$subject = $Db -> field('subject', array('id' => $history_id));
+			
+			if (!empty($message)) {
+				if (!empty($subscriber)) {			
+					$Db -> model = $Mailinglist -> model;
+					$mailinglist_name = $Db -> field('title', array('id' => $subscriber -> mailinglist_id));
 					
-					$Db -> model = $History -> model;
-					$post_id = $Db -> field('post_id', array('id' => $history_id));
-					if (!empty($post_id) && $getpost = get_post($post_id)) {
-						global $post;
-						$post = $getpost;
+					if (!empty($history_id)) {
+						$Db -> model = $History -> model;
+						$subject = $Db -> field('subject', array('id' => $history_id));
+						
+						$Db -> model = $History -> model;
+						$post_id = $Db -> field('post_id', array('id' => $history_id));
+						if (!empty($post_id) && $getpost = get_post($post_id)) {
+							global $post;
+							$post = $getpost;
+						}
+						
+						$themeidquery = "SELECT `theme_id` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
+						$theme_id = $wpdb -> get_var($themeidquery);
+					} else {
+						$themeidquery = "SELECT `id` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `def` = 'Y' LIMIT 1";
+						$theme_id = $wpdb -> get_var($themeidquery);
 					}
 					
-					$themeidquery = "SELECT `theme_id` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
-					$theme_id = $wpdb -> get_var($themeidquery);
-				} else {
-					$themeidquery = "SELECT `id` FROM `" . $wpdb -> prefix . $Theme -> table . "` WHERE `def` = 'Y' LIMIT 1";
-					$theme_id = $wpdb -> get_var($themeidquery);
-				}
-				
-				$newsearch = array(
-					"/\[" . $this -> pre . "email\]/", 
-					'/\[' . $this -> pre . 'field name="email"\]/',
-					"/\[" . $this -> pre . "unsubscribe\]/", 
-					"/\[" . $this -> pre . "unsubscribeurl\]/", 
-					"/\[" . $this -> pre . "unsubscribeall\]/",
-					"/\[" . $this -> pre . "blogname\]/", 
-					"/\[" . $this -> pre . "siteurl\]/", 
-					"/\[" . $this -> pre . "activate\]/", 
-					"/\[" . $this -> pre . "manage\]/", 
-					"/\[" . $this -> pre . "online\]/", 
-					"/\[" . $this -> pre . "track\]/", 
-					"/\[" . $this -> pre . "mailinglist\]/",
-					"/\[" . $this -> pre . "subject\]/",
-					"/\[" . $this -> pre . "historyid\]/",
-					"/\[" . $this -> pre . "unsubscribecomments\]/",
-					"/\[" . $this -> pre . "bouncecount\]/",
-					"/\[" . $this -> pre . "customfields\]/",
-				);
-				
-				$newreplace = array(
-					$subscriber -> email, 
-					$subscriber -> email,
-					$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, false), 
-					$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, false, true),
-					$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, true),
-					get_bloginfo('name'), 
-					home_url(), 
-					$this -> gen_activation_link($subscriber, $theme_id), 
-					$this -> gen_manage_link($subscriber, $theme_id), 
-					$this -> gen_online_link($subscriber, $history_id, false, $theme_id), 
-					$this -> gen_tracking_link($eunique), 
-					$this -> gen_mailinglist_names($subscriber),
-					stripslashes($subject),
-					$history_id,
-					$this -> gen_unsubscribe_comments(),
-					$subscriber -> bouncecount,
-					$this -> output_custom_fields($subscriber),
-				);
-				
-				$fields = $Field -> get_all();
-				
-				if (!empty($fields)) {
-					foreach ($fields as $field) {
-						$search[] = "/\{" . $field -> slug . "\}/";
-						$newsearch[] = '/\[' . $this -> pre . 'field name="' . $field -> slug . '"\]/';
-						
-						switch ($field -> type) {
-							case 'pre_country'		:
-								$Db -> model = $wpmlCountry -> model;
-								$replace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
-								$newreplace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
-								break;
-							case 'pre_date'			:
-								$date = @unserialize($subscriber -> {$field -> slug});
-								if (!empty($date) && is_array($date)) {
-									$replace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
-									$newreplace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
-								}
-								break;
-							case 'pre_gender'		:
-								$replace[] = $Html -> gender($subscriber -> {$field -> slug});
-								$newreplace[] = $Html -> gender($subscriber -> {$field -> slug});
-								break;
-							case 'radio'			:
-							case 'select'			:
-								$value = $subscriber -> {$field -> slug};
-								$fieldoptions = maybe_unserialize($field -> fieldoptions);
-								
-								$replace[] = __($fieldoptions[$value]);
-								$newreplace[] = __($fieldoptions[$value]);
-								break;
-							default					:
-								$value = $subscriber -> {$field -> slug};
-								if (!empty($value)) {
-									if (($varray = @unserialize($value)) !== false) {
-										$subscriber -> {$field -> slug} = '';
-										$newline = (empty($subscriber -> format) || $subscriber -> format == "html") ? "<br/>" : "\r\n";
-										
-										foreach ($varray as $vkey => $vval) {
-											$subscriber -> {$field -> slug} .= '&raquo; ' . __($vval) . $newline;
+					$newsearch = array(
+						"/\[" . $this -> pre . "email\]/", 
+						'/\[' . $this -> pre . 'field name="email"\]/',
+						"/\[" . $this -> pre . "unsubscribe\]/", 
+						"/\[" . $this -> pre . "unsubscribeurl\]/", 
+						"/\[" . $this -> pre . "unsubscribeall\]/",
+						"/\[" . $this -> pre . "blogname\]/", 
+						"/\[" . $this -> pre . "siteurl\]/", 
+						"/\[" . $this -> pre . "activate\]/", 
+						"/\[" . $this -> pre . "manage\]/", 
+						"/\[" . $this -> pre . "online\]/", 
+						"/\[" . $this -> pre . "track\]/", 
+						"/\[" . $this -> pre . "mailinglist\]/",
+						"/\[" . $this -> pre . "subject\]/",
+						"/\[" . $this -> pre . "historyid\]/",
+						"/\[" . $this -> pre . "unsubscribecomments\]/",
+						"/\[" . $this -> pre . "bouncecount\]/",
+						"/\[" . $this -> pre . "customfields\]/",
+					);
+					
+					$newreplace = array(
+						$subscriber -> email, 
+						$subscriber -> email,
+						$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, false), 
+						$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, false, true),
+						$this -> gen_unsubscribe_link($subscriber, $theme_id, $history_id, true),
+						get_bloginfo('name'), 
+						home_url(), 
+						$this -> gen_activation_link($subscriber, $theme_id), 
+						$this -> gen_manage_link($subscriber, $theme_id), 
+						$this -> gen_online_link($subscriber, $history_id, false, $theme_id), 
+						$this -> gen_tracking_link($eunique), 
+						$this -> gen_mailinglist_names($subscriber),
+						stripslashes($subject),
+						$history_id,
+						$this -> gen_unsubscribe_comments(),
+						$subscriber -> bouncecount,
+						$this -> output_custom_fields($subscriber),
+					);
+					
+					$fields = $Field -> get_all();
+					
+					if (!empty($fields)) {
+						foreach ($fields as $field) {
+							$search[] = "/\{" . $field -> slug . "\}/";
+							$newsearch[] = '/\[' . $this -> pre . 'field name="' . $field -> slug . '"\]/';
+							
+							switch ($field -> type) {
+								case 'pre_country'		:
+									$Db -> model = $wpmlCountry -> model;
+									$replace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
+									$newreplace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
+									break;
+								case 'pre_date'			:
+									$date = @unserialize($subscriber -> {$field -> slug});
+									if (!empty($date) && is_array($date)) {
+										$replace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
+										$newreplace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
+									}
+									break;
+								case 'pre_gender'		:
+									$replace[] = $Html -> gender($subscriber -> {$field -> slug});
+									$newreplace[] = $Html -> gender($subscriber -> {$field -> slug});
+									break;
+								case 'radio'			:
+								case 'select'			:
+									$value = $subscriber -> {$field -> slug};
+									$fieldoptions = maybe_unserialize($field -> fieldoptions);
+									
+									$replace[] = __($fieldoptions[$value]);
+									$newreplace[] = __($fieldoptions[$value]);
+									break;
+								default					:
+									$value = $subscriber -> {$field -> slug};
+									if (!empty($value)) {
+										if (($varray = @unserialize($value)) !== false) {
+											$subscriber -> {$field -> slug} = '';
+											$newline = (empty($subscriber -> format) || $subscriber -> format == "html") ? "<br/>" : "\r\n";
+											
+											foreach ($varray as $vkey => $vval) {
+												$subscriber -> {$field -> slug} .= '&raquo; ' . __($vval) . $newline;
+											}
 										}
 									}
-								}
-							
-								$replace[] = $subscriber -> {$field -> slug};
-								$newreplace[] = $subscriber -> {$field -> slug};
-								break;
+								
+									$replace[] = $subscriber -> {$field -> slug};
+									$newreplace[] = $subscriber -> {$field -> slug};
+									break;
+							}
 						}
 					}
-				}
+					
+					$subject = preg_replace($newsearch, $newreplace, stripslashes($subject));
+					$message = preg_replace($newsearch, $newreplace, stripslashes($message));
+				} elseif (!empty($user)) {
 				
-				$subject = preg_replace($newsearch, $newreplace, stripslashes($subject));
-				$message = preg_replace($newsearch, $newreplace, stripslashes($message));
+				}
 			}
 			
 			if (!empty($issubject) && $issubject == true) {	
@@ -3643,7 +3647,7 @@ if (!class_exists('wpMailPlugin')) {
 									$subject = $this -> et_subject('confirm');
 									$fullbody = $this -> et_message('confirm', $subscriber);
 									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-									$this -> execute_mail($subscriber, $subject, $message, false, false, false, false);
+									$this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false);
 								}
 							}
 						}
@@ -3651,7 +3655,7 @@ if (!class_exists('wpMailPlugin')) {
 						$subject = $this -> et_subject('confirm');
 						$fullbody = $this -> et_message('confirm', $subscriber);
 						$message = $this -> render_email(false, array('subscriber' => $subscriber), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-						$this -> execute_mail($subscriber, $subject, $message, false, false, false, false);
+						$this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false);
 					}
 					
 					return true;
@@ -3680,7 +3684,7 @@ if (!class_exists('wpMailPlugin')) {
 					$fullbody = $this -> et_message('subscribe', $subscriber);
 					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
 					
-					$this -> execute_mail($to, $subject, $message, false, false, false, false);
+					$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 					
 					return true;
 				}
@@ -3709,7 +3713,7 @@ if (!class_exists('wpMailPlugin')) {
 					$fullbody = $this -> et_message('unsubscribe', $subscriber);
 					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
 					
-					if ($this -> execute_mail($to, $subject, $message, false, false, false, false)) {
+					if ($this -> execute_mail($to, false, $subject, $message, false, false, false, false)) {
 						return true;
 					}
 				}
@@ -3725,7 +3729,7 @@ if (!class_exists('wpMailPlugin')) {
 					$subject = $this -> et_subject('bounce', $subscriber);
 					$fullbody = $this -> et_message('bounce', $subscriber);
 					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-					$this -> execute_mail($to, $subject, $message, false, false, false, false);
+					$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 					
 					return true;
 				}
@@ -3850,12 +3854,12 @@ if (!class_exists('wpMailPlugin')) {
 			return $messageid;
 		}
 		
-		function execute_mail($subscriber = array(), $subject = null, $message = null, $attachments = null, $history_id = null, $eunique = null, $shortlinks = true) {
+		function execute_mail($subscriber = null, $user = null, $subject = null, $message = null, $attachments = null, $history_id = null, $eunique = null, $shortlinks = true) {
 			global $wpdb, $Db, $Html, $Email, $History, $phpmailer, $Subscriber, $orig_message, $wpml_message, $wpml_textmessage, $fromwpml;
 			$sent = false;
 			$fromwpml = true;
 		
-			if (empty($subscriber)) { $error[] = __("No subscriber specified", $this -> plugin_name); }
+			if (empty($subscriber) && empty($user)) { $error[] = __("No subscriber specified", $this -> plugin_name); }
 			if (empty($subject)) { $error[] = __('No subject specified', $this -> plugin_name); }
 			if (empty($message)) { $error[] = __('No message specified', $this -> plugin_name); }
 			
@@ -3868,18 +3872,20 @@ if (!class_exists('wpMailPlugin')) {
 			$smtpfrom = (empty($history -> from)) ? $this -> get_option('smtpfrom') : $history -> from;
 			$smtpfromname = (empty($history -> fromname)) ? $this -> get_option('smtpfromname') : $history -> fromname;
 			
-			$validationdata = array('subscriber' => $subscriber, 'subject' => $subject, 'message' => $message, 'history_id' => $history_id);
+			$validationdata = array('subscriber' => $subscriber, 'user' => $user, 'subject' => $subject, 'message' => $message, 'history_id' => $history_id);
 			$error = apply_filters($this -> pre . '_sendmail_validation', $error, $validationdata);
 			
 			if (!empty($attachments) && $attachments != false) {
 				$attachments = maybe_unserialize($attachments);
 			}
 			
+			$this -> debug($error);
+			
 			if (empty($error)) {
 				$Db -> model = $Email -> model;			
-				$subject = $this -> process_set_variables($subscriber, stripslashes($subject), $history_id, $eunique, true);			
-				$message = $this -> process_set_variables($subscriber, stripslashes($message), $history_id, $eunique);
-				$wpml_textmessage = $this -> process_set_variables($subscriber, stripslashes($wpml_textmessage), $history_id, $eunique);
+				$subject = $this -> process_set_variables($subscriber, $user, stripslashes($subject), $history_id, $eunique, true);			
+				$message = $this -> process_set_variables($subscriber, $user, stripslashes($message), $history_id, $eunique);
+				$wpml_textmessage = $this -> process_set_variables($subscriber, $user, stripslashes($wpml_textmessage), $history_id, $eunique);
 				
 				if (!empty($subscriber -> id)) {
 					$Subscriber -> inc_sent($subscriber -> id);
@@ -3944,7 +3950,13 @@ if (!class_exists('wpMailPlugin')) {
 					$phpmailer -> CharSet = get_option('blog_charset');
 					$phpmailer -> SetFrom($smtpfrom, $smtpfromname);
 					$phpmailer -> Sender = $this -> get_option('bounceemail');
-					$to = $subscriber -> email;
+					
+					if (!empty($subscriber)) {
+						$to = $subscriber -> email;
+					} elseif (!empty($user)) {
+						$to = $user -> user_email;
+					}
+					
 					$phpmailer -> AddAddress($to);
 					$phpmailer -> AddReplyTo($smtpfrom, $smtpfromname);
 	
@@ -3983,7 +3995,12 @@ if (!class_exists('wpMailPlugin')) {
 						return false;	
 					}
 				} else {
-					$to = $subscriber -> email;					
+					if (!empty($subscriber)) {
+						$to = $subscriber -> email;					
+					} elseif (!empty($user)) {
+						$to = $user -> user_email;	
+					}
+					
 					$subject = stripslashes($subject);
 					$message = stripslashes($message);					
 					$headers = '';
@@ -4015,9 +4032,10 @@ if (!class_exists('wpMailPlugin')) {
 						
 					$e_data = array(
 						'eunique'				=>	$eunique,
-						'subscriber_id'			=>	$subscriber -> id,
-						'mailinglist_id'		=>	$subscriber -> mailinglist_id,
-						'mailinglists'			=>	maybe_serialize($Subscriber -> mailinglists($subscriber -> id, $subscriber -> mailinglists, false, "Y")),
+						'subscriber_id'			=>	(!empty($subscriber) ? $subscriber -> id : 0),
+						'user_id'				=>	(!empty($user) ? $user -> ID : 0),
+						'mailinglist_id'		=>	(!empty($subscriber -> mailinglist_id) ? $subscriber -> mailinglist_id : ''),
+						'mailinglists'			=>	(!empty($subscriber) ? maybe_serialize($Subscriber -> mailinglists($subscriber -> id, $subscriber -> mailinglists, false, "Y")) : ''),
 						'history_id'			=>	$history_id,
 						'read'					=>	"N",
 						'status'				=>	"sent",
@@ -5163,7 +5181,7 @@ if (!class_exists('wpMailPlugin')) {
 				$subject = __($this -> get_option('etsubject_' . $type));
 			}
 		
-			$subject = $this -> process_set_variables($subscriber, $subject, false, false, true);
+			$subject = $this -> process_set_variables($subscriber, $user, $subject, false, false, true);
 			return $subject;
 		}
 		
@@ -5190,7 +5208,7 @@ if (!class_exists('wpMailPlugin')) {
 					break;
 				}
 				
-				$message = $this -> process_set_variables($subscriber, $message, false, false, true);
+				$message = $this -> process_set_variables($subscriber, $user, $message, false, false, true);
 			}
 		
 			return $message;
