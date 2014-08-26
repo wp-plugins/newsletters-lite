@@ -5042,7 +5042,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function stripext($filename = null, $return = 'ext') {
 			if (!empty($filename)) { 
-				$extArray = preg_split("[/\\.]", $filename); 
+				$extArray = preg_split("/[/\\.]/i", $filename); 
 				
 				if ($return == 'ext') {
 					$p = count($extArray) - 1; 

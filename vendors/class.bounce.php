@@ -72,9 +72,9 @@ class BounceHandler {
     
     /**** INSTANTIATION *******************************************************/
     public function __construct(){
-        $this->output[0]['action']  = "";
-        $this->output[0]['status']  = "";
-        $this->output[0]['recipient'] = "";
+        $this -> output[0]['action']  = "";
+        $this -> output[0]['status']  = "";
+        $this -> output[0]['recipient'] = "";
     }
     
 

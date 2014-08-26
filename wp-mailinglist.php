@@ -1826,7 +1826,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('emailsdiv', __('Total Emails', $this -> plugin_name) . $Html -> help(__('The total number of emails sent to date since the plugin was installed until now.', $this -> plugin_name)), array($Metabox, 'welcome_emails'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('bouncesdiv', __('Bounced Emails', $this -> plugin_name) . $Html -> help(__('The total number of bounces to date.', $this -> plugin_name)), array($Metabox, 'welcome_bounces'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('statsdiv', __('Statistics Overview', $this -> plugin_name) . $Html -> help(__('This chart shows an overview of subscribers, emails sent, unsubscribes, bounces, etc in a visual manner.', $this -> plugin_name)), array($Metabox, 'welcome_stats'), "newsletters_page_" . $this -> sections -> welcome, 'normal', 'core');
-			add_meta_box('historydiv', __('Recent Emails', $this -> plugin_name) . $Html -> help(__('This is a quick overview of your 10 latest newsletters.', $this -> plugin_name)), array($Metabox, 'welcome_history'), "newsletters_page_" . $this -> sections -> welcome, 'normal', 'core');
+			add_meta_box('historydiv', __('Recent Emails', $this -> plugin_name) . $Html -> help(__('This is a quick overview of your 5 latest newsletters.', $this -> plugin_name)), array($Metabox, 'welcome_history'), "newsletters_page_" . $this -> sections -> welcome, 'normal', 'core');
 			
 			do_action($this -> pre . '_metaboxes_overview', "newsletters_page_" . $this -> sections -> welcome, "normal", $post);
 			
