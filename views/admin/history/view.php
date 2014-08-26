@@ -6,7 +6,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 
 ?>
 
-<div class="wrap <?php echo $this -> pre; ?>">
+<div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Sent/Draft:', $this -> plugin_name); ?> <?php echo $history -> subject; ?> <a href="?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history -> id; ?>" class="add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a></h2>
 	
 	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Sent &amp; Drafts', $this -> plugin_name), $this -> url); ?></div>
@@ -56,6 +56,8 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
                 	<?php $Db -> model = $Theme -> model; ?>
                     <?php if (!empty($history -> theme_id) && $theme = $Db -> find(array('id' => $history -> theme_id))) : ?>
                     	<a href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Theme Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
+                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
+                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Theme: %s', $this -> plugin_name), __($theme -> title)); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
                     <?php else : ?>
                     	<?php _e('None', $this -> plugin_name); ?>
                     <?php endif; ?>
@@ -78,11 +80,30 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					<?php global $wpdb; $Db -> model = $Email -> model; ?>
 					<?php $etotal = $Db -> count(array('history_id' => $history -> id)); ?>
 					<?php $eread = $Db -> count(array('read' => "Y", 'history_id' => $history -> id)); ?>
-					<?php $ebounced = $wpdb -> get_var("SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'"); ?>
+					<?php 
+					
+					$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'";
+					$query_hash = md5($query);
+					if ($oc_ebounced = wp_cache_get($query_hash, 'newsletters')) {
+						$ebounced = $oc_ebounced;
+					} else {
+						$ebounced = $wpdb -> get_var($query); 
+						wp_cache_set($query_hash, $ebounced, 'newsletters', 0);
+					}
+					
+					?>
 					<?php $ebouncedperc = (!empty($etotal)) ? number_format((($ebounced/$etotal) * 100), 2, '.', '') : 0; ?>
 					<?php 
 					
-					$eunsubscribed = $wpdb -> get_var("SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'");
+					$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'";
+					$query_hash = md5($query);
+					if ($oc_eunsubscribed = wp_cache_get($query_hash, 'newsletters')) {
+						$eunsubscribed = $oc_eunsubscribed;
+					} else {
+						$eunsubscribed = $wpdb -> get_var($query);
+						wp_cache_set($query_hash, $eunsubscribed, 'newsletters', 0);
+					}
+					
 					$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;
 					$clicks = $this -> Click -> count(array('history_id' => $history -> id));
 					

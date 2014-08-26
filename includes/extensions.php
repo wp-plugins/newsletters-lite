@@ -45,7 +45,23 @@ $extensions = array(
 			'plugin_name'		=>	'newsletters-cf7',
 			'plugin_file'		=>	'cf7.php',
 		),
-		'wpemember'				=>	array(
+		'dap'				=>	array(
+			'name'				=>	__('Digital Access Pass', $this -> plugin_name),
+			'link'				=>	"http://tribulant.com/extensions/view/43/digital-access-pass",
+			'description'		=>	sprintf(__("Capture email/newsletters subscribes from %sDigital Access Pass%s.", $this -> plugin_name), '<a href="http://digitalaccesspass.com" target="_blank">', '</a>'),
+			'slug'				=>	'dap',
+			'plugin_name'		=>	'newsletters-dap',
+			'plugin_file'		=>	'dap.php',
+		),
+		'newsletters_ga'	=>	array(
+			'name'				=>	__('Google Analytics', $this -> plugin_name),
+			'link'				=>	"http://tribulant.com/extensions/",
+			'description'		=>	sprintf(__("Google Analytics link tracking for the %s.", $this -> plugin_name), '<a href="http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin" target="_blank">' . __('Newsletter plugin', $this -> plugin_name) . '</a>'),
+			'slug'				=>	'newsletters_ga',
+			'plugin_name'		=>	'newsletters-ga',
+			'plugin_file'		=>	'ga.php',
+		),
+		'wpemember'			=>	array(
 			'name'				=>	__('WP eMember Subscribers', $this -> plugin_name),
 			'link'				=>	"http://tribulant.com/extensions/view/31/wp-emember-subscribers",
 			'description'		=>	__('Capture subscribers from WP eMember into the Newsletter plugin.', $this -> plugin_name),
@@ -53,7 +69,7 @@ $extensions = array(
 			'plugin_name'		=>	'newsletters-wpemember',
 			'plugin_file'		=>	'wpemember.php',
 		),
-		's2member'				=>	array(
+		's2member'			=>	array(
 			'name'				=>	__('s2Member Subscribers', $this -> plugin_name),
 			'link'				=>	"http://tribulant.com/extensions/view/32/s2member-subscribers",
 			'description'		=>	__('Capture subscribers from s2Member into the Newsletter plugin.', $this -> plugin_name),
@@ -61,7 +77,7 @@ $extensions = array(
 			'plugin_name'		=>	'newsletters-s2member',
 			'plugin_file'		=>	's2member.php',
 		),
-		'control'				=>	array(
+		'control'			=>	array(
 			'name'				=>	__('Total Control', $this -> plugin_name),
 			'link'				=>	"http://tribulant.com/extensions/view/36/total-control",
 			'description'		=>	__('Total control over your Newsletter plugin for WordPress.', $this -> plugin_name),
@@ -69,7 +85,7 @@ $extensions = array(
 			'plugin_name'		=>	'newsletters-control',
 			'plugin_file'		=>	'control.php',
 		),
-		'woocommerce'	=>	array(
+		'newsletters_woocommerce'	=>	array(
 			'name'			=>	__('WooCommerce Subscribers', $this -> plugin_name),
 			'link'			=>	"http://tribulant.com/extensions/view/42/woocommerce-subscribers",
 			'description'	=>	sprintf(__("Capture email subscribers from the WooCommerce plugin to the %sNewsletter plugin%s.", $this -> plugin_name), '<a href="http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin" target="_blank">', '</a>'),

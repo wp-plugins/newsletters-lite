@@ -191,9 +191,27 @@
 						
 						global $wpdb;
 						$tracking = (!empty($etotal)) ? ($eread/$etotal) * 100 : 0;
-						$ebounced = $wpdb -> get_var("SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $email -> id . "'");
+						
+						$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $email -> id . "'";
+						$query_hash = md5($query);
+						if ($oc_ebounced = wp_cache_get($query_hash, 'newsletters')) {
+							$ebounced = $oc_ebounced;
+						} else {
+							$ebounced = $wpdb -> get_var($query);
+							wp_cache_set($query_hash, $ebounced, 'newsletters', 0);
+						}
+						
 						$ebouncedperc = (!empty($etotal)) ? (($ebounced / $etotal) * 100) : 0; 
-						$eunsubscribed = $wpdb -> get_var("SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $email -> id . "'");
+						
+						$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $email -> id . "'";
+						$query_hash = md5($query);
+						if ($oc_eunsubscribed = wp_cache_get($query_hash, 'newsletters')) {
+							$eunsubscribed = $oc_eunsubscribed;
+						} else {
+							$eunsubscribed = $wpdb -> get_var($query);
+							wp_cache_set($query_hash, $eunsubscribed, 'newsletters', 0);
+						}
+						
 						$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;
 						$clicks = $this -> Click -> count(array('history_id' => $email -> id));
 						

@@ -447,7 +447,17 @@ class wpmlHistory extends wpMailPlugin {
 	function count() {
 		global $wpdb;
 		
-		if ($count = $wpdb -> get_var("SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table_name . "`")) {
+		$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table_name . "`";
+		
+		$query_hash = md5($query);
+		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+			$count = $oc_count;
+		} else {
+			$count = $wpdb -> get_var($query);
+			wp_cache_set($query_hash, $count, 'newsletters', 0);
+		}
+		
+		if (!empty($count)) {
 			return $count;
 		} else {
 			return 0;
@@ -618,7 +628,17 @@ class wpmlHistory extends wpMailPlugin {
 		global $wpdb;
 		
 		if (!empty($history_id)) {
-			if ($history = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $history_id . "' LIMIT 1")) {
+			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
+			
+			$query_hash = md5($query);
+			if ($oc_history = wp_cache_get($query_hash, 'newsletters')) {
+				$history = $oc_history;
+			} else {
+				$history = $wpdb -> get_row($query);
+				wp_cache_set($query_hash, $history, 'newsletters', 0);
+			}
+		
+			if (!empty($history)) {
 				$history = $this -> init_class($this -> model, $history);
 				
 				if ($assign == true) {
@@ -642,7 +662,17 @@ class wpmlHistory extends wpMailPlugin {
 	function get_first($assign = true) {
 		global $wpdb;
 		
-		if ($email = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` ASC LIMIT 1")) {
+		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` ASC LIMIT 1";
+		
+		$query_hash = md5($query);
+		if ($oc_email = wp_cache_get($query_hash, 'newsletters')) {
+			$email = $oc_email;
+		} else {
+			$email = $wpdb -> get_row($query);
+			wp_cache_set($query_hash, $email, 'newsletters', 0);
+		}
+		
+		if (!empty($email)) {
 			if (!empty($email)) {
 				$history = $this -> init_class($this -> model, $email);
 				
@@ -660,17 +690,27 @@ class wpmlHistory extends wpMailPlugin {
 	function get_latest($assign = true) {
 		global $wpdb;
 		
-		if ($email = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` DESC LIMIT 1")) {
-			if (!empty($email)) {
-				$history = $this -> init_class($this -> model, $email);
-				
-				if ($assign == true) {
-					$this -> data[$this -> model] = $history;
-				}
-				
-				return $history;
-			}
+		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` DESC LIMIT 1";
+		
+		$query_hash = md5($query);
+		if ($oc_email = wp_cache_get($query_hash, 'newsletters')) {
+			$email = $oc_email;
+		} else {
+			$email = $wpdb -> get_row($query);
+			wp_cache_set($query_hash, $email, 'newsletters', 0);
 		}
+		
+		if (!empty($email)) {
+			$history = $this -> init_class($this -> model, $email);
+			
+			if ($assign == true) {
+				$this -> data[$this -> model] = $history;
+			}
+			
+			return $history;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -679,7 +719,7 @@ class wpmlHistory extends wpMailPlugin {
 	 * @return $data ARRAY an array with history Objects.
 	 *
 	 */
-	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-history', $perpage = 15, $order = array('modified', "DESC")) {
+	function get_all_paginated($conditions = array(), $searchterm = null, $sub = 'newsletters-history', $perpage = 15, $order = array('created', "DESC")) {
 		global $wpdb;
 		
 		$paginate = new wpMailPaginate($wpdb -> prefix . "" . $this -> table_name . "", "*", $sub, $sub);

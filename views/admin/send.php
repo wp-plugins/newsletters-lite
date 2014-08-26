@@ -235,7 +235,10 @@ jQuery(document).ready(function() {
     	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
     		previewrunner();
     	<?php endif; ?>
-    	spamscorerunner();
+    	<?php $createspamscore = $this -> get_option('createspamscore'); ?>
+    	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>
+    		spamscorerunner();
+    	<?php endif; ?>
     
         window.onbeforeunload = function () {
             if (warnMessage != null) return warnMessage;

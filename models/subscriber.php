@@ -74,7 +74,16 @@ class wpmlSubscriber extends wpMailPlugin {
 							if ($subscriberslists = $Db -> find_all(array('subscriber_id' => $val))) {
 								foreach ($subscriberslists as $sl) {
 									$listquery = "SELECT * FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE id = '" . $sl -> list_id . "' LIMIT 1";
-									$this -> Mailinglist[] = $wpdb -> get_row($listquery);
+									
+									$query_hash = md5($listquery);
+									if ($oc_list = wp_cache_get($query_hash, 'newsletters')) {
+										$list = $oc_list;
+									} else {
+										$list = $wpdb -> get_row($listquery);
+										wp_cache_set($query_hash, $list, 'newsletters', 0);
+									}
+									
+									$this -> Mailinglist[] = $list;
 									$this -> subscriptions[] = $sl;
 								}
 							}
@@ -182,7 +191,15 @@ class wpmlSubscriber extends wpMailPlugin {
 			}
 		}
 		
-		if ($count = $wpdb -> get_var($query)) {
+		$query_hash = md5($query);
+		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+			$count = $oc_count;
+		} else {
+			$count = $wpdb -> get_var($query);
+			wp_cache_set($query_hash, $count, 'newsletters', 0);
+		}
+		
+		if (!empty($count)) {
 			return $count;
 		}
 		
@@ -200,8 +217,18 @@ class wpmlSubscriber extends wpMailPlugin {
 	
 		if (!empty($list)) {
 			$where = ($list == "all") ? '' : " WHERE `list_id` = '" . $list . "'";
+			
+			$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table . "`" . $where . "";
+			
+			$query_hash = md5($query);
+			if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+				$count = $oc_count;
+			} else {
+				$count = $wpdb -> get_var($query);
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
+			}
 		
-			if ($count = $wpdb -> get_var("SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table . "`" . $where . "")) {
+			if (!empty($count)) {
 				return $count;
 			}
 		}
@@ -220,8 +247,16 @@ class wpmlSubscriber extends wpMailPlugin {
 		
 		if (!empty($date)) {
 			$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE DATE_FORMAT(`created`, '%Y-%m-%d') = '" . $date . "'";
+			
+			$query_hash = md5($query);
+			if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+				$count = $oc_count;
+			} else {
+				$count = $wpdb -> get_var($query);
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
+			}
 		
-			if ($count = $wpdb -> get_var($query)) {
+			if (!empty($count)) {
 				return $count;
 			}
 		}
@@ -734,7 +769,15 @@ class wpmlSubscriber extends wpMailPlugin {
 				/* Custom Fields */	
 				$usedfields = array();
 				$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
-				if ($fields = $wpdb -> get_results($fieldsquery)) {				
+				$query_hash = md5($fieldsquery);
+				if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+					$fields = $oc_fields;
+				} else {
+					$fields = $wpdb -> get_results($fieldsquery);
+					wp_cache_set($query_hash, $fields, 'newsletters', 0);
+				}
+				
+				if (!empty($fields)) {				
 					foreach ($fields as $field) {
 						if ((empty($usedfields)) || (!empty($usedfields) && !in_array($field -> slug, $usedfields))) {						
 							if (!empty($data[$field -> slug])) {							
@@ -820,7 +863,15 @@ class wpmlSubscriber extends wpMailPlugin {
 				/* Custom Fields */
 				$usedfields = array();				
 				$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
-				if ($fields = $wpdb -> get_results($fieldsquery)) {
+				$query_hash = md5($fieldsquery);
+				if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+					$fields = $oc_fields;
+				} else {
+					$fields = $wpdb -> get_results($fieldsquery);
+					wp_cache_set($query_hash, $fields, 'newsletters', 0);
+				}
+				
+				if (!empty($fields)) {
 					foreach ($fields as $field) {
 						if (empty($usedfields) || (!empty($usedfields) && !in_array($field -> slug, $usedfields))) {
 							if (!empty($data[$field -> slug])) {								

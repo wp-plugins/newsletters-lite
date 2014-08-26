@@ -3,6 +3,7 @@
 <?php
 
 $createpreview = $this -> get_option('createpreview');
+$createspamscore = $this -> get_option('createspamscore');
 
 ?>
 
@@ -24,6 +25,14 @@ $createpreview = $this -> get_option('createpreview');
 				<label><input <?php echo (!empty($createpreview) && $createpreview == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="createpreview" value="Y" id="createpreview_Y" /> <?php _e('On', $this -> plugin_name); ?></label>
 				<label><input <?php echo (!empty($createpreview) && $createpreview == "N") ? 'checked="checked"' : ''; ?> type="radio" name="createpreview" value="N" id="createpreview_N" /> <?php _e('Off', $this -> plugin_name); ?></label>
 				<span class="howto"><?php _e('Turn on/off the preview feature while creating a newsletter.', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<th><label for="createspamscore_Y"><?php _e('Spam Score', $this -> plugin_name); ?></label></th>
+			<td>
+				<label><input <?php echo (!empty($createspamscore) && $createspamscore == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="createspamscore" value="Y" id="createspamscore_Y" /> <?php _e('On', $this -> plugin_name); ?></label>
+				<label><input <?php echo (!empty($createspamscore) && $createspamscore == "N") ? 'checked="checked"' : ''; ?> type="radio" name="createspamscore" value="N" id="createspamscore_N" /> <?php _e('Off', $this -> plugin_name); ?></label>
+				<span class="howto"><?php _e('Turn on/off the spam score utility while creating a newsletter', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
     	<tr>

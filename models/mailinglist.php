@@ -82,7 +82,9 @@ class wpmlMailinglist extends wpMailPlugin {
 		if ($this -> get_option('defaultlistcreated') == "N") {
 			$list_data = array('title' => __('Default List', $this -> plugin_name), 'privatelist' => "N");
 			
-			if (!$wpdb -> get_var("SELECT `id` FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `title` = 'Default List'")) {
+			$query = "SELECT `id` FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `title` = 'Default List'";
+			
+			if (!$wpdb -> get_var($query)) {
 				if ($this -> save($list_data)) {
 					$this -> update_option('defaultlistcreated', "Y");
 				}
@@ -134,7 +136,15 @@ class wpmlMailinglist extends wpMailPlugin {
 			}
 		}
 		
-		if ($count = $wpdb -> get_var($query)) {
+		$query_hash = md5($query);
+		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+			$count = $oc_count;
+		} else {
+			$count = $wpdb -> get_var($query);
+			wp_cache_set($query_hash, $count, 'newsletters', 0);
+		}
+		
+		if (!empty($count)) {
 			return $count;
 		}
 		
@@ -145,7 +155,17 @@ class wpmlMailinglist extends wpMailPlugin {
 		global $wpdb;
 		
 		if (!empty($mailinglist_id)) {
-			if ($list = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $mailinglist_id . "' LIMIT 1")) {
+			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $mailinglist_id . "' LIMIT 1";
+			
+			$query_hash = md5($query);
+			if ($oc_list = wp_cache_get($query_hash, 'newsletters')) {
+				$list = $oc_list;
+			} else {
+				$list = $wpdb -> get_row($query);
+				wp_cache_set($query_hash, $list, 'newsletters', 0);
+			}
+		
+			if (!empty($list)) {
 				$data = $this -> init_class($this -> model, $list);
 				
 				if ($assign == true) {
@@ -192,19 +212,25 @@ class wpmlMailinglist extends wpMailPlugin {
 		}
 		
         $query = "SELECT `id`, `title`, `paid`, `price`, `interval` FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` " . $privatecond . " ORDER BY `title` ASC";
+        
+        $query_hash = md5($query);
+        if ($oc_lists = wp_cache_get($query_hash, 'newsletters')) {
+	        $lists = $oc_lists;
+        } else {
+	        $lists = $wpdb -> get_results($query);
+	        wp_cache_set($query_hash, $lists, 'newsletters', 0);
+        }
 
-		if ($lists = $wpdb -> get_results($query)) {
-			if (!empty($lists)) {			
-				$listselect = array();
-				$this -> intervals = $this -> get_option('intervals');
-				
-				foreach ($lists as $list) {
-					$paid = ($list -> paid == "Y") ? ' <span class="wpmlsmall">(' . __('Paid', $this -> name) . ': ' . $Html -> currency() . '' . number_format($list -> price, 2, '.', '') . ' ' . $this -> intervals[$list -> interval] . ')</span>' : '';
-					$listselect[$list -> id] = $list -> title . $paid;
-				}
-				
-				return apply_filters($this -> pre . '_mailinglists_select', $listselect);
+		if (!empty($lists)) {			
+			$listselect = array();
+			$this -> intervals = $this -> get_option('intervals');
+			
+			foreach ($lists as $list) {
+				$paid = ($list -> paid == "Y") ? ' <span class="wpmlsmall">(' . __('Paid', $this -> name) . ': ' . $Html -> currency() . '' . number_format($list -> price, 2, '.', '') . ' ' . $this -> intervals[$list -> interval] . ')</span>' : '';
+				$listselect[$list -> id] = $list -> title . $paid;
 			}
+			
+			return apply_filters($this -> pre . '_mailinglists_select', $listselect);
 		}
 		
 		return false;
@@ -221,7 +247,17 @@ class wpmlMailinglist extends wpMailPlugin {
 		global $wpdb;
 	
 		if (!empty($list_id)) {
-			if ($list = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $list_id . "'")) {
+			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $list_id . "'";
+			
+			$query_hash = md5($query);
+			if ($oc_list = wp_cache_get($query_hash, 'newsletters')) {
+				$list = $oc_list;
+			} else {
+				$list = $wpdb -> get_row($query);
+				wp_cache_set($query_hash, $list, 'newsletters', 0);
+			}
+		
+			if (!empty($list)) {
 				new Mailinglist($list);
 				return true;
 			}
@@ -234,7 +270,17 @@ class wpmlMailinglist extends wpMailPlugin {
 		global $wpdb;
 	
 		if (!empty($id)) {
-			if ($title = $wpdb -> get_var("SELECT `title` FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $id . "' LIMIT 1")) {
+			$query = "SELECT `title` FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $id . "' LIMIT 1";
+			
+			$query_hash = md5($query);
+			if ($oc_title = wp_cache_get($query_hash, 'newsletters')) {
+				$title = $oc_title;
+			} else {
+				$title = $wpdb -> get_var($query);
+				wp_cache_set($query_hash, $title, 'newsletters', 0);
+			}
+		
+			if (!empty($title)) {
 				return __($title);
 			}
 		}
@@ -247,16 +293,24 @@ class wpmlMailinglist extends wpMailPlugin {
 		
 		$privatecond = ($privatelists == true) ? "" : "WHERE `privatelist` = 'N'";
 		
-		if ($lists = $wpdb -> get_results("SELECT " . $fields . " FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` " . $privatecond . " ORDER BY `title` ASC")) {
-			if (!empty($lists)) {
-				$data = array();
-			
-				foreach ($lists as $list) {
-					$data[] = $this -> init_class('wpmlMailinglist', $list);
-				}
-				
-				return $data;
+		$query = "SELECT " . $fields . " FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` " . $privatecond . " ORDER BY `title` ASC";
+		
+		$query_hash = md5($query);
+		if ($oc_lists = wp_cache_get($query_hash, 'newsletters')) {
+			$lists = $oc_lists;
+		} else {
+			$lists = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $lists, 'newsletters', 0);			
+		}
+		
+		if (!empty($lists)) {
+			$data = array();
+		
+			foreach ($lists as $list) {
+				$data[] = $this -> init_class('wpmlMailinglist', $list);
 			}
+			
+			return $data;
 		}
 		
 		return false;

@@ -504,7 +504,18 @@ global $q_config, $wpdb, $Mailinglist, $Template;
 								<td nowrap="nowrap" valign="top"><label for="template"><?php _e('Snippet:', $wpMail -> plugin_name); ?></label></td>
 								<td>
 									<?php $templatesquery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " ORDER BY title ASC"; ?>
-									<?php if ($templates = $wpdb -> get_results($templatesquery)) : ?>
+									<?php
+									
+									$query_hash = md5($templatesquery);
+									if ($oc_templates = wp_cache_get($query_hash, 'newsletters')) {
+										$templates = $oc_templates;
+									} else {
+										$templates = $wpdb -> get_results($templatesquery);
+										wp_cache_set($query_hash, $templates, 'newsletters', 0);
+									}
+									
+									?>
+									<?php if (!empty($templates)) : ?>
 										<select name="template" id="template">
 											<option value=""><?php _e('- Select Template -', $wpMail -> plugin_name); ?></option>
 											<?php foreach ($templates as $template) : ?>

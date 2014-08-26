@@ -62,16 +62,22 @@ class wpmlFieldsList extends wpMailPlugin {
 		$query .= " ORDER BY `" . $ofield . "` " . $odir . "";
 		$query .= (empty($limit)) ? '' : " LIMIT " . $limit . "";
 		
-		if ($fieldslists = $wpdb -> get_results($query)) {
-			if (!empty($fieldslists)) {
-				$data = array();
-				
-				foreach ($fieldslists as $fl) {
-					$data[] = $this -> init_class($this -> model, $fl);
-				}
-				
-				return $data;
+		$query_hash = md5($query);
+		if ($oc_fieldslists = wp_cache_get($query_hash, 'newsletters')) {
+			$fieldslists = $oc_fieldslists;
+		} else {
+			$fieldslists = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $fieldslists, 'newsletters', 0);
+		}
+		
+		if (!empty($fieldslists)) {
+			$data = array();
+			
+			foreach ($fieldslists as $fl) {
+				$data[] = $this -> init_class($this -> model, $fl);
 			}
+			
+			return $data;
 		}
 		
 		return false;
@@ -149,17 +155,23 @@ class wpmlFieldsList extends wpMailPlugin {
 		
 		if (!empty($field_id)) {		
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `field_id` = '" . $field_id . "'";
+			
+			$query_hash = md5($query);
+			if ($oc_fieldslists = wp_cache_get($query_hash, 'newsletters')) {
+				$fieldslists = $oc_fieldslists;
+			} else {
+				$fieldslists = $wpdb -> get_results($query);
+				wp_cache_set($query_hash, $fieldslists, 'newsletter', 0);
+			}
 		
-			if ($fieldslists = $wpdb -> get_results($query)) {			
-				if (!empty($fieldslists)) {
-					$data = array();
-				
-					foreach ($fieldslists as $fl) {
-						$data[] = $fl -> list_id;
-					}
-					
-					return $data;
+			if (!empty($fieldslists)) {
+				$data = array();
+			
+				foreach ($fieldslists as $fl) {
+					$data[] = $fl -> list_id;
 				}
+				
+				return $data;
 			}
 		}
 		
@@ -247,16 +259,24 @@ class wpmlFieldsList extends wpMailPlugin {
 		global $wpdb;
 		
 		if (!empty($field_id)) {
-			if ($fieldslists = $wpdb -> get_results("SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `field_id` = '" . $field_id . "'")) {
-				if (!empty($fieldslists)) {
-					$data = array();
-					
-					foreach ($fieldslists as $fl) {
-						$data[] = $this -> init_class('wpmlFieldsList', $fl);
-					}
-					
-					return $data;
+			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `field_id` = '" . $field_id . "'";
+			
+			$query_hash = md5($query);
+			if ($oc_fieldslists = wp_cache_get($query_hash, 'newsletters')) {
+				$fieldslists = $oc_fieldslists;
+			} else {
+				$fieldslists = $wpdb -> get_results($query);
+				wp_cache_set($query_hash, $fieldslists, 'newsletters', 0);
+			}
+		
+			if (!empty($fieldslists)) {
+				$data = array();
+				
+				foreach ($fieldslists as $fl) {
+					$data[] = $this -> init_class('wpmlFieldsList', $fl);
 				}
+				
+				return $data;
 			}
 		}
 		
@@ -286,7 +306,7 @@ class wpmlFieldsList extends wpMailPlugin {
 		return false;
 	}
 	
-	function delete_by_list($list_id = '') {
+	function delete_by_list($list_id = null) {
 		global $wpdb, $Mailinglist;
 		
 		if (!empty($list_id)) {

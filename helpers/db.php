@@ -470,10 +470,10 @@ class wpmlDbHelper extends wpMailPlugin {
 			
 			if (!empty($query)) {
 				$count = $wpdb -> get_var($query);
+				wp_cache_set($query_hash, $count, 'newsletters', 0);
 			}
 		}
 		
-		wp_cache_set($query_hash, $count, 'newsletters', 0);
 		return $count;
 	}
 	

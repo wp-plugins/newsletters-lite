@@ -89,7 +89,17 @@ class wpmlTemplate extends wpMailPlugin {
 		global $wpdb;
 		
 		if (!empty($template_id)) {
-			if ($template = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` WHERE `id` = '" . $template_id . "'")) {
+			$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` WHERE `id` = '" . $template_id . "'";
+			
+			$query_hash = md5($query);
+			if ($oc_template = wp_cache_get($query_hash, 'newsletters')) {
+				$template = $oc_template;
+			} else {
+				$template = $wpdb -> get_row($query);
+				wp_cache_set($query_hash, $template, 'newsletters', 0);
+			}
+		
+			if (!empty($template)) {
 				$template = $this -> init_class($this -> model, $template);
 				
 				if ($assign == true) {
@@ -106,16 +116,24 @@ class wpmlTemplate extends wpMailPlugin {
 	function get_all() {
 		global $wpdb;
 		
-		if ($templates = $wpdb -> get_results("SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` ORDER BY `title` ASC")) {
-			if (!empty($templates)) {
-				$data = array();
-			
-				foreach ($templates as $template) {
-					$data[] = $this -> init_class('wpmlTemplate', $template);
-				}
-				
-				return $data;
+		$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` ORDER BY `title` ASC";
+		
+		$query_hash = md5($query);
+		if ($oc_templates = wp_cache_get($query_hash, 'newsletters')) {
+			$templates = $oc_templates;
+		} else {
+			$templates = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $templates, 'newsletters', 0);
+		}
+		
+		if (!empty($templates)) {
+			$data = array();
+		
+			foreach ($templates as $template) {
+				$data[] = $this -> init_class('wpmlTemplate', $template);
 			}
+			
+			return $data;
 		}
 		
 		return false;

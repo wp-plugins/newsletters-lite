@@ -33,7 +33,13 @@
         		
         		global $wpdb;
         		$countquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Latestpost -> table . "";
-        		$count = $wpdb -> get_var($countquery);
+        		$query_hash = md5($countquery);
+        		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+	        		$count = $oc_count;
+        		} else {
+	        		$count = $wpdb -> get_var($countquery);
+	        		wp_cache_set($query_hash, $count, 'newsletters', 0);
+        		}
         		
         		?>
         		<span class="howto"><?php echo sprintf(__('%s posts already logged as sent with the Latest Posts Subscription.', $this -> plugin_name), $count); ?></span>

@@ -77,9 +77,17 @@
 		global $wpdb;
 		$fieldsquery = "SELECT * FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 		
+		$query_hash = md5($fieldsquery);
+		if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+			$fields = $oc_fields;
+		} else {
+			$fields = $wpdb -> get_results($fieldsquery);
+			wp_cache_set($query_hash, $fields, 'newsletters', 0);
+		}
+		
 		?>
 		
-        <?php if ($fields = $wpdb -> get_results($fieldsquery)) : ?>
+        <?php if (!empty($fields)) : ?>
 			<br/>
 			<h3><?php _e('Custom Fields', $this -> plugin_name); ?> (<?php echo $Html -> link(__('show/hide', $this -> plugin_name), '#void', array('onclick' => "jQuery('#customfieldsdiv').toggle();")); ?>)
 			<?php echo $Html -> help(__('Click "show/hide" to display the available custom fields and fill in values for the custom fields for this subscriber.', $this -> plugin_name)); ?></h3>

@@ -80,7 +80,18 @@ $count_users = count_users();
 	    <?php if (apply_filters('newsletters_admin_createnewsletter_fieldsconditionssettings', true)) : ?>
 	        <?php $Db -> model = $Field -> model; ?>
 	        <?php $fieldsquery = "SELECT `id`, `title`, `type`, `validation`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `type` = 'text' OR `type` = 'radio' OR `type` = 'select' OR `type` = 'pre_country' OR `type` = 'pre_gender' ORDER BY `order` ASC"; ?>
-	        <?php if ($fields = $wpdb -> get_results($fieldsquery)) : ?>
+	        <?php
+	        
+	        $query_hash = md5($fieldsquery);
+	        if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+		        $fields = $oc_fields;
+	        } else {
+		        $fields = $wpdb -> get_results($fieldsquery);
+		        wp_cache_set($query_hash, $fields, 'newsletters', 0);
+	        }
+	        
+	        ?>
+	        <?php if (!empty($fields)) : ?>
 	        	<div class="misc-pub-section">
 	                <h4><label><input <?php echo (!empty($_POST['dofieldsconditions']) && !empty($_POST['conditions'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="dofieldsconditions" value="1" id="dofieldsconditions" onclick="update_subscribers(); if (this.checked == true) { jQuery('#fieldsconditions').show(); } else { jQuery('#fieldsconditions').hide(); }" /> <?php _e('Fields Conditions', $this -> plugin_name); ?></label>
 	                <?php echo $Html -> help(__('The fields conditions work on the custom fields of your subscribers. You can filter or segment the subscribers in the chosen mailing list(s) to queue/send to subscribers with specific custom field values only. For example, with a "Gender" custom field, you can choose "Male" here under fields conditions to send only to male subscribers.', $this -> plugin_name)); ?></h4>

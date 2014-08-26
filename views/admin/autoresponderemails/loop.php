@@ -109,7 +109,17 @@
             		
             		if (!empty($aemail -> subscriber_id) && !empty($aemail -> list_id)) {
 	            		global $wpdb;
-	            		$aemail -> active = $wpdb -> get_var("SELECT `active` FROM " . $wpdb -> prefix . $SubscribersList -> table . " WHERE `subscriber_id` = '" . $aemail -> subscriber_id . "' AND `list_id` = '" . $aemail -> list_id . "' LIMIT 1");
+	            		$query = "SELECT `active` FROM " . $wpdb -> prefix . $SubscribersList -> table . " WHERE `subscriber_id` = '" . $aemail -> subscriber_id . "' AND `list_id` = '" . $aemail -> list_id . "' LIMIT 1";
+	            		
+	            		$query_hash = md5($query);
+	            		if ($oc_active = wp_cache_get($query_hash, 'newsletters')) {
+		            		$active = $oc_active;
+	            		} else {
+		            		$active = $wpdb -> get_var($query);
+		            		wp_cache_set($query_hash, $active, 'newsletters', 0);
+	            		}
+	            		
+	            		$aemail -> active = $active;
             		}
             		
             		?>

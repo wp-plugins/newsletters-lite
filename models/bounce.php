@@ -75,7 +75,16 @@ class wpmlBounce extends wpMailPlugin {
 		$total = 0;
 		
 		$alltotalquery = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $this -> table . "`";
-		if ($alltotal = $wpdb -> get_var($alltotalquery)) {
+		
+		$query_hash = md5($alltotalquery);
+		if ($oc_alltotal = wp_cache_get($query_hash, 'newsletters')) {
+			$alltotal = $oc_alltotal;
+		} else {
+			$alltotal = $wpdb -> get_var($alltotalquery);
+			wp_cache_set($query_hash, $alltotal, 'newsletters', 0);
+		}
+		
+		if (!empty($alltotal)) {
 			$total = $alltotal;
 		}
 		

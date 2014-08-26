@@ -89,7 +89,17 @@ class wpmlOrder extends wpMailPlugin {
 		
 		//make sure an order ID is available
 		if (!empty($order_id)) {
-			if ($order = $wpdb -> get_row("SELECT * FROM `" . $wpdb -> prefix . "wpmlorders` WHERE `id` = '" . $order_id . "' LIMIT 1")) {
+			$query = "SELECT * FROM `" . $wpdb -> prefix . "wpmlorders` WHERE `id` = '" . $order_id . "' LIMIT 1";
+			
+			$query_hash = md5($query);
+			if ($oc_order = wp_cache_get($query_hash, 'newsletters')) {
+				$order = $oc_order;
+			} else {
+				$order = $wpdb -> get_row($query);
+				wp_cache_set($query_hash, $order, 'newsletters', 0);
+			}
+		
+			if (!empty($order)) {
 				$order = $this -> init_class($this -> model, $order);
 				
 				return $order;

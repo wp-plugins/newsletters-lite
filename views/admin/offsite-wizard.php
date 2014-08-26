@@ -8,6 +8,7 @@
 					<td>
 						<label><input onclick="jQuery('#formtype_popup_div').show();" <?php echo (empty($_POST['formtype']) || $_POST['formtype'] == "popup") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="popup" id="formtype_popup" /> <?php _e('Popup', $this -> plugin_name); ?></label>
 						<label><input onclick="jQuery('#formtype_popup_div').hide();" <?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "iframe") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="iframe" id="formtype_iframe" /> <?php _e('iFrame', $this -> plugin_name); ?></label>
+						<label><input onclick="jQuery('#formtype_popup_div').hide();" <?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "html") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="html" id="formtype_html" /> <?php _e('HTML', $this -> plugin_name); ?></label>
 						<span class="howto"><?php _e('Should this offsite form open as a popup upon submission or just use an iFrame to load in itself?', $this -> plugin_name); ?></span>
 					</td>
 				</tr>

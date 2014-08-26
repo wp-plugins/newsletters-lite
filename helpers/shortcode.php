@@ -13,7 +13,16 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$subscriberscount = 0;
 		
 		$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Subscriber -> table . "`";
-		if ($count = $wpdb -> get_var($query)) {
+		
+		$query_hash = md5($query);
+		if ($oc_count = wp_cache_get($query_hash, 'newsletters')) {
+			$count = $oc_count;
+		} else {
+			$count = $wpdb -> get_var($query);
+			wp_cache_set($query_hash, $count, 'newsletters', 0);
+		}
+		
+		if (!empty($count)) {
 			$subscriberscount = $count;
 		}
 		
@@ -320,8 +329,16 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		if (!empty($id)) {
 			$templatequery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " WHERE id = '" . $id . "' LIMIT 1";
+			
+			$query_hash = md5($templatequery);
+			if ($oc_template = wp_cache_get($query_hash, 'newsletters')) {
+				$template = $oc_template;
+			} else {
+				$template = $wpdb -> get_row($templatequery);
+				wp_cache_set($query_hash, $template, 'newsletters', 0);
+			}
 		
-			if ($template = $wpdb -> get_row($templatequery)) {
+			if (!empty($template)) {
 				$output = wpautop(__($template -> content));
 			}
 		}
@@ -369,7 +386,15 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		" ORDER BY " . $wpdb -> prefix . $History -> table . "." . $orderby . " " . $order . "";
 		if (!empty($number)) { $query .= " LIMIT " . $number . ""; }	
 		
-		if ($emails = $wpdb -> get_results($query)) {
+		$query_hash = md5($query);
+		if ($oc_emails = wp_cache_get($query_hash, 'newsletters')) {
+			$emails = $oc_emails;
+		} else {
+			$emails = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $emails, 'newsletters', 0);
+		}
+		
+		if (!empty($emails)) {
 			$content = $this -> render('history', array('emails' => $emails, 'history_index' => $index), false, 'default');
 			$content = do_shortcode($content);
 			return $content;

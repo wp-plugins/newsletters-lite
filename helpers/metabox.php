@@ -48,23 +48,55 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 	function welcome_subscribers() {
 		global $wpdb, $Subscriber;
 		$subscribersquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Subscriber -> table . "";
-		$subscriberstotal = $wpdb -> get_var($subscribersquery);
+		
+		$query_hash = md5($subscribersquery);
+		if ($oc_subscriberstotal = wp_cache_get($query_hash, 'newsletters')) {
+			$subscriberstotal = $oc_subscriberstotal;
+		} else {
+			$subscriberstotal = $wpdb -> get_var($subscribersquery);
+			wp_cache_set($query_hash, $subscriberstotal, 'newsletters', 0);	
+		}
+		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'subscribers', array('total' => $subscriberstotal), true, 'admin');
 	}
 	
 	function welcome_lists() {
 		global $wpdb, $Mailinglist;
 		$publicquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `privatelist` = 'N'";
-		$total_public = $wpdb -> get_var($publicquery);
+		
+		$query_hash = md5($publicquery);
+		if ($oc_total_public = wp_cache_get($query_hash, 'newsletters')) {
+			$total_public = $oc_total_public;
+		} else {
+			$total_public = $wpdb -> get_var($publicquery);
+			wp_cache_set($query_hash, $total_public, 'newsletters', 0);
+		}
+		
 		$privatequery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `privatelist` = 'Y'";
-		$total_private = $wpdb -> get_var($privatequery);
+		
+		$query_hash = md5($privatequery);
+		if ($oc_total_private = wp_cache_get($query_hash, 'newsletters')) {
+			$total_private = $oc_total_private;
+		} else {
+			$total_private = $wpdb -> get_var($privatequery);
+			wp_cache_set($query_hash, $total_private, 'newsletters', 0);
+		}
+		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'lists', array('total_public' => $total_public, 'total_private' => $total_private), true, 'admin');
 	}
 	
 	function welcome_emails() {
 		global $wpdb, $Email;
 		$emailsquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Email -> table . "";
-		$emailstotal = $wpdb -> get_var($emailsquery);
+		
+		$query_hash = md5($emailsquery);
+		if ($oc_emailstotal = wp_cache_get($query_hash, 'newsletters')) {
+			$emailstotal = $oc_emailstotal;
+		} else {
+			$emailstotal = $wpdb -> get_var($emailsquery);
+			wp_cache_set($query_hash, $emailstotal, 'newsletters', 0);
+		}
+		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'emails', array('total' => $emailstotal), true, 'admin');
 	}
 	

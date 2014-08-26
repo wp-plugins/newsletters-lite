@@ -115,7 +115,13 @@
 			
 			global $wpdb;
 			$fieldsquery = "SELECT `id`, `title`, `slug` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
-			$fields = $wpdb -> get_results($fieldsquery);
+			$query_hash = md5($fieldsquery);
+			if ($oc_fields = wp_cache_get($query_hash, 'newsletters')) {
+				$fields = $oc_fields;
+			} else {
+				$fields = $wpdb -> get_results($fieldsquery);
+				wp_cache_set($query_hash, $fields, 'newsletters', 0);
+			}
 			
 			?>
 		

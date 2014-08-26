@@ -108,7 +108,14 @@ class wpMailPaginate extends wpMailPlugin {
 		list($ofield, $odir) = $this -> order;
 		$query .= " ORDER BY IF (`" . $ofield . "` = '' OR `" . $ofield . "` IS NULL,1,0), `" . $ofield . "` " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
 		
-		$records = $wpdb -> get_results($query);		
+		$query_hash = md5($query);
+		if ($oc_records = wp_cache_get($query_hash, 'newsletters')) {
+			$records = $oc_records;
+		} else {
+			$records = $wpdb -> get_results($query);
+			wp_cache_set($query_hash, $records, 'newsletters', 0);
+		}
+				
 		$records_count = count($records);
 		$this -> allcount = $allRecordsCount = $wpdb -> get_var($countquery);
 		$totalpagescount = round($records_count / $this -> per_page);

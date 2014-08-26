@@ -46,7 +46,14 @@ $Db -> model = $SubscribersList -> model;
 $active = $Db -> count(array('active' => "Y"));
 $Db -> model = $Unsubscribe -> model;
 $unsubscribes = $Db -> count();
-$bounces = $wpdb -> get_var("SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "`");
+$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "`";
+$query_hash = md5($query);
+if ($oc_bounces = wp_cache_get($query_hash, 'newsletters')) {
+	$bounces = $oc_bounces;
+} else {
+	$bounces = $wpdb -> get_var($query);
+	wp_cache_set($query_hash, $bounces, 'newsletters', 0);
+}
 
 ?>
 
