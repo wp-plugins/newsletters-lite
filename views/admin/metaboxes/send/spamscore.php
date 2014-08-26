@@ -13,6 +13,8 @@ var spamscorerequest = false;
 
 <?php if (!empty($_POST['ishistory'])) : ?>
 var history_id = "<?php echo $_POST['ishistory']; ?>";
+<?php else : ?>
+var history_id = false;
 <?php endif; ?>
 
 function spamscorerunner() {
@@ -45,7 +47,7 @@ function spamscorerunner() {
 }
 
 jQuery(document).ready(function() {
-	if (history_id != "") {
+	if (history_id != false) {
 		spamscorerunner();
 	}
 

@@ -2648,11 +2648,11 @@ if (!class_exists('wpMail')) {
 							if (!empty($_POST['preview'])) {
 								$message = __('Preview could not be sent', $this -> plugin_name);
 							} elseif (!empty($_POST['draft'])) {
-								if (empty($errors['mailinglists'])) {
+								/*if (empty($errors['mailinglists'])) {
 									$message = __('Draft could not be saved', $this -> plugin_name);
 								} else {
 									$message = __('Draft could not be saved, please select at least one mailing list.', $this -> plugin_name);	
-								}
+								}*/
 							} else {
 								if (!empty($_POST['sendtype']) && $_POST['sendtype'] == "queue") {
 									$message = __('Newsletter could not be scheduled/queued', $this -> plugin_name);

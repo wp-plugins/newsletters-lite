@@ -355,9 +355,6 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				case 'orders'			:
 					$name = __('Subscribe Orders', $this -> plugin_name);
 					break;
-				case 'stats'			:
-					$name = __('Subscribe Stats', $this -> plugin_name);
-					break;
 				case 'settings'			:
 					$name = __('General Configuration', $this -> plugin_name);
 					break;

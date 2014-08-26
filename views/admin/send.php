@@ -15,7 +15,11 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 ?>
 
 <div class="wrap <?php echo $this -> pre; ?> <?php echo $this -> sections -> send; ?> newsletters">
-	<h2><?php _e('Create Newsletter', $this -> plugin_name); ?></h2>
+	<?php if (!empty($_GET['id'])) : ?>
+		<h2><?php _e('Edit Newsletter', $this -> plugin_name); ?> <a href="?page=<?php echo $this -> sections -> send; ?>" class="add-new-h2"><?php _e('Add New', $this -> plugin_name); ?></a></h2>
+	<?php else : ?>
+		<h2><?php _e('Create Newsletter', $this -> plugin_name); ?></h2>
+	<?php endif; ?>
 	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> send; ?>" method="post" id="post" name="post" enctype="multipart/form-data">
 		<?php wp_nonce_field($this -> sections -> send); ?>
 		<input type="hidden" name="group" value="all" />

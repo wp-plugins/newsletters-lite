@@ -32,7 +32,6 @@ if (!class_exists('wpMailPlugin')) {
 			'history'					=>	"newsletters-history",
 			'links'						=>	"newsletters-links",
 			'orders'					=>	"newsletters-orders",
-			'stats'						=>	"newsletters-statistics",
 			'settings'					=>	"newsletters-settings",
 			'settings_subscribers'		=>	"newsletters-settings-subscribers",
 			'settings_templates'		=>	"newsletters-settings-templates",
@@ -1773,6 +1772,7 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if (!empty($subscribercount)) {
+				do_action('newsletters_admin_createnewsletter_subscribercount_result', $subscribercount);
 				echo '' . $subscribercount . ' ' . __('subscribers total', $this -> plugin_name) . '';	
 			} else {
 				echo 0;	
@@ -2461,9 +2461,9 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function enqueue_scripts() {	
 			//enqueue jQuery JS Library
-			wp_enqueue_script('jquery');
-			wp_enqueue_script('jquery-ui-core');
-			wp_enqueue_script('jquery-ui-widget');
+			if (apply_filters('newsletters_enqueuescript_jquery', true)) { wp_enqueue_script('jquery'); }
+			if (apply_filters('newsletters_enqueuescript_jqueryuicore', true)) { wp_enqueue_script('jquery-ui-core'); }
+			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }
 	
 			if (is_admin()) {			
 				if (preg_match("/(widgets\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
@@ -2562,21 +2562,22 @@ if (!class_exists('wpMailPlugin')) {
 			} else {						
 				if (wpml_is_management()) {				
 					if ($this -> get_option('loadscript_jqueryuitabs') == "Y") {
-						wp_enqueue_script('jquery-ui-tabs', false, array('jquery'), false, true);
-						wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'admin', false), array('jquery'));
+						if (apply_filters('newsletters_enqueuescript_jqueryuitabs', true)) { wp_enqueue_script('jquery-ui-tabs', false, array('jquery'), false, true); }
+						if (apply_filters('newsletters_enqueuescript_jquerycookie', true)) { wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'admin', false), array('jquery')); }
 					}
 				}
 			
 				//enqueue the plugin JS
-				if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script('jquery-ui-button', array('jquery'), false, true); }
-				if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'admin', false), array('jquery'), false, true); }
-				if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'admin', false), array('jquery'), false, true); }
+				if (apply_filters('newsletters_enqueuescript_jqueryuibutton', true)) {  if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script('jquery-ui-button', array('jquery'), false, true); } }
+				if (apply_filters('newsletters_enqueuescript_jqueryuiwatermark', true)) { if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'admin', false), array('jquery'), false, true); } }
+				if (apply_filters('newsletters_enqueuescript_jqueryuploadify', true)) { if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'admin', false), array('jquery'), false, true); } }
+				if (apply_filters('newsletters_enqueuescript_' . $this -> plugin_name, true)) { wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true); }
 				
-				wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true);
-				
-				$captcha_type = $this -> get_option('captcha_type');
-				if (!empty($captcha_type) && $captcha_type == "recaptcha") {
-					wp_enqueue_script('recaptcha', "http://www.google.com/recaptcha/api/js/recaptcha_ajax.js");
+				if (apply_filters('newsletters_enqueuescript_recaptcha', true)) { 
+					$captcha_type = $this -> get_option('captcha_type');
+					if (!empty($captcha_type) && $captcha_type == "recaptcha") {
+						wp_enqueue_script('recaptcha', "http://www.google.com/recaptcha/api/js/recaptcha_ajax.js");
+					}
 				}
 			}
 			

@@ -224,9 +224,7 @@ class wpmlSubscriber extends wpMailPlugin {
 	function check_registration($email = null) {
 		global $wpdb;
 	
-		if (!empty($email)) {
-			require_once(ABSPATH . WPINC . DS . 'registration.php');
-			
+		if (!empty($email)) {			
 			if ($user_id = email_exists($email)) {
 				return $user_id;
 			}
@@ -1061,11 +1059,11 @@ class wpmlSubscriber extends wpMailPlugin {
 	 *
 	 */
 	function delete($subscriber_id = null) {
-		global $wpdb, $Autoresponderemail, $Order, $Queue, $SubscribersList;
+		global $wpdb, $Autoresponderemail, $wpmlOrder, $Queue, $SubscribersList;
 		
 		if (!empty($subscriber_id)) {
 			if ($wpdb -> query("DELETE FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `id` = '" . $subscriber_id . "' LIMIT 1")) {
-				$Order -> delete_all(array('subscriber_id' => $subscriber_id));
+				$wpmlOrder -> delete_all(array('subscriber_id' => $subscriber_id));
 				$SubscribersList -> delete_all(array('subscriber_id' => $subscriber_id));
 				$Queue -> delete_all(array('subscriber_id' => $subscriber_id));
 				

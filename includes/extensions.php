@@ -53,6 +53,22 @@ $extensions = array(
 			'plugin_name'		=>	'newsletters-wpemember',
 			'plugin_file'		=>	'wpemember.php',
 		),
+		's2member'				=>	array(
+			'name'				=>	__('s2Member Subscribers', $this -> plugin_name),
+			'link'				=>	"http://tribulant.com/extensions/view/32/s2member-subscribers",
+			'description'		=>	__('Capture subscribers from s2Member into the Newsletter plugin.', $this -> plugin_name),
+			'slug'				=>	's2member',
+			'plugin_name'		=>	'newsletters-s2member',
+			'plugin_file'		=>	's2member.php',
+		),
+		'control'				=>	array(
+			'name'				=>	__('Total Control', $this -> plugin_name),
+			'link'				=>	"http://tribulant.com/extensions/view/36/total-control",
+			'description'		=>	__('Total control over your Newsletter plugin for WordPress.', $this -> plugin_name),
+			'slug'				=>	'control',
+			'plugin_name'		=>	'newsletters-control',
+			'plugin_file'		=>	'control.php',
+		),				
 	);
 
 ?>
