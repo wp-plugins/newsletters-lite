@@ -462,15 +462,15 @@ class wpmlSubscriber extends wpMailPlugin {
 			$data['list_id'] = array_filter($data['list_id']);			
 			$options = $this -> get_option('widget');
 			
+			if (!empty($data['list_id']) && is_array($data['list_id'])) {
+				foreach ($data['list_id'] as $list_id) {
+					$data['mailinglists'][] = $list_id;
+				}
+			}
+			
 			if ($validate == true) {
 				if (empty($data['email'])) { $this -> errors['email'] = __($emailfield -> errormessage); }
 				elseif (!$this -> email_validate($data['email'])) { $this -> errors['email'] = __($emailfield -> errormessage); }
-				
-				if (!empty($data['list_id']) && is_array($data['list_id'])) {
-					foreach ($data['list_id'] as $list_id) {
-						$data['mailinglists'][] = $list_id;
-					}
-				}
 				
 				$Field -> validate_optin($data);					
 				if (!empty($Field -> errors)) {

@@ -2512,6 +2512,12 @@ if (!class_exists('wpMailPlugin')) {
 						wp_enqueue_script('uploadify', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.uploadify.js', array('jquery'), '1.0', false);
 					}
 					
+					// CKEditor
+					if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> themes) {
+						$this -> debug('add ckeditor');
+						wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), false, "4.3.4", false);	
+					}
+					
 					if ($_GET['page'] == $this -> sections -> welcome ||
 						$_GET['page'] == $this -> sections -> send ||
 						$_GET['page'] == $this -> sections -> autoresponders ||
@@ -4490,7 +4496,7 @@ if (!class_exists('wpMailPlugin')) {
 				} else {
 					if (is_admin()) {
 						if (!$newsletters_managementpost_error) {
-							$error = sprintf(__('Newsletter plugin subscriber management post/page does not exist %s', $this -> plugin_name), '<a href="?page=' . $this -> sections -> settings . '&method=managementpost" class="button button-secondary">' . __('Create it Now', $this -> plugin_name) . '</a>');
+							$error = sprintf(__('Newsletter plugin subscriber management post/page does not exist %s', $this -> plugin_name), '<a href="' . admin_url('admin.php') . '?page=' . $this -> sections -> settings . '&method=managementpost" class="button button-secondary">' . __('Create it Now', $this -> plugin_name) . '</a>');
 							$this -> render_error($error);
 							$newsletters_managementpost_error = true;
 						}
