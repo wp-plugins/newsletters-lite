@@ -100,6 +100,8 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 9. Many extensions and integrations available
 10. Dashboard widget for quick overview
 
+=======
+
 == Changelog ==
 
 = 4.3.6.1 =

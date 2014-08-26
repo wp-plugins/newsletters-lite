@@ -3,8 +3,6 @@
 if (!class_exists('wpMailPlugin')) {
 	class wpMailPlugin extends wpMailCheckinit {
 	
-		//var $plugin_name = 'wp-mailinglist';
-		//var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
 		var $version = '4.3.6.1';
