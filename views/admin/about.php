@@ -1,6 +1,6 @@
 <?php
 /**
- * Newsletters About Dashboard
+ * Newsletters About Dashboard v4.3.6
  */
 
 /** WordPress Administration Bootstrap */
@@ -26,9 +26,11 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 				<p><?php _e('This version is 100% compatible with the latest WordPress version. It will fit nicely into your WordPress dashboard and maximizes the WordPress capabilities for speed, functionality and reliability.', $this -> plugin_name); ?></p>
 			</div>
 			<div class="col-2">
-				<img src="<?php echo $this -> url(); ?>/images/about/feature-2.jpg">
-				<h4><?php _e('Easier Editing Tools', $this -> plugin_name); ?></h4>
-				<p><?php _e('Improved visual editing of themes and several other areas throughout the plugin to help you see better what the end-product will look like without having to necessarily go into code.', $this -> plugin_name); ?></p>
+				<img src="<?php echo $this -> url(); ?>/images/about/feature-4.png">
+				<h4><?php _e('WPML integration', $this -> plugin_name); ?></h4>
+				<p><?php _e('This version of the Newsletter plugin is fully integrated with WPML. It now supports internationalization and multilanguage through WPML.', $this -> plugin_name); ?></p>
+ <?php /* _e('Easier Editing Tools', $this -> plugin_name); ?></h4>
+				<p><?php _e('Improved visual editing of themes and several other areas throughout the plugin to help you see better what the end-product will look like without having to necessarily go into code.', $this -> plugin_name); */?></p>
 			</div>
 			<div class="col-3 last-feature">
 				<img src="<?php echo $this -> url(); ?>/images/about/feature-3.jpg">
@@ -42,14 +44,17 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
 	<div class="feature-section col two-col">
 		<div class="col-1">
-			<img src="<?php echo $this -> url(); ?>/images/about/feature-5.png">			
-			<h4><?php _e('Spam Score', $this -> plugin_name); ?></h4>
-			<p><?php _e('Prevent your emails from ending up in spam/junk folder unnecessarily. The spam score utility will show on each newsletter you create to give the newsletter a score, taking all it\'s aspects and factors in consideration.', $this -> plugin_name); ?></p>
+			<img src="<?php echo $this -> url(); ?>/images/about/feature-7.png">			
+			<h4><?php _e('Clicks section in admin', $this -> plugin_name); ?></h4> 
+			<p><?php _e('A new clicks section in admin to view and manage all clicks on links. You can view all links and clicks per individual subscriber and all clicks per link.', $this -> plugin_name); ?>
+			<?php /* _e('Spam Score', $this -> plugin_name); ?></h4>
+			<p><?php _e('Prevent your emails from ending up in spam/junk folder unnecessarily. The spam score utility will show on each newsletter you create to give the newsletter a score, taking all it\'s aspects and factors in consideration.', $this -> plugin_name); */?></p>
 		</div>
 		<div class="col-2 last-feature">
-						<img src="<?php echo $this -> url(); ?>/images/about/feature-6.png">
-						<h4><?php _e('Sorry to see you go email', $this -> plugin_name); ?></h4>
-			<p><?php _e('The plugin can automatically send a "Sorry to see you go..." email to a user when they unsubscribe to both confirm their subscription, express your disappointment that they are leaving and it also includes a resubscribe link to convert.', $this -> plugin_name); ?></p>
+						<img src="<?php echo $this -> url(); ?>/images/about/feature-8.png">
+						<h4><?php _e('Filter Subscribers', $this -> plugin_name); ?></h4>
+						<p><?php _e('You can now filter subscribers per mailinglist, status and registered status. After filtering your subscribers, you can activate or deactivate them, assign them to another mailinglist or delete them.', $this -> plugin_name); ?>
+			<p><?php /*_e('The plugin can automatically send a "Sorry to see you go..." email to a user when they unsubscribe to both confirm their subscription, express your disappointment that they are leaving and it also includes a resubscribe link to convert.', $this -> plugin_name); */?></p>
 		</div>
 </div>
 
