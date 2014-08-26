@@ -5,7 +5,9 @@ var wpmlUrl = '<?php echo $this -> url(); ?>';
 
 <?php if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) : ?>
 	jQuery(document).ready(function() {
-		jQuery(".wpmlhelp a").tooltip();
+		if (jQuery.isFunction(jQuery.fn.tooltip)) {
+			jQuery(".wpmlhelp a").tooltip();
+		}
 	});
 <?php endif; ?>
 </script>

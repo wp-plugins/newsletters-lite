@@ -64,6 +64,12 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
+					<th class="column-post_id <?php echo ($orderby == "post_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=post_id&order=' . (($orderby == "post_id") ? $otherorder : "asc")); ?>">
+							<span><?php _e('Post', $this -> plugin_name); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
 					<?php if (apply_filters($this -> pre . '_admin_history_authorcolumn', true)) : ?>
                     <th class="column-author <?php echo ($orderby == "user_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=user_id&order=' . (($orderby == "user_id") ? $otherorder : "asc")); ?>">
@@ -113,6 +119,12 @@
 					<th class="column-recurring <?php echo ($orderby == "recurring") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=recurring&order=' . (($orderby == "recurring") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Recurring', $this -> plugin_name); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
+					<th class="column-post_id <?php echo ($orderby == "post_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=post_id&order=' . (($orderby == "post_id") ? $otherorder : "asc")); ?>">
+							<span><?php _e('Post', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -209,6 +221,18 @@
                     		<?php echo $Html -> help($helpstring); ?>
                     	<?php else : ?>
                     		<?php _e('No', $this -> plugin_name); ?>
+                    	<?php endif; ?>
+                    </td>
+                    <td>
+                    	<?php if (!empty($email -> post_id)) : ?>
+                    		<?php 
+                    		
+                    		$post = get_post($email -> post_id);
+                    		edit_post_link($post -> post_title, null, null, $email -> post_id);
+                    		
+                    		?>
+                    	<?php else : ?>
+                    		<?php _e('None', $this -> plugin_name); ?>
                     	<?php endif; ?>
                     </td>
                     <?php if (apply_filters($this -> pre . '_admin_history_authorcolumn', true)) : ?>

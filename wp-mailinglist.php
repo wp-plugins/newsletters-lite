@@ -1766,7 +1766,7 @@ if (!class_exists('wpMail')) {
 			
 			$this -> check_roles();
 		
-			add_object_page(__('Newsletters', $this -> plugin_name), __('Newsletters', $this -> plugin_name) . $update_icon, 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'));
+			add_menu_page(__('Newsletters', $this -> plugin_name), __('Newsletters', $this -> plugin_name) . $update_icon, 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'), false, "26.11");
 			$this -> menus['newsletters'] = add_submenu_page($this -> sections -> welcome, __('Overview', $this -> plugin_name), __('Overview', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'));
 			$this -> menus['newsletters-settings'] = add_submenu_page($this -> sections -> welcome, __('General Configuration', $this -> plugin_name), __('Configuration', $this -> plugin_name), 'newsletters_settings', $this -> sections -> settings, array($this, 'admin_config'));
 			$this -> menus['newsletters-settings-subscribers'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Subscribers Configuration', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_settings_subscribers', $this -> sections -> settings_subscribers, array($this, 'admin_settings_subscribers'));

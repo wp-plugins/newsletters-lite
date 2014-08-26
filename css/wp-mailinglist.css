@@ -226,7 +226,42 @@ table tbody tr.arow {
 	padding: 2px 5px;
 }
 
+.wpmlhelp {
+	display: inline-block;
+    margin: 2px 0 0 5px;
+    vertical-align: top;
+	-moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    z-index: 26;
+	background-color: #444444;
+}
+
 .wpmlhelp a {
+	display: block;
+	padding: 0 5px;
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 10px;
+    line-height: 15px;
+}
+
+.ui-tooltip {
+	padding: 8px;
+	position: absolute;
+	z-index: 9999;
+	max-width: 300px;
+	-webkit-box-shadow: 0 0 5px #aaa;
+	box-shadow: 0 0 5px #aaa;
+	background: white;
+	border-width: 2px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+}
+
+/*.wpmlhelp a {
 	width: 16px;
 	height: 16px;
 	background-image: url('../images/icons/question.png');
@@ -236,7 +271,7 @@ table tbody tr.arow {
 	text-decoration: none;
 	line-height: 16px;
 	margin: 0 6px 0 0;
-}
+}*/
 
 .wpml .extensionicon {
 	box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);

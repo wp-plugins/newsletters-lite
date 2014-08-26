@@ -36,7 +36,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 			?>
 			
 			<span class="wpmlhelp">
-				<a href="" onclick="return false;" title="<?php echo esc_attr(stripslashes($help)); ?>"> </a>
+				<a href="" onclick="return false;" title="<?php echo esc_attr(stripslashes($help)); ?>">&#63;</a>
 			</span>
 			
 			<?php
