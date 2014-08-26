@@ -1338,6 +1338,89 @@ if (!class_exists('wpMailPlugin')) {
 		    exit();
 		    die();
 	    }
+	    
+	    function ajax_spamscorerunner() {
+	    	global $Html, $Subscriber, $newsletters_presend, $newsletters_emailraw;
+	    	$newsletters_presend = true;
+	    	$subscriber_id = $Subscriber -> admin_subscriber_id();
+	    	$subscriber = $Subscriber -> get($subscriber_id, false);
+	    	$subject = $_POST['subject'];
+	    	$history_id = $_POST['ishistory'];
+			$message = $this -> render_email('send', array('message' => $_POST['content'], 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id), false, true, true, $_POST['theme_id']);
+			$this -> execute_mail($subscriber, false, $subject, $message, $history -> attachments, $history_id, false, false);
+			$spamscore = $this -> spam_score($newsletters_emailraw, "long");
+			
+			$output = "";
+			ob_start();
+			?>
+			
+			<p style="text-align:center;"><a href="#spamscore_report" onclick="jQuery.colorbox({inline:true, href:'#spamscore_report'}); return false;"><?php _e('See Report', $this -> plugin_name); ?></a></p>
+			<iframe width="100%" style="width:100%;" frameborder="0" scrolling="no" class="autoHeight widefat" src="<?php echo admin_url('admin-ajax.php'); ?>?action=newsletters_gauge&value=<?php echo $spamscore -> score; ?>"></iframe>
+			
+			<div style="display:none;">
+				<div id="spamscore_report">
+					<div class="wrap newsletters">
+						<h2><?php _e('Spam Score Report', $this -> plugin_name); ?></h2>
+						<h3><?php _e('Report', $this -> plugin_name); ?></h3>
+						<p><?php echo nl2br($spamscore -> report); ?></p>
+						<h3><?php _e('RAW Email', $this -> plugin_name); ?></h3>
+						<p><?php echo nl2br($newsletters_emailraw); ?></p>
+						<p><a href="" onclick="jQuery.colorbox.close(); return false;" class="button button-primary"><?php _e('Close Report', $this -> plugin_name); ?></a></p>
+					</div>
+				</div>
+			</div>
+			
+			<?php		
+			$output = ob_get_clean();
+			
+			
+			header("Content-Type: text/xml; charset=UTF-8");
+	    	
+	    	?>
+	    	
+	    	<result>
+				<success><?php echo $spamscore -> success; ?></success>
+				<report><![CDATA[<?php echo nl2br($spamscore -> report); ?>]]></report>
+				<score><?php echo $spamscore -> score; ?></score>
+				<output><![CDATA[<?php echo $output; ?>]]></output>
+			</result>
+	    	
+	    	<?php
+		    
+		    exit();
+		    die();
+	    }
+	    
+	    function ajax_gauge() {	    
+	    	$value = $_REQUEST['value'];
+		    
+		    ?>
+		    
+		    <html>
+		    	<body style="margin:0; padding:0;">
+				    <script type="text/javascript" src="<?php echo $this -> render_url('js/justgage.js', 'admin', false); ?>"></script>
+				    <script type="text/javascript" src="<?php echo $this -> render_url('js/raphael.js', 'admin', false); ?>"></script>
+				    <div id="gauge"></div>
+				    
+				    <script>
+					  var g = new JustGage({
+					    id: "gauge", 
+					    value: <?php echo $value; ?>, 
+					    min: 1,
+					    max: 10,
+					    title: "<?php echo ($value >= 5) ? __('This is spam!', $this -> plugin_name) : __('This is safe!', $this -> plugin_name); ?>",
+					    label: "<?php _e('Spam Score', $this -> plugin_name); ?>",
+					    levelColorsGradient: false
+					  }); 
+					</script>
+		    	</body>
+		    </html>
+		    
+		    <?php
+		    
+		    exit();
+		    die();
+	    }
 		
 		function ajax_historyiframe($returnoutput = false) {	
 			define('DOING_AJAX', true);
@@ -4091,6 +4174,24 @@ if (!class_exists('wpMailPlugin')) {
 			return $messageid;
 		}
 		
+		function spam_score($email = null, $options = "short") {
+			$data = array("email" => $email, "options" => $options);                                                                    
+			$data_string = json_encode($data);                                                                                   
+			 
+			$ch = curl_init('http://spamcheck.postmarkapp.com/filter');                                                                      
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);                                                                  
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                                          
+			    'Content-Type: application/json',                                                                                
+			    'Content-Length: ' . strlen($data_string))                                                                       
+			);                                                                                                                   
+			 
+			$result = curl_exec($ch);
+			$result = json_decode($result);
+			return $result;
+		}
+		
 		function execute_mail($subscriber = null, $user = null, $subject = null, $message = null, $attachments = null, $history_id = null, $eunique = null, $shortlinks = true) {
 			global $wpdb, $Db, $Html, $Email, $History, $phpmailer, $Mailinglist, $Subscriber, $SubscribersList, $orig_message, $wpml_message, $wpml_textmessage, $fromwpml;
 			$sent = false;
@@ -4233,6 +4334,18 @@ if (!class_exists('wpMailPlugin')) {
 					$phpmailer -> WordWrap = 0;
 					$phpmailer -> Encoding = $this -> get_option('emailencoding');
 					$phpmailer -> MessageID = $this -> phpmailer_messageid();
+					
+					global $newsletters_presend, $newsletters_emailraw;
+					if (!empty($newsletters_presend) && $newsletters_presend == true) {
+						$phpmailer -> PreSend();
+						//$header = $phpmailer -> CreateHeader();
+						//$body = $phpmailer -> CreateBody();
+						$header = $phpmailer -> MIMEHeader;
+						$body = $phpmailer -> MIMEBody;
+						$emailraw = $header . $body;
+						$newsletters_emailraw = $emailraw;
+						return $emailraw;
+					}
 					
 					if ($phpmailer -> Send()) {
 						$sent = true;
@@ -6056,6 +6169,21 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}	
 	}
+}
+
+class fakemailer {
+    public function Send() {
+        throw new phpmailerException( 'Cancelling mail' );
+    }
+}
+
+if ( ! class_exists( 'phpmailerException' ) ) {
+	/*class phpmailerException extends Exception {
+	    public function errorMessage() {
+	        $errorMsg = '<strong>' . $this->getMessage() . "</strong><br />\n";
+	        return $errorMsg;
+	    }
+	}*/
 }
 
 ?>

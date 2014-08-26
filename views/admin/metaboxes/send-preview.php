@@ -36,7 +36,7 @@ function previewrunner() {
 			if (history_id != "") { jQuery('#ishistory').val(history_id); }
 		},
 		complete: function(response) {		
-			setTimeout(previewrunner, 30000);
+			//setTimeout(previewrunner, 30000);
 			if (typeof previewcontent != 'undefined') { jQuery('#previewiframe').contents().find('html').html(previewcontent); }
 			jQuery('#previewrunnerbutton').removeAttr('disabled');
 			jQuery('#previewrunnerloading').hide();

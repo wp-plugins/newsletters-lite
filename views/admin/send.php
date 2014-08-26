@@ -227,6 +227,7 @@ jQuery(document).ready(function() {
 
     jQuery('input:not(:button,:submit),textarea,select').change(function() {
     	previewrunner();
+    	spamscorerunner();
     
         window.onbeforeunload = function () {
             if (warnMessage != null) return warnMessage;

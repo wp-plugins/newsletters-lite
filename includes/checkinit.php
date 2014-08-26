@@ -17,14 +17,7 @@ if (!class_exists('wpMailCheckinit')) {
 		
 			if (!is_admin() || (is_admin() && $this -> ci_serial_valid())) {
 				$this -> ci_initialization();
-			} else {				
-				/*wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
-				wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
-				wp_enqueue_style('colorbox', plugins_url() . '/' . $this -> plugin_name . '/css/colorbox.css', false, $this -> version, "all");
-				
-				$this -> add_action('admin_notices');
-				$this -> add_action('init', 'init', 10, 1);*/
-				
+			} else {			
 				$this -> add_action('admin_print_styles', 'ci_print_styles', 10, 1);
 				$this -> add_action('admin_print_scripts', 'ci_print_scripts', 10, 1);
 				$this -> add_action('admin_notices');
@@ -73,7 +66,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('after_plugin_row_wp-mailinglist/wp-mailinglist.php', 'after_plugin_row', 10, 2);
 			$this -> add_action('install_plugins_pre_plugin-information', 'display_changelog', 10, 1);
 			$this -> add_action('admin_init', 'tinymce');
-			$this -> add_action('phpmailer_init');
+			$this -> add_action('phpmailer_init', 'phpmailer_init', 999, 1);
 			$this -> add_action('profile_update');
 			$this -> add_action('comment_form');
 			$this -> add_action('wp_insert_comment', 'comment_post', 10, 2);
@@ -137,6 +130,8 @@ if (!class_exists('wpMailCheckinit')) {
 				add_action('wp_ajax_wpmltestbouncesettings', array($this, 'ajax_testbouncesettings'));
 				add_action('wp_ajax_wpmlhistory_iframe', array($this, 'ajax_historyiframe'));
 				add_action('wp_ajax_wpmlpreviewrunner', array($this, 'ajax_previewrunner'));
+				add_action('wp_ajax_newsletters_spamscorerunner', array($this, 'ajax_spamscorerunner'));
+				add_action('wp_ajax_newsletters_gauge', array($this, 'ajax_gauge'));
 				add_action('wp_ajax_wpmllatestposts_preview', array($this, 'ajax_latestposts_preview'));
 				add_action('wp_ajax_newsletters_lpsposts', array($this, 'ajax_lps_posts'));
 				add_action('wp_ajax_newsletters_delete_lps_post', array($this, 'ajax_delete_lps_post'));

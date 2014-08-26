@@ -74,6 +74,10 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'bounces', array('total' => $total), true, 'admin');
 	}
 	
+	function send_spamscore() {
+		$this -> render('metaboxes' . DS . 'send' . DS . 'spamscore', false, true, 'admin');
+	}
+	
 	function send_mailinglists() {
 		$this -> render('metaboxes' . DS . 'send-mailinglists', false, true, 'admin');
 	}

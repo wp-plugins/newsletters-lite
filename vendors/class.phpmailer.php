@@ -130,14 +130,14 @@ class PHPMailer {
    * @var string
    * @access protected
    */
-  protected $MIMEBody       = '';
+  public $MIMEBody       = '';
 
   /**
    * Stores the complete compiled MIME message headers.
    * @var string
    * @access protected
    */
-  protected $MIMEHeader     = '';
+  public $MIMEHeader     = '';
 
   /**
    * Stores the extra header list which CreateHeader() doesn't fold in

@@ -102,14 +102,14 @@
             <tr>
                 <th><label for="bouncepop_user"><?php _e('POP User/Email', $this -> plugin_name); ?></label></th>
                 <td>
-                    <input class="widefat" type="text" name="bouncepop_user" value="<?php echo esc_attr(stripslashes($this -> get_option('bouncepop_user'))); ?>" id="bouncepop_user" />
+                    <input class="widefat" autocomplete="off" type="text" name="bouncepop_user" value="<?php echo esc_attr(stripslashes($this -> get_option('bouncepop_user'))); ?>" id="bouncepop_user" />
                     <span class="howto"><?php _e('POP/incoming email username', $this -> plugin_name); ?></span>
                 </td>
             </tr>
             <tr>
                 <th><label for="bouncepop_pass"><?php _e('POP Password', $this -> plugin_name); ?></label></th>
                 <td>
-                    <input class="widefat" type="password" name="bouncepop_pass" value="<?php echo esc_attr(stripslashes($this -> get_option('bouncepop_pass'))); ?>" id="bouncepop_pass" />
+                    <input class="widefat" autocomplete="off" type="password" name="bouncepop_pass" value="<?php echo esc_attr(stripslashes($this -> get_option('bouncepop_pass'))); ?>" id="bouncepop_pass" />
                     <span class="howto"><?php _e('POP/incoming email password', $this -> plugin_name); ?></span>
                 </td>
             </tr>

@@ -19,7 +19,7 @@
 class POP3 {
     var $ERROR      = '';       //  Error string.
 
-    var $TIMEOUT    = 60;       //  Default timeout before giving up on a
+    var $TIMEOUT    = 180;       //  Default timeout before giving up on a
                                 //  network operation.
 
     var $COUNT      = -1;       //  Mailbox msg count

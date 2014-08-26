@@ -6,7 +6,23 @@ var wpmlUrl = '<?php echo $this -> url(); ?>';
 <?php if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) : ?>
 	jQuery(document).ready(function() {
 		if (jQuery.isFunction(jQuery.fn.tooltip)) {
-			jQuery(".wpmlhelp a").tooltip();
+			jQuery(".wpmlhelp a").tooltip({
+				content: function () {
+		            return jQuery(this).prop('title');
+		        },
+		        show: null, 
+		        close: function (event, ui) {
+		            ui.tooltip.hover(
+		            function () {
+		                jQuery(this).stop(true).fadeTo(400, 1);
+		            },    
+		            function () {
+		                jQuery(this).fadeOut("400", function () {
+		                    jQuery(this).remove();
+		                })
+		            });
+		        }
+			});
 		}
 	});
 <?php endif; ?>

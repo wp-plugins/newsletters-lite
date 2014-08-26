@@ -89,8 +89,9 @@ if (!class_exists('wpMail')) {
 		  	return $ver;
 		}
 		
-		function phpmailer_init($phpmailer) {	
-			global $fromwpml;			
+		function phpmailer_init($phpmailer = null) {	
+			global $phpmailer, $fromwpml;	
+					
 			if (!empty($fromwpml) && $fromwpml == true) {
 				global $orig_message, $wpml_message, $wpml_textmessage, $wpmlhistory_id;				
 				global $wpdb, $History;
@@ -126,6 +127,21 @@ if (!class_exists('wpMail')) {
 				$phpmailer -> Priority = $this -> get_option('mailpriority');
 				$phpmailer -> MessageID = $this -> phpmailer_messageid();
 				$phpmailer -> SMTPKeepAlive = true;
+				
+				global $Subscriber, $newsletters_presend, $newsletters_emailraw;				
+				if (!empty($newsletters_presend) && $newsletters_presend == true) {	
+					$subscriber_id = $Subscriber -> admin_subscriber_id();
+			    	$subscriber = $Subscriber -> get($subscriber_id, false);
+					$phpmailer -> PreSend();			
+					$header = $phpmailer -> CreateHeader();
+					$header .= "To: " . $subscriber -> email . "\r\n";
+					$header .= "Subject: " . $phpmailer -> Subject . "\r\n";
+					$body = $phpmailer -> CreateBody();	
+					$emailraw = $header . $body;
+					$newsletters_emailraw = $emailraw;				
+					
+					$phpmailer = new fakemailer();
+				}
 			}
 			
 			return $phpmailer;
@@ -1833,6 +1849,7 @@ if (!class_exists('wpMail')) {
 		function admin_head_send() {
 			global $Metabox, $Html;
 		
+			add_meta_box('spamscorediv', __('Spam Score', $this -> plugin_name), array($Metabox, 'send_spamscore'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
 			add_meta_box('mailinglistsdiv', __('Subscribers', $this -> plugin_name) . $Html ->  help(__('Tick/check the group(s) or list(s) that you want to send/queue this newsletter to. The newsletter will only be sent to active subscriptions in the chosen list(s).', $this -> plugin_name)), array($Metabox, 'send_mailinglists'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
 			add_meta_box('insertdiv', __('Insert into Newsletter', $this -> plugin_name) . $Html -> help(__('Use this box to insert various things into your newsletter such as posts, snippets, custom fields and post thumbnails.', $this -> plugin_name)), array($Metabox, 'send_insert'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
 			add_meta_box('themesdiv', __('Theme', $this -> plugin_name) . $Html -> help(__('Choose the theme that you want to use for this newsletter. The content filled into the TinyMCE editor to the left will be inserted into the theme where it has the [wpmlcontent] tag inside it.', $this -> plugin_name)), array($Metabox, 'send_theme'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');

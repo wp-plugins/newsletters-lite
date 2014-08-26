@@ -31,7 +31,7 @@ $createpreview = $this -> get_option('createpreview');
         	<?php echo $Html -> help(__('The ID of the WordPress post or page to which images uploaded through the media uploader is stored. All images are stored to this post or page so that they can be reused later on.', $this -> plugin_name)); ?></th>
             <td>
             	<?php $imagespost = $this -> get_option('imagespost'); ?>
-                <input type="text" class="widefat" style="width:50px;" name="imagespost" value="<?php echo esc_attr(stripslashes($imagespost)); ?>" id="imagespost" />
+                <input type="text" autocomplete="off" class="widefat" style="width:50px;" name="imagespost" value="<?php echo esc_attr(stripslashes($imagespost)); ?>" id="imagespost" />
             	<span class="howto"><?php _e('A WordPress post (draft or published) is required for the Newsletter plugin to save images to when uploading through the editor.', $this -> plugin_name); ?></span>
             </td>
         </tr>
