@@ -88,7 +88,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 				<div id="posttype_post" style="display:block">
 					<p>
 						<label for="posts_category_menu"><?php _e('Post Category:', $this -> plugin_name); ?></label><br/>
-						<?php $select = wp_dropdown_categories(array('show_option_none' => __('- Select Category -', "wp-mailinglist"), 'echo' => 0, 'name' => "posts_single_category", 'id' => "posts_category_menu", 'hide_empty' => 0, 'show_count' => 1)); ?>
+						<?php $select = wp_dropdown_categories(array('show_option_none' => __('- Select Category -', $this -> plugin_name), 'echo' => 0, 'name' => "posts_single_category", 'id' => "posts_category_menu", 'hide_empty' => 0, 'show_count' => 1)); ?>
 		                <?php $select = preg_replace("#<select([^>]*)>#", '<select$1 onchange="get_posts();" style="max-width:200px;">', $select); ?>
 		                <?php echo $select; ?>
 		                <?php echo $Html -> help(__('Select a post category to narrow down posts by category for easier selection.', $this -> plugin_name)); ?>
@@ -145,7 +145,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 				
 				<p>
 					<label for=""><?php _e('Posts Category:', $this -> plugin_name); ?></label><br/>
-					<?php $select = wp_dropdown_categories(array('show_option_all' => __('- All Categories -', "wp-mailinglist"), 'echo' => 0, 'name' => "posts_categories", 'id' => "posts_categories", 'hide_empty' => 0, 'show_count' => 1)); ?>
+					<?php $select = wp_dropdown_categories(array('show_option_all' => __('- All Categories -', $this -> plugin_name), 'echo' => 0, 'name' => "posts_categories", 'id' => "posts_categories", 'hide_empty' => 0, 'show_count' => 1)); ?>
 	                <?php $select = preg_replace("#<select([^>]*)>#", '<select$1 onchange="change_category();" style="max-width:200px;">', $select); ?>
 	                <?php echo $select; ?>
 				</p>
@@ -174,10 +174,10 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 				<p>
 					<label for="thumbnail_size"><?php _e('Thumbnail Size:', $this -> plugin_name); ?></label><br/>
 					<select name="thumbnail_size" id="thumbnail_size">
-						<option value="thumbnail"><?php _e('Thumbnail', "wp-mailinglist"); ?></option>
-						<option value="medium"><?php _e('Medium', "wp-mailinglist"); ?></option>
-						<option value="large"><?php _e('Large', "wp-mailinglist"); ?></option>
-						<option value="full"><?php _e('Full', "wp-mailinglist"); ?></option>
+						<option value="thumbnail"><?php _e('Thumbnail', $this -> plugin_name); ?></option>
+						<option value="medium"><?php _e('Medium', $this -> plugin_name); ?></option>
+						<option value="large"><?php _e('Large', $this -> plugin_name); ?></option>
+						<option value="full"><?php _e('Full', $this -> plugin_name); ?></option>
 					</select>
 				</p>
 				

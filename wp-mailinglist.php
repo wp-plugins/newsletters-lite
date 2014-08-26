@@ -4127,7 +4127,7 @@ if (!class_exists('wpMail')) {
 						$exportfilename = 'subscribers-' . date_i18n("Ymd", time()) . '.csv';
 						$exportfilepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
 						$exportfilefull = $exportfilepath . $exportfilename;
-						if (!$fh = fopen($exportfilefull, "w")) { $errors[] = sprintf(__('Export file could not be created, please check permissions on <b>%s</b> to make sure it is writable.', $this -> plugin_name), $Html -> uploads_path() . "/wp-mailinglist/export/"); }
+						if (!$fh = fopen($exportfilefull, "w")) { $errors[] = sprintf(__('Export file could not be created, please check permissions on <b>%s</b> to make sure it is writable.', $this -> plugin_name), $Html -> uploads_path() . "/" . $this -> plugin_name . "/export/"); }
 						else { fclose($fh); }
 						
 						@chmod($exportfilefull, 0777);

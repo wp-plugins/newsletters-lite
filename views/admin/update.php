@@ -1,8 +1,7 @@
 <?php if (!empty($update_info) && $update_info['is_valid_key'] == "1") : ?>
 	<?php
 	
-	$plugin_file = "wp-mailinglist/wp-mailinglist.php";
-	$upgrade_url = wp_nonce_url('update.php?action=upgrade-plugin&amp;plugin=' . urlencode($plugin_file), 'upgrade-plugin_' . $plugin_file);
+	$upgrade_url = wp_nonce_url('update.php?action=upgrade-plugin&amp;plugin=' . urlencode($this -> plugin_file), 'upgrade-plugin_' . $this -> plugin_file);
 	
 	?>
 	

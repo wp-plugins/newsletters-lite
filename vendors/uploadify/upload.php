@@ -2,7 +2,7 @@
 
 // Define a destination
 $upload_dir = wp_upload_dir();
-$targetFolder = $upload_dir['basedir'] . DS . 'wp-mailinglist' . DS . 'uploadify';
+$targetFolder = $upload_dir['basedir'] . DS . $this -> plugin_name . DS . 'uploadify';
 
 if (!empty($_FILES)) {
 	$tempFile = $_FILES['Filedata']['tmp_name'];
@@ -16,13 +16,13 @@ if (!empty($_FILES)) {
 		if (move_uploaded_file($tempFile, $targetFile)) {
 			echo $targetFileName;
 		} else {
-			echo __('File could not be moved from tmp', "wp-mailinglist");
+			echo __('File could not be moved from tmp', $this -> plugin_name);
 		}
 	} else {
-		echo __('Invalid file type', "wp-mailinglist");
+		echo __('Invalid file type', $this -> plugin_name);
 	}
 } else {
-	echo __('No file data was posted', "wp-mailinglist");
+	echo __('No file data was posted', $this -> plugin_name);
 }
 
 ?>

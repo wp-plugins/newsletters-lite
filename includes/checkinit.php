@@ -9,7 +9,8 @@ if (!class_exists('wpMailCheckinit')) {
 		
 		function ci_initialize() {				
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			if (!is_plugin_active(plugin_basename('wp-mailinglist/wp-mailinglist.php'))) {
+			
+			if (!is_plugin_active(plugin_basename($this -> plugin_name . DS . 'wp-mailinglist.php'))) {			
 				return;
 			}
 			
@@ -65,7 +66,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action($this -> pre . '_importusers', 'importusers_hook', 10, 1);
 			$this -> add_action('do_meta_boxes', 'do_meta_boxes', 10, 1);
 			$this -> add_action('admin_notices');
-			$this -> add_action('after_plugin_row_wp-mailinglist/wp-mailinglist.php', 'after_plugin_row', 10, 2);
+			$this -> add_action('after_plugin_row_' . $this -> plugin_name . '/wp-mailinglist.php', 'after_plugin_row', 10, 2);
 			$this -> add_action('install_plugins_pre_plugin-information', 'display_changelog', 10, 1);
 			$this -> add_action('admin_init', 'tinymce');
 			$this -> add_action('admin_init', 'custom_redirect', 1, 1);

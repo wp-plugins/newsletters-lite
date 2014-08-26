@@ -73,7 +73,7 @@
  * Include Math_BigInteger
  */
 if (!class_exists('Math_BigInteger')) {
-    require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Math/BigInteger.php');
+    require_once($this -> plugin_base() . '/vendors/dkim/Math/BigInteger.php');
 }
 
 /**
@@ -84,14 +84,14 @@ if (!class_exists('Math_BigInteger')) {
 // call function_exists() a second time to stop the require_once from being called outside
 // of the auto loader
 if (!function_exists('crypt_random') && !class_exists('Crypt_Random') && !function_exists('crypt_random')) {
-    require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/Random.php');
+    require_once($this -> plugin_base() . '/vendors/dkim/Crypt/Random.php');
 }
 
 /**
  * Include Crypt_Hash
  */
 if (!class_exists('Crypt_Hash')) {
-    require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/Hash.php');
+    require_once($this -> plugin_base() . '/vendors/dkim/Crypt/Hash.php');
 }
 
 /**#@+
@@ -248,7 +248,7 @@ define('CRYPT_RSA_PUBLIC_FORMAT_PKCS1', 7);
  * @access  public
  * @package Crypt_RSA
  */
-class Crypt_RSA {
+class Crypt_RSA extends wpMailPlugin {
     /**
      * Precomputed Zero
      *
@@ -483,8 +483,7 @@ class Crypt_RSA {
      * @param optional Integer $timeout
      * @param optional Math_BigInteger $p
      */
-    function createKey($bits = 1024, $timeout = false, $partial = array())
-    {
+    function createKey($bits = 1024, $timeout = false, $partial = array()) {
         if (!defined('CRYPT_RSA_EXPONENT')) {
             // http://en.wikipedia.org/wiki/65537_%28number%29
             define('CRYPT_RSA_EXPONENT', '65537');
@@ -503,10 +502,10 @@ class Crypt_RSA {
         if ( CRYPT_RSA_MODE == CRYPT_RSA_MODE_OPENSSL && $bits >= 384 && CRYPT_RSA_EXPONENT == 65537) {
             $rsa = openssl_pkey_new(array(
                 'private_key_bits' => $bits,
-                'config' => WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/openssl.cnf'
+                'config' => $this -> plugin_base() . '/vendors/dkim/openssl.cnf'
             ));
 
-            openssl_pkey_export($rsa, $privatekey, NULL, array('config' => WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/openssl.cnf'));
+            openssl_pkey_export($rsa, $privatekey, NULL, array('config' => $this -> plugin_base() . '/vendors/dkim/openssl.cnf'));
             $publickey = openssl_pkey_get_details($rsa);
             $publickey = $publickey['key'];
 
@@ -725,7 +724,7 @@ class Crypt_RSA {
                     $private.= $this->_random(16 - (strlen($private) & 15));
                     $source.= pack('Na*', strlen($private), $private);
                     if (!class_exists('Crypt_AES')) {
-                        require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/AES.php');
+                        require_once($this -> plugin_base() . '/vendors/dkim/Crypt/AES.php');
                     }
                     $sequence = 0;
                     $symkey = '';
@@ -746,7 +745,7 @@ class Crypt_RSA {
                 $key.= 'Private-Lines: ' . ((strlen($private) + 32) >> 6) . "\r\n";
                 $key.= chunk_split($private, 64);
                 if (!class_exists('Crypt_Hash')) {
-                    require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/Hash.php');
+                    require_once($this -> plugin_base() . '/vendors/dkim/Crypt/Hash.php');
                 }
                 $hash = new Crypt_Hash('sha1');
                 $hash->setKey(pack('H*', sha1($hashkey)));
@@ -786,7 +785,7 @@ class Crypt_RSA {
                     $symkey = pack('H*', md5($this->password . $iv)); // symkey is short for symmetric key
                     $symkey.= substr(pack('H*', md5($symkey . $this->password . $iv)), 0, 8);
                     if (!class_exists('Crypt_TripleDES')) {
-                        require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/TripleDES.php');
+                        require_once($this -> plugin_base() . '/vendors/dkim/Crypt/TripleDES.php');
                     }
                     $des = new Crypt_TripleDES();
                     $des->setKey($symkey);
@@ -952,26 +951,26 @@ class Crypt_RSA {
                     switch ($matches[1]) {
                         case 'AES-128-CBC':
                             if (!class_exists('Crypt_AES')) {
-                                require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/AES.php');
+                                require_once($this -> plugin_base() . '/vendors/dkim/Crypt/AES.php');
                             }
                             $symkey = substr($symkey, 0, 16);
                             $crypto = new Crypt_AES();
                             break;
                         case 'DES-EDE3-CFB':
                             if (!class_exists('Crypt_TripleDES')) {
-                                require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/TripleDES.php');
+                                require_once($this -> plugin_base() . '/vendors/dkim/Crypt/TripleDES.php');
                             }
                             $crypto = new Crypt_TripleDES(CRYPT_DES_MODE_CFB);
                             break;
                         case 'DES-EDE3-CBC':
                             if (!class_exists('Crypt_TripleDES')) {
-                                require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/TripleDES.php');
+                                require_once($this -> plugin_base() . '/vendors/dkim/Crypt/TripleDES.php');
                             }
                             $crypto = new Crypt_TripleDES();
                             break;
                         case 'DES-CBC':
                             if (!class_exists('Crypt_DES')) {
-                                require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/DES.php');
+                                require_once($this -> plugin_base() . '/vendors/dkim/Crypt/DES.php');
                             }
                             $crypto = new Crypt_DES();
                             break;
@@ -1177,7 +1176,7 @@ class Crypt_RSA {
                 switch ($encryption) {
                     case 'aes256-cbc':
                         if (!class_exists('Crypt_AES')) {
-                            require_once(WP_PLUGIN_DIR . '/wp-mailinglist/vendors/dkim/Crypt/AES.php');
+                            require_once($this -> plugin_base() . '/vendors/dkim/Crypt/AES.php');
                         }
                         $symkey = '';
                         $sequence = 0;

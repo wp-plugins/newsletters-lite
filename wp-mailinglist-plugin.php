@@ -3,8 +3,8 @@
 if (!class_exists('wpMailPlugin')) {
 	class wpMailPlugin extends wpMailCheckinit {
 	
-		var $plugin_name = 'wp-mailinglist';
-		var $name = 'wp-mailinglist';
+		//var $plugin_name = 'wp-mailinglist';
+		//var $name = 'wp-mailinglist';
 		var $plugin_base;
 		var $pre = 'wpml';	
 		var $version = '4.3.6';
@@ -88,7 +88,7 @@ if (!class_exists('wpMailPlugin')) {
 		 */
 		function register_plugin($name = null, $base = null) {
 			$this -> api_key = $this -> get_option('api_key');
-			$this -> plugin_name = $name;
+			$this -> plugin_name = basename(dirname(__FILE__));			
 			$this -> plugin_base = rtrim(dirname($base), DS);
 			if (!defined('NEWSLETTERS_LOG_FILE')) { define("NEWSLETTERS_LOG_FILE", $this -> plugin_base() . DS . "newsletters.log"); }
 			$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);
@@ -239,7 +239,7 @@ if (!class_exists('wpMailPlugin')) {
 	        $version_info = $update -> get_version_info($cache);
 	
 	        if (!$version_info) { return $option; }
-	        $plugin_path = 'wp-mailinglist/wp-mailinglist.php';
+	        $plugin_path = $this -> plugin_file;
 	        
 	        if(empty($option -> response[$plugin_path])) {
 				$option -> response[$plugin_path] = new stdClass();
@@ -3160,7 +3160,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				add_thickbox();				
-				wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);
+				wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/wp-mailinglist.js', array('jquery'), '1.0', true);
 				wp_enqueue_script('jquery-ui-tabs');
 				wp_enqueue_script('jquery-cookie', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.cookie.js', array('jquery'));
 				wp_enqueue_script('jquery-shiftclick', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.shiftclick.js', array('jquery'));
@@ -3201,8 +3201,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (is_admin()) {			
 				if (true || !empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
 					$load = true;	
-					$stylesource = plugins_url() . '/' . $this -> plugin_name . '/css/' . $this -> plugin_name . '.css';
-					//wp_enqueue_style('farbtastic');
+					$stylesource = plugins_url() . '/' . $this -> plugin_name . '/css/wp-mailinglist.css';
 					wp_enqueue_style('wp-color-picker');
 				}
 				
@@ -6400,7 +6399,6 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function render($file = null, $params = array(), $output = true, $folder = 'default', $extension = null) {	
 			$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);
-			//$this -> plugin_name = 'wp-mailinglist';
 		
 			if (!empty($file)) {				
 				$filename = $file . '.php';
@@ -6571,9 +6569,7 @@ if (!class_exists('wpMailPlugin')) {
 			return $hashlink;
 		}
 		
-		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {
-			$this -> plugin_name = 'wp-mailinglist';
-						
+		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {						
 			if (!empty($file) || !empty($fullbody)) {
 				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
 				$foot = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'foot.php';
@@ -6801,7 +6797,6 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function render_admin($file = null, $params = array(), $output = true) {	
 			if (!empty($file)) {
-				$this -> plugin_name = 'wp-mailinglist';
 				$filefull = $this -> plugin_base() . DS . 'views' . DS . 'admin' . DS . $file . '.php';
 			
 				if (!empty($params)) {
