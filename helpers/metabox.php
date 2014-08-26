@@ -40,6 +40,11 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'history', array('histories' => $histories), true, 'admin');
 	}
 	
+	function welcome_quicksearch() {
+		
+		$this -> render('metaboxes' . DS . 'welcome' . DS . 'quicksearch', false, true, 'admin');
+	}
+	
 	function welcome_subscribers() {
 		global $wpdb, $Subscriber;
 		$subscribersquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Subscriber -> table . "";

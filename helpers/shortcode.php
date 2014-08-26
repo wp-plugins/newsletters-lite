@@ -81,10 +81,6 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			'language'			=>	$language,
 		);
 		
-		//global $wpml_eftype, $wpml_target;
-		//$wpml_eftype = $eftype;
-		//$wpml_target = $target;
-		
 		foreach ($r as $rkey => $rval) {
 			global ${'wpml_' . $rkey};
 			${'wpml_' . $rkey} = $rval;

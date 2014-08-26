@@ -1788,11 +1788,28 @@ if (!class_exists('wpMailPlugin')) {
 								
 									$Db -> model = $Autoresponderemail -> model;
 									$Db -> delete_all(array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']));
-								
-									$success = true;
-									$successmessage = __('Subscription has been removed.', $this -> plugin_name);
+									
+									//Should the subscriber be deleted?
+									$deleted = false;
+									if ($this -> get_option('unsubscribedelete') == "Y") {											
+										$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists		
+										if (empty($subscribedlists) || !is_array($subscribedlists) || count($subscribedlists) <= 0) {							
+											$Db -> model = $Subscriber -> model;
+											$Db -> delete($subscriber -> id);
+											$deleted = true;
+										}
+									}
+									
 									$this -> admin_unsubscription_notification($subscriber, $mailinglist);
-									$subscriber = $Auth -> logged_in();
+								
+									if (!empty($deleted) || $deleted == true) {
+										$message = __('Subscription removed and subscriber record deleted', $this -> plugin_name);
+										$this -> redirect(home_url(), 'success', $message, true);
+									} else {
+										$success = true;
+										$successmessage = __('Subscription has been removed.', $this -> plugin_name);
+										$subscriber = $Auth -> logged_in();
+									}
 								} else {
 									$errors[] = __('Subscription could not be removed.', $this -> plugin_name);	
 								}
@@ -1986,12 +2003,6 @@ if (!class_exists('wpMailPlugin')) {
 		function sc_management($atts = array(), $content = null) {
 			global $wpdb, $Db, $Subscriber, $SubscribersList, $Auth, $Field, $Unsubscribe, $Autoresponderemail;
 			
-			define('DONOTCACHEPAGE', true);
-			define('DONOTCACHEDB', true);
-			define('DONOTMINIFY', true);
-			define('DONOTCDN', true);
-			define('DONOTCACHCEOBJECT', true);
-			
 			$output = "";
 			$defaults = array();
 			extract(shortcode_atts($defaults, $atts));
@@ -2122,10 +2133,12 @@ if (!class_exists('wpMailPlugin')) {
 					$this -> render('unsubscribe' . $userfile, array('subscriber' => $subscriber, 'user' => $user, 'data' => $data, 'errors' => $errors, 'success' => $success, 'deleted' => $deleted), true, 'default');
 					break;
 				case 'logout'				:
+					global $wpmljavascript;
 					$subscriberemailauth = $Auth -> read_emailcookie();
 					$subscriberauth = $Auth -> read_cookie();
 					$Auth -> delete_cookie($Auth -> cookiename, $subscriberauth);
 					$Auth -> delete_cookie($Auth -> emailcookiename, $subscriberemailauth);
+					echo $wpmljavascript;
 					$this -> render('management' . DS . 'logout-auth', false, true, 'default');
 					break;
 				case 'loginauth'			:
@@ -2222,9 +2235,13 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			global $wpmljavascript;
-			if (!empty($wpmljavascript)) { print($wpmljavascript); }
+			if (!empty($wpmljavascript)) {
+				echo $wpmljavascript;
+			}
 			
-			$output = ob_get_clean();
+			$output = ob_get_clean();			
+			global $Html;
+			$output = $Html -> fragment_cache($output, 'this', 'sc_management', false);
 			return $output;
 		}
 		
@@ -4283,11 +4300,11 @@ if (!class_exists('wpMailPlugin')) {
 	
 			if ($this -> debugging == true) {
 				echo '<pre>' . print_r($var, true) . '</pre>';
-				flush();
 			}
 			
 			if ($output == false) {
 				$debug = ob_get_clean();
+				ob_end_clean();
 				return $debug;
 			}
 			

@@ -1,5 +1,22 @@
 <?php
 
+if (!function_exists('newsletters_has_emails_in_queue')) {
+	function newsletters_has_emails_in_queue() {
+		if (class_exists('wpMail')) {
+			if ($wpMail = new wpMail()) {
+				global $Queue;
+				$queue_count = $Queue -> count();
+				
+				if (!empty($queue_count) && $queue_count > 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+}
+
 /**
  *	Check if the current post/page is the Manage Subscriptions page.	
  *

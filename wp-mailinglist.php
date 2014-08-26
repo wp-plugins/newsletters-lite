@@ -11,6 +11,7 @@ Author URI: http://tribulant.com
 
 if (!defined('DS')) { define("DS", DIRECTORY_SEPARATOR); }
 if (!defined('WP_MEMORY_LIMIT')) { define('WP_MEMORY_LIMIT', "1024M"); }
+if (!defined('W3TC_DYNAMIC_SECURITY')) { define('W3TC_DYNAMIC_SECURITY', md5(rand(0,999))); }
 
 //include the wpMailPlugin class file
 require_once(dirname(__FILE__) . DS . 'includes' . DS . 'checkinit.php');
@@ -288,8 +289,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function init() {	
-			global $Db, $Email, $Html, $History, $Mailinglist, $wpmlOrder, $Subscriber, $SubscribersList;
-			
+			global $Db, $Email, $Html, $History, $Mailinglist, $wpmlOrder, $Subscriber, $SubscribersList;			
 			$this -> init_textdomain();
 		
 			$wpmlmethod = (empty($_POST[$this -> pre . 'method'])) ? null : $_POST[$this -> pre . 'method'];
@@ -313,13 +313,7 @@ if (!class_exists('wpMail')) {
 		
 			if (!empty($method)) {
 				switch ($method) {
-					case 'exportdownload'					:
-						define('DONOTCACHEPAGE', true);
-						define('DONOTCACHEDB', true);
-						define('DONOTMINIFY', true);
-						define('DONOTCDN', true);
-						define('DONOTCACHCEOBJECT', true);
-					
+					case 'exportdownload'					:					
 						if (!empty($_GET['file'])) {
 							$filename = urldecode($_GET['file']);
 							$filepath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
@@ -355,13 +349,7 @@ if (!class_exists('wpMail')) {
 							}
 						}
 						break;
-					case 'ajaxupload'						:
-						define('DONOTCACHEPAGE', true);
-						define('DONOTCACHEDB', true);
-						define('DONOTMINIFY', true);
-						define('DONOTCDN', true);
-						define('DONOTCACHCEOBJECT', true);
-					
+					case 'ajaxupload'						:					
 						if (!empty($_GET['file'])) {
 							$uploaddir = wp_upload_dir();
 							$filename = urldecode($_GET['file']);
@@ -963,7 +951,7 @@ if (!class_exists('wpMail')) {
 			}
 		}
 		
-		function wp_footer() {
+		function wp_footer() {		
 			$this -> render('footer');
 		}
 		
@@ -1817,6 +1805,7 @@ if (!class_exists('wpMail')) {
 		function admin_head_welcome() {
 			global $Metabox, $Html, $post;
 			
+			add_meta_box('quicksearchdiv', __('Quick Search', $this -> plugin_name) . $Html -> help(__('Quick search', $this -> plugin_name)), array($Metabox, 'welcome_quicksearch'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('subscribersdiv', __('Total Subscribers', $this -> plugin_name) . $Html -> help(__('This is the total number of subscribers in the database. In other words, email addresses. Each subscriber could have multiple subscriptions to different lists or no subscriptions at all for that matter.', $this -> plugin_name)), array($Metabox, 'welcome_subscribers'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('listsdiv', __('Total Mailing Lists', $this -> plugin_name) . $Html -> help(__('The total mailing lists that you have in use. Each list can have a purpose of its own, make use of lists to organize and power your subscribers.', $this -> plugin_name)), array($Metabox, 'welcome_lists'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('emailsdiv', __('Total Emails', $this -> plugin_name) . $Html -> help(__('The total number of emails sent to date since the plugin was installed until now.', $this -> plugin_name)), array($Metabox, 'welcome_emails'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');

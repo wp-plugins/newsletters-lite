@@ -8,6 +8,33 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return true;
 	}
 	
+	function fragment_cache($content = null, $object = null, $method = null, $data = null) {
+		$output = "";
+	
+		if (!empty($content)) {				
+			if (is_plugin_active(plugin_basename('wp-super-cache/wp-cache.php'))) {			
+				return $content;
+			
+				//global $wp_cache_config_file, $newsletters_wpsc_cachedata;
+				//include $wp_cache_config_file;
+				//if (empty($wp_cache_mfunc_enabled)) { wp_cache_replace_line('^ *\$wp_cache_mfunc_enabled', "\$wp_cache_mfunc_enabled = 1;", $wp_cache_config_file); }
+				//if (empty($wp_super_cache_late_init)) { wp_cache_replace_line('^ *\$wp_super_cache_late_init', "\$wp_super_cache_late_init = 1;", $wp_cache_config_file); }
+				//if (empty($wp_cache_mod_rewrite)) { wp_cache_replace_line('^ *\$wp_cache_mod_rewrite', "\$wp_cache_mod_rewrite = 0;", $wp_cache_config_file); }
+			} elseif (is_plugin_active(plugin_basename('w3-total-cache/w3-total-cache.php'))) {	
+				$output .= '<!--mfunc ' . W3TC_DYNAMIC_SECURITY . ' ?>' . $content . '<?php -->';
+				$output .= $content;
+				$output .= '<!--/mfunc ' . W3TC_DYNAMIC_SECURITY . ' -->';
+			} elseif (is_plugin_active(plugin_basename('quick-cache/quick-cache.php'))) {
+				define('QUICK_CACHE_ALLOWED', FALSE);
+				$output = $content;
+			} else {
+				$output = $content;
+			}
+		}
+		
+		return $output;
+	}
+	
 	function wp_has_current_submenu($submenu = false) {
 		$menu = false;
 		if (!empty($submenu)) {
@@ -36,12 +63,6 @@ class wpmlHtmlHelper extends wpMailPlugin {
 			?>
 			
 			<span class="wpmlhelp"><a href="" onclick="return false;" title="<?php echo esc_attr(strip_tags(stripslashes($help))); ?>"></a></span>
-			
-			<?php /*
-			<span class="wpmlhelp">
-				<a href="" onclick="return false;" title="<?php echo esc_attr(strip_tags(stripslashes($help))); ?>">&#63;</a>
-			</span>
-			*/ ?>
 			
 			<?php
 			
