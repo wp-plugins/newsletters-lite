@@ -6,7 +6,7 @@ Requires at least: 3.8
 Tested up to: 3.9.2
 Stable tag: 4.3.6
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
 Newsletter plugin for WordPress to capture subscribers and send bulk emails.
 
@@ -18,7 +18,11 @@ It has robust, efficient and unique features! This is an all-in-one newsletter t
 
 The software works the way you do so you can focus on creating newsletters and giving your website the necessary exposure!
 
+<<<<<<< HEAD
 Enjoy the plugin and let us know if you need any assistance!
+=======
+Enjoy the plugin!
+>>>>>>> b0d8268360ece2069f3e4c3c14a54a598e621fbc
 
 == Installation ==
 

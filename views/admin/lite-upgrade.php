@@ -6,16 +6,19 @@ $plugin_link = "http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin"
 
 global $Db, $Mailinglist, $Subscriber;
 
+/* List Limits */
 $Db -> model = $Mailinglist -> model;
 $list_count = $Db -> count();
 $lists = $list_count;
 $lists_percentage = (($lists / 1) * 100);
 
+/* Subscriber Limits */
 $Db -> model = $Subscriber -> model;
 $subscriber_count = $Db -> count();
 $subscribers = $subscriber_count;
 $subscribers_percentage = (($subscribers / 500) * 100);
 
+/* Email Limits */
 $newsletters_lite = new newsletters_lite();
 $emails = $newsletters_lite -> lite_current_emails_all(1000, 'monthly');
 $emails_percentage = (($emails / 1000) * 100);
