@@ -5296,9 +5296,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.1") < 0) {
+				if (version_compare($cur_version, "4.3.2") < 0) {
 					$this -> update_options();
-					$version = "4.3.1";
+					$version = "4.3.2";
 				}
 			
 				//the current version is older.
