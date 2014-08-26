@@ -1,3 +1,11 @@
+<!-- Paid Subscription Settings -->
+
+<?php
+
+$paidsubscriptionredirect = $this -> get_option('paidsubscriptionredirect');
+
+?>
+
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -28,6 +36,14 @@
 						</select>
 					<?php endif; ?>
 					<span class="howto"><?php _e('Choose the currency to charge your subscribers in.', $this -> plugin_name); ?></span>
+				</td>
+			</tr>
+			<tr>
+				<th><label for="paidsubscriptionredirect_Y"><?php _e('Redirect Immediately to Payment', $this -> plugin_name); ?></label></th>
+				<td>
+					<label><input <?php echo (!empty($paidsubscriptionredirect) && $paidsubscriptionredirect == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="paidsubscriptionredirect" value="Y" id="paidsubscriptionredirect_Y" /> <?php _e('On', $this -> plugin_name); ?></label>
+					<label><input <?php echo (!empty($paidsubscriptionredirect) && $paidsubscriptionredirect == "N") ? 'checked="checked"' : ''; ?> type="radio" name="paidsubscriptionredirect" value="N" id="paidsubscriptionredirect_N" /> <?php _e('Off', $this -> plugin_name); ?></label>
+					<span class="howto"><?php _e('Should the subscriber be redirected immediately to make a payment?', $this -> plugin_name); ?></span>
 				</td>
 			</tr>
 			<tr>

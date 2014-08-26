@@ -93,6 +93,23 @@ class wpmlMailinglist extends wpMailPlugin {
 		return;
 	}
 	
+	function has_paid_list($lists = array()) {
+		global $Db;
+	
+		if (!empty($lists)) {
+			foreach ($lists as $list_id) {
+				$Db -> model = $this -> model;
+				$list = $Db -> find(array('id' => $list_id));
+				
+				if (!empty($list -> paid) && $list -> paid == "Y") {
+					return $list -> id;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Counts all the mailinglist records.
 	 * @return INT the number of mailing list records.

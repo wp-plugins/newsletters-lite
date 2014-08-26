@@ -972,7 +972,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function ajax_subscribe() {			
-			global $Subscriber, $Html;
+			global $Subscriber, $Mailinglist, $Html;
 			
 			define('DOING_AJAX', true);
 			define('SHORTINIT', true);
@@ -988,8 +988,14 @@ if (!class_exists('wpMailPlugin')) {
 			$action = ($this -> is_plugin_active('qtranslate')) ? qtrans_convertURL($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
 			$action = $Html -> retainquery($this -> pre . 'method=optin', $action) . '#' . $widget_id;
 			
-			if ($Subscriber -> optin($_POST)) {
+			if ($subscriber_id = $Subscriber -> optin($_POST)) {
 				echo '<p class="newsletters-acknowledgement">' . __($instance['acknowledgement']) . '</p>';
+				
+				if ($paidlist_id = $Mailinglist -> has_paid_list($_POST['list_id'])) {
+					$subscriber = $Subscriber -> get($subscriber_id, false);
+					$paidlist = $Mailinglist -> get($paidlist_id, false);
+					$this -> paidsubscription_form($subscriber, $paidlist, true);
+				}
 			
 				if ($this -> get_option('subscriberedirect') == "Y") {
 					$this -> redirect($this -> get_option('subscriberedirecturl'), false, false, true);
@@ -4965,6 +4971,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['importuserslists'] = array(1);
 			$options['importusersrequireactivate'] = "N";
 			$options['subscriptions'] = "Y";
+			$options['paidsubscriptionredirect'] = "Y";
 			$options['rssfeed'] = "N";
 			$options['deleteonbounce'] = 'Y';
 	        $options['bouncecount'] = 3;

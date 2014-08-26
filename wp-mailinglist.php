@@ -559,10 +559,16 @@ if (!class_exists('wpMail')) {
 						exit();
 						break;
 					case 'optin'			:
-						global $Subscriber, $Html;
+						global $Subscriber, $Html, $Mailinglist;
 						
 						if (!empty($_POST)) {						
-							if ($Subscriber -> optin($_POST)) {
+							if ($subscriber_id = $Subscriber -> optin($_POST)) {
+								if ($paidlist_id = $Mailinglist -> has_paid_list($_POST['list_id'])) {
+									$subscriber = $Subscriber -> get($subscriber_id, false);
+									$paidlist = $Mailinglist -> get($paidlist_id, false);
+									$this -> paidsubscription_form($subscriber, $paidlist, true);
+								}
+							
 								if ($this -> get_option('subscriberedirect') == "Y") {							
 									$this -> redirect($this -> get_option('subscriberedirecturl'));
 								} else {

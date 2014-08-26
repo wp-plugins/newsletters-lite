@@ -1,11 +1,11 @@
 <table class="form-table">
 	<tbody>
 		<tr>
-			<th><label for=""><?php _e('Redirect On Success Subscribe', $this -> plugin_name); ?></label>
+			<th><label for="subscriberedirect_N"><?php _e('Redirect On Success Subscribe', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('This redirect takes effect on the actual subscribe form when a user subscribes. You can turn this setting on to redirect a subscriber to a specific place upon successful subscribe.', $this -> plugin_name)); ?></th>
 			<td>
-				<label><input onclick="jQuery('#subscriberedirecturl_div').show();" <?php echo ($this -> get_option('subscriberedirect') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="subscriberedirect" value="Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
-				<label><input onclick="jQuery('#subscriberedirecturl_div').hide();" <?php echo ($this -> get_option('subscriberedirect') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="subscriberedirect" value="N" /> <?php _e('No', $this -> plugin_name); ?></label>
+				<label><input onclick="jQuery('#subscriberedirecturl_div').show();" <?php echo ($this -> get_option('subscriberedirect') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="subscriberedirect" value="Y" id="subscriberedirect_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+				<label><input onclick="jQuery('#subscriberedirecturl_div').hide();" <?php echo ($this -> get_option('subscriberedirect') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="subscriberedirect" value="N" id="subscriberedirect_N" /> <?php _e('No', $this -> plugin_name); ?></label>
 				<span class="howto"><?php _e('Should a subscriber be redirected after successfully subscribing?', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
