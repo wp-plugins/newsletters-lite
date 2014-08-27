@@ -102,6 +102,8 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 
 == Changelog ==
 
+= X.X =
+
 = 4.3.6.2 =
 * ADD: Screenshots for WordPress.org plugin page
 * IMPROVE: Updated readme.txt file
