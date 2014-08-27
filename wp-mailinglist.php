@@ -1717,16 +1717,16 @@ if (!class_exists('wpMail')) {
 			} else { setlocale(LC_ALL, $locale); }
 				
 			if (function_exists('load_plugin_textdomain')) {			
-				$mofile = $this -> plugin_name . '-' . $locale . '.mo';
+				$mofile = 'wp-mailinglist-' . $locale . '.mo';
 				$mofullfull = WP_PLUGIN_DIR . DS . 'wp-mailinglist-languages' . DS . $mofile;
 				$mofull = 'wp-mailinglist-languages' . DS;
 				$language_external = $this -> get_option('language_external');
 			
 				if (!empty($language_external) && file_exists($mofullfull)) {
-					load_plugin_textdomain($this -> plugin_name, false, $mofull);
+					load_plugin_textdomain('wp-mailinglist', false, $mofull);
 				} else {
 					$mofull = dirname(plugin_basename(__FILE__)) . DS . 'languages' . DS;
-					load_plugin_textdomain($this -> plugin_name, false, $mofull);
+					load_plugin_textdomain('wp-mailinglist', false, $mofull);
 				}
 			}	
 		}
