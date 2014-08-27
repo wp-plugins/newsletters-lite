@@ -66,8 +66,6 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action($this -> pre . '_importusers', 'importusers_hook', 10, 1);
 			$this -> add_action('do_meta_boxes', 'do_meta_boxes', 10, 1);
 			$this -> add_action('admin_notices');
-			$this -> add_action('after_plugin_row_' . $this -> plugin_name . '/wp-mailinglist.php', 'after_plugin_row', 10, 2);
-			$this -> add_action('install_plugins_pre_plugin-information', 'display_changelog', 10, 1);
 			$this -> add_action('admin_init', 'tinymce');
 			$this -> add_action('admin_init', 'custom_redirect', 1, 1);
 			$this -> add_action('phpmailer_init', 'phpmailer_init', 999, 1);
@@ -85,9 +83,15 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_filter('screen_settings', 'screen_settings', 15, 2);
 			$this -> add_filter('plugin_action_links', 'plugin_action_links', 10, 4);
 			$this -> add_filter('the_editor', 'the_editor', 1, 1);
-			$this -> add_filter('transient_update_plugins', 'check_update', 10, 1);
-	        $this -> add_filter('site_transient_update_plugins', 'check_update', 10, 1);
 	        $this -> add_filter('tiny_mce_before_init', 'override_mce_options', 10, 1);
+	        
+		    $this -> add_action('after_plugin_row_' . $this -> plugin_name . '/wp-mailinglist.php', 'after_plugin_row', 10, 2);
+			
+			if ($this -> ci_serial_valid()) {	
+				$this -> add_action('install_plugins_pre_plugin-information', 'display_changelog', 10, 1);
+				$this -> add_filter('transient_update_plugins', 'check_update', 10, 1);
+		        $this -> add_filter('site_transient_update_plugins', 'check_update', 10, 1);
+		    }
 	        
 	        if ($this -> language_do()) {
 	        	add_filter('gettext', array($this, 'language_useordefault'), 0);

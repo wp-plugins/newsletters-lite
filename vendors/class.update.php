@@ -39,7 +39,7 @@ class wpmlupdate extends wpMailPlugin {
 			$request_url = NEWSLETTERS_MANAGER_URL . 'updates/1/' . $this -> get_remote_request_params();
 			$raw_response = wp_remote_request($request_url, $options);
 			
-			set_transient($this -> pre . 'update_info', $raw_response, 86400);
+			set_transient($this -> pre . 'update_info', $raw_response, 43200);
 		}
 		
 		if (is_wp_error($raw_response) || 200 != $raw_response['response']['code']) {

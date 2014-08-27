@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.6.2';
+		var $version = '4.3.7';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -220,7 +220,7 @@ if (!class_exists('wpMailPlugin')) {
 		/**
 		 * This function outputs the changelog on the 'Plugins' page when the "View Details" link is clicked.
 		 */
-	    function display_changelog() {  	
+	    function display_changelog() {	    	
 	    	if (!empty($_GET['plugin']) && $_GET['plugin'] == $this -> plugin_name) {			
 		    	$update = $this -> vendor('update');
 		    	if ($changelog = $update -> get_changelog()) {				
@@ -249,7 +249,7 @@ if (!class_exists('wpMailPlugin')) {
 	        }
 	
 	        //Empty response means that the key is invalid. Do not queue for upgrade
-	        if(!$version_info["is_valid_key"] || version_compare($this -> version, $version_info["version"], '>=')){
+	        if(empty($version_info['is_valid_key']) || version_compare($this -> version, $version_info["version"], '>=')){
 	            unset($option -> response[$plugin_path]);
 	        } else {
 	            $option -> response[$plugin_path] -> url = "http://tribulant.com";
@@ -5659,9 +5659,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.6.2") < 0) {
+				if (version_compare($cur_version, "4.3.7") < 0) {
 					$this -> update_options();
-					$version = "4.3.6.2";
+					$version = "4.3.7";
 				}
 			
 				//the current version is older.

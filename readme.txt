@@ -102,6 +102,28 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 
 == Changelog ==
 
+= 4.3.7 =
+* ADD: NEWSLETTERS_NAME constant to define the plugin/folder name
+* ADD: Mandatory subscribers that cannot unsubscribe
+* ADD: Open live preview in new window when creating a newsletter  
+* IMPROVE: Remove wp-mailinglist-ajax.php completely and replace with wp_ajax_
+* IMPROVE: Remove TimThumb image script
+* IMPROVE: Remove included scripts and replace them with WordPress scripts
+* IMPROVE: Only show update notification to users who can 'edit_plugins'
+* IMPROVE: Button to hide update notification  
+* FIX: Latest Post subscriptions not logging posts with group by category setting on
+* FIX: Some permissions is not showing up in the list.
+* FIX: Multilingual - Checkbox list in sidebar widget not working
+* FIX: Editing future scheduled post unselects mailing lists
+* FIX: "Screen Options" custom fields not effective immediately
+* FIX: Export history and history emails breaks paging and link
+* FIX: Clicking on all languages in pages gives memory issue- fatal error
+* FIX: Multilingual - Specific list in widget shows drop down anyways
+* FIX: Subscribers filters resetting when paging is clicked
+* FIX: 'showdate' parameter ineffective on multiple posts shortcode
+* FIX: Dollar sign ($) like price in subject parses as PHP variable and disappears
+* FIX: Broken HTML on shortcode subscribe form due to 3rd party plugins  
+
 = 4.3.6.2 =
 * ADD: Screenshots for WordPress.org plugin page
 * IMPROVE: Updated readme.txt file
