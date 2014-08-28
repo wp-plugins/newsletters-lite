@@ -25,7 +25,6 @@ require_once(dirname(__FILE__) . DS . 'wp-mailinglist-plugin.php');
 
 if (!class_exists('wpMail')) {
 	class wpMail extends wpMailPlugin {
-		
 		var $url;
 		var $plugin_file;
 		
