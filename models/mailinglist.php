@@ -62,8 +62,8 @@ class wpmlMailinglist extends wpMailPlugin {
 				
 				switch ($key) {
 					case 'group_id'			:
-						if (!empty($val)) {
-							$Db -> model = $wpmlGroup -> model;
+						if (!empty($val)) {						
+							$Db -> model = $wpmlGroup -> model;							
 							$this -> group = $Db -> find(array('id' => $val));	
 						}
 						break;	

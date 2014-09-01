@@ -44,6 +44,10 @@ if (!class_exists('wpMailPlugin')) {
 			'support'					=>	"newsletters-support",
 		);
 		
+		var $blocks = array(
+			'newsletters_admin_send_sendtoroles'
+		);
+		
 		var $extensions = array();
 		
 		var $classes = array(
@@ -1191,7 +1195,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (empty($_POST['message'])) { $errors[] = __('Please fill in a message', $this -> plugin_name); }
 				
 				if (empty($errors)) {
-					$subscriber = null;
+					$subscriber = new stdClass();
 					$subscriber -> email = $_POST['testemail'];
 					$subject = $_POST['subject'];
 					$message = $_POST['message'];
@@ -1576,6 +1580,7 @@ if (!class_exists('wpMailPlugin')) {
 			ob_start();
 			echo do_shortcode(stripslashes($content));
 			$output = ob_get_clean();
+			
 			ob_start();
 			echo $this -> process_set_variables($subscriber, $user, $output, $email -> id);
 			$output = ob_get_clean();
@@ -2657,19 +2662,21 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function language_converturl($url = null, $language = null) {
 			global $newsletters_languageplugin;
-			$url = false;
 		
-			switch ($newsletters_languageplugin) {
-				case 'qtranslate'				:
-					$url = qtrans_convertURL($url, $language);
-					break;
-				case 'wpml'						:
-					$languages = icl_get_languages();
-					$language = $this -> language_current();
-					if (!empty($languages[$language]['url'])) {
-						$url = $languages[$language]['url'];
-					}
-					break;
+			if (!empty($url) && !empty($language)) {
+				switch ($newsletters_languageplugin) {
+					case 'qtranslate'				:
+						$url = qtrans_convertURL($url, $language);
+						break;
+					case 'wpml'						:
+						$languages = icl_get_languages();
+						$language = $this -> language_current();
+						
+						if (!empty($languages[$language]['url'])) {
+							//$url = $languages[$language]['url'];
+						}
+						break;
+				}
 			}
 			
 			return $url;
@@ -4326,7 +4333,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($eunique)) {
 				if ($this -> get_option('tracking') == "Y") {
-					$tracking = '<img style="display:none;" src="' . home_url() . '/?' . $this -> pre . 'method=track&id=' . $eunique . '" />';
+					$tracking = '<img src="' . home_url() . '/?' . $this -> pre . 'method=track&id=' . $eunique . '" />';
 				}	
 			}
 			
@@ -5721,6 +5728,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['dkim_domain'] = "domain.com";
 			$options['dkim_selector'] = "newsletters";
 			$options['tracking'] = "Y";
+			$options['tracking_image'] = "invisible";
 			$options['servertype'] = 'cpanel';
 	        $options['mailpriority'] = 3; //set the mail priority to "Normal"
 			$options['unsubscribeondelete'] = 'N';
@@ -5947,8 +5955,11 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function check_roles() {
 			global $wp_roles;
-			//$permissions = $this -> get_option('permissions');
-			$permissions = array();
+			$permissions = $this -> get_option('permissions');
+			
+			if (empty($permissions)) {
+				$permissions = array();
+			}
 			
 			if ($role = get_role('administrator')) {		
 				if (!empty($this -> sections)) {			
@@ -5958,9 +5969,16 @@ if (!class_exists('wpMailPlugin')) {
 							$permissions[$section_key][] = 'administrator';
 						}
 					}
-					
-					$this -> update_option('permissions', $permissions);
 				}
+				
+				if (!empty($this -> blocks)) {
+					foreach ($this -> blocks as $block) {
+						$role -> add_cap($block);
+						$permissions[$block][] = 'administrator';
+					}
+				}
+				
+				$this -> update_option('permissions', $permissions);
 			}
 			
 			return false;		
@@ -5980,23 +5998,25 @@ if (!class_exists('wpMailPlugin')) {
 						$role -> add_cap('newsletters_' . $section_key);
 					}
 				}
-			}
-	
-			/**
-			 * If the administrator role does not exist for some reason, we have a bit of a problem 
-			 * because this is a role management plugin and requires that someone actually be able to 
-			 * manage roles.  So, we're going to create a custom role here.  The site administrator can 
-			 * assign this custom role to any user they wish to work around this problem.  We're only 
-			 * doing this for single-site installs of WordPress.  The 'super admin' has permission to do
-			 * pretty much anything on a multisite install.
-			 */
-			elseif (empty($role) && !is_multisite()) {
+				
+				if (!empty($this -> blocks)) {
+					foreach ($this -> blocks as $block) {
+						$role -> add_cap($block);
+					}
+				}
+			} elseif (empty($role) && !is_multisite()) {
 				$newrolecapabilities = array();
 				$newrolecapabilities[] = 'read';
 			
 				if (!empty($sections)) {
 					foreach ($sections as $section_key => $section_menu) {
 						$newrolecapabilities[] = 'newsletters_' . $section_key;
+					}
+				}
+				
+				if (!empty($this -> blocks)) {
+					foreach ($this -> blocks as $block) {
+						$newrolecapabilities[] = $block;
 					}
 				}
 	
@@ -6013,6 +6033,11 @@ if (!class_exists('wpMailPlugin')) {
 				foreach ($sections as $section_key => $section_menu) {
 					$wp_roles -> add_cap('administrator', 'newsletters_' . $section_key);
 					$permissions[$section_key][] = 'administrator';
+				}
+				
+				foreach ($this -> blocks as $block) {
+					$wp_roles -> add_cap('administrator', $block);
+					$permissions[$block][] = 'administrator';
 				}
 				
 				$this -> update_option('permissions', $permissions);
@@ -6398,6 +6423,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function render($file = null, $params = array(), $output = true, $folder = 'default', $extension = null) {	
+			$this -> plugin_name = basename(dirname(__FILE__));
 			$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);
 		
 			if (!empty($file)) {				

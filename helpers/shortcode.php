@@ -149,16 +149,17 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$wpml_eftype = $eftype;
 		$wpml_target = $target;
 		
+		$currentlanguage = $arguments['language'];
+		
 		extract($arguments);
 							   
 		if ($posts = get_posts($arguments)) {	
 			$shortcode_post_showdate = $showdate;
 			
-			if ($this -> is_plugin_active('qtranslate')) {
-				$shortcode_post_language = $arguments['language'];
-			
+			if ($this -> language_do()) {
+				$shortcode_post_language = $currentlanguage;			
 				foreach ($posts as $pkey => $post) {
-					$posts[$pkey] = $this -> language_use($arguments['language'], $post, false);
+					$posts[$pkey] = $this -> language_use($currentlanguage, $post, false);
 				}
 				
 				$shortcode_posts = $posts;
@@ -240,7 +241,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_link'				:
-			case 'newsletters_post_link'	:			
+			case 'newsletters_post_link'	:					
 				if (!empty($shortcode_post)) {
 					return $this -> direct_post_permalink($shortcode_post -> ID);
 				}
@@ -326,9 +327,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$post_id = (empty($id)) ? $shortcode_post -> ID : $id;
 		
 		if (!empty($post_id)) {
-			if ($permalink = get_permalink($post_id)) {
+			if ($permalink = get_permalink($post_id)) {						
 				if ($this -> language_do()) {
-					$permalink = $this -> language_converturl($permalink, $shortcode_post_language);
+					$permalink = $this -> language_converturl($permalink, $shortcode_post_language);					
 					$permalink = $Html -> retainquery('lang=' . $shortcode_post_language, $permalink);
 				}
 				

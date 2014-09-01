@@ -18,11 +18,14 @@
                 
                 <span id="setgroupactiondiv" style="display:none;">
                 	<?php if ($groupsselect = $wpmlGroup -> select()) : ?>
-                    	<select name="setgroup_id" id="setgroup_id" class="alignleft">
-                        	<?php foreach ($groupsselect as $group_id => $group_title) : ?>
-                            	<option value="<?php echo $group_id; ?>"><?php echo $group_title; ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                		<label>
+	                		<?php _e('Group:', $this -> plugin_name); ?>
+	                    	<select name="setgroup_id" id="setgroup_id" class="action">
+	                        	<?php foreach ($groupsselect as $group_id => $group_title) : ?>
+	                            	<option value="<?php echo $group_id; ?>"><?php echo $group_title; ?></option>
+	                            <?php endforeach; ?>
+	                        </select>
+                		</label>
                     <?php else : ?>
                     	<?php _e('No groups are available.', $this -> plugin_name); ?>
                     <?php endif; ?>
@@ -34,8 +37,8 @@
 		</div>
         
         <script type="text/javascript">
-		function change_action(action) {
-			jQuery('id$="actiondiv"').hide();
+		function change_action(action) {		
+			jQuery('span[id$="actiondiv"]').hide();
 			jQuery('#' + action + 'actiondiv').show();	
 		}
 		</script>
@@ -182,8 +185,9 @@
 							<td><label for="checklist<?php echo $list -> id; ?>"><?php echo $FieldsList -> count_by_list($list -> id); ?></label></td>
 							<?php if (apply_filters($this -> pre . '_admin_mailinglists_groupcolumn', true)) : ?>
 			                    <td>
+			                    	<?php $Db -> model = $wpmlGroup -> model; ?>
 			                    	<?php if (!empty($list -> group_id)) : ?>
-			                        	<?php echo $Html -> link($list -> group -> title, '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $list -> group_id); ?>
+			                        	<?php echo $Html -> link(__($Db -> field('title', array('id' => $list -> group_id))), '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $list -> group_id); ?>
 			                        <?php else : ?>
 			                        	<?php _e('none', $this -> plugin_name); ?>
 			                        <?php endif; ?>

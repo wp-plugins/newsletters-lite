@@ -515,15 +515,31 @@ if (!class_exists('wpMail')) {
 						$this -> render_email('preview', false, true, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('sending'));
 						exit();
 						break;
-					case 'track'			:					
+					case 'track'			:	
+						global $Html;
+									
 						$Db -> model = $Email -> model;
 						$Db -> save_field('read', "Y", array('eunique' => $_GET['id']));
 						$Db -> save_field('status', "sent", array('eunique' => $_GET['id']));
 						
-						header("Content-Type: image/jpeg");
-						$image = imagecreate(1, 1);
-						imagejpeg($image);
-						imagedestroy($image);
+						$tracking = $this -> get_option('tracking');
+						$tracking_image = $this -> get_option('tracking_image');
+						$tracking_image_file = $this -> get_option('tracking_image_file');
+						
+						if (!empty($tracking) && $tracking == "Y") {
+							if (!empty($tracking_image) && $tracking_image == "custom") {
+								$tracking_image_full = $Html -> uploads_path() . DS . $this -> plugin_name . DS . $tracking_image_file;
+								$imginfo = getimagesize($tracking_image_full);
+								header("Content-type: " . $imginfo['mime']);
+								readfile($tracking_image_full);		
+							} else {
+								header("Content-Type: image/jpeg");
+								$image = imagecreate(1, 1);
+								imagejpeg($image);
+								imagedestroy($image);
+							}
+						}
+						
 						exit();
 						
 						break;
@@ -2247,6 +2263,8 @@ if (!class_exists('wpMail')) {
 					'post_type'				=>	((empty($_POST['newsletters_post_type'])) ? 'post' : $_POST['newsletters_post_type']),
 					'post_author'			=>	(empty($_POST['post_author'])) ? $user_ID : $_POST['post_author'],
 				);
+				
+				stripslashes_deep($post);
 				
 				$currstatus = $this -> get_option('sendonpublish');
 				$this -> update_option('sendonpublish', 'N');
@@ -5522,13 +5540,41 @@ if (!class_exists('wpMail')) {
 					
 					$this -> redirect($Html -> retainquery('reset=1', $this -> url), $msg_type, $message);
 					break;
-				default					:			
+				default					:							
 					//make sure that data has been posted
-					if (!empty($_POST)) {
+					if (!empty($_POST)) {					
 						//unset values that are not required
 						unset($_POST['save']);
 						delete_option('tridebugging');
 						$this -> delete_option('themeintextversion');
+						
+						if (!empty($_FILES)) {
+							foreach ($_FILES as $fkey => $fval) {
+								switch ($fkey) {
+									case 'tracking_image_file'			:
+										$tracking_image_file = $this -> get_option('tracking_image_file');
+									
+										if (!empty($_POST['tracking']) && $_POST['tracking'] == "Y" && !empty($_POST['tracking_image']) && $_POST['tracking_image'] == "custom") {
+											if (!empty($_FILES['tracking_image_file']['name'])) {
+												$tracking_image_file = $_FILES['tracking_image_file']['name'];
+												$tracking_image_path = $Html -> uploads_path() . DS . $this -> plugin_name . DS;
+												$tracking_image_full = $tracking_image_path . $tracking_image_file;
+											
+												if (move_uploaded_file($_FILES['tracking_image_file']['tmp_name'], $tracking_image_full)) {
+													$this -> update_option('tracking_image_file', $tracking_image_file);
+												} else {
+													$this -> render_error(__('Tracking image file could not be moved from /tmp', $this -> plugin_name));
+												}
+											} else {
+												if (empty($tracking_image_file)) {
+													$this -> render_error(__('No image was specified', $this -> plugin_name));
+												}
+											}
+										}
+										break;
+								}
+							}
+						}
 						
 						foreach ($_POST as $key => $val) {				
 							$this -> update_option($key, $val);
@@ -5694,6 +5740,17 @@ if (!class_exists('wpMail')) {
 										/* No roles were selected for this capability, at least add 'administrator' */
 										$wp_roles -> add_cap('administrator', 'newsletters_' . $section_key);
 										$permissions[$section_key][] = 'administrator';
+									}
+								}
+								
+								foreach ($this -> blocks as $block) {
+									if (!empty($permissions[$block])) {
+										foreach ($permissions[$block] as $role) {
+											$wp_roles -> add_cap($role, $block);
+										}
+									} else {
+										$wp_roles -> add_cap('administrator', $block);
+										$permissions[$block][] = 'administrator';
 									}
 								}
 							}

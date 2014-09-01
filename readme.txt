@@ -1,4 +1,4 @@
-=== Newsletters ===
+=== Tribulant Newsletters ===
 Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
@@ -58,6 +58,12 @@ Some of the features in the WordPress Newsletter plugin include:
 = Demo and Support =
 
 See the <a href="http://tribulant.net/newsletter/">online demonstration</a> and view the <a href="http://docs.tribulant.com/wordpress-mailing-list-plugin/31">online documentation</a> for tips, tricks, guides and more.
+
+= Extensions =
+
+There are many free and paid extension plugins for the WordPress Newsletter plugin. All extensions work with both Newsletters LITE and Newsletters PRO, no problem.
+
+<a href="http://tribulant.com/plugins/extensions/1/wordpress-newsletter-plugin">Visit the Newsletters extensions page</a>
 
 = PRO Version =
 

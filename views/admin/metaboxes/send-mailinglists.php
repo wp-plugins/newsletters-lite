@@ -40,17 +40,19 @@ $count_users = count_users();
                 <p class="<?php echo $this -> pre; ?>error"><?php _e('No lists are available', $this -> plugin_name); ?></p>
             <?php endif; ?>
         </div>
-        <?php if (!empty($roles)) : ?>
-        	<br/>
-        	<div id="usersdiv">
-        		<div><label class="selectit" style="font-weight:bold;"><input type="checkbox" name="rolesselectall" value="1" id="rolesselectall" onclick="jqCheckAll(this, false, 'roles'); update_subscribers();" /> <?php _e('Select all Roles', $this -> plugin_name); ?></label></div>
-        		<div class="scroll-list">
-        			<?php foreach ($roles as $role_key => $role_name) : ?>
-        				<div><label class="selectit"><input onclick="update_subscribers();" <?php echo (!empty($_POST['roles']) && is_array($_POST['roles']) && in_array($role_key, $_POST['roles'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="roles[]" value="<?php echo $role_key; ?>" id="roles_<?php echo $role_key; ?>" /> <?php echo __($role_name); ?><?php echo (!empty($count_users['avail_roles'][$role_key])) ? ' (' . sprintf(__('%s users'), $count_users['avail_roles'][$role_key]) . ')' : ''; ?></label></div>
-        			<?php endforeach; ?>
-        		</div>
-        	</div>
-        <?php endif; ?>
+        <?php if (current_user_can('newsletters_admin_send_sendtoroles')) : ?>
+	        <?php if (!empty($roles)) : ?>
+	        	<br/>
+	        	<div id="usersdiv">
+	        		<div><label class="selectit" style="font-weight:bold;"><input type="checkbox" name="rolesselectall" value="1" id="rolesselectall" onclick="jqCheckAll(this, false, 'roles'); update_subscribers();" /> <?php _e('Select all Roles', $this -> plugin_name); ?></label></div>
+	        		<div class="scroll-list">
+	        			<?php foreach ($roles as $role_key => $role_name) : ?>
+	        				<div><label class="selectit"><input onclick="update_subscribers();" <?php echo (!empty($_POST['roles']) && is_array($_POST['roles']) && in_array($role_key, $_POST['roles'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="roles[]" value="<?php echo $role_key; ?>" id="roles_<?php echo $role_key; ?>" /> <?php echo __($role_name); ?><?php echo (!empty($count_users['avail_roles'][$role_key])) ? ' (' . sprintf(__('%s users'), $count_users['avail_roles'][$role_key]) . ')' : ''; ?></label></div>
+	        			<?php endforeach; ?>
+	        		</div>
+	        	</div>
+	        <?php endif; ?>
+	    <?php endif; ?>
 	</div>
 	<div id="mailingliststabs-segment">
 		<?php if (apply_filters('newsletters_admin_createnewsletter_daterangesettings', true)) : ?>
@@ -117,7 +119,9 @@ $count_users = count_users();
 	                                <?php
 	                                
 	                                $condquery = false;
-	                                $condquery = $_POST['condquery'][$field -> slug];
+	                                if (!empty($_POST['condquery'][$field -> slug])) {
+	                                	$condquery = $_POST['condquery'][$field -> slug];
+									}
 	                                
 	                                switch ($field -> validation) {
 	                                	case 'numeric'					:

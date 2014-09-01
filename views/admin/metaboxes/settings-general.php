@@ -1,3 +1,13 @@
+<!-- General Configuration -->
+
+<?php
+
+$tracking = $this -> get_option('tracking');
+$tracking_image = $this -> get_option('tracking_image');
+$tracking_image_file = $this -> get_option('tracking_image_file');
+
+?>
+
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -40,13 +50,53 @@
 		</tr>
 		<tr>
 			<th><label for="trackingY"><?php _e('Read Tracking', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(__('Turn this setting on to enable the remote read tracking then you can use the shortcode [wpmltrack] inside your newsletter theme or content. The [wpmltrack] shortcode creates a 1x1 pixels invisible image in the email which calls back to your site to let your software know that the email was opened/read by the recipient.', $this -> plugin_name)); ?></th>
+			<?php echo $Html -> help(__('Turn this setting on to enable the remote read tracking then you can use the shortcode [wpmltrack] inside your newsletter theme or content.', $this -> plugin_name)); ?></th>
 			<td>
-				<label><input <?php echo ($this -> get_option('tracking') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="tracking" value="Y" id="trackingY" /> <?php _e('On', $this -> plugin_name); ?></label>
-				<label><input <?php echo ($this -> get_option('tracking') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="tracking" value="N" id="trackingN" /> <?php _e('Off', $this -> plugin_name); ?></label>
-				<span class="howto"><?php _e('Invisible tracking inside newsletters to tell you how many emails were (not) read', $this -> plugin_name); ?></span>
+				<label><input onclick="jQuery('#tracking_div').show();" <?php echo ($this -> get_option('tracking') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="tracking" value="Y" id="trackingY" /> <?php _e('On', $this -> plugin_name); ?></label>
+				<label><input onclick="jQuery('#tracking_div').hide();" <?php echo ($this -> get_option('tracking') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="tracking" value="N" id="trackingN" /> <?php _e('Off', $this -> plugin_name); ?></label>
+				<span class="howto"><?php _e('Tracking inside newsletters to tell you how many emails were (not) read', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
+	</tbody>
+</table>
+
+<div id="tracking_div" style="display:<?php echo (!empty($tracking) && $tracking == "Y") ? 'block' : 'none'; ?>;">
+	<table class="form-table">
+		<tbody>
+			<tr>
+				<th><label for="tracking_image_invisible"><?php _e('Tracking Image', $this -> plugin_name); ?></label></th>
+				<td>
+					<label><input onclick="jQuery('#tracking_image_div').hide();" <?php echo (empty($tracking_image) || (!empty($tracking_image) && $tracking_image == "invisible")) ? 'checked="checked"' : ''; ?> type="radio" name="tracking_image" value="invisible" id="tracking_image_invisible" /> <?php _e('Invisible', $this -> plugin_name); ?></label>
+					<label><input onclick="jQuery('#tracking_image_div').show();" <?php echo (!empty($tracking_image) && $tracking_image == "custom") ? 'checked="checked"' : ''; ?> type="radio" name="tracking_image" value="custom" id="tracking_image_custom" /> <?php _e('Custom Image/Logo', $this -> plugin_name); ?></label>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<div id="tracking_image_div" style="display:<?php echo (!empty($tracking_image) && $tracking_image == "custom") ? 'block' : 'none'; ?>;">
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th><label for="tracking_image_file"><?php _e('Tracking Image/Logo', $this -> plugin_name); ?></label></th>
+					<td>
+						<input type="file" name="tracking_image_file" value="" id="tracking_image_file" />
+						
+						<?php if (!empty($tracking_image_file)) : ?>
+							
+							<p>
+								<?php _e('Current image:', $this -> plugin_name); ?><br/>
+								<img src="<?php echo $Html -> uploads_url() . '/' . $this -> plugin_name . '/' . $tracking_image_file; ?>" alt="tracking" />
+							</p>
+						<?php endif; ?>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<table class="form-table">
+	<tbody>
 		<tr>
 			<th><label for="clicktrack_Y"><?php _e('Click Tracking', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('The click tracking will convert your links to unique shortlinks automatically. When the links are clicked inside newsletters, the link, email and subscriber is tracked to create statistics.', $this -> plugin_name)); ?></th>

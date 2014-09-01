@@ -246,7 +246,9 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 							posts_types.push(jQuery(this).val());
 						});
 						
-						shortcode += ' post_type="' + posts_types + '"';
+						if (posts_types != "") { 
+							shortcode += ' post_type="' + posts_types + '"';
+						}
 					}
 					shortcode += ']';
 				} else if (ptype == "thumbnail") {

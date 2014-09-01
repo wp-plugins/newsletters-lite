@@ -12,7 +12,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 <div class="wrap newsletters <?php echo $this -> pre; ?> <?php $this -> sections -> settings; ?>">
 	<h2><?php _e('General Configuration', $this -> plugin_name); ?></h2>
     <?php $this -> render('settings-navigation', false, true, 'admin'); ?>
-	<form action="?page=<?php echo $this -> sections -> settings; ?>" method="post" id="settings-form">
+	<form action="?page=<?php echo $this -> sections -> settings; ?>" method="post" id="settings-form" enctype="multipart/form-data">
 		<?php wp_nonce_field($this -> sections -> settings); ?>
 	
 		<div id="poststuff">

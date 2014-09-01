@@ -58,6 +58,16 @@ $permissions = $this -> get_option('permissions');
 <?php if (current_user_can('edit_users') || is_super_admin()) : ?>
 	<table class="form-table">
         <tbody>
+        	<tr>
+        		<th><label for=""><?php _e('Send to Roles Permissions', $this -> plugin_name); ?></label>
+        		<?php echo $Html -> help(__('Choose which user roles are able to see the roles checkboxes list under Newsletters > Create Newsletter to send to users.', $this -> plugin_name)); ?></th>
+        		<td>
+        			<label style="font-weight:bold;"><input type="checkbox" name="" value="" id="" /> <?php _e('Select all', $this -> plugin_name); ?></label><br/>
+        			<?php foreach ($wp_roles -> role_names as $role_key => $role_name) : ?>
+        				<label><input <?php echo (!empty($permissions['newsletters_admin_send_sendtoroles']) && in_array($role_key, $permissions['newsletters_admin_send_sendtoroles'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="permissions[newsletters_admin_send_sendtoroles][]" value="<?php echo $role_key; ?>" id="permissions_<?php echo $block; ?>_<?php echo $role_key; ?>" /> <?php echo __($role_name); ?></label><br/>
+        			<?php endforeach; ?>
+        		</td>
+        	</tr>
             <tr>
                 <th><label for="changepermissions_Y"><?php _e('Change Permissions', $this -> plugin_name); ?></label></th>
                 <td>
