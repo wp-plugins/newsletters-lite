@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 3.9.2
-Stable tag: 4.3.7.1
+Stable tag: 4.3.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -121,6 +121,25 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.3.8 =
+* ADD: New meta box under Configuration > System for permissions
+* ADD: Setting to include theme when publishing post from newsletter
+* ADD: Roles permissions on certain blocks eg. "Send to roles" checkboxes list
+* ADD: Subscribe to all lists by default without showing checkboxes
+* ADD: Setting to choose in which order queued emails go out
+* ADD: Permalink/shortlink to online version of newsletter
+* ADD: Upload/specify image/logo for the tracking image
+* IMPROVE: Links to remove send/system default from newsletter themes
+* IMPROVE: WPML (multilingual) dashboard language switcher odd behaviour
+* IMPROVE: Remove tracking image ALT attribute  
+* FIX: Dashboard widget latest subjects not showing due to CSS
+* FIX: Inserting multiple posts 'post_type' parameter/attribute empty
+* FIX: Role permissions reset back to just 'administrator'
+* FIX: Can't pick a group in mailing lists set group bulk action
+* FIX: Can't send a Newsletter only to WP Users
+* FIX: Multilingual posts shortcode links go to home page
+* FIX: Bounce count not updating correctly  
 
 = 4.3.7 =
 * ADD: NEWSLETTERS_NAME constant to define the plugin/folder name
