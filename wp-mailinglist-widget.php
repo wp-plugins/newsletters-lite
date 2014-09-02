@@ -82,6 +82,7 @@ class Newsletters_Widget extends WP_Widget {
 										<select onchange="if (this.value == 'select' || this.value == 'checkboxes') { jQuery('#<?php echo $this -> get_field_id('lists'); ?>-<?php echo $language; ?>').show(); } else { jQuery('#<?php echo $this -> get_field_id('lists'); ?>-<?php echo $language; ?>').hide(); }" class="widefat" name="<?php echo $this -> get_field_name('list'); ?>[<?php echo $language; ?>]" id="<?php echo $this -> get_field_id('list'); ?>-<?php echo $language; ?>">
 											<option value=""><?php _e('- Select -', $wpMail -> plugin_name); ?></option>
 											<optgroup label="<?php _e('Multiple', $wpMail -> plugin_name); ?>">
+												<option <?php echo ($instance['list'][$language] == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Lists (no choice)', $wpMail -> plugin_name); ?></option>
 												<option <?php echo ($instance['list'][$language] == "select") ? 'selected="selected"' : ''; ?> value="select"><?php _e('Select Drop Down', $wpMail -> plugin_name); ?></option>
 												<option <?php echo ($instance['list'][$language] == "checkboxes") ? 'selected="selected"' : ''; ?> value="checkboxes"><?php _e('Checkbox List', $wpMail -> plugin_name); ?></option>
 											</optgroup>
@@ -172,6 +173,7 @@ class Newsletters_Widget extends WP_Widget {
 						<select onchange="if (this.value == 'select' || this.value == 'checkboxes') { jQuery('#<?php echo $this -> get_field_id('lists'); ?>').show(); } else { jQuery('#<?php echo $this -> get_field_id('lists'); ?>').hide(); }" class="widefat" name="<?php echo $this -> get_field_name('list'); ?>" id="<?php echo $this -> get_field_id('list'); ?>">
 							<option value=""><?php _e('- Select -', $wpMail -> plugin_name); ?></option>
 							<optgroup label="<?php _e('Multiple', $wpMail -> plugin_name); ?>">
+								<option <?php echo ($instance['list'] == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Lists (no choice)', $wpMail -> plugin_name); ?></option>
 								<option <?php echo ($instance['list'] == "select") ? 'selected="selected"' : ''; ?> value="select"><?php _e('Select Drop Down', $wpMail -> plugin_name); ?></option>
 								<option <?php echo ($instance['list'] == "checkboxes") ? 'selected="selected"' : ''; ?> value="checkboxes"><?php _e('Checkbox List', $wpMail -> plugin_name); ?></option>
 							</optgroup>

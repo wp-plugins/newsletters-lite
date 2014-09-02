@@ -38,7 +38,16 @@ function previewrunner() {
 		success: function(response) {
 			history_id = jQuery("history_id", response).text();
 			previewcontent = jQuery("previewcontent", response).text();
-			if (history_id != "") { jQuery('#ishistory').val(history_id); }
+			newsletter_url = jQuery("newsletter_url", response).text();
+			
+			if (history_id != "") { 
+				jQuery('#ishistory').val(history_id); 
+
+				jQuery('#edit-slug-box').show();
+				jQuery('#sample-permalink').html(newsletter_url);
+				jQuery('#view-post-btn a').attr('href', newsletter_url);
+				jQuery('#shortlink').attr('value', newsletter_url).val(newsletter_url);
+			}
 		},
 		complete: function(response) {		
 			//setTimeout(previewrunner, 30000);

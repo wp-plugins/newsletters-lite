@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.7';
+		var $version = '4.3.7.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -1384,7 +1384,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function ajax_previewrunner() {
-	    	global $wpdb, $Db, $History;
+	    	global $wpdb, $Db, $Html, $History;
 	    	define('DOING_AJAX', true);
 	    	define('SHORTINIT', true);
 	    	
@@ -1456,6 +1456,7 @@ if (!class_exists('wpMailPlugin')) {
 	    	<result>
 				<history_id><?php echo $history_id; ?></history_id>
 				<previewcontent><![CDATA[<?php echo $preview; ?>]]></previewcontent>
+				<newsletter_url><![CDATA[<?php echo $Html -> retainquery($this -> pre . 'method=newsletter&id=' . $history_id, home_url()); ?>]]></newsletter_url>
 			</result>
 	    	
 	    	<?php
@@ -1812,8 +1813,8 @@ if (!class_exists('wpMailPlugin')) {
 			// Count the users based on roles
 			$users_count = 0;
 			if (!empty($_POST['roles'])) {
-				if ($count_users = count_users()) {				
-					foreach ($count_users['avail_roles'] as $role => $count) {					
+				if ($count_users = count_users()) {								
+					foreach ($count_users['avail_roles'] as $role => $count) {										
 						if (array_key_exists($role, $_POST['roles'])) {
 							$users_count += $count;
 						}
@@ -1908,8 +1909,11 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if (!empty($subscribers)) {
 					$subscribercount = count($subscribers);
-					$subscribercount += $users_count;
 				}
+			}
+			
+			if (!empty($users_count)) {
+				$subscribercount += $users_count;
 			}
 			
 			if (!empty($subscribercount)) {
@@ -1919,6 +1923,7 @@ if (!class_exists('wpMailPlugin')) {
 				echo 0;	
 			}
 				
+			exit();
 			die();
 		}
 		
@@ -3773,7 +3778,7 @@ if (!class_exists('wpMailPlugin')) {
 						case 'special'			:						
 							switch ($field -> slug) {
 								case 'list'				:
-								default 				:								
+								default 				:																
 									if (preg_match("/[0-9]/si", $optinid, $matches)) {
 										$number = $matches[0];
 										
@@ -3786,10 +3791,12 @@ if (!class_exists('wpMailPlugin')) {
 											if (is_numeric($list)) {
 												echo '<input type="hidden" name="list_id[]" value="' . $list . '" />';
 											} else {
-												echo '<label class="' . $this -> pre . 'customfield ' . $this -> pre . 'customfield' . $field_id . '">';
-												_e($field -> title);
-												if ($field -> required == "Y") { echo ' <span class="' . $this -> pre . 'required">&#42;</span>'; };
-												echo '</label>';
+												if (empty($list) || $list != "all") {
+													echo '<label class="' . $this -> pre . 'customfield ' . $this -> pre . 'customfield' . $field_id . '">';
+													_e($field -> title);
+													if ($field -> required == "Y") { echo ' <span class="' . $this -> pre . 'required">&#42;</span>'; };
+													echo '</label>';
+												}
 												
 												$instance['lists'] = array_filter(explode(",", $instance['lists']));
 												$lists = (empty($instance['lists'])) ? $Mailinglist -> select(false) : $Mailinglist -> select(true, $instance['lists']);
@@ -3800,6 +3807,8 @@ if (!class_exists('wpMailPlugin')) {
 														echo '<input' . ((!empty($_POST['list_id']) && in_array($list_id, $_POST['list_id'])) ? ' checked="checked"' : '') . ' type="checkbox" name="list_id[]" value="' . $list_id . '" class="newsletters-list-checkbox" id="' . $optinid . $field -> slug . '-list-checkbox" /> ';
 														echo __($list_title) . '</label>';
 													}
+												} elseif ($list == "all") {
+													echo '<input type="hidden" name="list_id[]" value="all" />';
 												} else {
 													echo '<select class="' . ((!empty($Subscriber -> errors['list_id'])) ? ' wpmlfielderror ' : '') . $this -> pre . ' autowidth widefat ' . $this -> pre . 'select newsletters-list-select" id="' . $optinid . $field -> slug . '-list-select" name="list_id[]">';
 													echo '<option value="">' . __('- Select -', $this -> plugin_name) . '</option>';
@@ -5666,9 +5675,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.7") < 0) {
+				if (version_compare($cur_version, "4.3.7.1") < 0) {
 					$this -> update_options();
-					$version = "4.3.7";
+					$version = "4.3.7.1";
 				}
 			
 				//the current version is older.
@@ -5759,6 +5768,8 @@ if (!class_exists('wpMailPlugin')) {
 			$options['scheduleinterval'] = "2minutes";
 			$options['cronrunning'] = "N";
 			$options['schedulenotify'] = "N";
+			$options['queuesendorder'] = "ASC";
+			$options['queuesendorderby'] = "created";
 			$options['emailsperinterval'] = 20;
 			$options['autoresponderscheduling'] = "hourly";
 			$options['tinymcebtn'] = "Y";
@@ -6120,9 +6131,9 @@ if (!class_exists('wpMailPlugin')) {
 	        			preg_match_all("/[<](.*)[>]/i", $email, $matches);
 	
 	        			if ($this -> get_option('servertype') == "plesk") {
-	        				$emailaddress = trim($matches[1][0]);
+	        				$email = trim($matches[1][0]);
 	        			} else {
-	        				$emailaddress = trim($matches[1][2]);
+	        				$email = trim($matches[1][2]);
 	        			}
 	
 	        			$Db -> model = $Subscriber -> model;

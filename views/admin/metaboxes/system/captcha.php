@@ -37,7 +37,7 @@ $recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 			<tr>
 				<th>&nbsp;</th>
 				<td>
-					<p><?php echo sprintf(__('In order to use reCAPTCHA, the public and private keys below are required.<br/>Go to the reCAPTCHA sign up and %screate a set of keys%s for this domain.', $this -> plugin_name), '<a href="https://www.google.com/recaptcha/admin/create" onclick="jQuery.colorbox({iframe:true, width:\'80%\', height:\'80%\', href:\'http://www.google.com/recaptcha/admin/create\'}); return false;">', '</a>'); ?></p>
+					<p><?php echo sprintf(__('In order to use reCAPTCHA, the public and private keys below are required.<br/>Go to the reCAPTCHA sign up and %screate a set of keys%s for this domain.', $this -> plugin_name), '<a href="https://www.google.com/recaptcha/admin/create" onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:\'80%\', height:\'80%\', href:\'http://www.google.com/recaptcha/admin/create\'}); return false;">', '</a>'); ?></p>
 				</td>
 			</tr>
 			<tr>

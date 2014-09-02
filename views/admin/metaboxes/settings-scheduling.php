@@ -1,4 +1,12 @@
-<?php $scheduling = $this -> get_option('scheduling'); ?>
+<!-- Email Scheduling Settings -->
+
+<?php 
+
+$scheduling = $this -> get_option('scheduling'); 
+$queuesendorder = $this -> get_option('queuesendorder');
+$queuesendorderby = $this -> get_option('queuesendorderby');
+
+?>
 <input type="hidden" name="scheduling" value="Y" />
 
 <table class="form-table">
@@ -75,6 +83,23 @@ $command = '<code>wget -O /dev/null "' . $commandurl . '" > /dev/null 2>&1</code
 
 <table class="form-table">
 	<tbody>
+		<tr>
+			<th><label for=""><?php _e('Sending Order', $this -> plugin_name); ?></label></th>
+			<td>
+				<select name="queuesendorder">
+					<option <?php echo (!empty($queuesendorder) && $queuesendorder == "ASC") ? 'selected="selected"' : ''; ?> value="ASC"><?php _e('Ascending', $this -> plugin_name); ?></option>
+					<option <?php echo (!empty($queuesendorder) && $queuesendorder == "DESC") ? 'selected="selected"' : ''; ?> value="DESC"><?php _e('Descending', $this -> plugin_name); ?></option>
+				</select>
+				<?php _e('by', $this -> plugin_name); ?>
+				<select name="queuesendorderby">
+					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "history_id") ? 'selected="selected"' : ''; ?> value="history_id"><?php _e('History ID', $this -> plugin_name); ?></option>
+					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "theme_id") ? 'selected="selected"' : ''; ?> value="theme_id"><?php _e('Theme ID', $this -> plugin_name); ?></option>
+					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "subject") ? 'selected="selected"' : ''; ?> value="subject"><?php _e('Subject', $this -> plugin_name); ?></option>
+					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "created") ? 'selected="selected"' : ''; ?> value="created"><?php _e('Date', $this -> plugin_name); ?></option>
+				</select>
+				<span class="howto"><?php _e('Choose the order in which the emails in the queue will be sent out', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
 		<tr>
 			<th><?php _e('Admin Notify on Execution', $this -> plugin_name); ?></th>
 			<td>

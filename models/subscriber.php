@@ -586,6 +586,20 @@ class wpmlSubscriber extends wpMailPlugin {
 					}
 				}
 				
+				// All lists?
+				if ($data['mailinglists'] == "all" || $data['mailinglists'][0] == "all") {
+					$data['mailinglists'] = array();
+				
+					$Db -> model = $Mailinglist -> model;
+					if ($lists = $Db -> find_all()) {
+						foreach ($lists as $list) {
+							$data['mailinglists'][] = $list -> id;
+						}
+					}
+					
+					$data['list_id'] = $data['mailinglists'];
+				}
+				
 				// is an "active" parameter already passed through?
 				if (empty($data['active'])) {
 					$data['active'] = ($this -> get_option('requireactivate') == "Y") ? 'N' : 'Y';
@@ -686,6 +700,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			} elseif (!$this -> email_validate($email)) { $this -> errors['email'] = __('Please fill in a valid email address', $this -> plugin_name); }
 			
 			if (!is_admin() && empty($mailinglists)) { $this -> errors['mailinglists'] = __('Please select mailing list(s)', $this -> plugin_name); }
+			
 			if (empty($registered)) { $this -> errors['registered'] = __('Please select a registered status', $this -> plugin_name); }
 			elseif ($registered == "Y") {
 				if (!$userid = $this -> check_registration($data['email'])) {

@@ -128,6 +128,7 @@
     padding-right: 6px;
     text-align: right;
     width: auto;
+    display: block !important;
 }
 
 #dashboard-widgets #wp-mailinglist td.b a,
@@ -735,6 +736,7 @@ ul#wpmlsubmenu a.current {
 .newsletters-icon-delete-regular {
     position: relative;
     text-decoration: none;
+    vertical-align: middle !important;
 }
 
 .newsletters-icon-delete:before,

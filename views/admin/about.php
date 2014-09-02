@@ -6,9 +6,9 @@
 ?>
 
 <div class="wrap newsletters about-wrap">
-	<h1><?php echo sprintf(__( 'Welcome to Newsletters %s', $this -> plugin_name), $this -> version); ?></h1>
+	<h1><?php echo sprintf(__( 'Welcome to Tribulant Newsletters %s', $this -> plugin_name), $this -> version); ?></h1>
 	<div class="about-text">
-		<?php echo sprintf(__('Thank you for installing! Newsletters %s is more powerful, reliable and versatile than before. It includes many features and improvements to make email marketing easier and more efficient for you.', $this -> plugin_name), $this -> version); ?>
+		<?php echo sprintf(__('Thank you for installing! Tribulant Newsletters %s is more powerful, reliable and versatile than before. It includes many features and improvements to make email marketing easier and more efficient for you.', $this -> plugin_name), $this -> version); ?>
 	</div>
 	<div class="newsletters-badge"><?php echo sprintf(__('Version %s', $this -> plugin_name), $this -> version); ?></div>
 	
@@ -24,8 +24,6 @@
 				<img src="<?php echo $this -> url(); ?>/images/about/feature-4.png">
 				<h4><?php _e('WPML integration', $this -> plugin_name); ?></h4>
 				<p><?php _e('This version of the Newsletter plugin is fully integrated with WPML. It now supports internationalization and multilanguage through WPML.', $this -> plugin_name); ?></p>
-				<?php /* _e('Easier Editing Tools', $this -> plugin_name); ?></h4>
-				<p><?php _e('Improved visual editing of themes and several other areas throughout the plugin to help you see better what the end-product will look like without having to necessarily go into code.', $this -> plugin_name); */?></p>
 			</div>
 			<div class="col-3 last-feature">
 				<img src="<?php echo $this -> url(); ?>/images/about/feature-3.jpg">
@@ -41,21 +39,18 @@
 		<div class="col-1">
 			<img src="<?php echo $this -> url(); ?>/images/about/feature-7.png">			
 			<h4><?php _e('Clicks section in admin', $this -> plugin_name); ?></h4> 
-			<p><?php _e('A new clicks section in admin to view and manage all clicks on links. You can view all links and clicks per individual subscriber and all clicks per link.', $this -> plugin_name); ?>
-			<?php /* _e('Spam Score', $this -> plugin_name); ?></h4>
-			<p><?php _e('Prevent your emails from ending up in spam/junk folder unnecessarily. The spam score utility will show on each newsletter you create to give the newsletter a score, taking all it\'s aspects and factors in consideration.', $this -> plugin_name); */?></p>
+			<p><?php _e('A new clicks section in admin to view and manage all clicks on links. You can view all links and clicks per individual subscriber and all clicks per link.', $this -> plugin_name); ?></p>
 		</div>
 		<div class="col-2 last-feature">
-						<img src="<?php echo $this -> url(); ?>/images/about/feature-8.png">
-						<h4><?php _e('Filter Subscribers', $this -> plugin_name); ?></h4>
-						<p><?php _e('You can now filter subscribers per mailinglist, status and registered status. After filtering your subscribers, you can activate or deactivate them, assign them to another mailinglist or delete them.', $this -> plugin_name); ?>
-			<p><?php /*_e('The plugin can automatically send a "Sorry to see you go..." email to a user when they unsubscribe to both confirm their subscription, express your disappointment that they are leaving and it also includes a resubscribe link to convert.', $this -> plugin_name); */?></p>
+			<img src="<?php echo $this -> url(); ?>/images/about/feature-8.png">
+			<h4><?php _e('Filter Subscribers', $this -> plugin_name); ?></h4>
+			<p><?php _e('You can now filter subscribers per mailinglist, status and registered status. After filtering your subscribers, you can activate or deactivate them, assign them to another mailinglist or delete them.', $this -> plugin_name); ?></p>
 		</div>
-</div>
+	</div>
 
-<hr>
+	<hr>
 	
-		<div class="changelog under-the-hood">
+	<div class="changelog under-the-hood">
 		<h3><?php _e( 'New Extensions', $this -> plugin_name); ?></h3>
 		<div class="feature-section col three-col">
 			<div class="col-1">

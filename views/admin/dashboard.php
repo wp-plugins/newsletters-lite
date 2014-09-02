@@ -57,6 +57,8 @@ if (!empty(${'newsletters_query_' . $query_hash})) {
 	${'newsletters_query_' . $query_hash} = $bounces;
 }
 
+$bounces = (empty($bounces)) ? 0 : $bounces;
+
 ?>
 
 <div class="table table_discussion">
@@ -84,7 +86,7 @@ if (!empty(${'newsletters_query_' . $query_hash})) {
 					<a href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><span class="pending-count"><?php echo $unsubscribes; ?></span></a>
 				</td>
 				<td class="last t">
-					<a class="waiting" href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><?php _e('Unsubscribes', $this -> plugin_name); ?></a>
+					<a class="waiting" href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>&method=unsubscribes"><?php _e('Unsubscribes', $this -> plugin_name); ?></a>
 				</td>
 			</tr>
 			<tr>

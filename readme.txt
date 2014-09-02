@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 3.9.2
-Stable tag: 4.3.7
+Stable tag: 4.3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -62,6 +62,20 @@ See the <a href="http://tribulant.net/newsletter/">online demonstration</a> and 
 = Extensions =
 
 There are many free and paid extension plugins for the WordPress Newsletter plugin. All extensions work with both Newsletters LITE and Newsletters PRO, no problem.
+
+Some extensions include:
+
+* <a href="http://tribulant.com/extensions/view/42/woocommerce-subscribers">WooCommerce Subscribers</a>
+* <a href="http://tribulant.com/extensions/view/28/contact-form-7-subscribers">Contact Form 7 Subscribers</a>
+* <a href="http://tribulant.com/extensions/view/46/google-analytics">Google Analytics Tracking</a>
+* <a href="http://tribulant.com/extensions/view/6/embedded-images">Embedded Images</a>
+* <a href="http://tribulant.com/extensions/view/26/total-ms-control">Total MS Control</a>
+* <a href="http://tribulant.com/extensions/view/17/gravity-forms-subscribers">Gravity Forms Subscribers</a>
+* <a href="http://tribulant.com/extensions/view/16/formidable-subscribers">Formidable Subscribers</a>
+* <a href="http://tribulant.com/extensions/view/43/digital-access-pass">Digital Access Pass Subscribers</a>
+* <a href="http://tribulant.com/extensions/view/36/total-control">Total Control</a>
+* <a href="http://tribulant.com/extensions/view/32/s2member-subscribers">s2Member Subscribers</a>
+* <a href="http://tribulant.com/extensions/view/31/wp-emember-subscribers">WP eMember Subscribers</a>
 
 <a href="http://tribulant.com/plugins/extensions/1/wordpress-newsletter-plugin">Visit the Newsletters extensions page</a>
 

@@ -38,6 +38,15 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						<?php if (!empty($errors['subject'])) : ?>
 							<p class="<?php echo $this -> pre; ?>error"><?php echo $errors['subject']; ?></p>
 						<?php endif; ?>
+						<div class="inside">
+						<div id="edit-slug-box" class="hide-if-no-js" style="display:<?php echo (!empty($_POST['ishistory'])) ? 'block' : 'none'; ?>;">
+							<?php $newsletter_url = $Html -> retainquery($this -> pre . 'method=newsletter&id=' . $_POST['ishistory'], home_url()); ?>
+							<strong><?php _e('Permalink:', $this -> plugin_name); ?></strong>
+							<span id="sample-permalink" tabindex="-1"><?php echo $newsletter_url; ?></span>
+							<span id="view-post-btn"><a href="<?php echo $newsletter_url; ?>" target="_blank" class="button button-small"><?php _e('View Newsletter', $this -> plugin_name); ?></a></span>
+							<input id="shortlink" type="hidden" value="<?php echo $newsletter_url; ?>">
+							<a href="#" class="button button-small" onclick="prompt('URL:', jQuery('#shortlink').val()); return false;"><?php _e('Get Link', $this -> plugin_name); ?></a></div>
+						</div>
 					</div>
 					<div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section" style="position:relative;">
 						<!-- The Editor -->

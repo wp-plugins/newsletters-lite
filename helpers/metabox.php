@@ -190,6 +190,10 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'settings-wprelated', false, true, 'admin');
 	}
 	
+	function settings_permissions() {
+		$this -> render('metaboxes' . DS . 'system' . DS . 'permissions', false, true, 'admin');
+	}
+	
 	function settings_importusers() {
 		$this -> render('metaboxes' . DS . 'settings-importusers', false, true, 'admin');
 	}

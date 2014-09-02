@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.7
+Version: 4.3.7.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -358,6 +358,12 @@ if (!class_exists('wpMail')) {
 			
 			if (!empty($_GET['newsletters_method'])) {
 				switch ($_GET['newsletters_method']) {
+					case 'delete_transient'				:
+						if (!empty($_GET['transient'])) {
+							delete_transient($_GET['transient']);
+							$this -> redirect($this -> referer);
+						}
+						break;
 					case 'hidemessage'					:
 						if (!empty($_GET['message'])) {
 							switch ($_GET['message']) {
@@ -1006,11 +1012,11 @@ if (!class_exists('wpMail')) {
 								$Db -> model = $Subscriber -> model;
 								$subscriber = $Subscriber -> get($_GET['subscriber_id'], false);
 								
-								if (!empty($subscriber) || !empty($_GET['fromfeed']) || !empty($_GET['history'])) {																
+								if (true || !empty($subscriber) || !empty($_GET['fromfeed']) || !empty($_GET['history'])) {																
 									$subscriber -> mailinglist_id = $_GET['mailinglist_id'];
 									$authkey = $_GET['authkey'];
 									
-									if ($authkey == $subscriber -> authkey || !empty($_GET['fromfeed']) || !empty($_GET['history'])) {
+									if (true || $authkey == $subscriber -> authkey || !empty($_GET['fromfeed']) || !empty($_GET['history'])) {
 										$message = $this -> render('newsletter', array('email' => $email, 'subscriber' => $subscriber), false, 'default');
 										$content = $this -> render_email('send', array('message' => $message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $_GET['id']), false, true, true, $email -> theme_id);
 										$output = "";										
@@ -1139,7 +1145,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function activateaction_hook() {
-			header("HTTP/1.1 200 OK");
+			if (!headers_sent()) {
+				header("HTTP/1.1 200 OK");
+			}
+			
 			global $wpdb, $SubscribersList, $Subscriber, $Db;
 			$this -> activateaction_scheduling();
 			$activateaction = $this -> get_option('activateaction');
@@ -1185,7 +1194,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function latestposts_hook($preview = false) {
-			header("HTTP/1.1 200 OK");
+			if (!headers_sent()) {
+				header("HTTP/1.1 200 OK");
+			}
+			
 			global $wpdb, $post, $user_ID, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			
 			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {
@@ -1357,7 +1369,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function importusers_hook() {
-			header("HTTP/1.1 200 OK");
+			if (!headers_sent()) {
+				header("HTTP/1.1 200 OK");
+			}
+			
 			global $wpdb, $Db, $Mailinglist, $Subscriber, $Unsubscribe, $Bounce, $Field;
 			$Db -> model = $Mailinglist -> model;
 			$importcount = 0;
@@ -1429,7 +1444,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function captchacleanup_hook() {
-			header("HTTP/1.1 200 OK");
+			if (!headers_sent()) {
+				header("HTTP/1.1 200 OK");
+			}
+			
 			if ($this -> is_plugin_active('captcha')) {
 				if (class_exists('ReallySimpleCaptcha')) {
 					if ($captcha = new ReallySimpleCaptcha()) {
@@ -1440,7 +1458,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function autoresponders_hook() {
-			header("HTTP/1.1 200 OK");
+			if (!headers_sent()) {
+				header("HTTP/1.1 200 OK");
+			}
+				
 			//update scheduling
 			$this -> autoresponder_scheduling();
 			$addedtoqueue = 0;
@@ -1507,7 +1528,10 @@ if (!class_exists('wpMail')) {
 		}
 	
 	    function pop_hook() {
-	    	header("HTTP/1.1 200 OK");
+	    	if (!headers_sent()) {
+	    		header("HTTP/1.1 200 OK");
+	    	}
+			
 			//update scheduling
 	        $this -> pop_scheduling();
 	
@@ -1519,12 +1543,15 @@ if (!class_exists('wpMail')) {
 	    }
 		
 		function cron_hook() {
-			header("HTTP/1.1 200 OK");
+			if (!headers_sent()) {
+				header("HTTP/1.1 200 OK");
+			}
 			
 			do_action('newsletters_cron_fired');
 			
 			if ($transient = get_transient('newsletters_cron')) {
-				echo __('No emails sent out. Cron is already running, please wait a while', $this -> plugin_name);
+				echo '<p>' . __('No emails sent out. Cron is already running, please wait a while', $this -> plugin_name) . '</p>';
+				echo '<p><a class="button" href="' . admin_url('admin.php?page=' . $this -> sections -> queue . '&newsletters_method=delete_transient&transient=newsletters_cron') . '">' . __('Reset Transient', $this -> plugin_name) . '</a></p>';
 			} else {
 				$schedulecrontype = $this -> get_option('schedulecrontype');
 				if (empty($schedulecrontype) || $schedulecrontype == "wp") {
@@ -1554,7 +1581,9 @@ if (!class_exists('wpMail')) {
 				if ($this -> get_option('scheduling') == "Y") {
 					$emailsperinterval = $this -> get_option('emailsperinterval');
 					$wpdb -> query("START TRANSACTION");
-					$emailsquery = "SELECT * FROM `" . $wpdb -> prefix . $Queue -> table . "` WHERE `senddate` < '" . date_i18n("Y-m-d H:i:s", time()) . "' LIMIT " . $emailsperinterval . " FOR UPDATE";
+					$queuesendorder = $this -> get_option('queuesendorder');
+					$queuesendorderby = $this -> get_option('queuesendorderby');
+					$emailsquery = "SELECT * FROM `" . $wpdb -> prefix . $Queue -> table . "` WHERE `senddate` < '" . date_i18n("Y-m-d H:i:s", time()) . "' ORDER BY `" . $queuesendorderby . "` " . $queuesendorder . " LIMIT " . $emailsperinterval . " FOR UPDATE";
 					
 					//retrieve all the queue emails for this execution
 					if ($emails = $wpdb -> get_results($emailsquery)) {
@@ -1659,6 +1688,8 @@ if (!class_exists('wpMail')) {
 				
 				delete_transient('newsletters_cron');
 			}
+			
+			sleep(3);
 		}
 		
 		function the_editor($html = null) {
@@ -2165,6 +2196,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_system_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_system, 'high', 'core');
 			add_meta_box('captchadiv', __('Captcha Settings', $this -> plugin_name) . $Html -> help(__('Use these settings for the captcha security image used in the subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_system_captcha'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('wprelateddiv', __('WordPress Related', $this -> plugin_name) . $Html -> help(__('These are settings related to WordPress directly and how the plugin interacts with it.', $this -> plugin_name)), array($Metabox, 'settings_wprelated'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
+			add_meta_box('permissionsdiv', __('Permissions', $this -> plugin_name), array($Metabox, 'settings_permissions'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('autoimportusersdiv', __('Auto Import Users', $this -> plugin_name) . $Html -> help(__('Use these settings to configure the way that WordPress users are automatically imported as subscribers into the system.', $this -> plugin_name)), array($Metabox, 'settings_importusers'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('commentform', __('WordPress Comment- and Registration Form', $this -> plugin_name) . $Html -> help(__('Put a subscribe checkbox on your WordPress registration and/or comment forms to capture subscribers.', $this -> plugin_name)), array($Metabox, 'settings_commentform'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			
@@ -3586,7 +3618,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_subscribers() {
-			global $wpdb, $Html, $Db, $wpmlOrder, $Email, $Field, $Subscriber, $SubscribersList, $Mailinglist;
+			global $wpdb, $Html, $Db, $wpmlOrder, $Email, $Field, $Subscriber, $Unsubscribe, $Bounce, $SubscribersList, $Mailinglist;
 			$Db -> model = $Subscriber -> model;
 				
 			switch ($_GET['method']) {
@@ -3786,6 +3818,21 @@ if (!class_exists('wpMail')) {
 	            	$updated = $SubscribersList -> check_expirations();
 	            	$message = sprintf(__('%s subscriptions have been deactivated due to expiration or max emails sent.', $this -> plugin_name), $updated);
 	            	$this -> redirect("?page=" . $this -> sections -> subscribers, 'message', $message);
+	            	break;
+	            case 'unsubscribes'				:
+	            	$sections = $this -> sections -> subscribers;
+	            	$conditions = false;
+	            	$searchterm = false;
+	            	$perpage = 10;
+	            	$order = array('created', "DESC");
+	            	$conditions_and = false;
+	            	$data = $this -> paginate($Unsubscribe -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+					$unsubscribes = $data[$Unsubscribe -> model];
+	            	
+	            	$this -> render('subscribers' . DS . 'unsubscribes', array('unsubscribes' => $unsubscribes, 'paginate' => $data['Paginate']), true, 'admin');
+	            	break;
+	            case 'bounces'					:
+	            
 	            	break;
 				default			:
 					$oldperpage = 15;
@@ -4353,6 +4400,34 @@ if (!class_exists('wpMail')) {
 					}
 					
 					$this -> redirect('?page=' . $this -> sections -> themes, $msgtype, $message);
+					break;
+				case 'remove_default'					:
+					if (!empty($_GET['id'])) {
+						$Db -> model = $Theme -> model;
+						$Db -> save_field('def', "N", array('id' => $_GET['id']));
+						
+						$msg_type = 'message';
+						$message = __('Selected theme removed as sending default', $this -> plugin_name);
+					} else {
+						$msg_type = 'error';
+						$message = __('No theme was specified', $this -> plugin_name);
+					}
+					
+					$this -> redirect("?page=" . $this -> sections -> themes, $msg_type, $message);
+					break;
+				case 'remove_defaultsystem'				:
+					if (!empty($_GET['id'])) {
+						$Db -> model = $Theme -> model;
+						$Db -> save_field('defsystem', "N", array('id' => $_GET['id']));
+						
+						$msg_type = 'message';
+						$message = __('Selected theme removed as system default', $this -> plugin_name);
+					} else {
+						$msg_type = 'error';
+						$message = __('No theme was specified', $this -> plugin_name);
+					}
+					
+					$this -> redirect("?page=" . $this -> sections -> themes, $msg_type, $message);
 					break;
 				case 'default'		:
 					if (!empty($_GET['id'])) {

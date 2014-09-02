@@ -40,12 +40,12 @@
                 
                 	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
                 		<th style="width:85px;">
-                			<a onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" style="border:none;">
+                			<a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" style="border:none;">
                 				<img class="extensionicon" style="border:none; width:75px; height:75px;" border="0" src="<?php echo $img; ?>" alt="<?php echo $extension['slug']; ?>" />
                 			</a>
                 		</th>
                     	<th>
-							<a onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" class="row-title"><?php echo $extension['name']; ?></a>
+							<a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" class="row-title"><?php echo $extension['name']; ?></a>
 							<br/><small class="howto"><?php echo $extension['description']; ?></small>
                             <div class="row-actions">
                             	<?php 
@@ -54,7 +54,7 @@
 									case 0	:
 										?>
                                         
-                                        <span class="edit"><a onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" target="_blank"><?php _e('Get this extension now', $this -> plugin_name); ?></a></span>
+                                        <span class="edit"><a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" target="_blank"><?php _e('Get this extension now', $this -> plugin_name); ?></a></span>
                                         
                                         <?php
 										break;
@@ -86,7 +86,7 @@
 							
 							switch ($status) {
 								case 0			:
-									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span> <small>(<?php echo $Html -> link(__('Buy Now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'onclick' => "jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?>)</small><?php
+									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span> <small>(<?php echo $Html -> link(__('Buy Now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'onclick' => "jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?>)</small><?php
 									break;
 								case 1			:
 									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Installed but Inactive', $this -> plugin_name); ?></span><?php

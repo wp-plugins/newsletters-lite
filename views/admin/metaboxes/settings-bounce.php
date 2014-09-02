@@ -123,7 +123,7 @@
             <tr>
             	<th>&nbsp;</th>
             	<td>
-            		<a id="testbouncesettings" class="button-primary" onclick="testbouncesettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>" title="<?php _e('Test POP3 bounce settings', $this -> plugin_name); ?>"><?php _e('Test POP3 Settings', $this -> plugin_name); ?></a>
+            		<a id="testbouncesettings" class="button-primary" onclick="testbouncesettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>"><?php _e('Test POP3 Settings &raquo;', $this -> plugin_name); ?></a>
             		<span id="testbouncesettingsloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" border="0" style="border:none;" /></span>
             	</td>
             </tr>

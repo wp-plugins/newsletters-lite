@@ -337,3 +337,63 @@ select.wpml {
 	border:1px solid #DDD;
 	padding: 10px;
 }
+
+/* Admin Bar */
+
+#wpadminbar .newsletters-lite a:before {
+    font-family: 'newsletters_dashicons' !important;
+    content: '\f466';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 20px;
+}
+
+#wpadminbar .newsletters-lite {
+}
+
+#wpadminbar .newsletters-lite a {
+}
+
+#wpadminbar .newsletters-lite-listlimit {
+}
+
+#wpadminbar .newsletters-lite-listlimit a {
+}
+
+#wpadminbar .newsletters-lite-subscriberlimit {
+}
+
+#wpadminbar .newsletters-lite-subscriberlimit a {
+}
+
+#wpadminbar .newsletters-lite-emaillimit {
+}
+
+#wpadminbar .newsletters-lite-emaillimit a {
+}
+
+#wpadminbar .newsletters-lite-submitserial {
+}
+
+#wpadminbar .newsletters-lite-submitserial a:before {
+    content: '' !important;
+}
+
+#wpadminbar .newsletters-lite-submitserial a {
+	   color: green !important;
+	   background: white;
+	font-weight: bold;
+}
+
+#wpadminbar .newsletters-lite-upgrade {
+}
+
+#wpadminbar .newsletters-lite-upgrade a:before {
+    content: '' !important;
+}
+
+#wpadminbar .newsletters-lite-upgrade a {
+	   color: red !important;
+	   background: white;
+	font-weight: bold;
+}
