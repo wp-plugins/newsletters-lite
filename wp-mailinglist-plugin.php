@@ -1,5 +1,6 @@
 <?php
 
+
 if (!class_exists('wpMailPlugin')) {
 	class wpMailPlugin extends wpMailCheckinit {
 	

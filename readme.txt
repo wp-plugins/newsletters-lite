@@ -18,6 +18,7 @@ It has robust, efficient and unique features! This is an all-in-one newsletter t
 
 The software works the way you do so you can focus on creating newsletters and giving your website the necessary exposure!
 
+
 = Features =
 
 Some of the features in the WordPress Newsletter plugin include:
