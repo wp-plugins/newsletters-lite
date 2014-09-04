@@ -12,7 +12,7 @@ Newsletter plugin for WordPress to capture subscribers and send beautiful, bulk 
 
 == Description ==
 
-A full-featured newsletter plugin created by <a href="http://tribulant.com">Tribulant Software</a> for WordPress which fulfils all subscribers, emails, marketing and newsletter related needs for both personal and business environments.
+A full-featured WordPress newsletter plugin created by <a href="http://tribulant.com">Tribulant Software</a> for WordPress which fulfils all subscribers, emails, marketing and newsletter related needs for both personal and business environments.
 
 It has robust, efficient and unique features! This is an all-in-one newsletter tool for your WordPress site can be configured to behave as desired and it will provide the best experience for your email subscribers at the same time.
 
