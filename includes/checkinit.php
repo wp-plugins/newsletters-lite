@@ -32,6 +32,8 @@ if (!class_exists('wpMailCheckinit')) {
 		function ci_initialization() {								
 			/* RSS Feeds */
 			if ($this -> get_option('rssfeed') == "Y" && !is_admin()) { 
+				global $wp_rewrite;
+				if (!$wp_rewrite) $wp_rewrite = new WP_Rewrite();
 				add_feed('newsletters', array($this, 'feed_newsletters'));	
 			}
 			
@@ -52,11 +54,14 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('user_register', 'user_register', 10, 1);
 			$this -> add_action('save_post', 'save_post', 10, 2);
 			$this -> add_action('delete_post', 'delete_post', 10, 1);
-			$this -> add_action('init', 'init', 1, 1);
+			$this -> add_action('init', 'init', 10, 1);
+			$this -> add_action('wp_login', 'end_session', 10, 1);
+			$this -> add_action('wp_logout', 'end_session', 10, 1);
 			$this -> add_action('init', 'init_textdomain', 10, 1);
 			$this -> add_action('plugins_loaded', "plugins_loaded", 2, 1);
 			
 			/* Schedules */
+			$this -> add_action('newsletters_ratereviewhook', 'ratereview_hook', 10, 1);
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
 	        $this -> add_action($this -> pre . '_pophook', 'pop_hook', 10, 1);
 			$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);

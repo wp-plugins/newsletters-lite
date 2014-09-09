@@ -16,8 +16,8 @@
 		<h3><?php _e( 'What\'s new in this release', $this -> plugin_name); ?></h3>
 		<div class="feature-section col three-col">
 			<div class="col-1">
-				<img src="<?php echo $this -> url(); ?>/images/about/feature-1.jpg">
-				<h4><?php _e('WordPress 3.9 Compatibility', $this -> plugin_name); ?></h4>
+				<img src="<?php echo $this -> url(); ?>/images/about/feature-1.png">
+				<h4><?php _e('WordPress 4.0 Compatibility', $this -> plugin_name); ?></h4>
 				<p><?php _e('This version is 100% compatible with the latest WordPress version. It will fit nicely into your WordPress dashboard and maximizes the WordPress capabilities for speed, functionality and reliability.', $this -> plugin_name); ?></p>
 			</div>
 			<div class="col-2">

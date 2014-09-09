@@ -8,6 +8,36 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return true;
 	}
 	
+	function hidden_type_operator($key = null) {
+		$operator = false;
+	
+		if (!empty($key)) {
+			
+			switch ($key) {
+				case 'post'			:
+					$operator = "&#36;_POST";
+					break;
+				case 'get'			:
+					$operator = "&#36;_GET";
+					break;
+				case 'global'		:
+					$operator = "&#36;GLOBALS";
+					break;
+				case 'cookie'		:
+					$operator = "&#36;_COOKIE";
+					break;
+				case 'session'		:
+					$operator = "&#36;_SESSION";
+					break;
+				case 'server'		:
+					$operator = "&#36;_SERVER";
+					break;
+			}
+		}
+		
+		return $operator;
+	}
+	
 	function fragment_cache($content = null, $object = null, $method = null, $data = null) {
 		$output = "";
 	
@@ -146,7 +176,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return $days;	
 	}
 	
-	function field_type($type = null) {
+	function field_type($type = null) {	
 		if (!empty($type)) {
 			$fieldtypes = array(
 				'special'		=>	__('Special', $this -> plugin_name),
@@ -159,6 +189,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				'pre_country'	=>	__('Predefined : Country Select', $this -> plugin_name),
 				'pre_date'		=>	__('Predefined : Date Picker (YYYY-MM-DD)', $this -> plugin_name),
 				'pre_gender'	=>	__('Predefined : Gender', $this -> plugin_name),
+				'hidden'		=>	__('Hidden', $this -> plugin_name),
 			);	
 			
 			return $fieldtypes[$type];

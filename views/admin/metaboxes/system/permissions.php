@@ -2,7 +2,7 @@
 
 <?php
 
-global $user_ID, $wp_roles;
+global $wp_roles;
 $roles = $this -> get_option('wproles');
 $permissions = $this -> get_option('permissions');
 

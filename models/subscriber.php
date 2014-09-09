@@ -147,7 +147,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			
 			if (!empty($listsarray)) {			
 				foreach ($listsarray as $larr) {
-					if (empty($includeonly) || (!empty($includeonly) && in_array($larr -> list_id, $includeonly))) {
+					if (empty($includeonly) || (!empty($includeonly) && $includeonly[0] == "all") || (!empty($includeonly) && in_array($larr -> list_id, $includeonly))) {
 						if (empty($mailinglists) || (!empty($mailinglists) && !in_array($larr -> list_id, $mailinglists))) {
 							if (empty($exclude) || (!empty($exclude) && !in_array($larr -> list_id, $exclude))) {
 								$mailinglists[] = $larr -> list_id;
@@ -502,7 +502,7 @@ class wpmlSubscriber extends wpMailPlugin {
 	
 	function optin($data = array(), $validate = true, $checkexists = true, $confirm = true) {
 		//global Wordpress variables
-		global $wpdb, $Db, $Auth, $user_ID, $SubscribersList, $Field, $Mailinglist;
+		global $wpdb, $Db, $Auth, $SubscribersList, $Field, $Mailinglist;
 		$this -> errors = array();
 		$number = $_REQUEST['uninumber'];
 		$emailfield = $Field -> email_field();
@@ -562,7 +562,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				if ($data['id'] = $this -> email_exists($data['email'])) {
 					$lists = $this -> mailinglists($data['id'], $data['mailinglists']);
 				
-					if (!empty($checkexists) && $checkexists == true && !empty($lists)) {
+					if (!empty($checkexists) && $checkexists == true && !empty($lists)) {					
 						$this -> render('error', array('errors' => array('email' => __($this -> get_option('subscriberexistsmessage')))), true, 'default');					
 						
 						if ($this -> get_option('subscriberexistsredirect') == "management") {

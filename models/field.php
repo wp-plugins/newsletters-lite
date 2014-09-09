@@ -26,6 +26,8 @@ class wpmlField extends wpMailPlugin {
 		'watermark'		=>	"TEXT NOT NULL",
 		'slug'			=>	"VARCHAR(100) NOT NULL DEFAULT ''",
 		'type'			=>	"VARCHAR(255) NOT NULL DEFAULT 'text'",
+		'hidden_type'	=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'hidden_value'	=>	"TEXT NOT NULL",
 		'fieldoptions'	=>	"TEXT NOT NULL",
 		'filetypes'		=>	"TEXT NOT NULL",
 		'filesizelimit'	=>	"TEXT NOT NULL",
@@ -48,6 +50,8 @@ class wpmlField extends wpMailPlugin {
 		'watermark'		=>	array("TEXT", "NOT NULL"),
 		'slug'			=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
 		'type'			=>	array("VARCHAR(255)", "NOT NULL DEFAULT 'text'"),
+		'hidden_type'	=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'hidden_value'	=>	array("TEXT", "NOT NULL"),
 		'fieldoptions'	=>	array("TEXT", "NOT NULL"),
 		'filetypes'		=>	array("TEXT", "NOT NULL"),
 		'filesizelimit'	=>	array("TEXT", "NOT NULL"),
@@ -452,7 +456,7 @@ class wpmlField extends wpMailPlugin {
 				}
 			
 				if (!empty($id)) {
-					$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET `title` = '" . $title . "', `slug` = '" . $slug . "', `display` = '" . $display . "', `required` = '" . $required . "', `errormessage` = '" . $errormessage . "', `validation` = '" . $validation . "', `regex` = '" . $regex . "', `type` = '" . $type . "', `filetypes` = '" . $filetypes . "', `filesizelimit` = '" . $filesizelimit . "', `fieldoptions` = '" . $fieldoptions . "', `modified` = '" . $modified . "', `caption` = '" . $caption . "', `watermark` = '" . $watermark . "' WHERE `id` = '" . $id . "' LIMIT 1;";
+					$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET `title` = '" . $title . "', `slug` = '" . $slug . "', `display` = '" . $display . "', `required` = '" . $required . "', `errormessage` = '" . $errormessage . "', `validation` = '" . $validation . "', `regex` = '" . $regex . "', `type` = '" . $type . "', `hidden_type` = '" . $hidden_type . "', `hidden_value` = '" . $hidden_value . "', `filetypes` = '" . $filetypes . "', `filesizelimit` = '" . $filesizelimit . "', `fieldoptions` = '" . $fieldoptions . "', `modified` = '" . $modified . "', `caption` = '" . $caption . "', `watermark` = '" . $watermark . "' WHERE `id` = '" . $id . "' LIMIT 1;";
 					$field_old = $this -> get($id);
 				} else {
 					$query1 = "INSERT INTO `" . $wpdb -> prefix . "" . $this -> table . "` (";

@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 4.3.8
+Stable tag: 4.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -121,6 +121,22 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.3.9 =
+* ADD: WordPress 4.0 compatibility
+* ADD: More action/filter hooks in the core
+* ADD: Hidden custom fields  
+* IMPROVE: get_editable_user_ids() deprecated
+* IMPROVE: Improvements to the newsletters RSS feed
+* IMPROVE: Change $user_ID checks to is_user_logged_in()
+* IMPROVE: Don't show the "RSS" button under Sent & Draft Emails if RSS is turned off
+* IMPROVE: Change 'init' hook priority
+* IMPROVE: 'list' parameter for the [newsletters_subscriberscount] shortcode   
+* FIX: Subscriber exists redirect doesn't work on "all" mailinglists subscribe form
+* FIX: Latest posts send with no posts and group by category
+* FIX: Manage subscriptions incorrectly says "You are logged in..."
+* FIX: Manage subscriptions unsubscribe "You are not subscribed to any lists."
+* FIX: PHP Fatal error: Call to undefined function icl_get_languages()  
 
 = 4.3.8 =
 * ADD: New meta box under Configuration > System for permissions

@@ -7,24 +7,27 @@ class wpmlAuthHelper extends wpMailPlugin {
 	var $emailcookiename = 'subscriberemailauth';
 	
 	function logged_in() {
-		global $wpdb, $Db, $Subscriber, $user_ID;
+		global $wpdb, $Db, $Subscriber;
+		$user_id = get_current_user_id();
 		
 		$Db -> model = $Subscriber -> model;
-		if ($subscriberauth = $this -> read_cookie()) {
+		if ($subscriberauth = $this -> read_cookie()) {				
 			$Db -> model = $Subscriber -> model;			
-			if ($subscriber = $Db -> find(array('cookieauth' => $subscriberauth))) {			
+			if ($subscriber = $Db -> find(array('cookieauth' => $subscriberauth), false, false, true, true, false)) {			
 				return $subscriber;	
 			}
-		} elseif ($user_ID && !empty($user_ID) && $subscriber = $Db -> find(array('user_id' => $user_ID))) {
+		} elseif (is_user_logged_in() && $subscriber = $Db -> find(array('user_id' => $user_id))) {
 			return $subscriber;
 		}
 		
 		return false;	
 	}
 	
-	function read_cookie($create = false) {
+	function read_cookie($create = false) {		
 		if (isset($_COOKIE[$this -> cookiename])) {
 			return $_COOKIE[$this -> cookiename];
+		} elseif (isset($_SESSION[$this -> cookiename])) {
+			return $_SESSION[$this -> cookiename];
 		}
 		
 		return false;
@@ -33,6 +36,8 @@ class wpmlAuthHelper extends wpMailPlugin {
 	function read_emailcookie() {
 		if (isset($_COOKIE[$this -> emailcookiename])) {
 			return $_COOKIE[$this -> emailcookiename];
+		} elseif (isset($_SESSION[$this -> emailcookiename])) {
+			return $_SESSION[$this -> emailcookiename];
 		}
 		
 		return false;
@@ -53,12 +58,13 @@ class wpmlAuthHelper extends wpMailPlugin {
 			}
 			
 			if (!headers_sent()) {
-				setcookie($this -> emailcookiename, $email, strtotime($days), '/');
+				setcookie($this -> emailcookiename, $email, strtotime($days));
 			} else {
 				$this -> javascript_cookie($this -> emailcookiename, $email);	
 			}
 			
 			$_COOKIE[$this -> emailcookiename] = $email;
+			$_SESSION[$this -> emailcookiename] = $email;
 		}
 		
 		return false;
@@ -75,12 +81,13 @@ class wpmlAuthHelper extends wpMailPlugin {
 			}
 			
 			if (!headers_sent()) {
-				setcookie($this -> cookiename, $value, strtotime($days), '/');
+				setcookie($this -> cookiename, $value, strtotime($days));
 			} else {
 				$this -> javascript_cookie($this -> cookiename, $value);	
 			}
 			
 			$_COOKIE[$this -> cookiename] = $value;
+			$_SESSION[$this -> cookiename] = $value;
 		}
 			
 		return true;

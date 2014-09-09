@@ -479,7 +479,7 @@ class wpmlDbHelper extends wpMailPlugin {
 		return $count;
 	}
 	
-	function find($conditions = array(), $fields = false, $order = array('modified', "DESC"), $assign = true, $recursive = true) {
+	function find($conditions = array(), $fields = false, $order = array('modified', "DESC"), $assign = true, $recursive = true, $cache = true) {
 		if (!empty($this -> model)) {
 			global $wpdb, ${$this -> model};
 			
@@ -514,7 +514,7 @@ class wpmlDbHelper extends wpMailPlugin {
 			
 			$query_hash = md5($query);
 			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
+			if ($cache == true && !empty(${'newsletters_query_' . $query_hash})) {
 				return ${'newsletters_query_' . $query_hash};
 			}
 			

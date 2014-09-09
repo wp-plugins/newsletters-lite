@@ -166,7 +166,7 @@ if (!class_exists('newsletters_lite')) {
 		}
 		
 		function lite_current_emails_all($sendlimit = null, $sendlimitinterval = null, $sendlimitstart = null) {
-			global $user_ID, $History, $Email, $wpdb;
+			global $History, $Email, $wpdb;
 			$emailscount = false;
 			
 			$prevtime = date("Y-m-d H:i:s", $this -> lite_prevtime(false, $sendlimitinterval, $sendlimitstart));

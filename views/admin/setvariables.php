@@ -1,6 +1,6 @@
 <p><small><?php _e('Each of these shortcodes below can be used inside the content of a newsletter to be replaced with an appropriate value automatically.', $this -> plugin_name); ?></small></p>
 
-<div class="scroll-list">
+<div class="scroll-list" style="max-height:400px;">
     <table class="form-table">
         <thead>
             <tr>
@@ -143,10 +143,11 @@
                 <td><?php _e('Output all custom fields with values in a table for the subscriber.', $this -> plugin_name); ?></td>
             </tr>
             <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-                <td><code>[<?php echo $this -> pre; ?>subscriberscount]</code>
+                <td><code>[<?php echo $this -> pre; ?>subscriberscount {list}]</code>
                     <?php if (empty($noinsert) || $noinsert == false) : ?><br/><small><a href="javascript:wpml_tinymcetag('[<?php echo $this -> pre; ?>subscriberscount]');"><?php _e('Insert into Editor', $this -> plugin_name); ?></a></small><?php endif; ?>
                 </td>
-                <td><?php _e('Display the total number of subscribers in the database.', $this -> plugin_name); ?></td>
+                <td><?php _e('Display the total number of subscribers in the database.', $this -> plugin_name); ?>
+                <?php _e('Optional, <code>list</code> parameter to specify the mailing list ID', $this -> plugin_name); ?></td>
             </tr>
             <?php $Db -> model = 'Field'; ?>
             <?php $fields = $Db -> find_all(false, array('id', 'title', 'slug'), array('title', "ASC")); ?>

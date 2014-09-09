@@ -2,7 +2,7 @@
 
 <?php
 
-global $ID, $post_ID, $post, $user_ID;
+global $ID, $post_ID, $post;
 $ID = $this -> get_option('imagespost');
 $post_ID = $this -> get_option('imagespost');
 

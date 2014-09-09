@@ -9,10 +9,22 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	}
 	
 	function subscriberscount($atts = array(), $content = null) {
-		global $wpdb, $Subscriber;
+		global $wpdb, $Subscriber, $SubscribersList, $Mailinglist;
 		$subscriberscount = 0;
 		
-		$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Subscriber -> table . "`";
+		$defaults = array(
+			'list'				=>	false
+		);
+		
+		extract(shortcode_atts($defaults, $atts));
+		
+		if (!empty($list)) {
+			$query = "SELECT COUNT(*) FROM " . $wpdb -> prefix . $SubscribersList -> table . " LEFT JOIN " 
+			. $wpdb -> prefix . $Mailinglist -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".list_id = " 
+			. $wpdb -> prefix . $Mailinglist -> table . ".id WHERE " . $wpdb -> prefix . $Mailinglist -> table . ".id = '" . $list . "'";
+		} else {
+			$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Subscriber -> table . "`";	
+		}
 		
 		$query_hash = md5($query);
 		global ${'newsletters_query_' . $query_hash};

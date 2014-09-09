@@ -4,7 +4,7 @@ var contentarea = 1;
 
 <?php
 
-global $ID, $user_ID, $post, $post_ID, $wp_meta_boxes, $errors;
+global $ID, $post, $post_ID, $wp_meta_boxes, $errors;
 
 $ID = $this -> get_option('imagespost');
 $post_ID = $this -> get_option('imagespost');

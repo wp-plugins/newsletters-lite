@@ -220,7 +220,7 @@ $regex = $Html -> field_value('Field[regex]');
 							unset($types['special']);
 							
 							?>
-							<?php echo $Form -> select('Field[type]', $types, array('onchange' => "if (this.value == 'select' || this.value == 'radio' || this.value == 'checkbox') { jQuery('#typediv').show(); } else { if (this.value == 'file') { jQuery('#filediv').show(); } else { jQuery('#filediv').hide(); } jQuery('#typediv').hide(); }")); ?>
+							<?php echo $Form -> select('Field[type]', $types, array('onchange' => "if (this.value == 'select' || this.value == 'radio' || this.value == 'checkbox') { jQuery('#typediv').show(); } else { if (this.value == 'file') { jQuery('#filediv').show(); } else { jQuery('#filediv').hide(); if (this.value == 'hidden') { jQuery('#hiddendiv').show() } else { jQuery('#hiddendiv').hide(); } } jQuery('#typediv').hide(); }")); ?>
 						</td>
 					</tr>
 				</tbody>
@@ -230,6 +230,65 @@ $regex = $Html -> field_value('Field[regex]');
 		<?php else : ?>	
 			<input type="hidden" name="Field[type]" value="text" />
 		<?php endif; ?>
+		
+		<div id="hiddendiv" style="display:<?php echo ($Html -> field_value('Field[type]') == "hidden") ? 'block' : 'none'; ?>;">
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th><label for=""><?php _e('Hidden Value', $this -> plugin_name); ?></label></th>
+						<td>
+							<?php 
+							
+							$hidden_variable_types = array(
+								'post'				=>	__('$_POST', $this -> plugin_name),
+								'get'				=>	__('$_GET', $this -> plugin_name),
+								'global'			=>	__('$GLOBALS', $this -> plugin_name),
+								'cookie'			=>	__('$_COOKIE', $this -> plugin_name),
+								'session'			=>	__('$_SESSION', $this -> plugin_name),
+								'server'			=>	__('$_SERVER', $this -> plugin_name),
+								
+							);
+							
+							$hidden_type = $Html -> field_value('Field[hidden_type]');
+							
+							?>
+							
+							<?php foreach ($hidden_variable_types as $hk => $hv) : ?>
+								<label><input <?php echo ((empty($hidden_type) && $hk == "post") || (!empty($hidden_type) && $hidden_type == $hk)) ? 'checked="checked"' : ''; ?> type="radio" name="Field[hidden_type]" id="Field_hidden_type_<?php echo $hk; ?>" value="<?php echo $hk; ?>" /> <?php echo $hv; ?></label>
+							<?php endforeach; ?>
+							
+							<p>
+								<code><span id="hidden_type_operator"><?php echo (empty($hidden_type)) ? "&#36;_POST" : $Html -> hidden_type_operator($hidden_type); ?></span>['<input type="text" name="Field[hidden_value]" id="Field_hidden_value" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[hidden_value]'))); ?>" />']</code>
+							</p>
+							
+							<script type="text/javascript">
+							jQuery(document).ready(function() {
+								jQuery('input[name="Field[hidden_type]"]').click(function() {
+									var hidden_type = jQuery(this).val();
+									
+									if (hidden_type == "post") {
+										var hidden_type_operator = "$_POST";
+									} else if (hidden_type == "get") {
+										var hidden_type_operator = "$_GET";
+									} else if (hidden_type == "global") {
+										var hidden_type_operator = "$GLOBALS";
+									} else if (hidden_type == "cookie") {
+										var hidden_type_operator = "$_COOKIE";
+									} else if (hidden_type == "session") {
+										var hidden_type_operator = "$_SESSION";
+									} else if (hidden_type == "server") {
+										var hidden_type_operator = "$_SERVER";
+									}
+									
+									jQuery('#hidden_type_operator').html(hidden_type_operator);
+								});
+							});
+							</script>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		
 		<div id="filediv" style="display:<?php echo ($Html -> field_value('Field[type]') == "file") ? 'block' : 'none'; ?>;">		
 			<table class="form-table">

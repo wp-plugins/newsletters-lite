@@ -11,7 +11,9 @@ if (!empty($subscriber -> subscriptions)) {
 
 ?>
 
-<p><?php _e('You are logged in and the subscriber email below is linked to your user account.', $this -> plugin_name); ?></p>
+<?php if (is_user_logged_in()) : ?>
+	<p><?php _e('You are logged in and the subscriber email below is linked to your user account.', $this -> plugin_name); ?></p>
+<?php endif; ?>
 
 <p class="managementemail">
 	<?php _e('Your email address is:', $this -> plugin_name); ?> <strong><?php echo stripslashes($subscriber -> email); ?></strong> 

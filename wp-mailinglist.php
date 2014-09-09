@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.8
+Version: 4.3.9
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -227,6 +227,17 @@ if (!class_exists('wpMail')) {
 			}
 		}
 		
+		function ratereview_hook($days = 7) {
+			if (!headers_sent()) {
+	    		header("HTTP/1.1 200 OK");
+	    	}
+		
+			$this -> update_option('showmessage_ratereview', $days);
+			$this -> delete_option('hidemessage_ratereview');
+			
+			return true;
+		}
+		
 		function admin_notices() {
 			global $Html;
 		
@@ -240,6 +251,17 @@ if (!class_exists('wpMail')) {
 				}
 			
 				if (!$this -> ci_serial_valid() && (empty($_GET['page']) || $_GET['page'] != $this -> sections -> submitserial)) {
+					$showmessage_ratereview = $this -> get_option('showmessage_ratereview');
+					$hidemessage_ratereview = $this -> get_option('hidemessage_ratereview');
+					
+					if (!empty($showmessage_ratereview) && empty($hidemessage_ratereview)) {
+						$rate_url = "http://wordpress.org/support/view/plugin-reviews/newsletters-lite?rate=5#postform";
+						$works_url = "http://wordpress.org/plugins/newsletters-lite/?compatibility[version]=" . get_bloginfo("version") . "&compatibility[topic_version]=" . $this -> version . "&compatibility[compatible]=1";
+						$message = sprintf(__('You have been using Newsletters LITE for %s days or more. Please consider leaving a %s and say it %s on %s', $this -> plugin_name), $showmessage_ratereview, '<a href="' . $rate_url . '" target="_blank" class="button">' . __('review', $this -> plugin_name) . '</a>', '<a href="' . $works_url . '" target="_blank" class="button">' . __('works', $this -> plugin_name) . '</a>', '<a href="http://wordpress.org/plugins/newsletters-lite/" target="_blank">WordPress.org</a>');
+						$message .= ' <a style="text-decoration:none;" href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=ratereview') . '" class="newsletters-icon-delete-regular"></a>';
+						$this -> render_message($message);
+					}
+				
 					$hidemessage_submitserial = $this -> get_option('hidemessage_submitserial');
 				
 					if (empty($hidemessage_submitserial)) {
@@ -247,7 +269,7 @@ if (!class_exists('wpMail')) {
 						$message .= ' <a class="button button-primary" id="' . $this -> pre . 'submitseriallink" href="' . admin_url('admin.php') . '?page=' . $this -> sections -> submitserial . '">' . __('Submit Serial Key', $this -> plugin_name) . '</a>';
 						$message .= ' <a class="button button-secondary" href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">' . __('Upgrade to PRO', $this -> plugin_name) . '</a>';
 						$message .= ' <a style="text-decoration:none;" href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=submitserial') . '" class="newsletters-icon-delete-regular"></a>';
-						$this -> render_error($message);
+						$this -> render_message($message);
 						
 						?>
 			            
@@ -331,9 +353,17 @@ if (!class_exists('wpMail')) {
 			echo $data;
 		}
 		
+		function end_session() {
+			session_destroy();
+		}
+		
 		function init() {	
 			global $Db, $Email, $Html, $History, $Mailinglist, $wpmlOrder, $Subscriber, $SubscribersList;			
 			$this -> init_textdomain();
+			
+			if (!session_id() && !headers_sent()) {
+				session_start();
+			}
 		
 			$wpmlmethod = (empty($_POST[$this -> pre . 'method'])) ? null : $_POST[$this -> pre . 'method'];
 			$method = (empty($_GET[$this -> pre . 'method'])) ? $wpmlmethod : $_GET[$this -> pre . 'method'];
@@ -369,6 +399,9 @@ if (!class_exists('wpMail')) {
 							switch ($_GET['message']) {
 								case 'submitserial'				:
 									$this -> update_option('hidemessage_submitserial', true);
+									break;
+								case 'ratereview'				:
+									$this -> update_option('hidemessage_ratereview', true);
 									break;
 							}
 						}
@@ -1198,7 +1231,7 @@ if (!class_exists('wpMail')) {
 				header("HTTP/1.1 200 OK");
 			}
 			
-			global $wpdb, $post, $user_ID, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
+			global $wpdb, $post, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			
 			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {
 				$latestposts_groupbycategory = $this -> get_option('latestposts_groupbycategory');
@@ -1224,10 +1257,14 @@ if (!class_exists('wpMail')) {
 						$c = 0;
 					
 						foreach ($categories as $category) {
-							$shortcode_categories[$c]['category'] = $category;
+							
 							$post_criteria['category'] = $category -> cat_ID;
 							$posts = get_posts($post_criteria);							
-							$shortcode_categories[$c]['posts'] = $posts;
+							
+							if (!empty($posts)) {
+								$shortcode_categories[$c]['category'] = $category;
+								$shortcode_categories[$c]['posts'] = $posts;
+							}
 							
 							$c++;
 						}
@@ -1246,7 +1283,6 @@ if (!class_exists('wpMail')) {
 						}
 						
 						$subject = $this -> get_option('latestposts_subject');
-						//$content = $this -> render('latestposts', array('posts' => $posts), false, 'default');
 						global $shortcode_posts;
 						$shortcode_posts = $posts;
 						$content = $this -> et_message('latestposts', false, $latestposts_language);
@@ -1561,7 +1597,7 @@ if (!class_exists('wpMail')) {
 				} else {
 					$expiration = 150;
 				}					
-				set_transient('newsletters_cron', true, ($expiration * 2));
+				set_transient('newsletters_cron', true, ($expiration));
 			
 				global $wpdb, $Db, $Email, $History, $Subscriber, $SubscribersList, $Queue;
 				$emailssent = 0;
@@ -2270,7 +2306,8 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_send() {
-			global $wpdb, $Unsubscribe, $user_ID, $Db, $Template, $Html, $History, $HistoriesAttachment, $Mailinglist, $Queue, $Subscriber, $Field, $SubscribersList;
+			global $wpdb, $Unsubscribe, $Db, $Template, $Html, $History, $HistoriesAttachment, $Mailinglist, $Queue, $Subscriber, $Field, $SubscribersList;
+			$user_id = get_current_user_id();
 		
 			$this -> remove_server_limits();
 			$mailinglists = $Mailinglist -> get_all('*', true);
@@ -2293,7 +2330,7 @@ if (!class_exists('wpMail')) {
 					'post_slug'				=>	$slug,
 					'post_category'			=>	$_POST['cat'],
 					'post_type'				=>	((empty($_POST['newsletters_post_type'])) ? 'post' : $_POST['newsletters_post_type']),
-					'post_author'			=>	(empty($_POST['post_author'])) ? $user_ID : $_POST['post_author'],
+					'post_author'			=>	(empty($_POST['post_author'])) ? $user_id : $_POST['post_author'],
 				);
 				
 				stripslashes_deep($post);
@@ -5917,7 +5954,7 @@ if (!class_exists('wpMail')) {
 		
 		function activation_hook() {
 			$this -> add_option('activation_redirect', true);
-			wp_redirect(admin_url('index.php') . "?page=newsletters-about");
+			//wp_redirect(admin_url('index.php') . "?page=newsletters-about");
 		}
 		
 		function custom_redirect() {
@@ -5984,7 +6021,7 @@ require_once(dirname(__FILE__) . DS . 'wp-mailinglist-api.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-functions.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-widget.php');
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'activation_hook'));
-add_filter('update_plugin_complete_actions', array($wpMail, 'update_plugin_complete_actions'), 10, 2);
+//add_filter('update_plugin_complete_actions', array($wpMail, 'update_plugin_complete_actions'), 10, 2);
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'update_options'));
 
 ?>

@@ -2,7 +2,7 @@
 <p><?php _e('You can subscribe to our other mailing list(s) as well.', $this -> plugin_name); ?></p>
 
 <?php if (!empty($success) && $success == true) : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php echo $successmessage; ?></p>
+	<p class="<?php echo $this -> pre; ?>success"><?php echo $successmessage; ?></p>
 <?php endif; ?>
 
 <?php if (!empty($errors)) : ?>

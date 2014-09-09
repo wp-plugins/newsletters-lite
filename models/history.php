@@ -518,8 +518,7 @@ class wpmlHistory extends wpMailPlugin {
 				foreach (array_keys($this -> table_fields) as $field) {				
 					switch ($field) {
 						case 'user_id'			:
-							global $user_ID;
-							$user_id = $user_ID;
+							$user_id = get_current_user_id();
 							break;
 						case 'mailinglists'		:
 							if (!empty($mailinglists) && is_array($mailinglists)) {
@@ -557,8 +556,7 @@ class wpmlHistory extends wpMailPlugin {
 							}
 							break;
 						case 'user_id'			:
-							global $user_ID;
-							$user_id = $user_ID;
+							$user_id = get_current_user_id();
 							break;
 					}
 				

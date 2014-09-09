@@ -1,6 +1,6 @@
 <?php
 
-global $ID, $user_ID, $post, $post_ID, $wp_meta_boxes;
+global $ID, $post, $post_ID, $wp_meta_boxes;
 $ID = $this -> get_option('imagespost');
 $post_ID = $this -> get_option('imagespost');
 

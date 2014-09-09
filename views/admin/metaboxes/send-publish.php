@@ -36,9 +36,7 @@
 			<tr>
 				<th><label for="post_author"><?php _e('Post Author', $this -> plugin_name); ?></label></th>
 				<td>
-					<?php global $current_user, $user_ID; ?>
-					<?php $authors = get_editable_user_ids($current_user -> id); ?>
-					<?php wp_dropdown_users(array('include' => $authors, 'name' => 'post_author', 'selected' => $user_ID)); ?>
+					<?php wp_dropdown_users(array('who' => "authors", 'name' => 'post_author', 'selected' => get_current_user_id())); ?>
 				</td>
 			</tr>
 			<tr>

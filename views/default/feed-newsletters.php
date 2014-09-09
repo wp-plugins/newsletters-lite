@@ -8,11 +8,11 @@
 		<?php if (!empty($emails)) : ?>
 			<?php foreach ($emails as $email) : ?>
 				<item>
-					<title><?php echo $email -> subject; ?></title>
+					<title><?php echo esc_attr(stripslashes($email -> subject)); ?></title>
 					<link><?php echo home_url(); ?>/?<?php echo $this -> pre; ?>method=newsletter&amp;id=<?php echo $email -> id; ?>&amp;fromfeed=1</link>
 					<guid><?php echo home_url(); ?>/?<?php echo $this -> pre; ?>method=newsletter&amp;id=<?php echo $email -> id; ?>&amp;fromfeed=1</guid>
 					<pubDate><?php echo date_i18n("r", strtotime($email -> modified)); ?></pubDate>
-					<description><![CDATA[ <?php echo strip_tags(apply_filters('the_content', $this -> strip_set_variables($email -> message))); ?> ]]></description>
+					<description><![CDATA[ <?php echo esc_attr(strip_tags(apply_filters('the_content', $this -> strip_set_variables($email -> message)))); ?> ]]></description>
 				</item>
 			<?php endforeach; ?>
 		<?php endif; ?>

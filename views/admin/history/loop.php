@@ -2,7 +2,8 @@
 	<form action="?page=<?php echo $this -> sections -> history; ?>&amp;method=mass" id="newsletters-history-form" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected history emails?', $this -> plugin_name); ?>')) { return false; }" method="post">
 		<div class="tablenav">
 			<div class="alignleft actions">
-				<?php if (apply_filters($this -> pre . '_admin_history_rsslink', true)) : ?>
+				<?php $rssfeed = $this -> get_option('rssfeed'); ?>
+				<?php if (!empty($rssfeed) && $rssfeed == "Y" && apply_filters($this -> pre . '_admin_history_rsslink', true)) : ?>
 					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="newsletters-icon-rss button"> <?php _e('RSS', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<?php if (apply_filters($this -> pre . '_admin_history_exportlink', true)) : ?>
