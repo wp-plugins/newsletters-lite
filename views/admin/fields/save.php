@@ -240,6 +240,7 @@ $regex = $Html -> field_value('Field[regex]');
 							<?php 
 							
 							$hidden_variable_types = array(
+								'custom'			=>	__('Custom', $this -> plugin_name),
 								'post'				=>	__('$_POST', $this -> plugin_name),
 								'get'				=>	__('$_GET', $this -> plugin_name),
 								'global'			=>	__('$GLOBALS', $this -> plugin_name),
@@ -254,10 +255,10 @@ $regex = $Html -> field_value('Field[regex]');
 							?>
 							
 							<?php foreach ($hidden_variable_types as $hk => $hv) : ?>
-								<label><input <?php echo ((empty($hidden_type) && $hk == "post") || (!empty($hidden_type) && $hidden_type == $hk)) ? 'checked="checked"' : ''; ?> type="radio" name="Field[hidden_type]" id="Field_hidden_type_<?php echo $hk; ?>" value="<?php echo $hk; ?>" /> <?php echo $hv; ?></label>
+								<label><input <?php echo ((empty($hidden_type) && $hk == "custom") || (!empty($hidden_type) && $hidden_type == $hk)) ? 'checked="checked"' : ''; ?> type="radio" name="Field[hidden_type]" id="Field_hidden_type_<?php echo $hk; ?>" value="<?php echo $hk; ?>" /> <?php echo $hv; ?></label>
 							<?php endforeach; ?>
 							
-							<p>
+							<p id="hidden_type_paragraph" style="display:<?php echo (empty($hidden_type) || $hidden_type == "custom") ? 'none' : 'block'; ?>;">
 								<code><span id="hidden_type_operator"><?php echo (empty($hidden_type)) ? "&#36;_POST" : $Html -> hidden_type_operator($hidden_type); ?></span>['<input type="text" name="Field[hidden_value]" id="Field_hidden_value" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[hidden_value]'))); ?>" />']</code>
 							</p>
 							
@@ -265,6 +266,7 @@ $regex = $Html -> field_value('Field[regex]');
 							jQuery(document).ready(function() {
 								jQuery('input[name="Field[hidden_type]"]').click(function() {
 									var hidden_type = jQuery(this).val();
+									jQuery('#hidden_type_paragraph').show();
 									
 									if (hidden_type == "post") {
 										var hidden_type_operator = "$_POST";
@@ -278,6 +280,8 @@ $regex = $Html -> field_value('Field[regex]');
 										var hidden_type_operator = "$_SESSION";
 									} else if (hidden_type == "server") {
 										var hidden_type_operator = "$_SERVER";
+									} else if (hidden_type == "custom") {
+										jQuery('#hidden_type_paragraph').hide();
 									}
 									
 									jQuery('#hidden_type_operator').html(hidden_type_operator);
@@ -414,6 +418,9 @@ $regex = $Html -> field_value('Field[regex]');
 		
 		<p class="submit">
 			<?php echo $Form -> submit(__('Save Custom Field', $this -> plugin_name)); ?>
+			<div class="checkout_continueediting">
+				<label><input <?php echo (!empty($_REQUEST['continueediting'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="continueediting" value="1" id="continueediting" /> <?php _e('Continue editing', $this -> plugin_name); ?></label>
+			</div>
 		</p>
 	</form>
 </div>

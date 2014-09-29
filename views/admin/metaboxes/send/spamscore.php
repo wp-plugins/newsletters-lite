@@ -42,8 +42,7 @@ function spamscorerunner() {
 			output = jQuery("output", response).text();
 			jQuery('#spamscore_result').html(output);
 		},
-		complete: function(response) {		
-			//setTimeout(spamscorerunner, 60000);
+		complete: function(response) {
 			jQuery('#spamscorerunnerloading').hide();
 			jQuery('#spamscorerunnerbutton').removeAttr('disabled');
 		}

@@ -266,7 +266,61 @@ if (!class_exists('wpMailPlugin')) {
 	        return $option;
 	    }
 	    
+	    function ajax_mailinglist_save() {
+		    define('DOING_AJAX', true);
+		    define('SHORTINIT', true);
+		    
+		    $this -> render('mailinglists' . DS . 'save-ajax', false, true, 'admin');
+		    
+		    exit();
+		    die();
+	    }
+	    
 	    function ajax_posts_by_category() {
+		    define('DOING_AJAX', true);
+		    define('SHORTINIT', true);
+		    
+		    header('Content-Type: application/json');
+		    
+		    $posts_by_category = array();
+			
+			$arguments = array(
+				'numberposts'			=>	"-1",
+				'orderby'				=>	'post_title',
+				'order'					=>	"ASC",
+				'post_type'				=>	"post",
+				'post_status'			=>	"publish",
+			);
+			
+			if (!empty($_REQUEST['cat_id']) && $_REQUEST['cat_id'] > 0) {
+				$arguments['category'] = $_REQUEST['cat_id'];	
+			}
+			
+			if (!empty($_REQUEST['post_type'])) {
+				$arguments['post_type'] = $_REQUEST['post_type'];
+			}
+			
+			if ($posts = get_posts($arguments)) {	
+				$posts_by_category[] = array('text' => __('- Select -', $this -> plugin_name), 'value' => false);
+										
+				foreach ($posts as $post) {
+					if ($this -> language_do()) {
+						$posts_by_category[] = array('text' => $this -> language_use($_REQUEST['language'], $post -> post_title, false), 'value' => $post -> ID);
+						//$posts_by_category .= '<option value="' . $post -> ID . '">' . $this -> language_use($_REQUEST['language'], $post -> post_title, false) . '</option>';
+					} else {
+						$posts_by_category[] = array('text' => __($post -> post_title), 'value' => $post -> ID);
+						//$posts_by_category .= '<option value="' . $post -> ID . '">' . $post -> post_title . '</option>';
+					}
+				}
+			}
+			
+			echo json_encode($posts_by_category);
+		    
+		    exit();
+		    die();
+	    }
+	    
+	    function ajax_posts_by_category_bak() {
 	    	define('DOING_AJAX', true);
 	    	define('SHORTINIT', true);
 	    
@@ -1523,8 +1577,18 @@ if (!class_exists('wpMailPlugin')) {
 		    die();
 	    }
 	    
+	    function ajax_tinymce_snippet() {
+	    	define('DOING_AJAX', true);
+	    	define('SHORTINIT', true);
+	    
+		    $this -> render('tinymce' . DS . 'snippet', false, true, 'admin');
+		    
+		    exit();
+		    die();
+	    }
+	    
 	    function ajax_gauge() {	    
-	    	$value = $_REQUEST['value'];
+	    	$value = (empty($_REQUEST['value'])) ? 1 : $_REQUEST['value'];
 		    
 		    ?>
 		    
@@ -5673,10 +5737,9 @@ if (!class_exists('wpMailPlugin')) {
 						foreach ($themes as $theme) {
 							$newcontent = "";
 							ob_start();
-							echo do_shortcode(stripslashes(eval(' ?>' . $theme -> content . '<? ')));
 							$newcontent = ob_get_clean();
 							$themequery = "UPDATE `" . $wpdb -> prefix . $Theme -> table . "` SET `content` = '" . esc_sql($newcontent) . "' WHERE `id` = '" . $theme -> id . "'";						
-							$wpdb -> query($themequery);
+							//$wpdb -> query($themequery);
 						}
 					}
 					
@@ -6009,7 +6072,7 @@ if (!class_exists('wpMailPlugin')) {
 			global $wp_roles;
 			$permissions = $this -> get_option('permissions');
 			
-			if (empty($permissions)) {
+			if (empty($permissions) || !is_array($permissions)) {
 				$permissions = array();
 			}
 			
@@ -6018,6 +6081,11 @@ if (!class_exists('wpMailPlugin')) {
 					foreach ($this -> sections as $section_key => $section_menu) {												
 						if (empty($role -> capabilities['newsletters_' . $section_key])) {
 							$role -> add_cap('newsletters_' . $section_key);
+							
+							if (empty($permissions[$section_key]) || !is_array($permissions[$section_key])) {
+								$permissions[$section_key] = array();
+							}
+							
 							$permissions[$section_key][] = 'administrator';
 						}
 					}

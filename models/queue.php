@@ -223,7 +223,7 @@ class wpmlQueue extends wpMailPlugin {
 				$existsquery = "SELECT `id` FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `user_id` = '" . $user -> ID . "' AND `slug` = '" . $slug . "' LIMIT 1";
 			}
 				
-			$query_hash = md5($existsquery);
+			/*$query_hash = md5($existsquery);
 			global ${'newsletters_query_' . $query_hash};
 			if (!empty(${'newsletters_query_' . $query_hash})) {			
 				$exists = ${'newsletters_query_' . $query_hash};
@@ -233,9 +233,9 @@ class wpmlQueue extends wpMailPlugin {
 				}
 				
 				${'newsletters_query_' . $query_hash} = $exists;
-			}
+			}*/
 		
-			if ($exists == false) {
+			if (true || $exists == false) {
 				$subject = addslashes($subject);
 				$message = apply_filters('newsletters_admin_queue_save_message', $message, $subscriber, $subject,  $attachments, $post_id, $history_id, $return_query, $theme_id, $senddate);
 				$message = addslashes($message);
@@ -255,7 +255,27 @@ class wpmlQueue extends wpMailPlugin {
 					`attachments`,
 					`senddate`,
 					`created`, 
-					`modified`) VALUES (
+					`modified`) ";
+					
+					$query .= "SELECT * FROM (SELECT '" . (empty($post_id) ? '0' : $post_id) . "' AS post_id, 
+					'" . $history_id . "' AS history_id, 
+					'" . $theme_id . "' AS theme_id, 
+					'" . $user_id . "' AS user_id,
+					'" . $subscriber_id . "' AS subscriber_id, 
+					'" . $subscriber -> mailinglist_id . "' AS mailinglist_id, 
+					'" . maybe_serialize($subscriber -> mailinglists) . "' AS mailinglists,
+					'" . $subject . "' AS subject, 
+					'" . $slug . "' AS slug, 
+					'" . $message . "' AS message, 
+					'" . (!empty($attachments) ? maybe_serialize($attachments) : '') . "' AS attachments,
+					'" . $senddate . "' AS senddate, 
+					'" . $nowdate . "' AS created, 
+					'" . $nowdate . "' AS modified) AS tmp
+					WHERE NOT EXISTS (
+					    " . $existsquery . "
+					) LIMIT 1;";
+					
+					/* VALUES (
 					'" . (empty($post_id) ? '0' : $post_id) . "', 
 					'" . $history_id . "', 
 					'" . $theme_id . "', 
@@ -269,7 +289,7 @@ class wpmlQueue extends wpMailPlugin {
 					'" . (!empty($attachments) ? maybe_serialize($attachments) : '') . "',
 					'" . $senddate . "', 
 					'" . $nowdate . "', 
-					'" . $nowdate . "');";
+					'" . $nowdate . "');";*/
 			
 				if (empty($return_query) || !$return_query) {
 					if ($wpdb -> query($query)) {

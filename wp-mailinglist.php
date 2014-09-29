@@ -62,7 +62,12 @@ if (!class_exists('wpMail')) {
 		}
 	
 		function mceplugin($plugins = array()) {
-			$url = $this -> url() . '/js/tinymce/editor_plugin.js';
+			if (version_compare(get_bloginfo('version'), "3.8") >= 0) {
+				$url = $this -> url() . '/js/tinymce/editor_plugin.js';
+			} else {
+				$url = $this -> url() . '/js/tinymce/editor_plugin_old.js';
+			}
+			
 			$plugins['Newsletters'] = $url;
 			
 			//Viper's Video Quicktags compatibility
@@ -76,7 +81,68 @@ if (!class_exists('wpMail')) {
 		}	
 		
 		function tiny_mce_before_init($init_array = array()) {
-			$init_array['content_css'] .= "," . $this -> url() . '/css/editor-style.css';			
+			global $wpdb, $Db, $post, $Template, $Mailinglist;
+		
+			$init_array['content_css'] .= "," . $this -> url() . '/css/editor-style.css';	
+
+			$snippets = array();
+			$templatesquery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " ORDER BY title ASC";
+			$templates = $wpdb -> get_results($templatesquery);
+			
+			foreach ($templates as $template) {
+				$snippets[] = array('text' => __($template -> title), 'value' => $template -> id);
+			}
+			
+			$snippets = json_encode($snippets);
+			$init_array['newsletters_snippet_list'] = $snippets;
+			
+			$mailinglists = array();
+			$Db -> model = $Mailinglist -> model;
+			if ($lists = $Db -> find_all(false, false, array('title', "ASC"))) {
+				foreach ($lists as $list) {
+					$mailinglists[] = array('text' => $list -> id . ' - ' . __($list -> title), 'value' => $list -> id);
+				}
+			}
+			$mailinglists = json_encode($mailinglists);
+			$init_array['newsletters_mailinglists_list'] = $mailinglists;
+			
+			$post_id = $post -> ID;
+			$init_array['newsletters_post_id'] = $post_id;
+			
+			$init_array['newsletters_language_do'] = $this -> language_do();
+			if ($this -> language_do()) {
+				$newsletters_languages = array();
+				$languages = $this -> language_getlanguages();
+				foreach ($languages as $language) {
+					$newsletters_languages[] = array('text' => $this -> language_name($language), 'value' => $language);
+				}
+				$newsletters_languages = json_encode($newsletters_languages);
+				$init_array['newsletters_languages'] = $newsletters_languages;
+			}
+			
+			$categories_args = array('hide_empty' => 0, 'show_count' => 1);
+			if ($categories = get_categories($categories_args)) {
+				$newsletters_categories = array();
+				$newsletters_categories[]= array('text' => __('- Select -', $this -> plugin_name), 'value' => false);
+				foreach ($categories as $category) {
+					$newsletters_categories[] = array('text' => __($category -> name), 'value' => $category -> cat_ID);
+				}
+				$newsletters_categories = json_encode($newsletters_categories);
+				$init_array['newsletters_post_categories'] = $newsletters_categories;
+			}
+			
+			$init_array['newsletters_loading_image'] = $this -> url() . '/images/loading.gif';
+			
+			if ($post_types = $this -> get_custom_post_types()) {
+				$newsletters_post_types = array();
+				$newsletters_post_types[] = array('text' => __('- Select -', $this -> plugin_name), 'value' => false);
+				foreach ($post_types as $ptype_key => $ptype) {
+					$newsletters_post_types[] = array('text' => $ptype -> labels -> name, 'value' => $ptype_key);
+				}
+				$newsletters_post_types = json_encode($newsletters_post_types);
+				$init_array['newsletters_post_types'] = $newsletters_post_types;
+			}			
+					
 			return $init_array;
 		}
 	
@@ -451,6 +517,8 @@ if (!class_exists('wpMail')) {
 										}
 										
 										fclose($fh);
+										exit();
+										die();
 									}
 								} else {
 									$error = __('Export file could not be created', $this -> plugin_name);
@@ -1593,7 +1661,7 @@ if (!class_exists('wpMail')) {
 				if (empty($schedulecrontype) || $schedulecrontype == "wp") {
 					$schedules = $this -> cron_schedules($schedules);
 					$interval = $this -> get_option('scheduleinterval');
-					$expiration = $schedules[$interval]['interval'];
+					$expiration = ($schedules[$interval]['interval'] * 2);
 				} else {
 					$expiration = 150;
 				}					
@@ -1796,7 +1864,9 @@ if (!class_exists('wpMail')) {
 			
 			if (!empty($locale)) { 
 				if ($locale == "ja" || $locale == "ja_JP") { setlocale(LC_ALL, "ja_JP.UTF8"); }
-			} else { setlocale(LC_ALL, $locale); }
+			} else { 
+				setlocale(LC_ALL, apply_filters('newsletters_setlocale', $locale)); 
+			}
 				
 			if (function_exists('load_plugin_textdomain')) {			
 				$mofile = 'wp-mailinglist-' . $locale . '.mo';
@@ -2310,8 +2380,6 @@ if (!class_exists('wpMail')) {
 			$user_id = get_current_user_id();
 		
 			$this -> remove_server_limits();
-			$mailinglists = $Mailinglist -> get_all('*', true);
-			$templates = $Template -> get_all();
 			$sentmailscount = 0;
 			
 			/* Themes */
@@ -2344,6 +2412,9 @@ if (!class_exists('wpMail')) {
 			
 			switch ($_GET['method']) {			
 				case 'template'		:
+					$mailinglists = $Mailinglist -> get_all('*', true);
+					$templates = $Template -> get_all();
+				
 					if ($template = $Template -> get($_GET['id'])) {
 						$this -> render_message(__('Email template has been loaded into the subject field and editor below.', $this -> plugin_name));
 						$_POST = array('subject' => $template -> title, 'theme_id' => $template -> theme_id, 'inctemplate' => $template -> id, 'content' => $template -> content);
@@ -2354,6 +2425,9 @@ if (!class_exists('wpMail')) {
 					}
 					break;				
 				case 'history'		:
+					$mailinglists = $Mailinglist -> get_all('*', true);
+					$templates = $Template -> get_all();
+				
 					if ($history = $History -> get($_GET['id'])) {								
 						$_POST = array(
 							'ishistory'			=>	$history -> id,
@@ -2469,7 +2543,7 @@ if (!class_exists('wpMail')) {
 						}
 	
 						if (empty($errors)) {					
-							if (empty($_POST['preview']) && empty($_POST['draft'])) {												
+							if (empty($_POST['preview']) && empty($_POST['draft'])) {																		
 								if (!empty($_POST)) {															
 									if (!empty($errors)) {
 										if ($this -> get_option('scheduling') == "Y") {
@@ -2635,6 +2709,7 @@ if (!class_exists('wpMail')) {
 												. str_replace(" AND ()", "", $fieldsquery);
 												
 												$sentmailscount = 0;
+												$sendingprogress = $this -> get_option('sendingprogress');
 												$datasets = array();
 												$q_queries = array();
 												$d = 0;
@@ -2660,7 +2735,7 @@ if (!class_exists('wpMail')) {
 														foreach ($users as $user) {
 															$this -> remove_server_limits();
 															
-															if ($this -> get_option('sendingprogress') == "N") {
+															if ($sendingprogress == "N") {
 																$q_queries[] = $Queue -> save(
 																	false,
 																	$user, 
@@ -2699,7 +2774,7 @@ if (!class_exists('wpMail')) {
 														$subscriber -> mailinglist_id = $_POST['mailinglists'][0];										
 														$subscriber -> mailinglists = $_POST['mailinglists'];
 														
-														if ($this -> get_option('sendingprogress') == "N") {
+														if ($sendingprogress == "N") {
 															$q_queries[] = $Queue -> save(
 																$subscriber,
 																false, 
@@ -2960,6 +3035,9 @@ if (!class_exists('wpMail')) {
 					}
 					
 					if (empty($dontrendersend) || $dontrendersend == false) {
+						$mailinglists = $Mailinglist -> get_all('*', true);
+						$templates = $Template -> get_all();
+					
 						$this -> render('send', array('mailinglists' => $mailinglists, 'themes' => $themes, 'templates' => $templates, 'errors' => $errors), true, 'admin');
 					}
 					break;
@@ -2975,7 +3053,12 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST)) {
 						if ($Db -> save($_POST)) {
 							$message = __('Autoresponder has been saved.', $this -> plugin_name);
-							$this -> redirect("?page=" . $this -> sections -> autoresponders, 'message', $message);
+							
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> autoresponders . '&method=save&id=' . $Autoresponder -> insertid . '&continueediting=1'), 'message', $message);
+							} else {
+								$this -> redirect("?page=" . $this -> sections -> autoresponders, 'message', $message);
+							}
 						} else {
 							$this -> render_error(__('Autoresponder could not be saved, please try again.', $this -> plugin_name));	
 							$this -> render('autoresponders' . DS . 'save', false, true, 'admin');
@@ -4288,13 +4371,15 @@ if (!class_exists('wpMail')) {
 									${'newsletters_query_' . $query_hash} = $fields;
 								}
 								
+								$delimiter = (!empty($_POST['export_delimiter'])) ? $_POST['export_delimiter'] : ",";
+								
 								$headings = array();
 								$headings[] = __('ID', $this -> plugin_name);
 								$headings[] = __('Email Address', $this -> plugin_name);
 								
 								if (!empty($fields)) {
 									foreach ($fields as $field) {
-										$headings[] = $field -> title;
+										$headings[] = __($field -> title);
 									}
 								}
 								
@@ -4303,7 +4388,7 @@ if (!class_exists('wpMail')) {
 								$headings[] = __('Modified', $this -> plugin_name);
 								
 								$data = "";
-								$data .= '"' . implode('","', $headings) . '"' . "\r\n";
+								$data .= '"' . implode('"' . $delimiter . '"', $headings) . '"' . "\r\n";
 							
 								foreach ($subscribers as $subscriber) {
 									$datasets[$d] = array(
@@ -4314,7 +4399,10 @@ if (!class_exists('wpMail')) {
 									if (!empty($fields)) {
 										foreach ($fields as $field) {
 											if (!empty($field -> fieldoptions)) {
-												$fieldoptions = array_map('__', unserialize($field -> fieldoptions));
+												$fieldoptions_unserialize = unserialize($field -> fieldoptions);
+												if (!empty($fieldoptions_unserialize) && is_array($fieldoptions_unserialize)) {
+													$fieldoptions = array_map('__', $fieldoptions_unserialize);	
+												}
 											}
 											
 											switch ($_POST['export_purpose']) {
@@ -4373,7 +4461,7 @@ if (!class_exists('wpMail')) {
 									$datasets[$d]['created'] = $subscriber -> created;
 									$datasets[$d]['modified'] = $subscriber -> modified;
 									
-									$data .= '"' . implode('","', $datasets[$d]) . '"' . "\r\n";
+									$data .= '"' . implode('"' . $delimiter . '"', $datasets[$d]) . '"' . "\r\n";
 									
 									$d++;
 								}
@@ -4387,8 +4475,8 @@ if (!class_exists('wpMail')) {
 								fclose($fh);
 								@chmod($exportfilefull, 0777);
 								
-								$message = $d . ' ' . sprintf(__('subscribers have been exported. %s', $this -> plugin_name), '<a href="' . $Html -> uploads_url() . '/' . $this -> plugin_name . '/export/' . $exportfilename . '">' . __('Download CSV', $this -> plugin_name) . '</a>');
-								$this -> render_message($message);
+								//$message = $d . ' ' . sprintf(__('subscribers have been exported. %s', $this -> plugin_name), '<a href="' . $Html -> uploads_url() . '/' . $this -> plugin_name . '/export/' . $exportfilename . '">' . __('Download CSV', $this -> plugin_name) . '</a>');
+								//$this -> render_message($message);
 								$this -> render('import-export', array('exportfile' => $exportfilename), true, 'admin');
 							}
 						} else {
@@ -5407,7 +5495,12 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST)) {
 						if ($Field -> save($_POST)) {					
 							$message = __('Custom field has been saved', $this -> plugin_name);
-							$this -> redirect('?page=' . $this -> sections -> fields, 'message', $message);
+							
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> fields . '&method=save&id=' . $Field -> insertid . '&continueediting=1'), 'message', $message);	
+							} else {
+								$this -> redirect('?page=' . $this -> sections -> fields, 'message', $message);
+							}
 						} else {
 							$this -> render_error(__('Custom field could not be saved', $this -> plugin_name));
 							$this -> render_admin('fields' . DS . 'save');

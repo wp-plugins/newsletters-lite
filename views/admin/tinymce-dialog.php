@@ -352,7 +352,7 @@ global $wpdb, $Mailinglist, $Template;
                                             <option value="author"><?php _e('Author', $this -> plugin_name); ?></option>
                                             <option value="category"><?php _e('Category', $this -> plugin_name); ?></option>
                                             <option value="content"><?php _e('Post Content', $this -> plugin_name); ?></option>
-                                            <option value="ID"><?php _e('Post ID', ""); ?></option>
+                                            <option value="ID"><?php _e('Post ID', $this -> plugin_name); ?></option>
                                             <option value="menu_order"><?php _e('Menu Order', $this -> plugin_name); ?></option>
                                             <option value="title"><?php _e('Post Title', $this -> plugin_name); ?></option>
                                             <option value="rand"><?php _e('Random Order', $this -> plugin_name); ?></option>

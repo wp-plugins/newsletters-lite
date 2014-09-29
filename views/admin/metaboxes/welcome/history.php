@@ -24,7 +24,11 @@
 							<?php if (empty($history -> sent)) : ?>
 								<small><?php _e('(Draft)', $this -> plugin_name); ?></small>
 							<?php endif; ?>
-							<small class="alignright"><?php echo sprintf(__('%s&#37; <span class="wpmlsuccess">opened</span> / %s&#37; <span class="wpmlpending">unsub</span> / %s&#37; <span class="wpmlerror">bounced</span> / %s <span class="wpmlneutral">clicks</span>', $this -> plugin_name), number_format($tracking, 2, '.', ''), number_format($eunsubscribeperc, 2, '.', ''), number_format($ebouncedperc, 2, '.', ''), $clicks); ?></small>
+							<p class="submit">
+								<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $history -> id); ?>"><?php _e('View', $this -> plugin_name); ?></a>
+								<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> send . '&amp;method=history&amp;id=' . $history -> id); ?>"><?php _e('Edit', $this -> plugin_name); ?></a>
+							</p>
+							<small class="alignright" style="border: 1px #efefef solid; padding: 1px 5px; background: #fefefe; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;"><?php echo sprintf(__('%s&#37; <span class="wpmlsuccess">opened</span> / %s&#37; <span class="wpmlpending">unsub</span> / %s&#37; <span class="wpmlerror">bounced</span> / %s <span class="wpmlneutral">clicks</span>', $this -> plugin_name), number_format($tracking, 2, '.', ''), number_format($eunsubscribeperc, 2, '.', ''), number_format($ebouncedperc, 2, '.', ''), $clicks); ?></small>
 						</h4>
 						<em><abbr title="<?php echo $history -> created; ?>"><?php echo date_i18n("M j, Y", strtotime($history -> created)); ?></abbr></em>
 						<p><?php echo $Html -> truncate(strip_tags(do_shortcode($this -> strip_set_variables($history -> message))), 300); ?></p>

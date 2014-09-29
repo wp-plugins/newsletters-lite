@@ -182,8 +182,8 @@
 
 #dashboard-widgets #wp-mailinglist a.button,
 #dashboard-widgets #newsletters-lite a.button {
-    clear: right;
-    float: right;
+    /*clear: right;
+    float: right;*/
     position: relative;
     top: -5px;
 }
@@ -307,11 +307,23 @@ table tbody tr.arow {
     max-width: 300px;
     -webkit-box-shadow: 0 0 5px #aaa;
     box-shadow: 0 0 5px #aaa;
-    background: white;
+    background: #000000;
+    opacity: .8;
+	filter: alpha(opacity=80);
+	zoom: 1;
     border-width: 2px;
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
+}
+
+.ui-tooltip-content {
+	color: #fff;
+	font-size: 12px;
+	background-color: #000;
+	color: #fff;
+	text-align: center;
+	white-space: normal;
 }
 
 .wpml .extensionicon {
@@ -595,7 +607,8 @@ ul#wpmlsubmenu a.current {
 }
 
 .wpml .postbox .scroll-list,
-.misc-pub-section .scroll-list {
+.misc-pub-section .scroll-list,
+.ui-tabs .scroll-list {
     background: #FFFFFF !important;
 }
 
@@ -633,6 +646,7 @@ ul#wpmlsubmenu a.current {
 
 #adminmenu .toplevel_page_newsletters div.wp-menu-image:before,
 .mce-i-Newsletters:before,
+.mce-i-newsletters:before,
 .newsletters-update-nag:before,
 #wpadminbar .newsletters-lite a:before {
     font-family: 'newsletters_dashicons' !important;

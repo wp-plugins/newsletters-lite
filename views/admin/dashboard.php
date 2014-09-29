@@ -1,8 +1,10 @@
 <div>
 	<?php
 	
+	$from = date("Y-m-d", strtotime("-14 days"));
+	$to = date("Y-m-d", time());
 	include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
-	newsletters_open_flash_chart_object("100%", "180", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats', false, $this -> url());
+	newsletters_open_flash_chart_object("100%", "180", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&from=' . $from . '&to=' . $to, false, $this -> url());
 	
 	?>
 </div>
@@ -11,7 +13,7 @@
 <?php
 
 $Db -> model = $History -> model;
-$histories = $Db -> find_all(false, false, array('modified', "DESC"), 4);
+$histories = $Db -> find_all(false, false, array('modified', "DESC"), 5);
 
 ?>
 
@@ -25,8 +27,9 @@ $histories = $Db -> find_all(false, false, array('modified', "DESC"), 4);
 						<td class="first b b-ad">
 							<?php echo __($history -> subject); ?>
 						</td>
-						<td class="t ad">
-							<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $history -> id); ?>"><?php _e('View', $this -> plugin_name); ?></a>
+						<td class="t ad" style="text-align:right; width:40%;">
+							<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $history -> id); ?>"><?php _e('View', $this -> plugin_name); ?></a>
+							<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> send . '&amp;method=history&amp;id=' . $history -> id); ?>"><?php _e('Edit', $this -> plugin_name); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>
@@ -99,6 +102,10 @@ $bounces = (empty($bounces)) ? 0 : $bounces;
 			</tr> 
 		</tbody>
 	</table>
+	
+	<p>
+		<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> welcome); ?>"><?php _e('See full overview', $this -> plugin_name); ?></a>
+	</p>
 </div>
 
 <br class="clear" />

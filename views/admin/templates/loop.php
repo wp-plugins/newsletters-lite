@@ -103,7 +103,7 @@
 							</td>
 							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> sent; ?></label></td>
 							<td>
-								<code>[wpmlsnippet id="<?php echo $template -> id; ?>"]</code>
+								<code>[newsletters_snippet id="<?php echo $template -> id; ?>"]</code>
 							</td>
 							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> modified; ?></label></td>
 						</tr>
