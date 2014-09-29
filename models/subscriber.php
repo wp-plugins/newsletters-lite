@@ -683,7 +683,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		
 		if ($validate == true) {
 			//was the email address left empty?
-			if (empty($email)) { $this -> errors['email'] = $emailfield -> errormessage; }
+			if (empty($email)) { $this -> errors['email'] = __($emailfield -> errormessage); }
 			//does a subscriber with this email address already exist?
 			elseif ($curr_id = $this -> email_exists($email)) { 
 				if ($email != $subscriber -> email) {
@@ -751,7 +751,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			
 			if (empty($active)) { $this -> errors['active'] = __('Please select an active status', $this -> plugin_name); }
 		} else {
-			if (empty($email)) { $this -> errors['email'] = $emailfield -> errormessage; }
+			if (empty($email)) { $this -> errors['email'] = __($emailfield -> errormessage); }
 		}
 		
 		$this -> errors = apply_filters($this -> pre . '_subscriber_validation', $this -> errors, $this -> data[$this -> model]);
@@ -836,7 +836,7 @@ class wpmlSubscriber extends wpMailPlugin {
 									}
 								}
 							
-								$query .= " `" . $field -> slug . "` = '" . esc_sql($data[$field -> slug]) . "', ";
+								$query .= " `" . $field -> slug . "` = '" . utf8_encode(esc_sql($data[$field -> slug])) . "', ";
 							}
 						
 							$usedfields[] = $field -> slug;

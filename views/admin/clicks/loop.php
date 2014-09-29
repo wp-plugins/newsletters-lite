@@ -15,6 +15,7 @@
 		$orderby = (empty($_GET['orderby'])) ? 'created' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
+		$colspan = 7;
 		
 		?>
 		<table class="widefat">
@@ -96,6 +97,13 @@
 									?>
 									
 									<a href="?page=<?php echo $this -> sections -> clicks; ?>&amp;subscriber_id=<?php echo $subscriber -> id; ?>" class="row-title"><?php echo $subscriber -> email; ?></a>
+									<div class="row-actions">
+										<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> clicks . '&amp;method=delete&amp;id=' . $click -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this click?', $this -> plugin_name) . "')) { return false; }", 'class' => "delete")); ?></span>
+									</div>
+								<?php elseif (!empty($click -> user_id)) : ?>
+									<?php $user = $this -> userdata($click -> user_id); ?>
+									<?php _e('User:', $this -> plugin_name); ?> <a href="" class="row-title"><?php echo $user -> display_name; ?></a>
+									<br/><small><?php echo $user -> user_email; ?></small>
 									<div class="row-actions">
 										<span class="delete"><?php echo $Html -> link(__('Delete', $this -> plugin_name), '?page=' . $this -> sections -> clicks . '&amp;method=delete&amp;id=' . $click -> id, array('onclick' => "if (!confirm('" . __('Are you sure you want to delete this click?', $this -> plugin_name) . "')) { return false; }", 'class' => "delete")); ?></span>
 									</div>

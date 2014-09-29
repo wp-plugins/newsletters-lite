@@ -15,7 +15,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
                 	<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-expired" class="button"><?php _e('Check Expired', $this -> plugin_name); ?></a>
                 <?php endif; ?>
                 <a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=unsubscribes'); ?>"><?php _e('Unsubscribes', $this -> plugin_name); ?></a>
-                <a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=bounces'); ?>"><?php _e('Bounces', $this -> plugin_name); ?></a>
+                <?php /*<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=bounces'); ?>"><?php _e('Bounces', $this -> plugin_name); ?></a>*/ ?>
 				<select class="widefat" style="width:auto;" name="action" onchange="action_change(this.value);">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>

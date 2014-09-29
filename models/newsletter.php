@@ -31,6 +31,12 @@ if (!class_exists('newsletters_lite')) {
 		
 		function lite_admin_bar_menu($wp_admin_bar = null) {
 			global $wp_admin_bar;
+
+			if (is_multisite()) {				
+				if (is_network_admin()) {
+					return;
+				}
+			}
 			
 			if (!current_user_can('newsletters_welcome')) {
 				return;

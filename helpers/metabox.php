@@ -110,6 +110,13 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'bounces', array('total' => $total), true, 'admin');
 	}
 	
+	function welcome_unsubscribes() {
+		global $Unsubscribe, $Db;
+		$Db -> model = $Unsubscribe -> model;
+		$total = $Db -> count();
+		$this -> render('metaboxes' . DS . 'welcome' . DS . 'unsubscribes', array('total' => $total), true, 'admin');
+	}
+	
 	function send_spamscore() {
 		$this -> render('metaboxes' . DS . 'send' . DS . 'spamscore', false, true, 'admin');
 	}
@@ -254,6 +261,10 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 	
 	function settings_bounce() {
 		$this -> render('metaboxes' . DS . 'settings-bounce', false, true, 'admin');
+	}
+	
+	function settings_emails() {
+		$this -> render('metaboxes' . DS . 'settings' . DS . 'emails', false, true, 'admin');
 	}
 	
 	function settings_latestposts() {

@@ -744,6 +744,8 @@ class wpmlHistory extends wpMailPlugin {
 				
 				$Db -> model = $Queue -> model;
 				$Db -> delete_all(array('history_id' => $id));
+				
+				$this -> Click -> delete_all(array('history_id' => $id));
 			
 				return true;
 			}

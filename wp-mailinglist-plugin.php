@@ -2070,7 +2070,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($_POST)) {
 				if (!empty($_POST['subscriber_id']) && !empty($_POST['mailinglist_id']) && !empty($_POST['activate'])) {
-					global $wpdb, $Db, $Subscriber, $SubscribersList, $Auth, $Mailinglist, $Autoresponderemail;
+					global $wpdb, $Db, $Subscriber, $SubscribersList, $Auth, $Mailinglist, $Autoresponderemail, $Unsubscribe;
 					
 					if ($subscriber = $Auth -> logged_in()) {
 						if ($subscriber -> id == $_POST['subscriber_id']) {
@@ -2084,6 +2084,10 @@ if (!class_exists('wpMailPlugin')) {
 							
 							if ($_POST['activate'] == "N") {
 								if ($Db -> delete_all(array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']))) {																
+								
+									$Db -> model = $Unsubscribe -> model;
+									$unsubscribe_data = array('email' => $subscriber -> email, 'mailinglist_id' => $_POST['mailinglist_id']);
+									$Db -> save($unsubscribe_data, true);
 								
 									$Db -> model = $Autoresponderemail -> model;
 									$Db -> delete_all(array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']));
@@ -2423,7 +2427,9 @@ if (!class_exists('wpMailPlugin')) {
 							
 							$this -> user_unsubscription_notification($subscriber, $mailinglists);
 						
-							if (!empty($data['unsubscribelists'])) {										
+							if (!empty($data['unsubscribelists'])) {	
+								$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists	
+																
 								foreach ($data['unsubscribelists'] as $unsubscribelist_id) {
 									$Db -> model = $Mailinglist -> model;
 									$mailinglist = $Db -> find(array('id' => $unsubscribelist_id));
@@ -2434,6 +2440,7 @@ if (!class_exists('wpMailPlugin')) {
 									}
 									
 									if (!empty($subscriber -> id) && !empty($unsubscribelist_id)) {
+										$subscribedlists = array_diff($subscribedlists, array($unsubscribelist_id));
 										$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $unsubscribelist_id));
 										$Db -> model = $Queue -> model;
 										$Db -> delete_all(array('subscriber_id' => $subscriber -> id, 'mailinglist_id' => $unsubscribelist_id));
@@ -2448,8 +2455,7 @@ if (!class_exists('wpMailPlugin')) {
 								
 								do_action('newsletters_subscriber_unsubscribe', $subscriber -> id, $data['unsubscribelists']);
 													
-								if ($this -> get_option('unsubscriberemoveallsubscriptions') == "Y") {
-									$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists							
+								if ($this -> get_option('unsubscriberemoveallsubscriptions') == "Y") {						
 									foreach ($subscribedlists as $subscribedlist_id) {
 										if (!empty($subscriber -> id) && !empty($subscribedlist_id)) {
 											$SubscribersList -> delete_all(array('subscriber_id' => $subscriber -> id, 'list_id' => $subscribedlist_id));
@@ -2460,8 +2466,7 @@ if (!class_exists('wpMailPlugin')) {
 								}
 								
 								//Should the subscriber be deleted?
-								if ($this -> get_option('unsubscribedelete') == "Y") {											
-									$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists		
+								if ($this -> get_option('unsubscribedelete') == "Y") {																				
 									if (empty($subscribedlists) || !is_array($subscribedlists) || count($subscribedlists) <= 0) {							
 										$Db -> model = $Subscriber -> model;
 										$Db -> delete($subscriber -> id);
@@ -2661,7 +2666,7 @@ if (!class_exists('wpMailPlugin')) {
 				return $text;
 			}
 			
-			if(is_object($text)||@get_class($text) == '__PHP_Incomplete_Class') {
+			if(is_object($text) && get_class($text) == '__PHP_Incomplete_Class') {
 				foreach(get_object_vars($text) as $key => $t) {
 					$text->$key = $this -> language_use($lang,$text->$key,$show_available);
 				}
@@ -5847,7 +5852,7 @@ if (!class_exists('wpMailPlugin')) {
 			$this -> check_tables();
 			$this -> get_managementpost(false, true);
 			
-			global $wpml_add_option_count, $wpdb, $Theme;
+			global $wpml_add_option_count, $wpdb, $Theme, $Field;
 			$wpml_add_option_count = 0;
 					
 			$options = array();	
@@ -6068,9 +6073,14 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			// Scheduled tasks
-			wp_schedule_single_event(strtotime("+7 day"), 'newsletters_ratereviewhook', array(7));
-			wp_schedule_single_event(strtotime("+14 day"), 'newsletters_ratereviewhook', array(14));
-			wp_schedule_single_event(strtotime("+30 day"), 'newsletters_ratereviewhook', array(30));
+			$ratereview_scheduled = $this -> get_option('ratereview_scheduled');
+			if (empty($ratereview_scheduled)) {
+				wp_schedule_single_event(strtotime("+7 day"), 'newsletters_ratereviewhook', array(7));
+				wp_schedule_single_event(strtotime("+14 day"), 'newsletters_ratereviewhook', array(14));
+				wp_schedule_single_event(strtotime("+30 day"), 'newsletters_ratereviewhook', array(30));
+				wp_schedule_single_event(strtotime("+30 day"), 'newsletters_ratereviewhook', array(60));
+				$this -> update_option('ratereview_scheduled', true);
+			}
 			
 			$this -> get_imagespost();		
 			$this -> get_managementpost();
@@ -6087,6 +6097,8 @@ if (!class_exists('wpMailPlugin')) {
 			$this -> autoresponder_scheduling();
 			$this -> init_fieldtypes();
 			$this -> predefined_templates();
+			
+			$Field -> check_default_fields();
 			
 			return $wpml_add_option_count;
 		}
@@ -6513,6 +6525,7 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if (!empty($message) && is_admin()) {
+				$message = rawurlencode($message);
 				$url = $Html -> retainquery($this -> pre . 'message=' . ($message), $url);
 			}
 			
@@ -6526,7 +6539,7 @@ if (!class_exists('wpMailPlugin')) {
 				<?php
 				
 				flush();
-			} else {
+			} else {			
 				header("Location: " . $url . "");
 				exit();	
 			}

@@ -335,9 +335,9 @@ if (!class_exists('wpMail')) {
 					$hidemessage_ratereview = $this -> get_option('hidemessage_ratereview');
 					
 					if (!empty($showmessage_ratereview) && empty($hidemessage_ratereview)) {
-						$rate_url = "http://wordpress.org/support/view/plugin-reviews/newsletters-lite?rate=5#postform";
+						$rate_url = "https://wordpress.org/support/view/plugin-reviews/newsletters-lite?rate=5#postform";
 						$works_url = "http://wordpress.org/plugins/newsletters-lite/?compatibility[version]=" . get_bloginfo("version") . "&compatibility[topic_version]=" . $this -> version . "&compatibility[compatible]=1";
-						$message = sprintf(__('You have been using Newsletters LITE for %s days or more. Please consider leaving a %s and say it %s on %s', $this -> plugin_name), $showmessage_ratereview, '<a href="' . $rate_url . '" target="_blank" class="button">' . __('review', $this -> plugin_name) . '</a>', '<a href="' . $works_url . '" target="_blank" class="button">' . __('works', $this -> plugin_name) . '</a>', '<a href="http://wordpress.org/plugins/newsletters-lite/" target="_blank">WordPress.org</a>');
+						$message = sprintf(__('You have been using %s for %s days or more. Please consider %s it and say it %s on %s', $this -> plugin_name), '<a href="https://wordpress.org/plugins/newsletters-lite/" target="_blank">' . __('Tribulant Newsletters', $this -> plugin_name) . '</a>', $showmessage_ratereview, '<a href="' . $rate_url . '" target="_blank" class="button">' . __('Rating', $this -> plugin_name) . '</a>', '<a href="' . $works_url . '" target="_blank" class="button">' . __('Works', $this -> plugin_name) . '</a>', '<a href="http://wordpress.org/plugins/newsletters-lite/" target="_blank">WordPress.org</a>');
 						$message .= ' <a style="text-decoration:none;" href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=ratereview') . '" class="newsletters-icon-delete-regular"></a>';
 						$this -> render_message($message);
 					}
@@ -438,6 +438,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function init() {	
+			if (!empty($_REQUEST['newsletters_obstart'])) {
+				ob_start();
+			}
+		
 			global $Db, $Email, $Html, $History, $Mailinglist, $wpmlOrder, $Subscriber, $SubscribersList;			
 			$this -> init_textdomain();
 			
@@ -450,6 +454,16 @@ if (!class_exists('wpMail')) {
 			
 			if ($this -> get_option('clicktrack') == "Y" && !empty($_GET[$this -> pre . 'link'])) {
 				if ($link = $this -> Link -> find(array('hash' => $_GET[$this -> pre . 'link']))) {
+				
+					$email_conditions = array('history_id' => $_GET['history_id']);
+					if (!empty($_GET['subscriber_id'])) { $email_conditions['subscriber_id'] = $_GET['subscriber_id']; }
+					if (!empty($_GET['user_id'])) { $email_conditions['user_id'] = $_GET['user_id']; }
+				
+					$Db -> model = $Email -> model;
+					$Db -> save_field('read', "Y", $email_conditions);
+					$Db -> model = $Email -> model;
+					$Db -> save_field('status', "sent", $email_conditions);
+				
 					$click_data = array(
 						'link_id'			=>	$link -> id,
 						'history_id'		=>	$_GET['history_id'],
@@ -708,7 +722,7 @@ if (!class_exists('wpMail')) {
 	                            
 	                            <?php wp_head(); ?>
 							</head>
-							<body>
+							<body style="background:none;">
 								<div id="<?php echo $widget_id; ?>" class="<?php echo $this -> pre; ?> widget_newsletters">
 								<div id="<?php echo $widget_id; ?>-wrapper">
 									<?php
@@ -1186,12 +1200,13 @@ if (!class_exists('wpMail')) {
 		
 			if (!empty($user_id)) {
 				$Db -> model = $Subscriber -> model;
-			
 				if ($subscriber = $Db -> find(array('user_id' => $user_id))) {
 					if (!empty($subscriber)) {
 						$Subscriber -> delete($subscriber -> id);
 					}
 				}
+				
+				$this -> Click -> delete_all(array('user_id' => $user_id));
 			}
 		}
 		
@@ -1770,7 +1785,7 @@ if (!class_exists('wpMail')) {
 								}
 							} elseif (!empty($email -> user_id)) {
 								if ($user = $this -> userdata($email -> user_id)) {
-									$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
+									$eunique = md5($email -> user_id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
 									if ((empty($userids[$email -> history_id]) || (!empty($userids[$email -> history_id]) && !in_array($user -> ID, $userids[$email -> history_id])))) {
 										$userids[$email -> history_id][] = $user -> ID;
 										$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => false, 'user' => $user, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id), false, 'html', true, $email -> theme_id);
@@ -2180,6 +2195,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('listsdiv', __('Total Mailing Lists', $this -> plugin_name) . $Html -> help(__('The total mailing lists that you have in use. Each list can have a purpose of its own, make use of lists to organize and power your subscribers.', $this -> plugin_name)), array($Metabox, 'welcome_lists'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('emailsdiv', __('Total Emails', $this -> plugin_name) . $Html -> help(__('The total number of emails sent to date since the plugin was installed until now.', $this -> plugin_name)), array($Metabox, 'welcome_emails'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('bouncesdiv', __('Bounced Emails', $this -> plugin_name) . $Html -> help(__('The total number of bounces to date.', $this -> plugin_name)), array($Metabox, 'welcome_bounces'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
+			add_meta_box('unsubscribesdiv', __('Unsubscribes', $this -> plugin_name) . $Html -> help(__('Total unsubscribes to date.', $this -> plugin_name)), array($Metabox, 'welcome_unsubscribes'), "newsletters_page_" . $this -> sections -> welcome, 'side', 'core');
 			add_meta_box('statsdiv', __('Statistics Overview', $this -> plugin_name) . $Html -> help(__('This chart shows an overview of subscribers, emails sent, unsubscribes, bounces, etc in a visual manner.', $this -> plugin_name)), array($Metabox, 'welcome_stats'), "newsletters_page_" . $this -> sections -> welcome, 'normal', 'core');
 			add_meta_box('historydiv', __('Recent Emails', $this -> plugin_name) . $Html -> help(__('This is a quick overview of your 5 latest newsletters.', $this -> plugin_name)), array($Metabox, 'welcome_history'), "newsletters_page_" . $this -> sections -> welcome, 'normal', 'core');
 			
@@ -2248,6 +2264,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('publishingdiv', __('Posts Configuration', $this -> plugin_name) . $Html -> help(__('These are settings related to posts in general. For publishing newsletters as posts and also inserting posts into newsletters.', $this -> plugin_name)), array($Metabox, 'settings_publishing'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('schedulingdiv', __('Email Scheduling', $this -> plugin_name) . $Html -> help(__('The purpose of email scheduling is to allow you to send thousands of emails in a load distributed way. Please take note that you cannot expect your server/hosting to send hundreds/thousands of emails all simultaneously so this is where email scheduling helps you.', $this -> plugin_name)), array($Metabox, 'settings_scheduling'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('bouncediv', __('Bounce Configuration', $this -> plugin_name), array($Metabox, 'settings_bounce'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
+			add_meta_box('emailsdiv', __('Emails Configuration', $this -> plugin_name), array($Metabox, 'settings_emails'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('latestposts', __('Latest Posts Subscription', $this -> plugin_name), array($Metabox, 'settings_latestposts'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('customcss', __('Theme, Scripts &amp; Custom CSS', $this -> plugin_name), array($Metabox, 'settings_customcss'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			
@@ -2731,7 +2748,8 @@ if (!class_exists('wpMail')) {
 												. str_replace(" AND ()", "", $fieldsquery);
 												
 												$sentmailscount = 0;
-												$sendingprogress = $this -> get_option('sendingprogress');
+												$sendingprogress_option = $this -> get_option('sendingprogress');
+												$sendingprogress = (!empty($_POST['sendingprogress'])) ? "Y" : $sendingprogress_option;
 												$datasets = array();
 												$q_queries = array();
 												$d = 0;
@@ -2835,7 +2853,7 @@ if (!class_exists('wpMail')) {
 													}
 												}
 												
-												if ($this -> get_option('sendingprogress') == "Y") {						
+												if ($sendingprogress == "Y") {						
 													$this -> render('send-post', array('subscribers' => $datasets, 'subject' => $_POST['subject'], 'content' => $_POST['content'], 'attachments' => $newattachments, 'post_id' => $post_id, 'history_id' => $history_id, 'theme_id' => $_POST['theme_id']), true, 'admin');
 													$dontrendersend = true;
 												} else {
@@ -3979,20 +3997,125 @@ if (!class_exists('wpMail')) {
 	            	$this -> redirect("?page=" . $this -> sections -> subscribers, 'message', $message);
 	            	break;
 	            case 'unsubscribes'				:
-	            	$sections = $this -> sections -> subscribers;
+	            	$unsubscribes_table = $wpdb -> prefix . $Unsubscribe -> table;
+	            	$sections = $this -> sections -> subscribers . '&method=unsubscribes';
 	            	$conditions = false;
-	            	$searchterm = false;
-	            	$perpage = 10;
+	            	$searchterm = (!empty($_GET[$this -> pre . 'searchterm'])) ? $_GET[$this -> pre . 'searchterm'] : false;
+					$searchterm = (!empty($_POST['searchterm'])) ? $_POST['searchterm'] : $searchterm;
+	            	$perpage = (isset($_COOKIE[$this -> pre . 'unsubscribesperpage'])) ? $_COOKIE[$this -> pre . 'unsubscribesperpage'] : 15;
 	            	
 	            	$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
+					
+					$conditions = (!empty($searchterm)) ? array($unsubscribes_table . '.email' => "LIKE '%" . $searchterm . "%'") : false;
+					
+					if (!empty($_GET['history_id'])) {
+						$conditions[$unsubscribes_table . '.history_id'] = $_GET['history_id'];
+					}
 	            	
 	            	$conditions_and = false;
-	            	$data = $this -> paginate($Unsubscribe -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
-					$unsubscribes = $data[$Unsubscribe -> model];
+	            	
+	            	if (!empty($_GET['showall'])) {
+	            		$Db -> model = $Unsubscribe -> model;
+						$unsubscribes = $Db -> find_all(false, "*", $order);
+						$data[$Unsubscribe -> model] = $unsubscribes;
+						$data['Paginate'] = false;
+	            	} else {
+		            	$data = $this -> paginate($Unsubscribe -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+						$unsubscribes = $data[$Unsubscribe -> model];
+					}
 	            	
 	            	$this -> render('subscribers' . DS . 'unsubscribes', array('unsubscribes' => $unsubscribes, 'paginate' => $data['Paginate']), true, 'admin');
+	            	break;
+	            case 'unsubscribedelete'		:
+	            	if (!empty($_GET['id'])) {
+		            	$Db -> model = $Unsubscribe -> model;
+		            	
+		            	if ($Db -> delete($_GET['id'])) {
+		            		$msgtype = 'message';
+		            		$message = __('Unsubscribe has been deleted', $this -> plugin_name);
+		            	} else {
+			            	$msgtype = 'error';
+			            	$message = __('Unsubscribe could not be deleted', $this -> plugin_name);
+		            	}
+	            	} else {
+		            	$msgtype = 'error';
+		            	$message = __('No unsubscribe was specified', $this -> plugin_name);
+	            	}
+	            	
+	            	$this -> redirect($this -> referer, $msgtype, $message);
+	            	break;
+	            case 'unsubscribemass'			:
+	            	if (!empty($_POST['action'])) {
+	            		$action = $_POST['action'];
+	            		$unsubscribes = $_POST['unsubscribes'];
+	            		
+	            		if (!empty($unsubscribes)) {
+		            		switch ($action) {
+			            		case 'delete'				:
+			            			foreach ($unsubscribes as $unsubscribe_id) {
+				            			$Db -> model = $Unsubscribe -> model;
+				            			$Db -> delete($unsubscribe_id);
+			            			}
+			            			
+			            			$msgtype = 'message';
+			            			$message = __('Selected unsubscribes deleted', $this -> plugin_name);
+			            			break;
+			            		case 'deletesubscribers'	:
+			            			foreach ($unsubscribes as $unsubscribe_id) {
+				            			$Db -> model = $Unsubscribe -> model;
+				            			$subscriber_id = $Db -> field('subscriber_id', array('id' => $unsubscribe_id));
+				            			
+				            			if (!empty($subscriber_id)) {
+					            			$Db -> model = $Subscriber -> model;
+					            			$Db -> delete($subscriber_id);
+				            			}
+			            			}
+			            			
+			            			$msgtype = 'message';
+			            			$message = __('Subscribers of the selected unsubscribes have been deleted', $this -> plugin_name);
+			            			break;
+			            		case 'deleteusers'			:
+			            			foreach ($unsubscribes as $unsubscribe_id) {
+				            			$Db -> model = $Unsubscribe -> model;
+				            			$user_id = $Db -> field('user_id', array('id' => $unsubscribe_id));
+				            			
+				            			if (!empty($user_id)) {
+					            			wp_delete_user($user_id);
+				            			}
+			            			}
+			            			
+			            			$msgtype = 'message';
+			            			$message = __('Users of the selected unsubscribes have been deleted', $this -> plugin_name);
+			            			break;
+		            		}
+	            		} else {
+		            		$msgtype = 'error';
+		            		$message = __('No unsubscribes were selected', $this -> plugin_name);
+	            		}
+	            	} else {
+		            	$msgtype = 'error';
+		            	$message = __('No action was specified', $this -> plugin_name);
+	            	}
+	            	
+	            	$this -> redirect($this -> referer, $msgtype, $message);
+	            	break;
+	            case 'deleteuser'				:
+	            	if (!empty($_GET['user_id'])) {
+	            		if (wp_delete_user($_GET['user_id'])) {
+		            		$msgtype = 'message';
+		            		$message = __('User has been deleted', $this -> plugin_name);
+	            		} else {
+		            		$msgtype = 'error';
+		            		$message = __('User could not be deleted', $this -> plugin_name);
+	            		}
+	            	} else {
+		            	$msgtype = 'error';
+		            	$message = __('No user was specified', $this -> plugin_name);
+	            	}
+	            	
+	            	$this -> redirect($this -> referer, $msgtype, $message);
 	            	break;
 	            case 'bounces'					:
 	            
@@ -4287,7 +4410,7 @@ if (!class_exists('wpMail')) {
 													if (!empty($_POST['fields'])) {										
 														foreach ($_POST['fields'] as $field => $value) {
 															if (empty($datasets[$d][$field])) {
-																$datasets[$d][$field] = $row[($_POST[$field . 'column'] - 1)];
+																$datasets[$d][$field] = utf8_encode($row[($_POST[$field . 'column'] - 1)]);
 															}
 														}
 													}
@@ -4883,20 +5006,31 @@ if (!class_exists('wpMail')) {
 					break;
 				case 'send'					:
 					if (!empty($_GET['id'])) {
-						if ($email = $Db -> find(array('id' => $_GET['id']))) {											
-							$subscriber = $Subscriber -> get($email -> subscriber_id, false);
-							$subscriber -> mailinglist_id = $email -> mailinglist_id;
-							$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
-							$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $email -> theme_id);
+						if ($email = $Db -> find(array('id' => $_GET['id']))) {	
+							if (empty($email -> subscriber_id)) {
+								$user = $this -> userdata($email -> user_id);
+								$eunique = md5($email -> user_id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
+								$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => false, 'user' => $user, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id), false, 'html', true, $email -> theme_id);
+								$result = $this -> execute_mail(false, $user, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique);
+							} else {																
+								$subscriber = $Subscriber -> get($email -> subscriber_id, false);
+								$subscriber -> mailinglist_id = $email -> mailinglist_id;
+								$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $email -> history_id . date_i18n("YmdH", time()));
+								$message = $this -> render_email('send', array('message' => $email -> message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $email -> history_id, 'post_id' => $email -> post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $email -> theme_id);
+								$result = $this -> execute_mail($subscriber, false, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique);
+							}
 							
-							if ($this -> execute_mail($subscriber, false, $email -> subject, $message, $email -> attachments, $email -> history_id, $eunique)) {
+							if ($result == true) {
 								$Queue -> delete($email -> id);
 								$emailssent++;	
 								$msg_type = 'message';
 								$message = __('Queued email has been sent', $this -> plugin_name);
 							} else {
+								global $mailerrors;
+								$Db -> model = $Queue -> model;
+								$Db -> save_field('error', esc_sql(trim(strip_tags($mailerrors))), array('id' => $email -> id));
 								$msg_type = 'error';
-								$message = __('Email could not be sent, please check email settings', $this -> plugin_name);
+								$message = sprintf(__('Email could not be sent: %s', $this -> plugin_name), esc_sql(trim(strip_tags($mailerrors))));
 							}
 						} else {
 							$msg_type = 'error';
@@ -5376,6 +5510,29 @@ if (!class_exists('wpMail')) {
 					
 					$this -> redirect('?page=' . $this -> sections -> clicks, $msg_type, $message);
 					break;
+				case 'mass'						:
+					if (!empty($_POST['action'])) {
+						$action = $_POST['action'];
+						$clicks = $_POST['clicks'];
+						
+						if (!empty($clicks)) {
+							foreach ($clicks as $click_id) {
+								$this -> Click -> delete($click_id);
+							}
+							
+							$msg_type = 'message';
+							$message = __('Selected clicks have been deleted', $this -> plugin_name);
+						} else {
+							$msg_type = 'error';
+							$message = __('No clicks were selected', $this -> plugin_name);
+						}
+					} else {
+						$msg_type = 'error';
+						$message = __('No action was specified', $this -> plugin_name);
+					}
+					
+					$this -> redirect($this -> referer, $msg_type, $message);
+					break;
 				default							:
 					$perpage = (isset($_COOKIE[$this -> pre . 'linksperpage'])) ? $_COOKIE[$this -> pre . 'linksperpage'] : 15;
 					$searchterm = (!empty($_GET[$this -> pre . 'searchterm'])) ? $_GET[$this -> pre . 'searchterm'] : false;
@@ -5806,6 +5963,7 @@ if (!class_exists('wpMail')) {
 						unset($_POST['save']);
 						delete_option('tridebugging');
 						$this -> delete_option('themeintextversion');
+						$this -> delete_option('emailarchive');
 						
 						if (!empty($_FILES)) {
 							foreach ($_FILES as $fkey => $fval) {

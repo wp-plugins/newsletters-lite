@@ -78,6 +78,12 @@ class wpmlField extends wpMailPlugin {
 			}
 		}
 		
+		$Db -> model = $this -> model;
+	}
+	
+	function check_default_fields() {
+		global $Db, $wpdb, $FieldsList;
+	
 		if (is_admin()) {
 			if (!$emailfield = $this -> email_field()) {
 				$this -> init_fieldtypes();
@@ -158,7 +164,7 @@ class wpmlField extends wpMailPlugin {
 			}
 		}
 		
-		$Db -> model = $this -> model;
+		return true;
 	}
 	
 	function email_field() {

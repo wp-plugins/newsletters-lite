@@ -188,7 +188,7 @@
 	                    	<span class="<?php echo $this -> pre; ?><?php echo ($email -> status == "sent") ? 'success' : 'error'; ?>"><?php echo ($email -> status == "sent") ? __('Sent', $this -> plugin_name) : __('Unsent', $this -> plugin_name); ?></span>
 	                    </td>
 	                    <td>
-	                    	<?php echo (!empty($email -> read) && $email -> read == "Y") ? '<span style="color:green;">' . __('Yes', $this -> plugin_name) : '<span class="' . $this -> pre . 'error">' . __('No', $this -> plugin_name); ?></span>
+	                    	<?php echo (!empty($email -> read) && $email -> read == "Y") ? '<span class="newsletters_success">' . __('Yes', $this -> plugin_name) : '<span class="newsletters_error">' . __('No', $this -> plugin_name); ?></span>
 	                    </td>
 	                    <td>
 	                    	<?php

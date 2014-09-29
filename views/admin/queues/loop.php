@@ -164,6 +164,7 @@
 									<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=view&amp;id=<?php echo $subscriber -> id; ?>" class="row-title" title="<?php _e('View this subscriber', $this -> plugin_name); ?>"><?php echo $subscriber -> email; ?></a>
 								<?php elseif (!empty($user)) : ?>
 									<a href="<?php echo get_edit_user_link($user -> ID); ?>" class="row-title"><?php echo $user -> display_name; ?></a>
+									<br/><small><?php echo $user -> user_email; ?></small>
 								<?php endif; ?>
 								<div class="row-actions">
 									<span class="delete"><a onclick="if (!confirm('<?php _e('Are you sure you want to delete this queued email?', $this -> plugin_name); ?>')) { return false; }" class="submitdelete" href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=delete&amp;id=<?php echo $queue -> id; ?>"><?php _e('Delete', $this -> plugin_name); ?></a> |</span>

@@ -353,6 +353,8 @@ class wpmlDbHelper extends wpMailPlugin {
                             //remove all autoresponder emails
                             $this -> model = $Autoresponderemail -> model;
                             $this -> delete_all(array('subscriber_id' => $record_id));
+                            
+                            $this -> Click -> delete_all(array('subscriber_id' => $record_id));
 							return true;
 							break;
 						case 'Mailinglist'			:
@@ -385,6 +387,8 @@ class wpmlDbHelper extends wpMailPlugin {
                             //remove all emails
                             $this -> model = $Email -> model;
                             $this -> delete_all(array('history_id' => $record_id));
+                            
+                            $this -> Click -> delete_all(array('history_id' => $record_id));
 							break;
 						case 'Autoresponder'		:
 							global $AutorespondersList, $Autoresponderemail;

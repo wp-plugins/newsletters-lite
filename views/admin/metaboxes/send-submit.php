@@ -254,5 +254,13 @@
 			<input class="button button-primary button-large" type="submit" name="send" id="sendbutton" disabled="disabled" value="<?php echo $sendbutton; ?>" />
 		</div>
 		<br class="clear" />
+		<?php
+			
+		$sendingprogress = $this -> get_option('sendingprogress');
+		
+		?>
+		<div class="publishing-action-inside">
+			<label><input <?php echo (!empty($sendingprogress) && $sendingprogress == "Y") ? 'checked="checked"' : ''; ?> type="checkbox" name="sendingprogress" value="1" id="sendingprogress" /> <?php _e('Use progress bar to queue/send', $this -> plugin_name); ?></label>
+		</div>
 	</div>
 </div>

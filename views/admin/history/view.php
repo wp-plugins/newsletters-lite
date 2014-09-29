@@ -112,7 +112,23 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					$clicks = $this -> Click -> count(array('history_id' => $history -> id));
 					
 					?>
-					<?php echo sprintf(__('%s opened %s, %s unsubscribes %s, %s bounces %s and %s%s clicks%s out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . $ebouncedperc . '&#37;)', '<a href="?page=' . $this -> sections -> clicks . '&amp;history_id=' . $history -> id . '">', '<strong>' . $clicks . '</strong>', '</a>', '<strong>' . $etotal . '</strong>'); ?>
+					<?php 
+					
+					echo sprintf(__('%s opened %s, %s%s unsubscribes%s %s, %s bounces %s and %s%s clicks%s out of %s emails sent out', $this -> plugin_name), 
+					'<strong>' . $eread . '</strong>', 
+					'(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', 
+					'<a href="' . admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=unsubscribes&history_id=' . $history -> id) . '">',
+					'<strong>' . $eunsubscribed . '</strong>', 
+					'</a>',
+					'(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', 
+					'<strong>' . (empty($ebounced) ? 0 : $ebounced) . '</strong>', 
+					'(' . $ebouncedperc . '&#37;)', 
+					'<a href="?page=' . $this -> sections -> clicks . '&amp;history_id=' . $history -> id . '">', 
+					'<strong>' . $clicks . '</strong>', 
+					'</a>', 
+					'<strong>' . $etotal . '</strong>'); 
+					
+					?>
 				</td>
 			</tr>
             <?php if (!empty($history -> attachments)) : ?>
