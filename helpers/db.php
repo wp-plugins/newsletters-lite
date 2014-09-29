@@ -332,7 +332,7 @@ class wpmlDbHelper extends wpMailPlugin {
 							break;
 						case 'Subscriber'			:
 							//global variables
-							global $Autoresponderemail, $AutorespondersList, $Email, $wpmlOrder, $Queue, $SubscribersList;
+							global $wpmlClick, $Autoresponderemail, $AutorespondersList, $Email, $wpmlOrder, $Queue, $SubscribersList;
 						
 							//remove all Orders
 							$this -> model = $wpmlOrder -> model;
@@ -354,7 +354,7 @@ class wpmlDbHelper extends wpMailPlugin {
                             $this -> model = $Autoresponderemail -> model;
                             $this -> delete_all(array('subscriber_id' => $record_id));
                             
-                            $this -> Click -> delete_all(array('subscriber_id' => $record_id));
+                            $wpmlClick -> delete_all(array('subscriber_id' => $record_id));
 							return true;
 							break;
 						case 'Mailinglist'			:
@@ -371,7 +371,7 @@ class wpmlDbHelper extends wpMailPlugin {
 							$this -> delete_all(array('list_id' => $record_id));
 							break;
 						case 'History'				:
-							global $Queue, $Email, $Autoresponder;
+							global $Queue, $wpmlClick, $Email, $Autoresponder;
 						
 							$this -> model = 'HistoriesList';
 							$this -> delete_all(array('history_id' => $record_id));
@@ -388,7 +388,7 @@ class wpmlDbHelper extends wpMailPlugin {
                             $this -> model = $Email -> model;
                             $this -> delete_all(array('history_id' => $record_id));
                             
-                            $this -> Click -> delete_all(array('history_id' => $record_id));
+                            $wpmlClick -> delete_all(array('history_id' => $record_id));
 							break;
 						case 'Autoresponder'		:
 							global $AutorespondersList, $Autoresponderemail;

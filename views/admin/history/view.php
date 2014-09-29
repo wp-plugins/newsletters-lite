@@ -74,6 +74,15 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
             		<?php endif; ?>
             	</td>
             </tr>
+            <?php $Db -> model = $Queue -> model; ?>
+            <?php if ($queue_count = $Db -> count(array('history_id' => $history -> id))) : ?>
+            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+            		<th><?php _e('Queued', $this -> plugin_name); ?></th>
+            		<td>
+            			<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> queue . '&filter=1&history_id=' . $history -> id); ?>"><?php echo sprintf(__('%s emails in the queue', $this -> plugin_name), $queue_count); ?></a>
+            		</td>
+            	</tr>
+            <?php endif; ?>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Tracking', $this -> plugin_name); ?></th>
 				<td>

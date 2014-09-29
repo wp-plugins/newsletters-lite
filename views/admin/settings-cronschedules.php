@@ -1,3 +1,13 @@
+<!-- Schedule Tasks -->
+
+<?php
+
+$emailarchive = $this -> get_option('emailarchive');
+$Db -> model = $Email -> model;
+$emailscount = $Db -> count();
+
+?>
+
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Scheduled Tasks', $this -> plugin_name); ?> <?php echo $Html -> link(__('Refresh', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks, array('class' => "add-new-h2")); ?></h2>   
 	
@@ -113,6 +123,24 @@
                 	<?php echo $Html -> next_scheduled('importusers'); ?>
                 </td>
             </tr>
+            <?php if (!empty($emailarchive)) : ?>
+            	<tr>
+            		<th>
+                	<a class="row-title" href="?page=<?php echo $this -> sections -> settings; ?>#emailarchive"><?php _e('Email Archiving', $this -> plugin_name); ?></a>
+                	<?php if (!empty($emailscount)) : ?>
+                		<small>(<?php echo sprintf(__('%s emails sent', $this -> plugin_name), $emailscount); ?>)</small>
+                	<?php endif; ?>
+                    <div class="row-actions">
+                    	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=runschedule&amp;hook=newsletters_emailarchivehook', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+                        <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=reschedule&amp;hook=newsletters_emailarchivehook', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+                        <span class="delete"><?php echo $Html -> link(__('Stop Schedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=clearschedule&amp;hook=newsletters_emailarchivehook', array('onclick' => "if (!confirm('" . __('Are you sure you wish to clear this scheduled task?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?></span>
+                    </div>
+                </th>
+                <td>
+                	<?php echo $Html -> next_scheduled('newsletters_emailarchivehook'); ?>
+                </td>
+            	</tr>
+            <?php endif; ?>
             <?php $activateaction = $this -> get_option('activateaction'); ?>
             <?php if (!empty($activateaction) && $activateaction != "none") : ?>
 	            <!-- Confirmation/Activation Reminders/Deletion -->
@@ -130,22 +158,22 @@
 	                </td>
 	            </tr>
 	        <?php endif; ?>
+	        <?php if ($this -> is_plugin_active('captcha')) : ?>
+	        	<tr>
+	        		<th>                
+						<?php _e('Really Simple Captcha cleanup', $this -> plugin_name); ?>
+	                    <div class="row-actions">
+	                    	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=runschedule&amp;hook=captchacleanup', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+	                        <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=reschedule&amp;hook=captchacleanup', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+	                        <span class="delete"><?php echo $Html -> link(__('Stop Schedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=clearschedule&amp;hook=captchacleanup', array('onclick' => "if (!confirm('" . __('Are you sure you wish to clear this scheduled task?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?></span>
+	                    </div>
+	                </th>
+	                <td>
+	                	<?php echo $Html -> next_scheduled('captchacleanup'); ?>
+	                </td>
+	        	</tr>
+	        <?php endif; ?>
+	        <?php do_action('wpml_cronschedules'); ?>
         </tbody>
-        <?php if ($this -> is_plugin_active('captcha')) : ?>
-        	<tr>
-        		<th>                
-					<?php _e('Really Simple Captcha cleanup', $this -> plugin_name); ?>
-                    <div class="row-actions">
-                    	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=runschedule&amp;hook=captchacleanup', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
-                        <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=reschedule&amp;hook=captchacleanup', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
-                        <span class="delete"><?php echo $Html -> link(__('Stop Schedule', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&amp;method=clearschedule&amp;hook=captchacleanup', array('onclick' => "if (!confirm('" . __('Are you sure you wish to clear this scheduled task?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?></span>
-                    </div>
-                </th>
-                <td>
-                	<?php echo $Html -> next_scheduled('captchacleanup'); ?>
-                </td>
-        	</tr>
-        <?php endif; ?>
-        <?php do_action('wpml_cronschedules'); ?>
     </table>
 </div>

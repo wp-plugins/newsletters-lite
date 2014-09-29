@@ -251,7 +251,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			case 'post_title'				:
 			case 'newsletters_post_title'	:
 				if (!empty($shortcode_post)) {
-					return $shortcode_post -> post_title;
+					return __($shortcode_post -> post_title);
 				}
 				break;
 			case 'post_link'				:
@@ -303,7 +303,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 						global $post;
 						$post = $shortcode_post;
 						setup_postdata($post);
-						$return .= get_the_excerpt();
+						$return .= __(get_the_excerpt());
 						wp_reset_postdata();
 					}
 				} else {
@@ -321,7 +321,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					global $post;
 					$post = $shortcode_post;
 					setup_postdata($post);
-					$return = wpautop(get_the_content());
+					$return = wpautop(__(get_the_content()));
 					wp_reset_postdata();
 				} else {
 					$this -> add_filter('excerpt_length');
@@ -331,7 +331,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 						global $post;
 						$post = $shortcode_post;
 						setup_postdata($post);
-						$return .= get_the_excerpt();
+						$return .= __(get_the_excerpt());
 						wp_reset_postdata();
 					}
 				}

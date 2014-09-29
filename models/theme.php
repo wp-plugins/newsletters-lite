@@ -155,7 +155,7 @@ class wpmlTheme extends wpMailPlugin {
 		
 		if ($themes = $Db -> find_all(false, false, array('title', "ASC"))) {
 			foreach ($themes as $theme) {
-				$themeselect[$theme -> id] = $theme -> title;	
+				$themeselect[$theme -> id] = __($theme -> title);	
 			}
 		}
 		

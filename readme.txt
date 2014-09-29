@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 4.3.9
+Stable tag: 4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -121,6 +121,56 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4 =
+* ADD: Filters in the email queue section
+* ADD: See queued emails count when viewing sent/draft emails individually
+* ADD: Prevent autoresponder creationg when manually adding subscribers in admin
+* ADD: Checkbox to specify Ajax queuing/sending progress while creating newsletter
+* ADD: See all unsubscribes history
+* ADD: Built-in, daily cron to optimize the database tables
+* ADD: Button to open latest posts preview in a new window/tab
+* ADD: Export delimiter setting for CSV
+* ADD: Empty index.php file in plugin folder to prevent indexing of files
+* ADD: Insert anchor links with "name" attribute from TinyMCE
+* ADD: Custom hidden field that takes any value, editable by admin
+* ADD: Archive sent emails older than X days to a flat file
+* ADD: "Continue editing" checkbox in all save sections of admin
+* ADD: Show Unsubscribe users to delete
+* ADD: Display attached files from newsletter on published post  
+* IMPROVE: More action/filter hooks
+* IMPROVE: Improved publish newsletter as post behaviour
+* IMPROVE: Prioritise emails in the queue without an existing error on them
+* IMPROVE: Check custom fields on subscribers table when clicking "Check/optimize database"
+* IMPROVE: MySQL optimization of tables with indexes
+* IMPROVE: Tabs under Import/Export section in admin for easier navigation
+* IMPROVE: Queue, import, etc... performance improvements
+* IMPROVE: Columns in Newsletters > Subscribers section should reflect in order of custom fields
+* IMPROVE: Improved help tooltips design
+* IMPROVE: View/Edit buttons per history email under Newsletters > Overview section
+* IMPROVE: Change 'init' hook priority to 11 for compatibility
+* IMPROVE: Change dashboard widget stats chart/graph to 14 days to prevent clutter
+* IMPROVE: "Edit" button in dashboard widget latest emails
+* IMPROVE: Improvements when upgrading from very old version
+* IMPROVE: New, improved TinyMCE button and interfaces
+* IMPROVE: Remove unused font files
+* IMPROVE: Hidden custom fields should be editable by admin
+* IMPROVE: Move bounce "Server Type" setting into CGI bounce DIV
+* IMPROVE: Only fire wp_schecule_single_event once, on first activation
+* IMPROVE: Put background:none; on offsite code iframe
+* IMPROVE: Mark email as read if a user clicks a link inside it  
+* FIX: Ajax progress queuing/sending to users broken
+* FIX: Clicks section bulk actions not working
+* FIX: "Send Now" link to user from the email queue doesn't work
+* FIX: Database error when queuing to only users, no mailing lists
+* FIX: Cannot turn off captcha on hardcoded forms
+* FIX: Language files don't load with different plugin folder name
+* FIX: Post excerpt shortcode no longer working
+* FIX: Export subscribers to CSV generates HTML code at the end of the file
+* FIX: Subscriber validation fails on special characters like é
+* FIX: Associated records not deleted when parent is deleted
+* FIX: Newsletters lite admin bar menu shows up on multi-site
+* FIX: "Delete Subscriber on Unsubscribe" not working as it should.  
 
 = 4.3.9 =
 * ADD: WordPress 4.0 compatibility

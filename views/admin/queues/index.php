@@ -94,6 +94,32 @@
 				</ul>
 			<?php endif; ?>
 		</form>
+		<br class="clear" />
 	<?php endif; ?>
+	<form id="posts-filter" action="?page=<?php echo $this -> sections -> queue; ?>" method="get">
+    	<input type="hidden" name="page" value="<?php echo $this -> sections -> queue; ?>">
+    	    	
+    	<div class="alignleft actions">
+    		<?php _e('Filters:', $this -> plugin_name); ?>
+    		<select style="max-width:200px;" name="history_id">
+    			<option value=""><?php _e('All History Emails', $this -> plugin_name); ?></option>
+    			<?php if ($histories = $History -> select()) : ?>
+    				<?php foreach ($histories as $history_id => $history_subject) : ?>
+    					<option <?php echo (!empty($_GET['history_id']) && $_GET['history_id'] == $history_id) ? 'selected="selected"' : ''; ?> value="<?php echo $history_id; ?>"><?php echo $history_subject; ?></option>
+    				<?php endforeach; ?>
+    			<?php endif; ?>
+    		</select>
+    		<select name="theme_id">
+    			<option value=""><?php _e('All Themes', $this -> plugin_name); ?></option>
+    			<?php if ($themes = $Theme -> select()) : ?>
+    				<?php foreach ($themes as $theme_id => $theme_title) : ?>
+    					<option <?php echo (!empty($_GET['theme_id']) && $_GET['theme_id'] == $theme_id) ? 'selected="selected"' : ''; ?> value="<?php echo $theme_id; ?>"><?php echo $theme_title; ?></option>
+    				<?php endforeach; ?>
+    			<?php endif; ?>
+    		</select>
+    		<input type="submit" name="filter" value="<?php _e('Filter', $this -> plugin_name); ?>" class="button button-primary">
+    	</div>
+    </form>
+    <br class="clear" />
 	<?php $this -> render('queues' . DS . 'loop', array('queues' => $queues, 'paginate' => $paginate), true, 'admin'); ?>
 </div>

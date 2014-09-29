@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.3.9
+Version: 4.4
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -305,6 +305,10 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function optimize_hook() {
+			if (!headers_sent()) {
+	    		header("HTTP/1.1 200 OK");
+	    	}
+		
 			global $wpdb;		
 			$this -> check_tables();
 					
@@ -314,6 +318,26 @@ if (!class_exists('wpMail')) {
 					$wpdb -> query($query);
 				}
 			}
+			
+			return true;
+		}
+		
+		function emailarchive_hook() {		
+			global $wpdb, $Html, $Email;
+			$emailarchive_olderthan = $this -> get_option('emailarchive_olderthan');
+			$interval = (empty($emailarchive_olderthan)) ? 90 : $emailarchive_olderthan;
+			$condition = " WHERE DATE_SUB(NOW(), INTERVAL " . $interval . " DAY) > created";
+			
+			$outfile_file = 'emailarchive.txt';
+			$outfile_path = $Html -> uploads_path() . DS . $this -> plugin_name . DS  . 'export' . DS;
+			$outfile_full = $outfile_path . $outfile_file;
+			
+			$query = "SELECT * FROM " . $wpdb -> prefix . $Email -> table . $condition;
+			$command = 'mysql -h ' . DB_HOST . ' -u ' . DB_USER . ' -p' . DB_PASSWORD . ' ' . DB_NAME . ' -N -B -e "' . $query . '" | sed "s/\t/,/g" >> ' . $outfile_full;
+			$exec = exec($command, $output);
+			
+			$query = "DELETE FROM " . $wpdb -> prefix . $Email -> table . $condition;
+			$wpdb -> query($query);
 			
 			return true;
 		}
@@ -404,7 +428,7 @@ if (!class_exists('wpMail')) {
 					if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
 						global $wpdb, $Queue;
 						if ($queueerrorcount = $wpdb -> get_var("SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Queue -> table . "` WHERE `error` IS NOT NULL AND `error` <> ''")) {
-							$this -> render_error(sprintf(__('There are %s failed emails in the <a href="%s">queue</a> awaiting review.', $this -> plugin_name), $queueerrorcount, admin_url('admin.php?page=' . $this -> sections -> queue)));
+							$this -> render_error(sprintf(__('There are %s failed emails in the <a href="%s">queue</a> awaiting review.', $this -> plugin_name), $queueerrorcount, admin_url('admin.php?page=' . $this -> sections -> queue . '&orderby=error&order=asc')));
 						}
 					}
 				}
@@ -1716,10 +1740,10 @@ if (!class_exists('wpMail')) {
 					$wpdb -> query("START TRANSACTION");
 					$queuesendorder = $this -> get_option('queuesendorder');
 					$queuesendorderby = $this -> get_option('queuesendorderby');
-					$emailsquery = "SELECT * FROM `" . $wpdb -> prefix . $Queue -> table . "` WHERE `senddate` < '" . date_i18n("Y-m-d H:i:s", time()) . "' ORDER BY `" . $queuesendorderby . "` " . $queuesendorder . " LIMIT " . $emailsperinterval . " FOR UPDATE";
+					$emailsquery = "SELECT * FROM `" . $wpdb -> prefix . $Queue -> table . "` WHERE `senddate` < '" . date_i18n("Y-m-d H:i:s", time()) . "' ORDER BY `error` ASC, `" . $queuesendorderby . "` " . $queuesendorder . " LIMIT " . $emailsperinterval . " FOR UPDATE";
 					
 					//retrieve all the queue emails for this execution
-					if ($emails = $wpdb -> get_results($emailsquery)) {
+					if ($emails = $wpdb -> get_results($emailsquery)) {					
 						if ($this -> get_option('schedulenotify') == "Y" && $this -> get_option('scheduling') == "Y") {
 							$subscriber_id = $Subscriber -> admin_subscriber_id($_POST['mailinglists']);
 							$subscriber = $Subscriber -> get($subscriber_id, false);
@@ -2108,7 +2132,7 @@ if (!class_exists('wpMail')) {
 		function admin_menu() {
 			global $Queue, $queue_count;
 			$queue_count = ($Queue -> count()) ? $Queue -> count() : '';
-			$queue_count_icon = ' <span class="update-plugins count-1"><span class="update-count">' . $queue_count . '</span></span>';
+			$queue_count_icon = ' <span class="update-plugins count-1"><span class="update-count" id="newsletters-menu-queue-count">' . $queue_count . '</span></span>';
 			$update_icon = ($this -> has_update()) ? ' <span class="update-plugins count-1"><span class="update-count">1</span></span>' : '';
 			
 			$this -> check_roles();
@@ -2264,7 +2288,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('publishingdiv', __('Posts Configuration', $this -> plugin_name) . $Html -> help(__('These are settings related to posts in general. For publishing newsletters as posts and also inserting posts into newsletters.', $this -> plugin_name)), array($Metabox, 'settings_publishing'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('schedulingdiv', __('Email Scheduling', $this -> plugin_name) . $Html -> help(__('The purpose of email scheduling is to allow you to send thousands of emails in a load distributed way. Please take note that you cannot expect your server/hosting to send hundreds/thousands of emails all simultaneously so this is where email scheduling helps you.', $this -> plugin_name)), array($Metabox, 'settings_scheduling'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('bouncediv', __('Bounce Configuration', $this -> plugin_name), array($Metabox, 'settings_bounce'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
-			add_meta_box('emailsdiv', __('Emails Configuration', $this -> plugin_name), array($Metabox, 'settings_emails'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
+			add_meta_box('emailsdiv', __('History &amp; Emails Configuration', $this -> plugin_name), array($Metabox, 'settings_emails'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('latestposts', __('Latest Posts Subscription', $this -> plugin_name), array($Metabox, 'settings_latestposts'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('customcss', __('Theme, Scripts &amp; Custom CSS', $this -> plugin_name), array($Metabox, 'settings_customcss'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			
@@ -2409,7 +2433,7 @@ if (!class_exists('wpMail')) {
 		function admin_send() {
 			global $wpdb, $Unsubscribe, $Db, $Template, $Html, $History, $HistoriesAttachment, $Mailinglist, $Queue, $Subscriber, $Field, $SubscribersList;
 			$user_id = get_current_user_id();
-		
+			$post_id = false;
 			$this -> remove_server_limits();
 			$sentmailscount = 0;
 			
@@ -2418,15 +2442,26 @@ if (!class_exists('wpMail')) {
 			$themes = $Db -> find_all(false, false, array('title', "ASC"));
 			
 			// Do the post publishing
+			if (!empty($_POST['post_id'])) {
+				$post_id = $_POST['post_id'];
+			} elseif (!empty($_GET['id'])) {
+				$history_id = $_GET['id'];				
+				$Db -> model = $History -> model;
+				if ($history_post_id = $Db -> field('post_id', array('id' => $history_id))) {
+					$post_id = $history_post_id;
+				}
+			}
+			
 			if (!empty($_POST['publishpost']) && $_POST['publishpost'] == "Y") {									
 				$status = (!empty($_POST['post_status'])) ? $_POST['post_status'] : 'draft';
 				$slug = (!empty($_POST['post_slug'])) ? $_POST['post_slug'] : $Html -> sanitize($_POST['subject'], '-');
 			
 				$post = array(
+					'ID'					=>	$post_id,
 					'post_title'			=>	$_POST['subject'],
 					'post_content'			=>	$this -> strip_set_variables($_POST['content']),
 					'post_status'			=>	$status,
-					'post_slug'				=>	$slug,
+					'post_name'				=>	$slug,
 					'post_category'			=>	$_POST['cat'],
 					'post_type'				=>	((empty($_POST['newsletters_post_type'])) ? 'post' : $_POST['newsletters_post_type']),
 					'post_author'			=>	(empty($_POST['post_author'])) ? $user_id : $_POST['post_author'],
@@ -2439,7 +2474,7 @@ if (!class_exists('wpMail')) {
 				$_POST['sendtolist'] = "N";
 				$post_id = wp_insert_post($post);				
 				$this -> update_option('sendonpublish', $currstatus);
-			} else { $post_id = false; }
+			}
 			
 			switch ($_GET['method']) {			
 				case 'template'		:
@@ -2470,6 +2505,7 @@ if (!class_exists('wpMail')) {
 							'roles'				=>	maybe_unserialize($history -> roles),
 							'mailinglists'		=>	$history -> mailinglists,
 							'theme_id'			=>	$history -> theme_id,
+							'post_id'			=>	$post_id,
 							'condquery'			=>	maybe_unserialize($history -> condquery),
 							'conditions'		=>	maybe_unserialize($history -> conditions),
 							'conditionsscope'	=>	$history -> conditionsscope,
@@ -2494,6 +2530,15 @@ if (!class_exists('wpMail')) {
 							$_POST['sendrecurringdate'] = $history -> recurringdate;
 							$_POST['sendrecurringlimit'] = $history -> recurringlimit;
 							$_POST['sendrecurringsent'] = $history -> recurringsent;
+						}
+						
+						if (!empty($post_id)) {
+							if ($post = get_post($post_id)) {
+								$_POST['cat'] = wp_get_post_categories($post_id);
+								$_POST['post_status'] = $post -> post_status;
+								$_POST['newsletters_post_type'] = $post -> post_type;
+								$_POST['post_slug'] = $post -> post_name;
+							}
 						}
 						
 						$this -> render_admin('send', array('mailinglists' => $mailinglists, 'themes' => $themes, 'templates' => $templates), true, 'admin');
@@ -2599,6 +2644,7 @@ if (!class_exists('wpMail')) {
 											'mailinglists'		=>	serialize($_POST['mailinglists']),
 											'groups'			=>	serialize($_POST['groups']),
 											'roles'				=>	serialize($_POST['roles']),
+											'post_id'			=>	$post_id,
 											'newattachments'	=>	$newattachments,
 											'senddate'			=>	$_POST['senddate'],
 											'scheduled'			=>	$_POST['scheduled'],
@@ -2891,6 +2937,7 @@ if (!class_exists('wpMail')) {
 									'daterange'			=>	$_POST['daterange'],
 									'daterangefrom'		=>	$_POST['daterangefrom'],
 									'daterangeto'		=>	$_POST['daterangeto'],
+									'post_id'			=>	$post_id,
 									'mailinglists'		=>	serialize($_POST['mailinglists']),
 									'groups'			=>	serialize($_POST['groups']),
 									'roles'				=>	serialize($_POST['roles']),
@@ -2965,6 +3012,7 @@ if (!class_exists('wpMail')) {
 									'mailinglists'		=>	serialize($_POST['mailinglists']),
 									'groups'			=>	serialize($_POST['groups']),
 									'roles'				=>	serialize($_POST['roles']),
+									'post_id'			=>	$post_id,
 									'newattachments'	=>	$newattachments,
 									'recurring'			=>	"N",
 									'senddate'			=>	$_POST['senddate'],
@@ -5044,6 +5092,10 @@ if (!class_exists('wpMail')) {
 					$this -> redirect($this -> url, $msg_type, $message);
 					break;
 				default						:
+					$conditions = false;
+					$sections = $this -> sections -> queue;
+					$queue_table = $wpdb -> prefix . $Queue -> table;
+				
 					$perpage = (isset($_COOKIE[$this -> pre . 'queuesperpage'])) ? $_COOKIE[$this -> pre . 'queuesperpage'] : 15;				
 					$ofield = (isset($_COOKIE[$this -> pre . 'queuessorting'])) ? $_COOKIE[$this -> pre . 'queuessorting'] : "modified";
 					$odir = (isset($_COOKIE[$this -> pre . 'queues' . $ofield . 'dir'])) ? $_COOKIE[$this -> pre . 'queues' . $ofield . 'dir'] : "DESC";
@@ -5053,6 +5105,18 @@ if (!class_exists('wpMail')) {
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
 					
+					if (!empty($_GET['filter'])) {
+						$sections .= '&filter=1';
+						
+						if (!empty($_GET['history_id'])) {
+							$conditions[$queue_table . '.history_id'] = $_GET['history_id'];
+						}
+						
+						if (!empty($_GET['theme_id'])) {
+							$conditions[$queue_table . '.theme_id'] = $_GET['theme_id'];
+						}
+					}
+					
 					if (!empty($_GET['showall'])) {						
 						$emailsquery = "SELECT * FROM " . $wpdb -> prefix . $Queue -> table . "";
 						$emails = $wpdb -> get_results($emailsquery);
@@ -5060,7 +5124,7 @@ if (!class_exists('wpMail')) {
 						$data[$Queue -> model] = $emails;
 						$data['Paginate'] = false;
 					} else {
-						$data = $this -> paginate($Queue -> model, null, $this -> sections -> queue, $conditions, $searchterm, $perpage, $order);
+						$data = $this -> paginate($Queue -> model, null, $sections, $conditions, $searchterm, $perpage, $order);
 					}
 					
 					$this -> render_admin('queues' . DS . 'index', array('queues' => $data[$Queue -> model], 'paginate' => $data['Paginate']));
@@ -5885,7 +5949,14 @@ if (!class_exists('wpMail')) {
 					break;
 				case 'runschedule'		:
 					if (!empty($_GET['hook'])) {
-						do_action($this -> pre . '_' . $_GET['hook']);						
+						if (preg_match("/(newsletters)/si", $_GET['hook'])) {
+							$hook = $_GET['hook'];
+						} else {
+							$hook = $this -> pre . '_' . $_GET['hook'];
+						}
+					
+						do_action($hook);	
+											
 						$msg_type = 'message';
 						$message = __('Task has been executed successfully!', $this -> plugin_name);
 					} else {
@@ -6028,12 +6099,18 @@ if (!class_exists('wpMail')) {
 										$this -> update_option('customcss', "N");	
 									}
 									break;
+								case 'emailarchive'			:
+									if (!empty($val)) {
+										$this -> emailarchive_scheduling();
+									}
+									break;
 							}
 						}
 						
 						//update scheduling
 						$this -> scheduling();
 	                    $this -> pop_scheduling();
+	                    $this -> optimize_scheduling();
 	                    
 	                    if (!empty($_POST['latestposts_updateinterval']) && $_POST['latestposts_updateinterval'] == "Y") {
 	                    	$this -> latestposts_scheduling();

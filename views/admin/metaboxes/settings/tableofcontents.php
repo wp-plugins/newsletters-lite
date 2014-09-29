@@ -10,6 +10,7 @@
 	<option value="publishingdiv"><?php _e('Posts Configuration', $this -> plugin_name); ?></option>
 	<option value="schedulingdiv"><?php _e('Email Scheduling', $this -> plugin_name); ?></option>
 	<option value="bouncediv"><?php _e('Bounce Configuration', $this -> plugin_name); ?></option>
+	<option value="emailsdiv"><?php _e('History &amp; Emails Configuration', $this -> plugin_name); ?></option>
 	<option value="latestposts"><?php _e('Latest Posts Subscription', $this -> plugin_name); ?></option>
 	<option value="customcss"><?php _e('Theme, Scripts &amp; Custom CSS', $this -> plugin_name); ?></option>
 </select>

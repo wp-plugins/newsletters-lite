@@ -63,6 +63,7 @@ if (!class_exists('wpMailCheckinit')) {
 			/* Schedules */
 			$this -> add_action('newsletters_ratereviewhook', 'ratereview_hook', 10, 1);
 			$this -> add_action('newsletters_optimizehook', 'optimize_hook', 10, 1);
+			$this -> add_action('newsletters_emailarchivehook', 'emailarchive_hook', 10, 1);
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
 	        $this -> add_action($this -> pre . '_pophook', 'pop_hook', 10, 1);
 			$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);
@@ -90,6 +91,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_filter('plugin_action_links', 'plugin_action_links', 10, 4);
 			$this -> add_filter('the_editor', 'the_editor', 1, 1);
 	        $this -> add_filter('tiny_mce_before_init', 'override_mce_options', 10, 1);
+	        $this -> add_filter('the_content');
 	        
 		    $this -> add_action('after_plugin_row_' . $this -> plugin_name . '/wp-mailinglist.php', 'after_plugin_row', 10, 2);
 			

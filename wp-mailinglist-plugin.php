@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.3.9';
+		var $version = '4.4';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -947,17 +947,28 @@ if (!class_exists('wpMailPlugin')) {
 				$history = $wpdb -> get_row($historyquery);
 			
 				if (!empty($history)) {
-					$subscriber_request = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));								
-					$subscriber = $Subscriber -> get($subscriber_request -> id, false);
-					$subscriber -> mailinglist_id = $subscriber_request -> mailinglist_id;
-					$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $subscriber_request -> mailinglists);
+					$subscriber_request = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
+					
+					if (!empty($subscriber_request -> user_id)) {
+						$subscriber = false;
+						$user = $this -> userdata($subscriber_request -> user_id);
+						$email = $user -> user_email;
+						$eunique = md5($user -> ID . $history_id . date_i18n("YmdH", time()));
+					} else {
+						$user = false;
+						$subscriber = $Subscriber -> get($subscriber_request -> id, false);
+						$email = $subscriber -> email;
+						$subscriber -> mailinglist_id = $subscriber_request -> mailinglist_id;
+						$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $subscriber_request -> mailinglists);
+						$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
+					}
+													
 					$content = $history -> message;
 					$subject = $history -> subject;
 					$history_id = $_REQUEST['history_id'];
 					$post_id = $_REQUEST['post_id'];
 					$theme_id = $_REQUEST['theme_id'];
 					$senddate = $_REQUEST['senddate'];
-					$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
 					$shortlinks = true;
 					
 					$newattachments = array();
@@ -972,16 +983,16 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 					
-					if ($Queue -> save($subscriber, false, $subject, $content, $newattachments, $post_id, $history_id, false, $theme_id, $senddate)) {
-						$success = "Y<|>" . $subscriber -> email . "<|>" . __('Success', $this -> plugin_name);
+					if ($Queue -> save($subscriber, $user, $subject, $content, $newattachments, $post_id, $history_id, false, $theme_id, $senddate)) {
+						$success = "Y<|>" . $email . "<|>" . __('Success', $this -> plugin_name);
 					} else {
-						$success = "N<|>" . $subscriber -> email . "<|>" . $Queue -> errors[0];
+						$success = "N<|>" . $email . "<|>" . $Queue -> errors[0];
 					}
 				} else {
-					$success = "N<|>" . $subscriber -> email . "<|>" . __('History email could not be read', $this -> plugin_name);
+					$success = "N<|>" . $email . "<|>" . __('History email could not be read', $this -> plugin_name);
 				}
 			} else {
-				$success = "N<|>" . $subscriber -> email . "<|>" . __('No data was posted', $this -> plugin_name);
+				$success = "N<|>" . $email . "<|>" . __('No data was posted', $this -> plugin_name);
 			}
 			
 			echo $success;
@@ -1447,6 +1458,7 @@ if (!class_exists('wpMailPlugin')) {
 	    	
 	    	ob_start();
 	    	$history_data = array(
+	    		'post_id'			=>	$_POST['post_id'],
 				'subject'			=>	$_POST['subject'],
 				'message'			=>	$_POST['content'],
 				'theme_id'			=>	$_POST['theme_id'],
@@ -3574,6 +3586,12 @@ if (!class_exists('wpMailPlugin')) {
 			}
 		}
 		
+		function emailarchive_scheduling() {		
+			if (!wp_next_scheduled('newsletters_emailarchivehook')) {
+				wp_schedule_event(time(), 'daily', 'newsletters_emailarchivehook');
+			}
+		}
+		
 		function get_custom_post_types($removedefaults = true) {
 			if ($post_types = get_post_types(null, 'objects')) {
 				$default_types = array('post', 'page', 'attachment', 'revision', 'nav_menu_item');
@@ -4515,6 +4533,7 @@ if (!class_exists('wpMailPlugin')) {
 				
 				//$message = preg_replace($patterns, "", $message);
 				$message = preg_replace($newpatterns, "", $message);
+				$message = apply_filters('newsletters_strip_set_variables', $message);
 				return $message;
 			}
 			
@@ -4699,7 +4718,9 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					$subject = preg_replace($newsearch, $newreplace, stripslashes($subject));
+					$subject = apply_filters('newsletters_process_set_variables_subscriber_subject', $subject, $subscriber);
 					$message = preg_replace($newsearch, $newreplace, stripslashes($message));
+					$message = apply_filters('newsletters_process_set_variables_subscriber_message', $message, $subscriber);
 				} elseif (!empty($user)) {
 					if (!empty($history_id)) {
 						$Db -> model = $History -> model;
@@ -4776,7 +4797,9 @@ if (!class_exists('wpMailPlugin')) {
 					);
 					
 					$subject = preg_replace($newsearch, $newreplace, stripslashes($subject));
+					$subject = apply_filters('newsletters_process_set_variables_user_subject', $subject, $user);
 					$message = preg_replace($newsearch, $newreplace, stripslashes($message));
+					$message = apply_filters('newsletters_process_set_variables_user_message', $message, $user);
 				}
 			}
 			
@@ -5808,7 +5831,7 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.3.9") < 0) {
+				if (version_compare($cur_version, "4.4") < 0) {
 					$this -> update_options();
 					
 					// ALTER TABLE queries
@@ -5838,7 +5861,7 @@ if (!class_exists('wpMailPlugin')) {
 					$query = "ALTER TABLE `" . $wpdb -> prefix . $Unsubscribe -> table . "` ADD INDEX(`email`);";
 					$wpdb -> query($query);
 					
-					$version = "4.3.9";
+					$version = "4.4";
 				}
 			
 				//the current version is older.
@@ -6094,6 +6117,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$this -> scheduling();
 			$this -> optimize_scheduling();
+			$this -> emailarchive_scheduling();
 			$this -> autoresponder_scheduling();
 			$this -> init_fieldtypes();
 			$this -> predefined_templates();
@@ -6275,6 +6299,19 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			    
 			return $initArray;
+		}
+		
+		function the_content($content = null) {
+			global $post, $Db, $History;
+			$Db -> model = $History -> model;
+			if ($history = $Db -> find(array('post_id' => $post -> ID))) {
+				if (!empty($history -> attachments)) {
+					$post_attachments = $this -> render('post-attachments', array('attachments' => $history -> attachments), false, 'default');
+					$content .= $post_attachments;
+				}
+			}
+			
+			return $content;
 		}
 		
 		function stripext($filename = null, $return = 'ext') {

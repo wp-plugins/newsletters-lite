@@ -31,6 +31,13 @@
 						<span class="howto"><?php _e('All ticked/checked subscriptions are activated immediately.', $this -> plugin_name); ?></span>													
 					</td>
 				</tr>
+				<tr>
+					<th><label for="preventautoresponders"><?php _e('Prevent Autoresponders?', $this -> plugin_name); ?></label>
+					<?php echo $Html -> help(__('Tick this box to prevent the automatic creation of autoresponder emails as you save this subscriber.', $this -> plugin_name)); ?></th>
+					<td>
+						<label><input type="checkbox" name="preventautoresponders" value="1" id="preventautoresponders" /> <?php _e('Yes, prevent creation of autoresponders', $this -> plugin_name); ?></label>
+					</td>
+				</tr>
 				<?php if (apply_filters($this -> pre . '_admin_subscriber_save_register', true)) : ?>										
 				<tr>
 					<th><?php _e('Register as WordPress user?', $this -> plugin_name); ?>

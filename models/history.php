@@ -794,7 +794,7 @@ class wpmlHistory extends wpMailPlugin {
 		
 		if ($histories = $Db -> find_all(false, false, array('modified', "DESC"))) {
 			foreach ($histories as $history) {
-				$historyselect[$history -> id] = $history -> id . ' - ' . $history -> subject . ' (' . date_i18n("Y-m-d", strtotime($history -> modified)) . ')';
+				$historyselect[$history -> id] = $history -> id . ' - ' . __($history -> subject) . ' (' . date_i18n("Y-m-d", strtotime($history -> modified)) . ')';
 			}
 		}
 		

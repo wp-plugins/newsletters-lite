@@ -27,6 +27,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 		<input type="hidden" id="ishistory" name="ishistory" value="<?php echo $_POST['ishistory']; ?>" />
 		<input type="hidden" name="inctemplate" value="<?php echo $_POST['inctemplate']; ?>" />
 		<input type="hidden" name="recurringsent" value="<?php echo esc_attr(stripslashes($_POST['sendrecurringsent'])); ?>" />
+		<input type="hidden" name="post_id" value="<?php echo esc_attr(stripslashes($_POST['post_id'])); ?>" />
 		
 		<div id="poststuff">
 			<div id="post-body" class="metabox-holder columns-2">

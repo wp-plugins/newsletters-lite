@@ -1002,11 +1002,13 @@ class wpmlSubscriber extends wpMailPlugin {
 						$wpdb -> query($subscriberquery);
 					}
 					
-					if (!empty($mailinglists)) {
-						foreach ($mailinglists as $mkey => $mval) {
-							$subscriber = $this -> get($subscriber_id, false);
-							$mailinglist = $Mailinglist -> get($mval, false);
-							$this -> autoresponders_send($subscriber, $mailinglist);
+					if (empty($_POST['preventautoresponders'])) {
+						if (!empty($mailinglists)) {
+							foreach ($mailinglists as $mkey => $mval) {
+								$subscriber = $this -> get($subscriber_id, false);
+								$mailinglist = $Mailinglist -> get($mval, false);
+								$this -> autoresponders_send($subscriber, $mailinglist);
+							}
 						}
 					}
 					

@@ -293,9 +293,13 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	}
 	
 	function next_scheduled($hook = null) {
+		if (!preg_match("/(newsletters)/si", $hook)) {
+			$hook = $this -> pre . '_' . $hook;
+		}
+	
 		if (!empty($hook) && $schedules = wp_get_schedules()) {		
-			if ($hookinterval = wp_get_schedule($this -> pre . '_' . $hook)) {
-				if ($hookschedule = wp_next_scheduled($this -> pre . '_' . $hook)) {				
+			if ($hookinterval = wp_get_schedule($hook)) {
+				if ($hookschedule = wp_next_scheduled($hook)) {				
 					return $schedules[$hookinterval]['display'] . ' - <strong>' . date_i18n("Y-m-d H:i:s", $hookschedule) . '</strong>';
 				} else {
 					return __('This task does not have a next schedule.', $this -> plugin_name);	
@@ -310,7 +314,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return false;
 	}
 	
-	function attachment_link($attachment = null, $icononly = false) {		
+	function attachment_link($attachment = null, $icononly = false, $truncate = 20) {		
 		$attachmentfile = "";
 		
 		if (!empty($attachment['subdir'])) {
@@ -322,7 +326,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	
 		if (!empty($attachmentfile)) {			
 			if ($icononly == false) {
-				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '">' . $this -> truncate(basename($attachmentfile), 20) . '</a>';
+				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '">' . $this -> truncate(basename($attachmentfile), $truncate) . '</a>';
 			} else {
 				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '"></a>';
 			}

@@ -298,7 +298,7 @@ class wpmlQueue extends wpMailPlugin {
 						$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;
 						return true;
 					} else {
-						$this -> errors[] = __('Query failed, email could not be queued.', $this -> plugin_name);
+						$this -> errors[] = __('Query failed, email may already be queued?', $this -> plugin_name);
 					}
 				} else {
 					return $query;	
