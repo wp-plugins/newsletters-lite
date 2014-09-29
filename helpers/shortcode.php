@@ -240,8 +240,10 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_author'				:	
-			case 'newsletters_post_author'	:		
-				setup_postdata($shortcode_post);
+			case 'newsletters_post_author'	:
+				global $post;
+				$post = $shortcode_post;	
+				setup_postdata($post);
 				$return = get_the_author();
 				wp_reset_postdata();
 				return $return;
@@ -298,12 +300,16 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					$this -> add_filter('excerpt_more');
 					
 					if (!empty($shortcode_post)) {
-						setup_postdata($shortcode_post);
+						global $post;
+						$post = $shortcode_post;
+						setup_postdata($post);
 						$return .= get_the_excerpt();
 						wp_reset_postdata();
 					}
 				} else {
-					setup_postdata($shortcode_post);
+					global $post;
+					$post = $shortcode_post;
+					setup_postdata($post);
 					$return = wpautop(get_the_content());
 					wp_reset_postdata();
 				}
@@ -312,7 +318,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			case 'post_content'				:
 			case 'newsletters_post_content'	:
 				if (empty($wpml_eftype) || (!empty($wpml_eftype) && $wpml_eftype != "excerpt")) {
-					setup_postdata($shortcode_post);
+					global $post;
+					$post = $shortcode_post;
+					setup_postdata($post);
 					$return = wpautop(get_the_content());
 					wp_reset_postdata();
 				} else {
@@ -320,7 +328,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					$this -> add_filter('excerpt_more');
 					
 					if (!empty($shortcode_post)) {
-						setup_postdata($shortcode_post);
+						global $post;
+						$post = $shortcode_post;
+						setup_postdata($post);
 						$return .= get_the_excerpt();
 						wp_reset_postdata();
 					}

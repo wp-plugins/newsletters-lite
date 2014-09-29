@@ -13,7 +13,7 @@ class wpmlBounce extends wpMailPlugin {
 		'history_id'		=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`)",
 	);
 	
 	var $tv_fields = array(
@@ -23,7 +23,7 @@ class wpmlBounce extends wpMailPlugin {
 		'history_id'		=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`)",					   
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`)",					   
 	);
 	
 	function wpmlBounce($data = array()) {

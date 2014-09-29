@@ -62,6 +62,7 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Schedules */
 			$this -> add_action('newsletters_ratereviewhook', 'ratereview_hook', 10, 1);
+			$this -> add_action('newsletters_optimizehook', 'optimize_hook', 10, 1);
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
 	        $this -> add_action($this -> pre . '_pophook', 'pop_hook', 10, 1);
 			$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);

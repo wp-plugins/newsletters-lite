@@ -56,6 +56,9 @@
 		
 		<p class="submit">
 			<input type="submit" name="save_order" value="<?php _e('Save Order', $this -> plugin_name); ?>" class="button-primary" />
+			<div class="newsletters_continueediting">
+				<label><input <?php echo (!empty($_REQUEST['continueediting'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="continueediting" value="1" id="continueediting" /> <?php _e('Continue editing', $this -> plugin_name); ?></label>
+			</div>
 		</p>
 	</form>
 </div>

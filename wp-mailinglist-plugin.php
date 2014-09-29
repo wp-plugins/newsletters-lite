@@ -3031,7 +3031,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function paginate($model = null, $fields = '*', $sub = null, $conditions = false, $searchterm = null, $per_page = 10, $order = array('modified', "DESC"), $conditions_and = null) {
 			global $wpdb, $Db, $Autoresponder, $Autoresponderemail, $Subscriber, $SubscribersList, $Mailinglist, 
-			${$model}, $AutorespondersList, $Mailinglist, $History;
+			${$model}, $AutorespondersList, $Mailinglist, $History, $Unsubscribe, $Bounce;
 			
 			$object = (!is_object(${$model})) ? $this -> {$model} : ${$model};
 		
@@ -3059,6 +3059,10 @@ if (!class_exists('wpMailPlugin')) {
 						$newdata[$n] = $record;
 						
 						switch ($model) {
+							case 'Bounce'						:
+							case 'Unsubscribe'					:
+								$newdata[$n] = $this -> init_class($model, $record);
+								break;
 							case 'History'						:
 								$newdata[$n] = $this -> init_class($History -> model, $record);
 								break;
@@ -3559,6 +3563,12 @@ if (!class_exists('wpMailPlugin')) {
 			}
 		}
 		
+		function optimize_scheduling() {
+			if (!wp_next_scheduled('newsletters_optimizehook')) {
+				wp_schedule_event(time(), 'daily', 'newsletters_optimizehook');
+			}
+		}
+		
 		function get_custom_post_types($removedefaults = true) {
 			if ($post_types = get_post_types(null, 'objects')) {
 				$default_types = array('post', 'page', 'attachment', 'revision', 'nav_menu_item');
@@ -3648,6 +3658,18 @@ if (!class_exists('wpMailPlugin')) {
 								//add the database table field.
 								$this -> add_field($oldname, $field, $attributes);
 							}
+						}
+						
+						global $Db, $Subscriber, $Field;
+						switch ($oldname) {
+							case $Subscriber -> table			:							
+								$Db -> model = $Field -> model;
+								if ($fields = $Db -> find_all()) {
+									foreach ($fields as $field) {
+										$this -> add_field($oldname, $field -> slug);
+									}
+								}
+								break;
 						}
 					}
 					
@@ -3831,8 +3853,11 @@ if (!class_exists('wpMailPlugin')) {
 						case 'hidden'			:						
 							switch ($field -> hidden_type) {
 								case 'post'					:
-								default  					:
 									$hidden_value = $_POST[$field -> hidden_value];
+									break;
+								case 'custom'				:
+								default  					:
+									$hidden_value = $_POST[$field -> slug];
 									break;
 								case 'get'					:
 									$hidden_value = $_GET[$field -> hidden_value];
@@ -3851,7 +3876,11 @@ if (!class_exists('wpMailPlugin')) {
 									break;
 							}
 							
-							echo '<input type="hidden" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
+							if (!is_admin()) {
+								echo '<input type="hidden" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
+							} else {
+								echo '<input type="text" class="widefat" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
+							}
 							break;
 						case 'text'				:
 							if (!empty($_GET['email']) && $field -> slug == "email") {
@@ -5776,6 +5805,34 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if (version_compare($cur_version, "4.3.9") < 0) {
 					$this -> update_options();
+					
+					// ALTER TABLE queries
+					global $wpdb, $Bounce, $Email, $Queue, $Subscriber, $SubscribersList, $Unsubscribe;
+					
+					// Bounce
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $Bounce -> table . "` ADD INDEX(`email`);";
+					$wpdb -> query($query);
+					
+					// Email
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $Email -> table . "` ADD INDEX(`eunique`), ADD INDEX(`subscriber_id`), ADD INDEX(`history_id`);";
+					$wpdb -> query($query);
+					
+					// Queue
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $Queue -> table . "` ADD INDEX(`user_id`), ADD INDEX(`subscriber_id`), ADD INDEX(`history_id`), ADD INDEX(`slug`);";
+					$wpdb -> query($query);
+					
+					// Subscriber
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $Subscriber -> table . "` ADD INDEX(`email`);";
+					$wpdb -> query($query);
+					
+					// SubscribersList
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $SubscribersList -> table . "` ADD INDEX(`subscriber_id`), ADD INDEX(`list_id`);";
+					$wpdb -> query($query);
+					
+					// Unsubscribe
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $Unsubscribe -> table . "` ADD INDEX(`email`);";
+					$wpdb -> query($query);
+					
 					$version = "4.3.9";
 				}
 			
@@ -6026,6 +6083,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (empty($permissions)) { $this -> init_roles(); }
 			
 			$this -> scheduling();
+			$this -> optimize_scheduling();
 			$this -> autoresponder_scheduling();
 			$this -> init_fieldtypes();
 			$this -> predefined_templates();
@@ -7115,8 +7173,8 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 	
-		function use_captcha($status) {						
-			if (true || $status == 'Y') {			
+		function use_captcha($status = "Y") {						
+			if ($status == 'Y') {			
 				$captcha_type = $this -> get_option('captcha_type');
 				if (!empty($captcha_type)) {				
 					switch ($captcha_type) {

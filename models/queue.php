@@ -32,7 +32,7 @@ class wpmlQueue extends wpMailPlugin {
 		'senddate'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'created' 			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`user_id`), INDEX(`subscriber_id`), INDEX(`history_id`), INDEX(`slug`)",
 	);
 	
 	var $tv_fields = array(
@@ -52,7 +52,7 @@ class wpmlQueue extends wpMailPlugin {
 		'senddate'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'created' 			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`)",					   
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`user_id`), INDEX(`subscriber_id`), INDEX(`history_id`), INDEX(`slug`)",					   
 	);
 
 	function wpmlQueue($data = array()) {
@@ -257,39 +257,41 @@ class wpmlQueue extends wpMailPlugin {
 					`created`, 
 					`modified`) ";
 					
-					$query .= "SELECT * FROM (SELECT '" . (empty($post_id) ? '0' : $post_id) . "' AS post_id, 
-					'" . $history_id . "' AS history_id, 
-					'" . $theme_id . "' AS theme_id, 
-					'" . $user_id . "' AS user_id,
-					'" . $subscriber_id . "' AS subscriber_id, 
-					'" . $subscriber -> mailinglist_id . "' AS mailinglist_id, 
-					'" . maybe_serialize($subscriber -> mailinglists) . "' AS mailinglists,
-					'" . $subject . "' AS subject, 
-					'" . $slug . "' AS slug, 
-					'" . $message . "' AS message, 
-					'" . (!empty($attachments) ? maybe_serialize($attachments) : '') . "' AS attachments,
-					'" . $senddate . "' AS senddate, 
-					'" . $nowdate . "' AS created, 
-					'" . $nowdate . "' AS modified) AS tmp
-					WHERE NOT EXISTS (
-					    " . $existsquery . "
-					) LIMIT 1;";
-					
-					/* VALUES (
-					'" . (empty($post_id) ? '0' : $post_id) . "', 
-					'" . $history_id . "', 
-					'" . $theme_id . "', 
-					'" . $user_id . "',
-					'" . $subscriber_id . "', 
-					'" . $subscriber -> mailinglist_id . "', 
-					'" . maybe_serialize($subscriber -> mailinglists) . "',
-					'" . $subject . "', 
-					'" . $slug . "', 
-					'" . $message . "', 
-					'" . (!empty($attachments) ? maybe_serialize($attachments) : '') . "',
-					'" . $senddate . "', 
-					'" . $nowdate . "', 
-					'" . $nowdate . "');";*/
+					if (!empty($subscriber) || !empty($user)) {
+						$query .= "SELECT * FROM (SELECT '" . (empty($post_id) ? '0' : $post_id) . "' AS post_id, 
+						'" . $history_id . "' AS history_id, 
+						'" . $theme_id . "' AS theme_id, 
+						'" . $user_id . "' AS user_id,
+						'" . $subscriber_id . "' AS subscriber_id, 
+						'" . $subscriber -> mailinglist_id . "' AS mailinglist_id, 
+						'" . maybe_serialize($subscriber -> mailinglists) . "' AS mailinglists,
+						'" . $subject . "' AS subject, 
+						'" . $slug . "' AS slug, 
+						'" . $message . "' AS message, 
+						'" . (!empty($attachments) ? maybe_serialize($attachments) : '') . "' AS attachments,
+						'" . $senddate . "' AS senddate, 
+						'" . $nowdate . "' AS created, 
+						'" . $nowdate . "' AS modified) AS tmp
+						WHERE NOT EXISTS (
+						    " . $existsquery . "
+						) LIMIT 1;";
+					} else {
+						$query .= " VALUES (
+						'" . (empty($post_id) ? '0' : $post_id) . "', 
+						'" . $history_id . "', 
+						'" . $theme_id . "', 
+						'" . $user_id . "',
+						'" . $subscriber_id . "', 
+						'" . $subscriber -> mailinglist_id . "', 
+						'" . maybe_serialize($subscriber -> mailinglists) . "',
+						'" . $subject . "', 
+						'" . $slug . "', 
+						'" . $message . "', 
+						'" . (!empty($attachments) ? maybe_serialize($attachments) : '') . "',
+						'" . $senddate . "', 
+						'" . $nowdate . "', 
+						'" . $nowdate . "');";
+					}
 			
 				if (empty($return_query) || !$return_query) {
 					if ($wpdb -> query($query)) {

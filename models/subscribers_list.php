@@ -25,7 +25,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 		'reminded'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'					=>	"PRIMARY KEY (`rel_id`)",
+		'key'					=>	"PRIMARY KEY (`rel_id`), INDEX(`subscriber_id`), INDEX(`list_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -42,7 +42,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 		'reminded'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'					=>	"PRIMARY KEY (`rel_id`)",				
+		'key'					=>	"PRIMARY KEY (`rel_id`), INDEX(`subscriber_id`), INDEX(`list_id`)",				
 	);
 	
 	function wpmlSubscribersList($data = array()) {

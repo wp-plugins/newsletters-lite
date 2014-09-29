@@ -418,7 +418,7 @@ $regex = $Html -> field_value('Field[regex]');
 		
 		<p class="submit">
 			<?php echo $Form -> submit(__('Save Custom Field', $this -> plugin_name)); ?>
-			<div class="checkout_continueediting">
+			<div class="newsletters_continueediting">
 				<label><input <?php echo (!empty($_REQUEST['continueediting'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="continueediting" value="1" id="continueediting" /> <?php _e('Continue editing', $this -> plugin_name); ?></label>
 			</div>
 		</p>

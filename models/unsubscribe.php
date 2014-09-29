@@ -15,7 +15,7 @@ class wpmlUnsubscribe extends wpMailPlugin {
 		'comments'			=>	"TEXT NOT NULL",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`)",
 	);
 	
 	var $tv_fields = array(
@@ -27,16 +27,38 @@ class wpmlUnsubscribe extends wpMailPlugin {
 		'comments'			=>	array("TEXT", "NOT NULL"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`)",					   
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`)",					   
 	);
 	
 	function wpmlUnsubscribe($data = array()) {
-		global $wpdb, $Db;
+		global $wpdb, $Db, $Mailinglist, $History;
 		$this -> table = $this -> pre . $this -> controller;
 		
 		if (!empty($data)) {
 			foreach ($data as $dkey => $dval) {				
 				$this -> {$dkey} = stripslashes_deep($dval);
+				
+				switch ($dkey) {
+					case 'user_id'				:					
+						if (!empty($dval)) {
+							$this -> userdata = $this -> userdata($dval);
+						}
+						break;
+					case 'mailinglist_id'		:
+						if (!empty($dval)) {
+							$Db -> model = $Mailinglist -> model;
+							$this -> mailinglist = $Db -> find(array('id' => $dval));
+							$Db -> model = $this -> model;
+						}
+						break;
+					case 'history_id'			:
+						if (!empty($dval)) {
+							$Db -> model = $History -> model;
+							$this -> history = $Db -> find(array('id' => $dval));
+							$Db -> model = $this -> model;
+						}
+						break;
+				}
 			}
 		}
 		

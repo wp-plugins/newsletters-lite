@@ -9,7 +9,7 @@
 		<div>
 			<ul id="fields">
 				<?php foreach ($fields as $field) : ?>
-					<li id="fields_<?php echo $field -> id; ?>" class="newsletters_lineitem"><?php echo $field -> title; ?></li>
+					<li id="fields_<?php echo $field -> id; ?>" class="newsletters_lineitem"><?php echo __($field -> title); ?></li>
 				<?php endforeach; ?>
 			</ul>
 		</div>

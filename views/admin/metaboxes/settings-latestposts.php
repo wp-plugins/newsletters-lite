@@ -59,6 +59,9 @@
 			<?php _e('Below is a preview of what the next latest posts subscription email will look like.', $this -> plugin_name); ?><br/>
 			<?php _e('Save settings to update the preview after making changes to settings.', $this -> plugin_name); ?>
 		</p>
+		<p>
+			<a class="button button-primary" href="<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>latestposts_preview" target="_blank"><?php _e('Open in a new window', $this -> plugin_name); ?></a>
+		</p>
 		<iframe width="100%" height="300" frameborder="0" scrolling="auto" class="autoHeight widefat" style="width:100%; margin:15px 0 0 0;" src="<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>latestposts_preview" id="latestpostsiframe">
 			<?php _e('Nothing to show yet, please configure your latest posts subscription and save the settings.', $this -> plugin_name); ?>
 		</iframe>

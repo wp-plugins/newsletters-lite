@@ -194,6 +194,9 @@
         
         <p class="submit">
         	<input class="button-primary" type="submit" name="save" value="<?php _e('Save Theme', $this -> plugin_name); ?>" />
+        	<div class="newsletters_continueediting">
+				<label><input <?php echo (!empty($_REQUEST['continueediting'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="continueediting" value="1" id="continueediting" /> <?php _e('Continue editing', $this -> plugin_name); ?></label>
+			</div>
         </p>
     </form>
 </div>

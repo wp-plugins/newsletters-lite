@@ -1,11 +1,21 @@
+<?php
+
+$paidsubscriptions = $this -> get_option('subscriptions');
+
+?>
+
 <?php /*<?php if (!empty($subscribers)) : ?>*/ ?>
 	<form action="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=mass" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected subscribers?', $this -> plugin_name); ?>')) { return false; };" method="post" id="subscribersform" name="subscribersform">
 		<div class="tablenav">
 			<div class="alignleft">
                 <?php if ($this -> get_option('bouncemethod') == "pop") : ?>
                     <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-bounced" title="<?php _e('Check for bounced emails', $this -> plugin_name); ?>" class="button" onclick="if (!confirm('<?php _e('Are you sure you wish to check your POP3 mailbox for bounced emails?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Check Bounced Emails', $this -> plugin_name); ?></a>
-                    <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-expired" class="button"><?php _e('Check Expired', $this -> plugin_name); ?></a>
                 <?php endif; ?>
+                <?php if (!empty($paidsubscriptions) && $paidsubscriptions == "Y") : ?>
+                	<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-expired" class="button"><?php _e('Check Expired', $this -> plugin_name); ?></a>
+                <?php endif; ?>
+                <a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=unsubscribes'); ?>"><?php _e('Unsubscribes', $this -> plugin_name); ?></a>
+                <a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=bounces'); ?>"><?php _e('Bounces', $this -> plugin_name); ?></a>
 				<select class="widefat" style="width:auto;" name="action" onchange="action_change(this.value);">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>

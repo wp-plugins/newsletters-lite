@@ -304,6 +304,20 @@ if (!class_exists('wpMail')) {
 			return true;
 		}
 		
+		function optimize_hook() {
+			global $wpdb;		
+			$this -> check_tables();
+					
+			if (!empty($this -> tablenames)) {
+				foreach ($this -> tablenames as $table) {
+					$query = "OPTIMIZE TABLE `" . $table . "`";
+					$wpdb -> query($query);
+				}
+			}
+			
+			return true;
+		}
+		
 		function admin_notices() {
 			global $Html;
 		
@@ -1840,7 +1854,7 @@ if (!class_exists('wpMail')) {
 				global $Db, $Field;
 				$Db -> model = $Field -> model;
 				$conditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
-				$fields = $Db -> find_all($conditions, false, array('title', "ASC"));
+				$fields = $Db -> find_all($conditions, false, array('order', "ASC"));
 			
 				$current .= $this -> render('subscribers' . DS . 'screen-options', array('fields' => $fields), false, 'admin');
 			}
@@ -1875,16 +1889,16 @@ if (!class_exists('wpMail')) {
 				$language_external = $this -> get_option('language_external');
 			
 				if (!empty($language_external) && file_exists($mofullfull)) {
-					load_plugin_textdomain('wp-mailinglist', false, $mofull);
+					load_plugin_textdomain($this -> plugin_name, false, $mofull);
 				} else {
 					$mofull = dirname(plugin_basename(__FILE__)) . DS . 'languages' . DS;
-					load_plugin_textdomain('wp-mailinglist', false, $mofull);
+					load_plugin_textdomain($this -> plugin_name, false, $mofull);
 				}
 			}	
 		}
 		
 		function save_post($post_id = null, $post = null) {	
-			global $wpdb, $Db, $Html, $Post, $Mailinglist, $History, $Queue, $Subscriber, $SubscribersList;
+			global $wpdb, $post, $Db, $Html, $Post, $Mailinglist, $History, $Queue, $Subscriber, $SubscribersList;
 			
 			if (empty($post)) {
 				$post = get_post($post_id);
@@ -2628,67 +2642,70 @@ if (!class_exists('wpMail')) {
 											$subscriberemails = array();
 											
 											if (!empty($_POST['mailinglists']) || !empty($_POST['roles'])) {
-												$this -> scheduling(true);
-												$mailinglistscondition = "(";
-												$m = 1;
-												
-												foreach ($_POST['mailinglists'] as $mailinglist_id) {
-													$mailinglistscondition .= $wpdb -> prefix . $SubscribersList -> table . ".list_id = '" . $mailinglist_id . "'";
-													if ($m < count($_POST['mailinglists'])) { $mailinglistscondition .= " OR "; }
-													$m++;	
-												}
-												
-												/* Fields Conditions */
-												if (!empty($_POST['dofieldsconditions'])) {
-													$fieldsquery = "";
-													$scopeall = (empty($_POST['fieldsconditionsscope']) || $_POST['fieldsconditionsscope'] == "all") ? true : false;
+												//$this -> scheduling(true);
+												$mailinglistscondition = false;
+												if (!empty($_POST['mailinglists'])) {
+													$mailinglistscondition = "(";
+													$m = 1;
 													
-													if (!empty($_POST['fields'])) {
-														$fieldsquery .= " AND (";
-														$f = 1;
+													foreach ($_POST['mailinglists'] as $mailinglist_id) {
+														$mailinglistscondition .= $wpdb -> prefix . $SubscribersList -> table . ".list_id = '" . $mailinglist_id . "'";
+														if ($m < count($_POST['mailinglists'])) { $mailinglistscondition .= " OR "; }
+														$m++;	
+													}
 													
-														foreach ($_POST['fields'] as $field_slug => $field_value) {
-															if (!empty($field_value)) {
-																$Db -> model = $Field -> model;
-																$customfield = $Db -> find(array('slug' => $field_slug), array('id', 'slug', 'type'));
-																$condition = $_POST['condquery'][$field_slug];
-																
-																switch ($condition) {
-																	case 'smaller'				:
-																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " < '" . $field_value . "'";
-																		break;
-																	case 'larger'				:
-																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " > '" . $field_value . "'";
-																		break;
-																	case 'contains'				:
-																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
-																		break;
-																	case 'equals'				:
-																	default						:
-																		$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
-																		break;
+													/* Fields Conditions */
+													if (!empty($_POST['dofieldsconditions'])) {
+														$fieldsquery = "";
+														$scopeall = (empty($_POST['fieldsconditionsscope']) || $_POST['fieldsconditionsscope'] == "all") ? true : false;
+														
+														if (!empty($_POST['fields'])) {
+															$fieldsquery .= " AND (";
+															$f = 1;
+														
+															foreach ($_POST['fields'] as $field_slug => $field_value) {
+																if (!empty($field_value)) {
+																	$Db -> model = $Field -> model;
+																	$customfield = $Db -> find(array('slug' => $field_slug), array('id', 'slug', 'type'));
+																	$condition = $_POST['condquery'][$field_slug];
+																	
+																	switch ($condition) {
+																		case 'smaller'				:
+																			$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " < '" . $field_value . "'";
+																			break;
+																		case 'larger'				:
+																			$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " > '" . $field_value . "'";
+																			break;
+																		case 'contains'				:
+																			$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
+																			break;
+																		case 'equals'				:
+																		default						:
+																			$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
+																			break;
+																	}
+																	
+																	if ($f < count($_POST['fields'])) {
+																		$fieldsquery .= ($scopeall) ? " AND" : " OR";
+																	}
 																}
 																
-																if ($f < count($_POST['fields'])) {
-																	$fieldsquery .= ($scopeall) ? " AND" : " OR";
-																}
+																$f++;
 															}
 															
-															$f++;
+															$fieldsquery .= ")";
+															$fieldsquery = str_replace(" AND)", "", $fieldsquery);
+															$fieldsquery .= ")";
+															$fieldsquery = str_replace("))", ")", $fieldsquery);
 														}
-														
-														$fieldsquery .= ")";
-														$fieldsquery = str_replace(" AND)", "", $fieldsquery);
-														$fieldsquery .= ")";
-														$fieldsquery = str_replace("))", ")", $fieldsquery);
 													}
-												}
-												
-												if (!empty($_POST['daterange']) && $_POST['daterange'] == "Y") {
-													if (!empty($_POST['daterangefrom']) && !empty($_POST['daterangeto'])) {
-														$daterangefrom = date_i18n("Y-m-d", strtotime($_POST['daterangefrom']));
-														$daterangeto = date_i18n("Y-m-d", strtotime($_POST['daterangeto']));
-														$fieldsquery .= " AND (" . $wpdb -> prefix . $Subscriber -> table . ".created >= '" . $daterangefrom . "' AND " . $wpdb -> prefix . $Subscriber -> table . ".created <= '" . $daterangeto . "')";
+													
+													if (!empty($_POST['daterange']) && $_POST['daterange'] == "Y") {
+														if (!empty($_POST['daterangefrom']) && !empty($_POST['daterangeto'])) {
+															$daterangefrom = date_i18n("Y-m-d", strtotime($_POST['daterangefrom']));
+															$daterangeto = date_i18n("Y-m-d", strtotime($_POST['daterangeto']));
+															$fieldsquery .= " AND (" . $wpdb -> prefix . $Subscriber -> table . ".created >= '" . $daterangefrom . "' AND " . $wpdb -> prefix . $Subscriber -> table . ".created <= '" . $daterangeto . "')";
+														}
 													}
 												}
 												
@@ -2702,8 +2719,13 @@ if (!class_exists('wpMail')) {
 												. $wpdb -> prefix . $SubscribersList -> table . " ON "
 												. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id 
 												LEFT JOIN " . $wpdb -> prefix . $Mailinglist -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".list_id = 
-												" . $wpdb -> prefix . $Mailinglist -> table . ".id WHERE "
-												. $mailinglistscondition . ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y' 
+												" . $wpdb -> prefix . $Mailinglist -> table . ".id";
+												
+												if (!empty($mailinglistscondition)) {
+													$query .= " WHERE " . $mailinglistscondition . ")";
+												}
+												
+												$query .= " AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y' 
 												AND (" . $wpdb -> prefix . $SubscribersList -> table . ".paid_sent < " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval 
 												OR " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval IS NULL OR " . $wpdb -> prefix . $Mailinglist -> table . ".maxperinterval = '')"
 												. str_replace(" AND ()", "", $fieldsquery);
@@ -2766,40 +2788,42 @@ if (!class_exists('wpMail')) {
 													}
 												}
 												
-												$subscribers = $wpdb -> get_results($query);
-												
-												if (!empty($subscribers)) {													
-													foreach ($subscribers as $subscriber) {
-														$this -> remove_server_limits();											
-														$subscriber -> mailinglist_id = $_POST['mailinglists'][0];										
-														$subscriber -> mailinglists = $_POST['mailinglists'];
-														
-														if ($sendingprogress == "N") {
-															$q_queries[] = $Queue -> save(
-																$subscriber,
-																false, 
-																$_POST['subject'], 
-																$_POST['content'], 
-																$newattachments, 
-																$post_id, 
-																$history_id, 
-																true, 
-																$_POST['theme_id'], 
-																$_POST['senddate']
-															);
-														} else {
-															$dataset = array(
-																'id'				=>	$subscriber -> id,
-																'email'				=>	$subscriber -> email,
-																'mailinglist_id'	=>	$subscriber -> mailinglist_id,
-																'mailinglists'		=>	$subscriber -> mailinglists,
-																'format'			=> 	(empty($subscriber -> format) ? 'html' : $subscriber -> format),
-															);
-														
-															$datasets[$d] = $dataset;
+												if (!empty($_POST['mailinglists'])) {
+													$subscribers = $wpdb -> get_results($query);
+													
+													if (!empty($subscribers)) {													
+														foreach ($subscribers as $subscriber) {
+															$this -> remove_server_limits();											
+															$subscriber -> mailinglist_id = $_POST['mailinglists'][0];										
+															$subscriber -> mailinglists = $_POST['mailinglists'];
+															
+															if ($sendingprogress == "N") {
+																$q_queries[] = $Queue -> save(
+																	$subscriber,
+																	false, 
+																	$_POST['subject'], 
+																	$_POST['content'], 
+																	$newattachments, 
+																	$post_id, 
+																	$history_id, 
+																	true, 
+																	$_POST['theme_id'], 
+																	$_POST['senddate']
+																);
+															} else {
+																$dataset = array(
+																	'id'				=>	$subscriber -> id,
+																	'email'				=>	$subscriber -> email,
+																	'mailinglist_id'	=>	$subscriber -> mailinglist_id,
+																	'mailinglists'		=>	$subscriber -> mailinglists,
+																	'format'			=> 	(empty($subscriber -> format) ? 'html' : $subscriber -> format),
+																);
+															
+																$datasets[$d] = $dataset;
+															}
+															
+															$d++;
 														}
-														
-														$d++;
 													}
 												}
 												
@@ -3398,7 +3422,12 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST)) {
 						if ($Mailinglist -> save($_POST)) {
 							$message = __('Mailing list has been saved', $this -> plugin_name);
-							$this -> redirect($this -> url, 'message', $message);
+							
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> lists . '&method=save&id=' . $Mailinglist -> insertid . '&continueediting=1'), 'message', $message);
+							} else {
+								$this -> redirect($this -> url, 'message', $message);
+							}
 						} else {
 							$this -> render_error(__('Mailing list could not be saved', $this -> plugin_name));
 							$mailinglist = $this -> init_class('wpmlMailinglist', $_POST);
@@ -3634,7 +3663,12 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST)) {
 						if ($Db -> save($_POST)) {
 							$message = __('Group has been saved.', $this -> plugin_name);
-							$this -> redirect($this -> url, 'message', $message);
+							
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> groups . '&method=save&id=' . $wpmlGroup -> insertid . '&continueediting=1'), 'message', $message);
+							} else {
+								$this -> redirect($this -> url, 'message', $message);
+							}
 						} else {
 							$this -> render_error(__('Group could not be saved.', $this -> plugin_name));
 							$group = $this -> init_class($wpmlGroup -> model, $_POST);
@@ -3766,7 +3800,12 @@ if (!class_exists('wpMail')) {
 							
 						if ($Subscriber -> save($_POST)) {
 							$message = __("Subscriber has been saved", $this -> plugin_name);
-							$this -> redirect($this -> url, 'message', $message);
+							
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=save&id=' . $Subscriber -> insertid . '&continueediting=1'), 'message', $message);
+							} else {
+								$this -> redirect($this -> url, 'message', $message);
+							}
 						} else {
 							$Subscriber -> get($_POST['subscriber_id']);
 							$this -> render_error(__('Subscriber could not be saved', $this -> plugin_name));
@@ -3944,7 +3983,11 @@ if (!class_exists('wpMail')) {
 	            	$conditions = false;
 	            	$searchterm = false;
 	            	$perpage = 10;
-	            	$order = array('created', "DESC");
+	            	
+	            	$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
+					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
+					$order = array($orderfield, $orderdirection);
+	            	
 	            	$conditions_and = false;
 	            	$data = $this -> paginate($Unsubscribe -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
 					$unsubscribes = $data[$Unsubscribe -> model];
@@ -4499,7 +4542,12 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST)) {
 						if ($Db -> save($_POST)) {
 							$message = __('Theme has been saved', $this -> plugin_name);
-							$this -> redirect('?page=' . $this -> sections -> themes, 'message', $message);
+							
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> themes . '&method=save&id=' . $Theme -> id . '&continueediting=1'), 'message', $message);	
+							} else {
+								$this -> redirect('?page=' . $this -> sections -> themes, 'message', $message);
+							}
 						} else {
 							$this -> render_error(__('Theme could not be saved', $this -> plugin_name));
 							$this -> render('themes' . DS . 'save', false, true, 'admin');
@@ -5394,9 +5442,15 @@ if (!class_exists('wpMail')) {
 						$_POST['completed'] = "Y";
 					
 						if ($wpmlOrder -> save($_POST, true)) {
-							$this -> render_message(__('Order has been saved', $this -> plugin_name));
-							$data = $wpmlOrder -> get_all_paginated();
-							$this -> render_admin('orders' . DS . 'index', array('orders' => $data[$wpmlOrder -> model], 'paginate' => $data['Pagination']));
+							$message = __('Order has been saved', $this -> plugin_name);
+						
+							if (!empty($_POST['continueediting'])) {
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> orders . '&method=save&id=' . $wpmlOrder -> insertid . '&continueediting=1'), 'message', $message);
+							} else {
+								$this -> render_message($message);
+								$data = $wpmlOrder -> get_all_paginated();
+								$this -> render_admin('orders' . DS . 'index', array('orders' => $data[$wpmlOrder -> model], 'paginate' => $data['Pagination']));
+							}
 						} else {
 							$this -> render_error(__('Order could not be saved', $this -> plugin_name));
 							$this -> render_admin('orders' . DS . 'save', array('order' => new wpmlOrder($_POST), 'errors' => $wpmlOrder -> errors));
