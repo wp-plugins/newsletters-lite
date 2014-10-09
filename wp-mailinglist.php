@@ -293,22 +293,14 @@ if (!class_exists('wpMail')) {
 			}
 		}
 		
-		function ratereview_hook($days = 7) {
-			if (!headers_sent()) {
-	    		header("HTTP/1.1 200 OK");
-	    	}
-		
+		function ratereview_hook($days = 7) {		
 			$this -> update_option('showmessage_ratereview', $days);
 			$this -> delete_option('hidemessage_ratereview');
 			
 			return true;
 		}
 		
-		function optimize_hook() {
-			if (!headers_sent()) {
-	    		header("HTTP/1.1 200 OK");
-	    	}
-		
+		function optimize_hook() {		
 			global $wpdb;		
 			$this -> check_tables();
 					
@@ -467,7 +459,7 @@ if (!class_exists('wpMail')) {
 			}
 		
 			global $Db, $Email, $Html, $History, $Mailinglist, $wpmlOrder, $Subscriber, $SubscribersList;			
-			$this -> init_textdomain();
+			//$this -> init_textdomain();
 			
 			if (!session_id() && !headers_sent()) {
 				session_start();
@@ -1298,11 +1290,7 @@ if (!class_exists('wpMail')) {
 			return;
 		}
 		
-		function activateaction_hook() {
-			if (!headers_sent()) {
-				header("HTTP/1.1 200 OK");
-			}
-			
+		function activateaction_hook() {			
 			global $wpdb, $SubscribersList, $Subscriber, $Db;
 			$this -> activateaction_scheduling();
 			$activateaction = $this -> get_option('activateaction');
@@ -1347,11 +1335,7 @@ if (!class_exists('wpMail')) {
 			}
 		}
 		
-		function latestposts_hook($preview = false) {
-			if (!headers_sent()) {
-				header("HTTP/1.1 200 OK");
-			}
-			
+		function latestposts_hook($preview = false) {			
 			global $wpdb, $post, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			
 			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {
@@ -1525,11 +1509,7 @@ if (!class_exists('wpMail')) {
 			return false;
 		}
 		
-		function importusers_hook() {
-			if (!headers_sent()) {
-				header("HTTP/1.1 200 OK");
-			}
-			
+		function importusers_hook() {			
 			global $wpdb, $Db, $Mailinglist, $Subscriber, $Unsubscribe, $Bounce, $Field;
 			$Db -> model = $Mailinglist -> model;
 			$importcount = 0;
@@ -1558,37 +1538,40 @@ if (!class_exists('wpMail')) {
 								$Db -> bounce = $Bounce -> model;
 								if (!$Db -> find(array('email' => $user -> user_email))) {
 									$Db -> model = $Subscriber -> model;
+									$user_role = $this -> user_role($user -> ID);
 									
-									$subscriber = array(
-										'id'				=>	false,
-										'email'				=>	$user -> user_email,
-										'mailinglists'		=>	$importuserslists,
-										'registered'		=>	"Y",
-										'username'			=>	$user -> user_login,
-										'fromregistration'	=>	true,
-										'justsubscribe'		=>	true,
-										'active'			=>	((empty($importusersrequireactivate) || $importusersrequireactivate == "Y") ? "N" : "Y"),
-										'user_id'			=>	$user -> ID,
-									);
-									
-									$fieldsquery = "SELECT `id`, `slug` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
-									$fields = $wpdb -> get_results($fieldsquery);
-									
-									if (!empty($fields)) {
-										$importusersfields = $this -> get_option('importusersfields');
-										$importusersfieldspre = $this -> get_option('importusersfieldspre');
+									if (!empty($importuserslists[$user_role])) {
+										$subscriber = array(
+											'id'				=>	false,
+											'email'				=>	$user -> user_email,
+											'mailinglists'		=>	$importuserslists[$user_role],
+											'registered'		=>	"Y",
+											'username'			=>	$user -> user_login,
+											'fromregistration'	=>	true,
+											'justsubscribe'		=>	true,
+											'active'			=>	((empty($importusersrequireactivate) || $importusersrequireactivate == "Y") ? "N" : "Y"),
+											'user_id'			=>	$user -> ID,
+										);
 										
-										foreach ($fields as $field) {
-											if (!empty($importusersfieldspre[$field -> id]) && $usermeta = get_user_meta($user -> ID, $importusersfieldspre[$field -> id], true)) {
-												$subscriber[$field -> slug] = $usermeta;
-											} elseif (!empty($importusersfields[$field -> id]) && $usermeta = get_user_meta($user -> ID, $importusersfields[$field -> id], true)) {
-												$subscriber[$field -> slug] = $usermeta;
+										$fieldsquery = "SELECT `id`, `slug` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
+										$fields = $wpdb -> get_results($fieldsquery);
+										
+										if (!empty($fields)) {
+											$importusersfields = $this -> get_option('importusersfields');
+											$importusersfieldspre = $this -> get_option('importusersfieldspre');
+											
+											foreach ($fields as $field) {
+												if (!empty($importusersfieldspre[$field -> id]) && $usermeta = get_user_meta($user -> ID, $importusersfieldspre[$field -> id], true)) {
+													$subscriber[$field -> slug] = $usermeta;
+												} elseif (!empty($importusersfields[$field -> id]) && $usermeta = get_user_meta($user -> ID, $importusersfields[$field -> id], true)) {
+													$subscriber[$field -> slug] = $usermeta;
+												}
 											}
-										}
-									}					
-									
-									if ($Subscriber -> save($subscriber, true)) {
-										$importcount++;	
+										}					
+										
+										if ($Subscriber -> save($subscriber, true)) {
+											$importcount++;	
+										}	
 									}		
 								}
 							}
@@ -1600,11 +1583,7 @@ if (!class_exists('wpMail')) {
 			echo $importcount . ' ' . __('users were imported as subscribers.', $this -> plugin_name);
 		}
 		
-		function captchacleanup_hook() {
-			if (!headers_sent()) {
-				header("HTTP/1.1 200 OK");
-			}
-			
+		function captchacleanup_hook() {			
 			if ($this -> is_plugin_active('captcha')) {
 				if (class_exists('ReallySimpleCaptcha')) {
 					if ($captcha = new ReallySimpleCaptcha()) {
@@ -1614,11 +1593,7 @@ if (!class_exists('wpMail')) {
 			}
 		}
 		
-		function autoresponders_hook() {
-			if (!headers_sent()) {
-				header("HTTP/1.1 200 OK");
-			}
-				
+		function autoresponders_hook() {				
 			//update scheduling
 			$this -> autoresponder_scheduling();
 			$addedtoqueue = 0;
@@ -1684,11 +1659,7 @@ if (!class_exists('wpMail')) {
 			echo $addedtoqueue . ' ' . __('autoresponder emails have been sent out.', $this -> plugin_name);
 		}
 	
-	    function pop_hook() {
-	    	if (!headers_sent()) {
-	    		header("HTTP/1.1 200 OK");
-	    	}
-			
+	    function pop_hook() {			
 			//update scheduling
 	        $this -> pop_scheduling();
 	
@@ -1699,11 +1670,7 @@ if (!class_exists('wpMail')) {
 	        return;
 	    }
 		
-		function cron_hook() {
-			if (!headers_sent()) {
-				header("HTTP/1.1 200 OK");
-			}
-			
+		function cron_hook() {			
 			do_action('newsletters_cron_fired');
 			
 			if ($transient = get_transient('newsletters_cron')) {
@@ -1922,12 +1889,12 @@ if (!class_exists('wpMail')) {
 			}
 				
 			if (function_exists('load_plugin_textdomain')) {			
-				$mofile = 'wp-mailinglist-' . $locale . '.mo';
+				$mofile = $this -> plugin_name . '-' . $locale . '.mo';
 				$mofullfull = WP_PLUGIN_DIR . DS . 'wp-mailinglist-languages' . DS . $mofile;
 				$mofull = 'wp-mailinglist-languages' . DS;
 				$language_external = $this -> get_option('language_external');
 			
-				if (!empty($language_external) && file_exists($mofullfull)) {
+				if (!empty($language_external) && file_exists($mofullfull)) {				
 					load_plugin_textdomain($this -> plugin_name, false, $mofull);
 				} else {
 					$mofull = dirname(plugin_basename(__FILE__)) . DS . 'languages' . DS;

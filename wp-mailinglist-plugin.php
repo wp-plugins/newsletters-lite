@@ -11,6 +11,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $post_errors = array();
 		var $intervals = array();
 		var $menus = array();
+		var $cache = array();
 		
 		var $sections = array(
 			//'about'						=>	"newsletters-about",
@@ -92,6 +93,7 @@ if (!class_exists('wpMailPlugin')) {
 			$this -> api_key = $this -> get_option('api_key');
 			$this -> plugin_name = basename(dirname(__FILE__));			
 			$this -> plugin_base = rtrim(dirname($base), DS);
+			$this -> plugin_file = plugin_basename($base);
 			if (!defined('NEWSLETTERS_LOG_FILE')) { define("NEWSLETTERS_LOG_FILE", $this -> plugin_base() . DS . "newsletters.log"); }
 			$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);
 			$this -> set_timezone();
@@ -113,6 +115,36 @@ if (!class_exists('wpMailPlugin')) {
 				$this -> extensions = $extensions;
 			}
 		}
+		
+		function set_cache($hash = null, $data = null, $type = 'query') {	    
+		    $this -> cache[$type][$hash] = maybe_serialize($data);
+		    
+		    return true;
+	    }
+	    
+	    function get_cache($hash = null, $type = 'query') {	    
+		    if (!empty($this -> cache[$type][$hash])) {
+			    return maybe_unserialize($this -> cache[$type][$hash]);
+		    }
+		    
+		    return false;
+	    }
+	    
+	    function delete_cache($hash = null, $type = 'query') {	    
+		    if (!empty($this -> cache[$type][$hash])) {
+			    unset($this -> cache[$type][$hash]);
+			    
+			    return true;
+		    }
+		    
+		    return false;
+	    }
+	    
+	    function delete_all_cache($type = 'query') {	    
+		    $this -> cache[$type] = array();
+		    
+		    return true;
+	    }
 		
 		function media_insert($html = null, $id = null, $attachment = null) {
 			$align = get_post_meta($id, '_wpmlalign', true);
@@ -3382,6 +3414,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 				if (class_exists($name)) {
 					if ($class = new $name($params)) {	
+						$class -> plugin_name = $this -> plugin_name;
 						return $class;
 					}
 				}
@@ -3826,6 +3859,19 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			}
 		
+			return false;
+		}
+		
+		function user_role($user_id = null) {
+			if (!empty($user_id)) {
+				if ($user = $this -> userdata($user_id)) {
+					$user_roles = $user -> roles;
+					$user_role = array_shift($user_roles);
+					
+					return $user_role;
+				}
+			}
+			
 			return false;
 		}
 	
@@ -5484,9 +5530,8 @@ if (!class_exists('wpMailPlugin')) {
 					break;	
 			}
 			
-			global ${'newsletters_option_' . $name};
-			if (!empty(${'newsletters_option_' . $name})) {
-				return ${'newsletters_option_' . $name};
+			if ($option = $this -> get_cache($name, 'option')) {			
+				return $option;
 			}
 			
 			if ($option = get_option($this -> pre . $name)) {
@@ -5499,7 +5544,9 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				${'newsletters_option_' . $name} = $option;
-				return apply_filters('newsletters_get_option', $option, $name);
+				$option = apply_filters('newsletters_get_option', $option, $name);
+				$this -> set_cache($name, $option, 'option');
+				return $option;
 			}
 			
 			return false;
@@ -6702,9 +6749,9 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				if (file_exists($filefull)) {
-					if ($output == false) {
+					//if ($output == false) {
 						ob_start();
-					}
+					//}
 					
 					if (!empty($this -> classes)) {
 						foreach ($this -> classes as $class) {
@@ -6720,13 +6767,25 @@ if (!class_exists('wpMailPlugin')) {
 				
 					include($filefull);
 					
+					$data = ob_get_clean();
+					$data = apply_filters('newsletters_render', $data, $file, $params, $output);
+					
 					if ($output == false) {
+						return $data;
+					}
+					
+					echo $data;
+					flush();
+					return true;
+					
+					/*if ($output == false) {
 						$data = ob_get_clean();
 						return $data;
 					} else {
+						
 						flush();
 						return true;
-					}
+					}*/
 				} else {
 					echo sprintf(__('Rendering of %s has failed!', $this -> plugin_name), '"' . $filefull . '"');
 				}

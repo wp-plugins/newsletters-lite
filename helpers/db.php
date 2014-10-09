@@ -300,13 +300,11 @@ class wpmlDbHelper extends wpMailPlugin {
 				}
 				
 				$query_hash = md5($query);
-				global ${'newsletters_query_' . $query_hash};
-				if (!empty(${'newsletters_query_' . $query_hash})) {
-					return ${'newsletters_query_' . $query_hash};
-				}
-				
-				if ($value = $wpdb -> get_var($query)) {
-					${'newsletters_query_' . $query_hash} = $value;
+				if ($ob_value = $this -> get_cache($query_hash)) {
+					return $ob_value;
+				} else {
+					$value = $wpdb -> get_var($query);
+					$this -> set_cache($query_hash, $value);
 					return $value;
 				}
 			}
@@ -469,14 +467,12 @@ class wpmlDbHelper extends wpMailPlugin {
 			}
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
-			}
-			
-			if (!empty($query)) {
+			if ($ob_count = $this -> get_cache($query_hash)) {
+				return $ob_count;
+			} else {
 				$count = $wpdb -> get_var($query);
-				${'newsletters_query_' . $query_hash} = $count;
+				$this -> set_cache($query_hash, $count);
+				return $count;
 			}
 		}
 		
@@ -517,9 +513,8 @@ class wpmlDbHelper extends wpMailPlugin {
 			$query .= " LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if ($cache == true && !empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
+			if ($ob_record = $this -> get_cache($query_hash)) {
+				return $ob_record;
 			}
 			
 			if ($record = $wpdb -> get_row($query)) {
@@ -531,7 +526,7 @@ class wpmlDbHelper extends wpMailPlugin {
 						$object -> data = $data;
 					}
 					
-					${'newsletters_query_' . $query_hash} = $data;
+					$this -> set_cache($query_hash, $data);
 					return $data;
 				}
 			}
@@ -579,9 +574,8 @@ class wpmlDbHelper extends wpMailPlugin {
 			$query .= (empty($limit)) ? '' : " LIMIT " . $limit . "";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
+			if ($ob_records = $this -> get_cache($query_hash)) {
+				return $ob_records;
 			}
 			
 			if ($records = $wpdb -> get_results($query)) {
@@ -593,7 +587,7 @@ class wpmlDbHelper extends wpMailPlugin {
 						$data[] = $this -> init_class($object -> model, $record);
 					}
 					
-					${'newsletters_query_' . $query_hash} = $data;
+					$this -> set_cache($query_hash, $data);
 					return $data;
 				}
 			}

@@ -812,6 +812,10 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		}
 	
 		$url = (empty($old_url)) ? $_SERVER['REQUEST_URI'] : rtrim($old_url, '&');
+		$url = rawurldecode($url);
+		$url = preg_replace("/\&?wpmlmessage\=(.*)\&?/si", "", $url);
+		//$url = preg_replace("/\&?wpmlupdated\=(.*)\&?/si", "", $url);
+		
 		$urls = @explode("?", $url);
 		$add = ltrim($add, '&');
 		
@@ -833,8 +837,8 @@ class wpmlHtmlHelper extends wpMailPlugin {
 
 		$querystring = $this -> queryString($path_parts);
 		
-		$urls[1] = preg_replace("/[\&|\?]" . $this -> pre . "message\=([0-9a-z-_+]*)/i", "", $urls[1]);
-		$urls[1] = preg_replace("/[\&|\?]page\=/si", "", $urls[1]);
+		//$urls[1] = preg_replace("/[\&|\?]" . $this -> pre . "message\=([0-9a-z-_+]*)/i", "", $urls[1]);
+		//$urls[1] = preg_replace("/[\&|\?]page\=/si", "", $urls[1]);
 		
 		$url = $urls[0];
 		$url .= '?';

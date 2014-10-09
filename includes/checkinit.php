@@ -10,7 +10,7 @@ if (!class_exists('wpMailCheckinit')) {
 		function ci_initialize() {				
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			
-			if (!is_plugin_active(plugin_basename($this -> plugin_name . DS . 'wp-mailinglist.php'))) {			
+			if (!is_plugin_active(plugin_basename($this -> plugin_file))) {			
 				return;
 			}
 			

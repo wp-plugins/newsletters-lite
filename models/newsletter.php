@@ -3,16 +3,22 @@
 if (!class_exists('newsletters_lite')) {
 	class newsletters_lite extends wpMailPlugin {
 		
-		function newsletters_lite() {		
-			if (!$this -> ci_serial_valid()) {
-				$this -> add_filter('newsletters_sections', 'lite_sections', 10, 1);
-				$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);		
-				$this -> add_action('newsletters_admin_menu', 'lite_admin_menu', 10, 1);
-				$this -> add_action('admin_bar_menu', 'lite_admin_bar_menu', 999, 1);
-				$this -> add_filter('wpml_mailinglist_validation', 'lite_mailinglist_validation', 10, 2);
-				$this -> add_filter('wpml_sendmail_validation', 'lite_sendmail_validation', 10, 2); 
-				$this -> add_filter('wpml_subscriber_validation', 'lite_subscriber_validation', 10, 2);
-				$this -> add_filter('newsletters_field_validation', 'lite_field_validation', 10, 2);
+		function newsletters_lite() {
+			//if (empty($this -> plugin_file)) {
+			//	$this -> plugin_file = plugin_basename(basename(dirname(dirname(__FILE__))) . DS . 'wp-mailinglist.php');
+			//}
+				
+			if (!is_multisite() || (is_multisite() && $this -> is_plugin_active($this -> plugin_file))) {	
+				if (!$this -> ci_serial_valid()) {				
+					$this -> add_filter('newsletters_sections', 'lite_sections', 10, 1);
+					$this -> sections = apply_filters('newsletters_sections', (object) $this -> sections);		
+					$this -> add_action('newsletters_admin_menu', 'lite_admin_menu', 10, 1);
+					$this -> add_action('admin_bar_menu', 'lite_admin_bar_menu', 999, 1);
+					$this -> add_filter('wpml_mailinglist_validation', 'lite_mailinglist_validation', 10, 2);
+					$this -> add_filter('wpml_sendmail_validation', 'lite_sendmail_validation', 10, 2); 
+					$this -> add_filter('wpml_subscriber_validation', 'lite_subscriber_validation', 10, 2);
+					$this -> add_filter('newsletters_field_validation', 'lite_field_validation', 10, 2);
+				}
 			}
 		}
 		
@@ -30,7 +36,7 @@ if (!class_exists('newsletters_lite')) {
 		}
 		
 		function lite_admin_bar_menu($wp_admin_bar = null) {
-			global $wp_admin_bar;
+			global $wp_admin_bar, $blog_id;
 
 			if (is_multisite()) {				
 				if (is_network_admin()) {
@@ -262,7 +268,11 @@ if (!class_exists('newsletters_lite')) {
 		}
 	}
 	
-	$newsletters_lite = new newsletters_lite();
+	add_action('plugins_loaded', 'load_newsletters_lite');
+	
+	function load_newsletters_lite() {
+		$newsletters_lite = new newsletters_lite();
+	}
 }
 
 ?>

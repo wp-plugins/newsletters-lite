@@ -50,12 +50,11 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$subscribersquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Subscriber -> table . "";
 		
 		$query_hash = md5($subscribersquery);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$subscriberstotal = ${'newsletters_query_' . $query_hash};
+		if ($ob_subscriberstotal = $this -> get_cache($query_hash)) {
+			$subscriberstotal = $ob_subscriberstotal;
 		} else {
 			$subscriberstotal = $wpdb -> get_var($subscribersquery);
-			${'newsletters_query_' . $query_hash} = $subscriberstotal;
+			$this -> set_cache($query_hash, $subscriberstotal);
 		}
 		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'subscribers', array('total' => $subscriberstotal), true, 'admin');
@@ -66,23 +65,21 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$publicquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `privatelist` = 'N'";
 		
 		$query_hash = md5($publicquery);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$total_public = ${'newsletters_query_' . $query_hash};
+		if ($ob_total_public = $this -> get_cache($query_hash)) {
+			$total_public = $ob_total_public;
 		} else {
 			$total_public = $wpdb -> get_var($publicquery);
-			${'newsletters_query_' . $query_hash} = $total_public;
+			$this -> set_cache($query_hash, $total_public);
 		}
 		
 		$privatequery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE `privatelist` = 'Y'";
 		
 		$query_hash = md5($privatequery);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$total_private = ${'newsletters_query_' . $query_hash};
+		if ($ob_total_private = $this -> get_cache($query_hash)) {
+			$total_private = $ob_total_private;
 		} else {
 			$total_private = $wpdb -> get_var($privatequery);
-			${'newsletters_query_' . $query_hash} = $total_private;
+			$this -> set_cache($query_hash, $total_private);
 		}
 		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'lists', array('total_public' => $total_public, 'total_private' => $total_private), true, 'admin');
