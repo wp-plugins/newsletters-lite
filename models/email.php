@@ -23,7 +23,7 @@ class wpmlEmail extends wpMailPlugin {
 		'bounced'				=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'created'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'					=>	"PRIMARY KEY (`id`), INDEX(`eunique`), INDEX(`subscriber_id`), INDEX(`history_id`)",
+		'key'					=>	"PRIMARY KEY (`id`), INDEX(`eunique`), INDEX(`subscriber_id`), INDEX(`user_id`), INDEX(`history_id`), INDEX(`read`), INDEX(`status`)",
 	);
 	
 	var $tv_fields = array(
@@ -40,8 +40,10 @@ class wpmlEmail extends wpMailPlugin {
 		'bounced'				=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'					=>	"PRIMARY KEY (`id`), INDEX(`eunique`), INDEX(`subscriber_id`), INDEX(`history_id`)",					   
+		'key'					=>	"PRIMARY KEY (`id`), INDEX(`eunique`), INDEX(`subscriber_id`), INDEX(`user_id`), INDEX(`history_id`), INDEX(`read`), INDEX(`status`)",					   
 	);
+	
+	var $indexes = array('eunique', 'subscriber_id', 'user_id', 'history_id', 'read', 'status');
 
 	function wpmlEmail($data = array()) {
 		global $Db;

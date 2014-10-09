@@ -51,7 +51,7 @@ class wpmlOrder extends wpMailPlugin {
 		'pmethod'		=>	"ENUM('pp','2co') NOT NULL DEFAULT 'pp'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`)"
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`subscriber_id`), INDEX(`list_id`)"
 	);
 	
 	var $tv_fields = array(
@@ -65,8 +65,10 @@ class wpmlOrder extends wpMailPlugin {
 		'pmethod'		=>	array("ENUM('pp','2co')", "NOT NULL DEFAULT 'pp'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`)"					   
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`subscriber_id`), INDEX(`list_id`)"					   
 	);
+	
+	var $indexes = array('subscriber_id', 'list_id');
 
 	function wpmlOrder($data = array()) {
 		$this -> table = $this -> pre . $this -> controller;

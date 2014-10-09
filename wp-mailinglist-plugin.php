@@ -3459,6 +3459,7 @@ if (!class_exists('wpMailPlugin')) {
 							$this -> {$model} -> fields = apply_filters('newsletters_db_table_fields_new', $this -> {$model} -> fields, $model);
 							$this -> tablenames[$this -> pre . $this -> {$model} -> controller] = $wpdb -> prefix . $this -> {$model} -> table;
 							$this -> tables[$this -> pre . $this -> {$model} -> controller] = $this -> {$model} -> fields;
+							$this -> indexes[$this -> pre . $this -> {$model} -> controller] = (!empty($this -> {$model} -> indexes)) ? $this -> {$model} -> indexes : false;
 						}
 					}
 				}
@@ -3501,6 +3502,7 @@ if (!class_exists('wpMailPlugin')) {
 							
 						$this -> tablenames[$this -> pre . ${$class} -> controller] = $wpdb -> prefix . ${$class} -> table;
 						$this -> tables[$this -> pre . ${$class} -> controller] = (empty(${$class} -> table_fields)) ? ${$class} -> fields : ${$class} -> table_fields;
+						$this -> indexes[$this -> pre . ${$class} -> controller] = (!empty(${$class} -> indexes)) ? ${$class} -> indexes : false;
 					}
 					
 					if (empty($this -> {$class}) || !is_object($this -> {$class})) {
@@ -3746,6 +3748,17 @@ if (!class_exists('wpMailPlugin')) {
 									}
 								}
 								break;
+						}
+						
+						$indexes = $this -> indexes[$oldname];
+						if (!empty($indexes)) {
+							foreach ($indexes as $index) {
+								$query = "SHOW INDEX FROM `" . $name . "` WHERE `Key_name` = '" . $index . "'";
+								if (!$wpdb -> get_row($query)) {
+									$query = "ALTER TABLE `" . $name . "` ADD INDEX(`" . $index . "`);";
+									$wpdb -> query($query);	
+								}	
+							}
 						}
 					}
 					
@@ -5881,42 +5894,8 @@ if (!class_exists('wpMailPlugin')) {
 				if (version_compare($cur_version, "3.9.9") < 0) {				
 					global $wpdb, $Queue, $Field;
 					$this -> update_options();
-					$wpdb -> query("ALTER TABLE `" . $wpdb -> prefix . $Queue -> table . "` ADD INDEX (`id`)");
 					$wpdb -> query("ALTER TABLE `" . $wpdb -> prefix . $Field -> table . "` CHANGE `type` `type` VARCHAR(255) NOT NULL DEFAULT 'text'");
 					$version = "3.9.9";
-				}
-				
-				if (version_compare($cur_version, "4.4") < 0) {
-					$this -> update_options();
-					
-					// ALTER TABLE queries
-					global $wpdb, $Bounce, $Email, $Queue, $Subscriber, $SubscribersList, $Unsubscribe;
-					
-					// Bounce
-					$query = "ALTER TABLE `" . $wpdb -> prefix . $Bounce -> table . "` ADD INDEX(`email`);";
-					$wpdb -> query($query);
-					
-					// Email
-					$query = "ALTER TABLE `" . $wpdb -> prefix . $Email -> table . "` ADD INDEX(`eunique`), ADD INDEX(`subscriber_id`), ADD INDEX(`history_id`);";
-					$wpdb -> query($query);
-					
-					// Queue
-					$query = "ALTER TABLE `" . $wpdb -> prefix . $Queue -> table . "` ADD INDEX(`user_id`), ADD INDEX(`subscriber_id`), ADD INDEX(`history_id`), ADD INDEX(`slug`);";
-					$wpdb -> query($query);
-					
-					// Subscriber
-					$query = "ALTER TABLE `" . $wpdb -> prefix . $Subscriber -> table . "` ADD INDEX(`email`);";
-					$wpdb -> query($query);
-					
-					// SubscribersList
-					$query = "ALTER TABLE `" . $wpdb -> prefix . $SubscribersList -> table . "` ADD INDEX(`subscriber_id`), ADD INDEX(`list_id`);";
-					$wpdb -> query($query);
-					
-					// Unsubscribe
-					$query = "ALTER TABLE `" . $wpdb -> prefix . $Unsubscribe -> table . "` ADD INDEX(`email`);";
-					$wpdb -> query($query);
-					
-					$version = "4.4";
 				}
 				
 				if (version_compare($cur_version, "4.4.1") < 0) {

@@ -15,7 +15,7 @@ class wpmlAutoresponderemail extends wpMailPlugin {
 		'status'				=>	"ENUM('sent','unsent') NOT NULL DEFAULT 'unsent'",
 		'created'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'					=>	"PRIMARY KEY (`id`), UNIQUE INDEX (subscriber_id, autoresponder_id)",
+		'key'					=>	"PRIMARY KEY (`id`), INDEX(`autoresponder_id`), INDEX(`list_id`), INDEX(`subscriber_id`), INDEX(`status`)",
 	);
 	
 	var $tv_fields = array(
@@ -27,8 +27,10 @@ class wpmlAutoresponderemail extends wpMailPlugin {
 		'status'				=>	array("ENUM('sent','unsent')", "NOT NULL DEFAULT 'unsent'"),
 		'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'					=>	"PRIMARY KEY (`id`), UNIQUE INDEX (subscriber_id, autoresponder_id)",				
+		'key'					=>	"PRIMARY KEY (`id`), INDEX(`autoresponder_id`), INDEX(`list_id`), INDEX(`subscriber_id`), INDEX(`status`)",				
 	);
+	
+	var $indexes = array('autoresponder_id', 'list_id', 'subscriber_id', 'status');
 	
 	function wpmlAutoresponderemail($data = array()) {
 		global $wpdb, $Db, $Autoresponder, $Subscriber, $SubscribersList;

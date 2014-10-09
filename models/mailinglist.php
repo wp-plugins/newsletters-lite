@@ -22,7 +22,7 @@ class wpmlMailinglist extends wpMailPlugin {
 		'redirect'			=>	"TEXT NOT NULL",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`paid`), INDEX(`group_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -40,8 +40,10 @@ class wpmlMailinglist extends wpMailPlugin {
 		'redirect'			=>	array("TEXT", "NOT NULL"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`)",					   
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`paid`), INDEX(`group_id`)",					   
 	);
+	
+	var $indexes = array('paid', 'group_id');
 	
 	var $id = 0;
 	var $title;

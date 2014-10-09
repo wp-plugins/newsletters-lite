@@ -17,7 +17,7 @@ class wpmlHistoriesAttachment extends wpMailPlugin {
 		'subdir'			=>	"TEXT NOT NULL",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`history_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -28,8 +28,10 @@ class wpmlHistoriesAttachment extends wpMailPlugin {
 		'subdir'			=>	array("TEXT", "NOT NULL"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`history_id`)",
 	);
+	
+	var $indexes = array('history_id');
 	
 	function wpmlHistoriesAttachment($data = array()) {
 		global $Db;

@@ -29,7 +29,7 @@ class wpmlPost extends wpMailPlugin {
 		'sent'			=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`)"
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`post_id`), INDEX(`sent`)"
 	);
 	
 	var $tv_fields = array(
@@ -38,8 +38,10 @@ class wpmlPost extends wpMailPlugin {
 		'sent'			=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`)"					   
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`post_id`), INDEX(`sent`)"					   
 	);
+	
+	var $indexes = array('post_id', 'sent');
 	
 	function wpmlPost($data = array()) {
 		$this -> table = $this -> pre . $this -> controller;

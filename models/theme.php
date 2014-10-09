@@ -20,7 +20,7 @@ class wpmlTheme extends wpMailPlugin {
 		'acolor'		=>	"VARCHAR(20) NOT NULL DEFAULT '#333333'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`)"
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`def`), INDEX(`defsystem`)"
 	);
 	
 	var $tv_fields = array(
@@ -35,8 +35,10 @@ class wpmlTheme extends wpMailPlugin {
 		'acolor'		=>	array("VARCHAR(20)", "NOT NULL DEFAULT '#333333'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`)"					   
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`def`), INDEX(`defsystem`)"					   
 	);
+	
+	var $indexes = array('def', 'defsystem');
 	
 	function wpmlTheme($data = array()) {
 		global $Db;

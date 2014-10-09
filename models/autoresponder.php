@@ -17,7 +17,7 @@ class wpmlAutoresponder extends wpMailPlugin {
 		'alwayssend'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`history_id`), INDEX(`status`)",
 	);
 	
 	var $tv_fields = array(
@@ -31,8 +31,10 @@ class wpmlAutoresponder extends wpMailPlugin {
 		'alwayssend'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`)",					   
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`history_id`), INDEX(`status`)",					   
 	);
+	
+	var $indexes = array('history_id', 'status');
 	
 	function wpmlAutoresponder($data = array()) {
 		global $wpdb, $AutorespondersList, $Mailinglist, $Db;

@@ -123,7 +123,27 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 == Changelog ==
 
 = 4.4.1 =
- 
+* ADD: Redirect URL per mailing list
+* ADD: Auto import certain WordPress user roles to certain mailing lists  
+* IMPROVE: More table indexes and index checking on "Check/optimize database tables" action
+* IMPROVE: Apache mod_security warning under Newsletters > Themes if enabled
+* IMPROVE: Help tooltip design improvements
+* IMPROVE: Prevent MySQL lock wait timeout exceeded
+* IMPROVE: Remove console.log() calls
+* IMPROVE: New, improved object cache system
+* IMPROVE: Improved query strings in admin URLs
+* IMPROVE: Do not delete autoresponder when deleting history email  
+* FIX: Subscribe sidebar widget 'scroll' setting only working on multilingual
+* FIX: Mailing Lists column empty under sent emails when viewing subscriber
+* FIX: Theme not saving, content goes blank due to mysql_real_escape_string()
+* FIX: Save a Theme "Continue Editing" not working
+* FIX: WordPress theme customize not loading on some themes
+* FIX: Extensions all show "Not installed" incorrectly
+* FIX: Some TinyMCE button functions don't open
+* FIX: Language/translation file problems with textdomain and path
+* FIX: Publishing new post doesn't queue email, until saved/updated again
+* FIX: Lists not showing on autoresponders with show all view
+* FIX: Newsletters lite admin bar menu shows up on multi-site  
 
 = 4.4 =
 * ADD: Filters in the email queue section

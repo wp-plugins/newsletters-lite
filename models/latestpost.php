@@ -11,7 +11,7 @@ class wpmlLatestpost extends wpMailPlugin {
 		'post_id'				=>	"INT(11) NOT NULL UNIQUE",
 		'created'				=> 	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'					=>	"PRIMARY KEY (`id`)",
+		'key'					=>	"PRIMARY KEY (`id`), INDEX(`post_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -19,8 +19,10 @@ class wpmlLatestpost extends wpMailPlugin {
 		'post_id'				=>	array("INT(11)", "NOT NULL UNIQUE"),
 		'created'				=> 	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'					=>	"PRIMARY KEY (`id`)",					   
+		'key'					=>	"PRIMARY KEY (`id`), INDEX(`post_id`)",					   
 	);
+	
+	var $indexes = array('post_id');
 	
 	function wpmlLatestpost($data = array()) {
 		global $Db;

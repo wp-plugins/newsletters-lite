@@ -35,7 +35,7 @@ class wpmlSubscriber extends wpMailPlugin {
         'mandatory'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`), INDEX(`email`)",
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`email`), INDEX(`user_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -53,8 +53,10 @@ class wpmlSubscriber extends wpMailPlugin {
         'mandatory'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`), INDEX(`email`)",					   
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`email`), INDEX(`user_id`)",					   
 	);
+	
+	var $indexes = array('email', 'user_id');
 	
 	var $name = 'wpmlSubscriber';
 	

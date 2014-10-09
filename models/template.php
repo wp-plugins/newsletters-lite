@@ -23,7 +23,7 @@ class wpmlTemplate extends wpMailPlugin {
 		'sent'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`)"
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`theme_id`)"
 	);
 	
 	var $tv_fields = array(
@@ -34,8 +34,10 @@ class wpmlTemplate extends wpMailPlugin {
 		'sent'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'		=>	array("DATETIME NOT", "NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME NOT", "NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`)"					   
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`theme_id`)"					   
 	);
+	
+	var $indexes = array('theme_id');
 	
 	function wpmlTemplate($data = array()) {
 		global $Db;

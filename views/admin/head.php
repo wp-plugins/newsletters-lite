@@ -8,6 +8,7 @@ var wpmlUrl = '<?php echo $this -> url(); ?>';
 	jQuery(document).ready(function() {
 		if (jQuery.isFunction(jQuery.fn.tooltip)) {
 			jQuery(".wpmlhelp a").tooltip({
+				tooltipClass: 'newsletters-ui-tooltip',
 				content: function () {
 		            return jQuery(this).prop('title');
 		        },

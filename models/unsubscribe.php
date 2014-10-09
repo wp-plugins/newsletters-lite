@@ -15,7 +15,7 @@ class wpmlUnsubscribe extends wpMailPlugin {
 		'comments'			=>	"TEXT NOT NULL",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`)",
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`), INDEX(`user_id`), INDEX(`mailinglist_id`), INDEX(`history_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -27,8 +27,10 @@ class wpmlUnsubscribe extends wpMailPlugin {
 		'comments'			=>	array("TEXT", "NOT NULL"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`)",					   
+		'key'				=>	"PRIMARY KEY (`id`), INDEX(`email`), INDEX(`user_id`), INDEX(`mailinglist_id`), INDEX(`history_id`)",					   
 	);
+	
+	var $indexes = array('email', 'user_id', 'mailinglist_id', 'history_id');
 	
 	function wpmlUnsubscribe($data = array()) {
 		global $wpdb, $Db, $Mailinglist, $History;

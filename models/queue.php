@@ -54,6 +54,8 @@ class wpmlQueue extends wpMailPlugin {
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'				=>	"PRIMARY KEY (`id`), INDEX(`user_id`), INDEX(`subscriber_id`), INDEX(`history_id`), INDEX(`slug`)",					   
 	);
+	
+	var $indexes = array('user_id', 'subscriber_id', 'history_id', 'slug');
 
 	function wpmlQueue($data = array()) {
 		global $Subscriber, $Db, $HistoriesAttachment;

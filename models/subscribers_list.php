@@ -45,6 +45,8 @@ class wpmlSubscribersList extends wpMailPlugin {
 		'key'					=>	"PRIMARY KEY (`rel_id`), INDEX(`subscriber_id`), INDEX(`list_id`)",				
 	);
 	
+	var $indexes = array('subscriber_id', 'list_id');
+	
 	function wpmlSubscribersList($data = array()) {
 		global $Db, $Subscriber, $Mailinglist;
 		

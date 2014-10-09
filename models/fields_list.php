@@ -13,19 +13,24 @@ class wpmlFieldsList extends wpMailPlugin {
 	var $data = array();
 
 	var $table_fields = array(
+		'rel_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'field_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'list_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'special'			=>	"TEXT NOT NULL",
 		'order'				=>	"INT(11) NOT NULL DEFAULT '0'",
-		'key'				=>	"KEY `field_id` (`field_id`, `list_id`)",
+		'key'				=>	"PRIMARY KEY (`rel_id`), INDEX(`field_id`), INDEX(`list_id`)",
 	);
 	
 	var $tv_fields = array(
+		'rel_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'field_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'list_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'special'			=>	array("TEXT", "NOT NULL"),
 		'order'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
-		'key'				=>	"KEY `field_id` (`field_id`, `list_id`)",);
+		'key'				=>	"PRIMARY KEY (`rel_id`), INDEX(`field_id`), INDEX(`list_id`)",
+	);
+	
+	var $indexes = array('field_id', 'list_id');
 
 	function wpmlFieldsList($data = array()) {
 		$this -> table = $this -> pre . $this -> controller;

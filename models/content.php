@@ -14,8 +14,10 @@ if (!class_exists('wpmlContent')) {
 			'content'				=>	array("TEXT", "NOT NULL"),
 			'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 			'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-			'key'					=>	"PRIMARY KEY (`id`)"
+			'key'					=>	"PRIMARY KEY (`id`), INDEX(`history_id`)"
 		);
+		
+		var $indexes = array('history_id');
 		
 		function wpmlContent($data = null) {
 			$this -> table = $this -> pre . $this -> controller;

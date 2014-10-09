@@ -12,7 +12,7 @@ class wpmlAutorespondersList extends wpMailPlugin {
 		'list_id'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'					=>	"PRIMARY KEY (`rel_id`)",
+		'key'					=>	"PRIMARY KEY (`rel_id`), INDEX(`autoresponder_id`), INDEX(`list_id`)",
 	);
 	
 	var $tv_fields = array(
@@ -21,8 +21,10 @@ class wpmlAutorespondersList extends wpMailPlugin {
 		'list_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'					=>	"PRIMARY KEY (`rel_id`)",				
+		'key'					=>	"PRIMARY KEY (`rel_id`), INDEX(`autoresponder_id`), INDEX(`list_id`)",				
 	);
+	
+	var $indexes = array('autoresponder_id', 'list_id');
 	
 	function wpmlAutorespondersList($data = array()) {
 		global $Db, $Autoresponder, $Mailinglist;

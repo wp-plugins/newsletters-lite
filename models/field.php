@@ -40,7 +40,7 @@ class wpmlField extends wpMailPlugin {
 		'order'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
-		'key'			=>	"PRIMARY KEY (`id`)"
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`slug`), INDEX(`type`), INDEX(`required`)"
 	);
 	
 	var $tv_fields = array(
@@ -64,8 +64,10 @@ class wpmlField extends wpMailPlugin {
 		'order'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-		'key'			=>	"PRIMARY KEY (`id`)"
+		'key'			=>	"PRIMARY KEY (`id`), INDEX(`slug`), INDEX(`type`), INDEX(`required`)"
 	);
+	
+	var $indexes = array('slug', 'type', 'required');
 
 	function wpmlField($data = array()) {
 		global $wpdb, $Db, $FieldsList;
