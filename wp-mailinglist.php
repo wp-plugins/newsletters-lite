@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.1
+Version: 4.4.1.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -3238,7 +3238,7 @@ if (!class_exists('wpMail')) {
 					}
 					
 					$this -> render_message(__('Please note that autoresponder emails are only sent to Active subscriptions. Once a subscription is Active, the autoresponder email will queue.', $this -> plugin_name));
-					$this -> render('autoresponders' . DS . 'index', array('autoresponders' => $autoresponders, 'paginate' => $data['Paginate']), true, 'admin');
+					$this -> render('autoresponders' . DS . 'index', array('autoresponders' => $data[$Autoresponder -> model], 'paginate' => $data['Paginate']), true, 'admin');
 					break;	
 			}
 		}

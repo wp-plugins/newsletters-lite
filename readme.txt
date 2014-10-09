@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 4.4.1
+Stable tag: 4.4.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -79,6 +79,26 @@ Some extensions include:
 
 <a href="http://tribulant.com/plugins/extensions/1/wordpress-newsletter-plugin">Visit the Newsletters extensions page</a>
 
+= Languages =
+
+All language files and the instructions to use them are hosted in an <a href="https://github.com/tribulant/wp-mailinglist-languages">online repository</a>.
+
+Thank you for these wonderful people who contributed in translating the plugin:
+
+* Afrikaans (af_ZA) by Tribulant Software
+* German (de_DE) by Peter Schonmann
+* Spanish (es_ES) by Juan Llamosas
+* French (fr_FR) by Kim Gjerstad
+* Hungarian (hu_HU) by Almási Gergely
+* Italian (it_IT) by Johnny
+* Lithuanian (lt_LT) by Tomas
+* Dutch (nl_NL) by <a href="http://www.webzenz.nl">Ronald de Caluwe | WebZenz</a>
+* Brazilian Portuguese (pt_BR) by Vitor Argos
+* Portuguese (pt_PT) by wordpress.mowster.net
+* Romanian (ro_RO) by <a href="http://richardconsulting.ro">Richard Vencu</a>
+* Swedish (sv_SE) by Tomas Lindhoff
+* Turkish (tr_TR) by Sersah Namoglu
+
 = PRO Version =
 
 The Newsletters LITE version has all the features that the PRO version has but it has some limitations.
@@ -121,6 +141,9 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.1.1 =
+* FIX: Autoresponders not showing in admin
 
 = 4.4.1 =
 * ADD: Redirect URL per mailing list

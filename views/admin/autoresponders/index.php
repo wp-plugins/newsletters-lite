@@ -33,6 +33,5 @@
 			</p>
 		</form>
 	<?php endif; ?>
-    
     <?php $this -> render('autoresponders' . DS . 'loop', array('autoresponders' => $autoresponders, 'paginate' => $paginate), true, 'admin'); ?>
 </div>
