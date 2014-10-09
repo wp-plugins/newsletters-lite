@@ -16,32 +16,6 @@
 			});
 			
 			return false;
-		
-			/*var posts_category_menu = jQuery('#posts_category_menu');
-			var posts_post_menu = jQuery('#posts_post_menu');	
-			
-			if (jQuery('input[name="postslanguage"]').length > 0) {				
-				var postslanguage = jQuery('input[name="postslanguage"]:checked').val();
-		
-				if (postslanguage == "" || postslanguage == "undefined" || postslanguage == undefined) {
-					alert('<?php _e('Please choose a language.', $this -> plugin_name); ?>');
-					return false;
-				}
-			}
-			
-			var post_type = new Array();
-			if (jQuery('input[name="post_types[]"]').length > 0) {
-				jQuery('input[name="post_types[]"]:checked').each(function() {
-					post_type.push(jQuery(this).val());
-				});
-			} else { post_type.push('post'); }
-		
-			jQuery('#posts_multiple_message').show();
-			
-			jQuery.post(wpmlajaxurl + "?action=newsletters_posts_by_category&cat_id=" + posts_category_menu.val(), {category:posts_category_menu.val(),language:postslanguage,post_type:post_type}, function(response) {
-				posts_post_menu.empty().html(response);
-				jQuery('#posts_multiple_message').hide();
-			});*/
 		}
 		
 		self.refresh = function(values) {
@@ -124,13 +98,15 @@
 					onclick: function() {
 						var newsletters_post_body = [];
 						
-						newsletters_post_body.push({
-							type: 'listbox',
-							name: 'newsletters_post_language',
-							label: 'Language',
-							values: tinymce.settings.newsletters_languages,
-							tooltip: 'Choose the language of the post to use'
-						});
+						if (typeof(tinymce.settings.newsletters_languages) !== 'undefined' && tinymce.settings.newsletters_languages.length > 0) {
+							newsletters_post_body.push({
+								type: 'listbox',
+								name: 'newsletters_post_language',
+								label: 'Language',
+								values: tinymce.settings.newsletters_languages,
+								tooltip: 'Choose the language of the post to use'
+							});
+						}
 						
 						newsletters_post_body.push({
 							type: 'checkbox',
@@ -164,8 +140,8 @@
 							type: 'listbox',
 							name: 'newsletters_post_id',
 							label: 'Post',
-							values: [{text:'- Choose Category -', value:false}],
-							tooltip: 'Choose the post to insert',
+							values: [{text:'- Choose Category Above -', value:false}],
+							tooltip: 'First choose a category above, then choose the post to insert',
 							onPostRender: function() {
 								post_element = this;
 							}
@@ -186,7 +162,12 @@
 								newsletters_post += ' eftype="' + e.data.newsletters_post_eftype + '"';
 								newsletters_post += ' post_id="' + e.data.newsletters_post_id + '"';
 								
-								if (e.data.newsletters_post_language.length > 0) {
+								if (e.data.newsletters_post_id == false || e.data.newsletters_post_id.length <= 0) {
+									alert('Choose a post');
+									return false;
+								}
+								
+								if (typeof(e.data.newsletters_post_language) !== 'undefined' && e.data.newsletters_post_language.length > 0) {
 									newsletters_post += ' language="' + e.data.newsletters_post_language + '"';
 								}
 								
@@ -200,13 +181,15 @@
 					onclick: function() {
 						var newsletters_posts_body = [];
 						
-						newsletters_posts_body.push({
-							type: 'listbox',
-							name: 'newsletters_posts_language',
-							label: 'Language',
-							values: tinymce.settings.newsletters_languages,
-							tooltip: 'Choose the language of the posts to use'
-						});
+						if (typeof(tinymce.settings.newsletters_languages) !== 'undefined' && tinymce.settings.newsletters_languages.length > 0) {
+							newsletters_posts_body.push({
+								type: 'listbox',
+								name: 'newsletters_posts_language',
+								label: 'Language',
+								values: tinymce.settings.newsletters_languages,
+								tooltip: 'Choose the language of the posts to use'
+							});
+						}
 						
 						newsletters_posts_body.push({
 							type: 'textbox',
@@ -275,12 +258,10 @@
 						editor.windowManager.open({
 							title: 'Insert Multiple Posts',
 							body: newsletters_posts_body,
-							onsubmit: function(e) {
-								console.log(e.data);
-								
+							onsubmit: function(e) {								
 								var newsletters_posts = '[newsletters_posts';
 								
-								if (e.data.newsletters_posts_language.length > 0) {
+								if (typeof(e.data.newsletters_posts_language) !== 'undefined' && e.data.newsletters_posts_language.length > 0) {
 									newsletters_posts += ' language="' + e.data.newsletters_posts_language + '"';
 								}
 								
@@ -297,6 +278,11 @@
 								newsletters_posts += ' orderby="' + e.data.newsletters_posts_orderby + '"';
 								newsletters_posts += ' order="' + e.data.newsletters_posts_order + '"';
 								newsletters_posts += ' category="' + e.data.newsletters_posts_category + '"';
+								
+								if (e.data.newsletters_posts_category == false || e.data.newsletters_posts_category.length <= 0) {
+									alert('Choose a category');
+									return false;
+								}
 								
 								if (e.data.newsletters_posts_posttype.length > 0) {
 									newsletters_posts += ' post_type="' + e.data.newsletters_posts_posttype + '"';

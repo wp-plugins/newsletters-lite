@@ -27,12 +27,11 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		}
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_count = $this -> get_cache($query_hash)) {
+			$count = $ob_count;
 		} else {
 			$count = $wpdb -> get_var($query);
-			${'newsletters_query_' . $query_hash} = $count;
+			$this -> set_cache($query_hash, $count);
 		}
 		
 		if (!empty($count)) {
@@ -397,12 +396,11 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			$templatequery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " WHERE id = '" . $id . "' LIMIT 1";
 			
 			$query_hash = md5($templatequery);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$template = ${'newsletters_query_' . $query_hash};
+			if ($ob_template = $this -> get_cache($query_hash)) {
+				$template = $ob_template;
 			} else {
 				$template = $wpdb -> get_row($templatequery);
-				${'newsletters_query_' . $query_hash} = $template;
+				$this -> set_cache($query_hash, $template);
 			}
 		
 			if (!empty($template)) {
@@ -454,12 +452,11 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		if (!empty($number)) { $query .= " LIMIT " . $number . ""; }	
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$emails = ${'newsletters_query_' . $query_hash};
+		if ($ob_emails = $this -> get_cache($query_hash)) {
+			$emails = $ob_emails;
 		} else {
 			$emails = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $emails;
+			$this -> set_cache($query_hash, $emails);
 		}
 		
 		if (!empty($emails)) {

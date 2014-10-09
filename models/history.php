@@ -138,12 +138,11 @@ class wpmlHistory extends wpMailPlugin {
 		AND (`recurringdate` <= NOW())";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$histories = ${'newsletters_query_' . $query_hash};
+		if ($ob_histories = $this -> get_cache($query_hash)) {
+			$histories = $ob_histories;
 		} else {
 			$histories = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $histories;
+			$this -> set_cache($query_hash, $histories);
 		}
 		
 		do_action('newsletters_queue_recurring_start', $histories);
@@ -228,12 +227,11 @@ class wpmlHistory extends wpMailPlugin {
 					$q_queries = array();
 					
 					$query_hash = md5($query);
-					global ${'newsletters_query_' . $query_hash};
-					if (!empty(${'newsletters_query_' . $query_hash})) {
-						$subscribers = ${'newsletters_query_' . $query_hash};
+					if ($ob_subscribers = $this -> get_cache($query_hash)) {
+						$subscribers = $ob_subscribers;
 					} else {
 						$subscribers = $wpdb -> get_results($query);
-						${'newsletters_query_' . $query_hash} = $subscribers;
+						$this -> set_cache($query_hash, $subscribers);
 					}
 					
 					if (!empty($subscribers)) {				
@@ -292,12 +290,11 @@ class wpmlHistory extends wpMailPlugin {
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE `senddate` <= '" . date_i18n("Y-m-d H:i:s", time()) . "' AND `scheduled` = 'Y' LIMIT 1";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$histories = ${'newsletters_query_' . $query_hash};
+		if ($ob_histories = $this -> get_cache($query_hash)) {
+			$histories = $ob_histories;
 		} else {
 			$histories = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $histories;
+			$this -> set_cache($query_hash, $histories);
 		}
 		
 		if (!empty($histories)) {		
@@ -389,12 +386,11 @@ class wpmlHistory extends wpMailPlugin {
 					$q_queries = array();
 					
 					$query_hash = md5($query);
-					global ${'newsletters_query_' . $query_hash};
-					if (!empty(${'newsletters_query_' . $query_hash})) {
-						$subscribers = ${'newsletters_query_' . $query_hash};
+					if ($ob_subscribers = $this -> get_cache($query_hash)) {
+						$subscribers = $ob_subscribers;
 					} else {
 						$subscribers = $wpdb -> get_results($query);
-						${'newsletters_query_' . $query_hash} = $subscribers;
+						$this -> set_cache($query_hash, $subscribers);
 					}
 					
 					if (!empty($subscribers)) {				
@@ -453,12 +449,11 @@ class wpmlHistory extends wpMailPlugin {
 		$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table_name . "`";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$count = ${'newsletters_query_' . $query_hash};
+		if ($ob_count = $this -> get_cache($query_hash)) {
+			$count = $ob_count;
 		} else {
 			$count = $wpdb -> get_var($query);
-			${'newsletters_query_' . $query_hash} = $count;
+			$this -> set_cache($query_hash, $count);
 		}
 		
 		if (!empty($count)) {
@@ -633,15 +628,11 @@ class wpmlHistory extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $history_id . "' LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$history = ${'newsletters_query_' . $query_hash};
-			} else {
-				$history = $wpdb -> get_row($query);
-				${'newsletters_query_' . $query_hash} = $history;
-			}
-		
-			if (!empty($history)) {
+			if ($ob_history = $this -> get_cache($query_hash)) {
+				return $ob_history;	
+			}		
+			
+			if ($history = $wpdb -> get_row($query)) {
 				$history = $this -> init_class($this -> model, $history);
 				
 				if ($assign == true) {
@@ -649,6 +640,7 @@ class wpmlHistory extends wpMailPlugin {
 					$this -> data[$this -> model] = $history;
 				}
 				
+				$this -> set_cache($query_hash, $history);
 				return $history;
 			}
 		}
@@ -668,24 +660,19 @@ class wpmlHistory extends wpMailPlugin {
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` ASC LIMIT 1";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$email = ${'newsletters_query_' . $query_hash};
-		} else {
-			$email = $wpdb -> get_row($query);
-			${'newsletters_query_' . $query_hash} = $email;
+		if ($ob_history = $this -> get_cache($query_hash)) {
+			return $ob_history;
 		}
 		
-		if (!empty($email)) {
-			if (!empty($email)) {
-				$history = $this -> init_class($this -> model, $email);
-				
-				if ($assign == true) {
-					$this -> data[$this -> model] = $history;
-				}
-				
-				return $history;
+		if ($email = $wpdb -> get_row($query)) {
+			$history = $this -> init_class($this -> model, $email);
+			
+			if ($assign == true) {
+				$this -> data[$this -> model] = $history;
 			}
+			
+			$this -> set_cache($query_hash, $history);
+			return $history;
 		}
 		
 		return false;
@@ -697,21 +684,18 @@ class wpmlHistory extends wpMailPlugin {
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` ORDER BY `created` DESC LIMIT 1";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$email = ${'newsletters_query_' . $query_hash};
-		} else {
-			$email = $wpdb -> get_row($query);
-			${'newsletters_query_' . $query_hash} = $email;
+		if ($ob_history = $this -> get_cache($query_hash)) {
+			return $ob_history;
 		}
 		
-		if (!empty($email)) {
+		if ($email = $wpdb -> get_row($query)) {
 			$history = $this -> init_class($this -> model, $email);
 			
 			if ($assign == true) {
 				$this -> data[$this -> model] = $history;
 			}
 			
+			$this -> set_cache($query_hash, $history);
 			return $history;
 		}
 		
@@ -730,8 +714,8 @@ class wpmlHistory extends wpMailPlugin {
 		if (!empty($id)) {
 			if ($wpdb -> query("DELETE FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $id . "' LIMIT 1")) {
 			
-				$Db -> model = $Autoresponder -> model;
-				$Db -> delete_all(array('history_id' => $id));
+				//$Db -> model = $Autoresponder -> model;
+				//$Db -> delete_all(array('history_id' => $id));
 				
 				$Db -> model = $Email -> model;
 				$Db -> delete_all(array('history_id' => $id));

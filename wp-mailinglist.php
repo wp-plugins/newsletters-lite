@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4
+Version: 4.4.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -110,6 +110,7 @@ if (!class_exists('wpMail')) {
 			$init_array['newsletters_post_id'] = $post_id;
 			
 			$init_array['newsletters_language_do'] = $this -> language_do();
+			$init_array['newsletters_languages'] = false;
 			if ($this -> language_do()) {
 				$newsletters_languages = array();
 				$languages = $this -> language_getlanguages();
@@ -832,6 +833,7 @@ if (!class_exists('wpMail')) {
 						if (!empty($_GET[$this -> pre . 'subscriber_email']) && !empty($_GET[$this -> pre . 'subscriber_id']) && !empty($_GET[$this -> pre . 'mailinglist_id'])) {
 							$subscriber_id = $_GET[$this -> pre . 'subscriber_id'];
 							$mailinglists = @explode(",", $_GET[$this -> pre . 'mailinglist_id']);
+							
 							$mailinglistsstring = $_GET[$this -> pre . 'mailinglist_id'];
 							$subscriber = $Subscriber -> get($subscriber_id, false);
 							$Auth -> set_emailcookie($subscriber -> email, "+30 days");
@@ -870,10 +872,14 @@ if (!class_exists('wpMail')) {
 							$message = __('Subscription is invalid', $this -> plugin_name);
 						}
 						
-						if ($this -> get_option('customactivateredirect') == "Y") {
-							$activateredirecturl = $this -> get_option('activateredirecturl');
+						if (!empty($mailinglists) && count($mailinglists) == 1 && !empty($mailinglist -> redirect)) {
+							$activateredirecturl = $mailinglist -> redirect;
 						} else {
-							$activateredirecturl = $Html -> retainquery('updated=1&success=' . __('Thank you for confirming your subscription.', $this -> plugin_name), $this -> get_managementpost(true));
+							if ($this -> get_option('customactivateredirect') == "Y") {
+								$activateredirecturl = $this -> get_option('activateredirecturl');
+							} else {
+								$activateredirecturl = $Html -> retainquery('updated=1&success=' . __('Thank you for confirming your subscription.', $this -> plugin_name), $this -> get_managementpost(true));
+							}
 						}
 						
 						//If there are paid lists... we need to provide a payment form.
@@ -1909,9 +1915,11 @@ if (!class_exists('wpMail')) {
 			if (empty($post)) {
 				$post = get_post($post_id);
 			}
+			
+			$post_status = (!empty($_POST['post_status'])) ? $_POST['post_status'] : $post -> post_status;
 		
 			if (!empty($post_id) && !empty($post)) {
-				switch ($post -> post_status) {
+				switch ($post_status) {
 					/* Future scheduled post */
 					case 'future'					:						
 						if (!empty($_POST[$this -> pre . 'mailinglists'])) {					
@@ -3222,15 +3230,15 @@ if (!class_exists('wpMail')) {
 					$data = array();
 					if (!empty($_GET['showall'])) {
 						$Db -> model = $Autoresponder -> model;
-						$lists = $Db -> find_all(false, "*", $order);
-						$data[$Autoresponder -> model] = $lists;
+						$autoresponders = $Db -> find_all(false, "*", $order);
+						$data[$Autoresponder -> model] = $autoresponders;
 						$data['Paginate'] = false;
 					} else {
 						$data = $this -> paginate($Autoresponder -> model, false, $this -> sections -> autoresponders, $conditions, $searchterm, $perpage, $order);
 					}
 					
 					$this -> render_message(__('Please note that autoresponder emails are only sent to Active subscriptions. Once a subscription is Active, the autoresponder email will queue.', $this -> plugin_name));
-					$this -> render('autoresponders' . DS . 'index', array('autoresponders' => $data[$Autoresponder -> model], 'paginate' => $data['Paginate']), true, 'admin');
+					$this -> render('autoresponders' . DS . 'index', array('autoresponders' => $autoresponders, 'paginate' => $data['Paginate']), true, 'admin');
 					break;	
 			}
 		}
@@ -4308,12 +4316,11 @@ if (!class_exists('wpMail')) {
 										$query = "SELECT `id`, `paid` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $importlist_id . "'";
 										
 										$query_hash = md5($query);
-										global ${'newsletters_query_' . $query_hash};
-										if (!empty(${'newsletters_query_' . $query_hash})) {
-											$mailinglist = ${'newsletters_query_' . $query_hash};
+										if ($ob_mailinglist = $this -> get_cache($query_hash)) {
+											$mailinglist = $ob_mailinglist;
 										} else {
 											$mailinglist = $wpdb -> get_row($query);
-											${'newsletters_query_' . $query_hash} = $mailinglist;
+											$this -> set_cache($query_hash, $mailinglist);
 										}
 									
 										if (!empty($mailinglist)) {
@@ -4394,12 +4401,11 @@ if (!class_exists('wpMail')) {
 																		$query = "SELECT `id`, `paid` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $mailinglist_id . "'";
 																		
 																		$query_hash = md5($query);
-																		global ${'newsletters_query_' . $query_hash};
-																		if (!empty(${'newsletters_query_' . $query_hash})) {
-																			$mailinglist = ${'newsletters_query_' . $query_hash};
+																		if ($ob_mailinglist = $this -> get_cache($query_hash)) {
+																			$mailinglist = $ob_mailinglist;
 																		} else {
 																			$mailinglist = $wpdb -> get_row($query);
-																			${'newsletters_query_' . $query_hash} = $mailinglist;
+																			$this -> set_cache($query_hash, $mailinglist);
 																		}
 																		
 																		if (!empty($mailinglist)) {
@@ -4544,12 +4550,11 @@ if (!class_exists('wpMail')) {
 								$fieldsquery = "SELECT * FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 								
 								$query_hash = md5($fieldsquery);
-								global ${'newsletters_query_' . $query_hash};
-								if (!empty(${'newsletters_query_' . $query_hash})) {
-									$fields = ${'newsletters_query_' . $query_hash};
+								if ($ob_fields = $this -> get_cache($query_hash)) {
+									$fields = $ob_fields;
 								} else {
 									$fields = $wpdb -> get_results($fieldsquery);
-									${'newsletters_query_' . $query_hash} = $fields;
+									$this -> set_cache($query_hash, $fields);
 								}
 								
 								$delimiter = (!empty($_POST['export_delimiter'])) ? $_POST['export_delimiter'] : ",";
@@ -4675,6 +4680,11 @@ if (!class_exists('wpMail')) {
 			$Db -> model = $Theme -> model;
 			$method = $_GET['method'];
 			
+			if ($this -> is_php_module('mod_security')) {
+				$error = __('Please note that Apache mod_security is turned on. Saving a theme may not be allowed due to the raw HTML. Please ask your hosting provider.', $this -> plugin_name);
+				$this -> render_error($error);	
+			}
+			
 			switch ($method) {
 				case 'save'			:
 					if (!empty($_POST)) {
@@ -4682,7 +4692,7 @@ if (!class_exists('wpMail')) {
 							$message = __('Theme has been saved', $this -> plugin_name);
 							
 							if (!empty($_POST['continueediting'])) {
-								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> themes . '&method=save&id=' . $Theme -> id . '&continueediting=1'), 'message', $message);	
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> themes . '&method=save&id=' . $Theme -> insertid . '&continueediting=1'), 'message', $message);	
 							} else {
 								$this -> redirect('?page=' . $this -> sections -> themes, 'message', $message);
 							}

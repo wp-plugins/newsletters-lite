@@ -91,6 +91,13 @@ if ($this -> language_do()) {
                 		<span class="howto"><?php _e('This is only effective when "Require Activation?" is turned on in configuration', $this -> plugin_name); ?></span>
                 	</td>
                 </tr>
+                <tr>
+                	<th><label for="Mailinglist.redirect"><?php _e('Confirm Redirect URL', $this -> plugin_name); ?></label></th>
+                	<td>
+                		<?php echo $Form -> text('Mailinglist[redirect]'); ?>
+                		<span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Leave empty for default, global behaviour, else fill in a confirmation redirect URL location for this list.', $this -> plugin_name); ?></span>
+                	</td>
+                </tr>
                 <?php if (apply_filters('newsletters_admin_mailinglists_save_paidlist_show', true)) : ?>
 					<tr>
 						<th><label for="Mailinglist.paidNo"><?php _e('Paid List', $this -> plugin_name); ?></label></th>
@@ -160,5 +167,6 @@ if ($this -> language_do()) {
 jQuery(document).ready(function() {
 	jQuery('[name="Mailinglist[title]"]').Watermark('<?php echo addslashes(__('Enter mailing list title here', $this -> plugin_name)); ?>');
 	jQuery('[name="Mailinglist[adminemail]"]').Watermark('<?php echo addslashes(__('Enter a valid email address', $this -> plugin_name)); ?>');
+	jQuery('[name="Mailinglist[redirect]"]').Watermark('<?php echo addslashes(__('http://domain.com/custom/url/to/go/to/', $this -> plugin_name)); ?>');
 });
 </script>

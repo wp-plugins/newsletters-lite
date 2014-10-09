@@ -86,13 +86,12 @@ class wpmlSubscribersList extends wpMailPlugin {
 			}
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
+			if ($ob_count = $this -> get_cache($query_hash)) {
+				return $ob_count;
 			}
 			
 			if ($count = $wpdb -> get_var($query)) {
-				${'newsletters_query_' . $query_hash} = $count;
+				$this -> set_cache($query_hash, $count);
 				return $count;
 			}
 		}
@@ -118,12 +117,11 @@ class wpmlSubscribersList extends wpMailPlugin {
 			}
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$value = ${'newsletters_query_' . $query_hash};
+			if ($ob_value = $this -> get_cache($query_hash)) {
+				$value = $ob_value;
 			} else {
 				$value = $wpdb -> get_var($query);
-				${'newsletters_query_' . $query_hash} = $value;
+				$this -> set_cache($query_hash, $value);
 			}
 			
 			if (!empty($value)) {
@@ -166,16 +164,14 @@ class wpmlSubscribersList extends wpMailPlugin {
 		$query .= " LIMIT 1";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$subscriberslist = ${'newsletters_query_' . $query_hash};
-		} else {
-			$subscriberslist = $wpdb -> get_row($query);
-			${'newsletters_query_' . $query_hash} = $subscriberslist;
+		if ($ob_subscriberslist = $this -> get_cache($query_hash)) {
+			return $ob_subscriberslist;
 		}
 		
-		if (!empty($subscriberslist)) {
-			return $this -> init_class($this -> model, $subscriberslist);
+		if ($subscriberslist = $wpdb -> get_row($query)) {
+			$return = $this -> init_class($this -> model, $subscriberslist);
+			$this -> set_cache($query_hash, $return);
+			return $return;
 		}
 		
 		return false;
@@ -204,21 +200,18 @@ class wpmlSubscribersList extends wpMailPlugin {
 		}
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$subscriberslists = ${'newsletters_query_' . $query_hash};
-		} else {
-			$subscriberslists = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $subscriberslists;
+		if ($ob_subscriberslists = $this -> get_cache($query_hash)) {
+			return $ob_subscriberslists;
 		}
 		
-		if (!empty($subscriberslists)) {
+		if ($subscriberslists = $wpdb -> get_results($query)) {
 			$data = array();
 			
 			foreach ($subscriberslists as $sl) {
 				$data[] = $this -> init_class($this -> model, $sl);
 			}
 			
+			$this -> set_cache($query_hash, $data);
 			return $data;
 		}
 	

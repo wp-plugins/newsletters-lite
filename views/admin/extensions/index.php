@@ -54,7 +54,7 @@
 									case 0	:
 										?>
                                         
-                                        <span class="edit"><a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" target="_blank"><?php _e('Get this extension now', $this -> plugin_name); ?></a></span>
+                                        <span class="edit"><a onclick="jQuery.colorbox({iframe:true, title:'<?php echo esc_attr(stripslashes($extension['name'])); ?>', fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" target="_blank"><?php _e('Get this extension now', $this -> plugin_name); ?></a></span>
                                         
                                         <?php
 										break;
@@ -86,7 +86,12 @@
 							
 							switch ($status) {
 								case 0			:
-									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span> <small>(<?php echo $Html -> link(__('Buy Now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'onclick' => "jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?>)</small><?php
+									?>
+									
+									<span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span>
+									<p><?php echo $Html -> link(__('Get it now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'class' => "button button-small", 'onclick' => "jQuery.colorbox({iframe:true, title:'" . esc_attr(stripslashes($extension['name'])) . "', fastIframe:false, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?></p>
+									
+									<?php
 									break;
 								case 1			:
 									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Installed but Inactive', $this -> plugin_name); ?></span><?php

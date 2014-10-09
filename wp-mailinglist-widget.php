@@ -39,7 +39,7 @@ class Newsletters_Widget extends WP_Widget {
 		global $Html;
 	
 		if (class_exists('wpMail')) {
-			if ($wpMail = new wpMail()) {						
+			if ($wpMail = new wpMail()) {									
 				if (empty($instance)) {
 					$instance['title'] = __('Stay up to date', $wpMail -> plugin_name);
 					$instance['list'] = "select";
@@ -129,7 +129,7 @@ class Newsletters_Widget extends WP_Widget {
 										<?php echo $Html -> help(__('Turn on/off Ajax for the subscribe form. If you turn Ajax on, the subscribe form will submit without any page refresh and it is much quicker. Turning it off will generate a page refresh as the user submits the form to subscribe.', $wpMail -> plugin_name)); ?>
 									</p>
 									<p>
-										<label><input <?php echo (!empty($instance['scroll'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $this -> get_field_name('scroll'); ?>" value="1" id="<?php echo $this -> get_field_id('scroll'); ?>" /> <?php _e('Scroll to subscribe form', $this -> plugin_name); ?></label>
+										<label><input <?php echo (!empty($instance['scroll'][$language])) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $this -> get_field_name('scroll'); ?>[<?php echo $language; ?>]" value="1" id="<?php echo $this -> get_field_id('scroll'); ?>-<?php echo $language; ?>" /> <?php _e('Scroll to subscribe form', $this -> plugin_name); ?></label>
 									</p>
 									<p>
 										<label for="<?php echo $this -> get_field_id('button'); ?>-<?php echo $language; ?>"><?php _e('Button Text:', $wpMail -> plugin_name); ?></label>
@@ -217,6 +217,9 @@ class Newsletters_Widget extends WP_Widget {
 						<?php echo $Html -> help(__('Turn on/off Ajax for the subscribe form. If you turn Ajax on, the subscribe form will submit without any page refresh and it is much quicker. Turning it off will generate a page refresh as the user submits the form to subscribe.', $wpMail -> plugin_name)); ?>
 					</p>
 					<p>
+						<label><input <?php echo (!empty($instance['scroll'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $this -> get_field_name('scroll'); ?>" value="1" id="<?php echo $this -> get_field_id('scroll'); ?>" /> <?php _e('Scroll to subscribe form', $this -> plugin_name); ?></label>
+					</p>
+					<p>
 						<label for="<?php echo $this -> get_field_id('button'); ?>"><?php _e('Button Text:', $wpMail -> plugin_name); ?></label>
 						<?php echo $Html -> help(__('The text to display on the subscribe button at the bottom of the subscribe form.', $wpMail -> plugin_name)); ?>
 						<input type="text" name="<?php echo $this -> get_field_name('button'); ?>" value="<?php echo esc_attr(stripslashes($instance['button'])); ?>" id="<?php echo $this -> get_field_id('button'); ?>" class="widefat" />
@@ -229,7 +232,9 @@ class Newsletters_Widget extends WP_Widget {
 				
 				<script type="text/javascript">
 				jQuery(document).ready(function() {
-					jQuery(".wpmlhelp a").tooltip();
+					if (jQuery.isFunction(jQuery.fn.tooltip)) {
+						jQuery(".wpmlhelp a").tooltip();
+					}
 				});
 				</script>
 				
@@ -240,9 +245,6 @@ class Newsletters_Widget extends WP_Widget {
 	
 	public function update($new_instance, $old_instance) {		
 		$instance = array();
-		unset($new_instance['scroll']);
-		
-		print_r($new_instance);
 			
 		if (class_exists('wpMail')) {
 			if ($wpMail = new wpMail()) {

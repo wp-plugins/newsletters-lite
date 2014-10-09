@@ -94,12 +94,11 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'";
 					
 					$query_hash = md5($query);
-					global ${'newsletters_query_' . $query_hash};
-					if (!empty(${'newsletters_query_' . $query_hash})) {
-						$ebounced = ${'newsletters_query_' . $query_hash};
+					if ($ob_ebounced = $this -> get_cache($query_hash)) {
+						$ebounced = $ob_ebounced;
 					} else {
 						$ebounced = $wpdb -> get_var($query);
-						${'newsletters_query_' . $query_hash} = $ebounced;
+						$this -> set_cache($query_hash, $ebounced);
 					}
 					
 					?>
@@ -109,12 +108,11 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'";
 					
 					$query_hash = md5($query);
-					global ${'newsletters_query_' . $query_hash};
-					if (!empty(${'newsletters_query_' . $query_hash})) {
-						$eunsubscribed = ${'newsletters_query_' . $query_hash};
+					if ($ob_eunsubscribed = $this -> get_cache($query_hash)) {
+						$eunsubscribed = $ob_eunsubscribed;
 					} else {
 						$eunsubscribed = $wpdb -> get_var($query);
-						${'newsletters_query_' . $query_hash} = $eunsubscribed;
+						$this -> set_cache($query_hash, $eunsubscribed);
 					}
 					
 					$eunsubscribeperc = (!empty($etotal)) ? (($eunsubscribed / $etotal) * 100) : 0;

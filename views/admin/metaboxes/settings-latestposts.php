@@ -36,12 +36,11 @@
         		global $wpdb;
         		$countquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Latestpost -> table . "";
         		$query_hash = md5($countquery);
-        		global ${'newsletters_query_' . $query_hash};
-        		if (!empty(${'newsletters_query_' . $query_hash})) {
-	        		$count = ${'newsletters_query_' . $query_hash};
+        		if ($ob_count = $this -> get_cache($query_hash)) {
+	        		$count = $ob_count;
         		} else {
 	        		$count = $wpdb -> get_var($countquery);
-	        		${'newsletters_query_' . $query_hash} = $count;
+	        		$this -> set_cache($query_hash, $count);
         		}
         		
         		?>

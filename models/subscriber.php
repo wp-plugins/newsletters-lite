@@ -78,12 +78,11 @@ class wpmlSubscriber extends wpMailPlugin {
 									$listquery = "SELECT * FROM " . $wpdb -> prefix . $Mailinglist -> table . " WHERE id = '" . $sl -> list_id . "' LIMIT 1";
 									
 									$query_hash = md5($listquery);
-									global ${'newsletters_query_' . $query_hash};
-									if (!empty(${'newsletters_query_' . $query_hash})) {
-										$list = ${'newsletters_query_' . $query_hash};
+									if ($ob_list = $this -> get_cache($query_hash)) {
+										$list = $ob_list;
 									} else {
 										$list = $wpdb -> get_row($listquery);
-										${'newsletters_query_' . $query_hash} = $list;
+										$this -> set_cache($query_hash, $list);
 									}
 									
 									$this -> Mailinglist[] = $list;
@@ -137,9 +136,8 @@ class wpmlSubscriber extends wpMailPlugin {
 			if (!empty($active)) { $query .= " AND `active` = '" . $active . "'"; }
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};	
+			if ($ob_mailinglists = $this -> get_cache($query_hash)) {
+				return $ob_mailinglists;
 			}
 			
 			$listsarray = $wpdb -> get_results($query);
@@ -158,7 +156,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			}
 		}
 		
-		${'newsletters_query_' . $query_hash} = $mailinglists;
+		$this -> set_cache($query_hash, $mailinglists);
 		return $mailinglists;
 	}
 	
@@ -196,12 +194,11 @@ class wpmlSubscriber extends wpMailPlugin {
 		}
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$count = ${'newsletters_query_' . $query_hash};
+		if ($ob_count = $this -> get_cache($query_hash)) {
+			$count = $ob_count;
 		} else {
 			$count = $wpdb -> get_var($query);
-			${'newsletters_query_' . $query_hash} = $count;
+			$this -> set_cache($query_hash, $count);
 		}
 		
 		if (!empty($count)) {
@@ -226,12 +223,11 @@ class wpmlSubscriber extends wpMailPlugin {
 			$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table . "`" . $where . "";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$count = ${'newsletters_query_' . $query_hash};
+			if ($ob_count = $this -> get_cache($query_hash)) {
+				$count = $ob_count;
 			} else {
 				$count = $wpdb -> get_var($query);
-				${'newsletters_query_' . $query_hash} = $count;
+				$this -> set_cache($query_hash, $count);
 			}
 		
 			if (!empty($count)) {
@@ -255,12 +251,11 @@ class wpmlSubscriber extends wpMailPlugin {
 			$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE DATE_FORMAT(`created`, '%Y-%m-%d') = '" . $date . "'";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$count = ${'newsletters_query_' . $query_hash};
+			if ($ob_count = $this -> get_cache($query_hash)) {
+				$count = $ob_count;
 			} else {
 				$count = $wpdb -> get_var($query);
-				${'newsletters_query_' . $query_hash} = $count;
+				$this -> set_cache($query_hash, $count);
 			}
 		
 			if (!empty($count)) {
@@ -290,9 +285,8 @@ class wpmlSubscriber extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `id` = '" . $subscriber_id . "' LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
+			if ($ob_subscriber = $this -> get_cache($query_hash)) {
+				return $ob_subscriber;
 			}
 		
 			if ($subscriber = $wpdb -> get_row($query)) {			
@@ -310,7 +304,7 @@ class wpmlSubscriber extends wpMailPlugin {
 					$this -> data[$this -> model] = $this -> init_class($this -> model, $subscriber); 
 				}
 
-				${'newsletters_query_' . $query_hash} = $subscriber;
+				$this -> set_cache($query_hash, $subscriber);
 				return $subscriber;
 			}
 		}
@@ -325,9 +319,8 @@ class wpmlSubscriber extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `list_id` = '" . $list . "'";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
+			if ($ob_subscribers = $this -> get_cache($query_hash)) {
+				return $ob_subscribers;
 			}
 		
 			if ($subscribers = $wpdb -> get_results($query)) {
@@ -338,7 +331,7 @@ class wpmlSubscriber extends wpMailPlugin {
 						$data[] = $this -> init_class('wpmlSubscriber', $subscriber);
 					}
 					
-					${'newsletters_query_' . $query_hash} = $data;
+					$this -> set_cache($query_hash, $data);
 					return $data;
 				}
 			}
@@ -370,9 +363,8 @@ class wpmlSubscriber extends wpMailPlugin {
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table . "` ORDER BY `email` ASC";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_subscribers = $this -> get_cache($query_hash)) {
+			return $ob_subscribers;
 		}
 		
 		if ($subscribers = $wpdb -> get_results($query)) {
@@ -383,7 +375,7 @@ class wpmlSubscriber extends wpMailPlugin {
 					$data[] = $this -> init_class('wpmlSubscriber', $subscriber);
 				}
 				
-				${'newsletters_query_' . $query_hash} = $data;
+				$this -> set_cache($query_hash, $data);
 				return $data;
 			}
 		}
@@ -776,12 +768,11 @@ class wpmlSubscriber extends wpMailPlugin {
 				$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
 				
 				$query_hash = md5($fieldsquery);
-				global ${'newsletters_query_' . $query_hash};
-				if (!empty(${'newsletters_query_' . $query_hash})) {
-					$fields = ${'newsletters_query_' . $query_hash};
+				if ($ob_fields = $this -> get_cache($query_hash)) {
+					$fields = $ob_fields;
 				} else {
 					$fields = $wpdb -> get_results($fieldsquery);
-					${'newsletters_query_' . $query_hash} = $fields;
+					$this -> set_cache($query_hash, $fields);
 				}
 				
 				if (!empty($fields)) {				
@@ -872,12 +863,11 @@ class wpmlSubscriber extends wpMailPlugin {
 				$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
 				
 				$query_hash = md5($fieldsquery);
-				global ${'newsletters_query_' . $query_hash};
-				if (!empty(${'newsletters_query_' . $query_hash})) {
-					$fields = ${'newsletters_query_' . $query_hash};
+				if ($ob_fields = $this -> get_cache($query_hash)) {
+					$fields = $ob_fields;
 				} else {
 					$fields = $wpdb -> get_results($fieldsquery);
-					${'newsletters_query_' . $query_hash} = $fields;
+					$this -> set_cache($query_hash, $fields);
 				}
 				
 				if (!empty($fields)) {

@@ -125,12 +125,11 @@
 		            		$query = "SELECT `active` FROM " . $wpdb -> prefix . $SubscribersList -> table . " WHERE `subscriber_id` = '" . $aemail -> subscriber_id . "' AND `list_id` = '" . $aemail -> list_id . "' LIMIT 1";
 		            		
 		            		$query_hash = md5($query);
-		            		global ${'newsletters_query_' . $query_hash};
-		            		if (!empty(${'newsletters_query_' . $query_hash})) {
-			            		$active = ${'newsletters_query_' . $query_hash};
+		            		if ($ob_active = $this -> get_cache($query_hash)) {
+			            		$active = $ob_active;
 		            		} else {
 			            		$active = $wpdb -> get_var($query);
-			            		${'newsletters_query_' . $query_hash} = $active;
+			            		$this -> set_cache($query_hash, $active);
 		            		}
 		            		
 		            		$aemail -> active = $active;

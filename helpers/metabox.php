@@ -90,12 +90,11 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$emailsquery = "SELECT COUNT(id) FROM " . $wpdb -> prefix . $Email -> table . "";
 		
 		$query_hash = md5($emailsquery);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$emailstotal = ${'newsletters_query_' . $query_hash};
+		if ($ob_emailstotal = $this -> get_cache($query_hash)) {
+			$emailstotal = $ob_emailstotal;
 		} else {
 			$emailstotal = $wpdb -> get_var($emailsquery);
-			${'newsletters_query_' . $query_hash} = $emailstotal;
+			$this -> set_cache($query_hash, $emailstotal);
 		}
 		
 		$this -> render('metaboxes' . DS . 'welcome' . DS . 'emails', array('total' => $emailstotal), true, 'admin');

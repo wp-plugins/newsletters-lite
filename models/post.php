@@ -60,12 +60,11 @@ class wpmlPost extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `post_id` = '" . $postid . "' LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$post = ${'newsletters_query_' . $query_hash};
+			if ($ob_post = $this -> get_cache($query_hash)) {
+				$post = $ob_post;
 			} else {
 				$post = $wpdb -> get_row($query);
-				${'newsletters_query_' . $query_hash} = $post;
+				$this -> set_cache($query_hash, $post);
 			}
 		
 			if (!empty($post)) {

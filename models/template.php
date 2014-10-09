@@ -92,21 +92,18 @@ class wpmlTemplate extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` WHERE `id` = '" . $template_id . "'";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$template = ${'newsletters_query_' . $query_hash};
-			} else {
-				$template = $wpdb -> get_row($query);
-				${'newsletters_query_' . $query_hash} = $template;
+			if ($ob_template = $this -> get_cache($query_hash)) {
+				return $ob_template;
 			}
 		
-			if (!empty($template)) {
+			if ($template = $wpdb -> get_row($query)) {
 				$template = $this -> init_class($this -> model, $template);
 				
 				if ($assign == true) {
 					$this -> data[$this -> model] = $template;
 				}
 				
+				$this -> set_cache($query_hash, $template);
 				return $template;
 			}
 		}
@@ -120,21 +117,18 @@ class wpmlTemplate extends wpMailPlugin {
 		$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table_name . "` ORDER BY `title` ASC";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$templates = ${'newsletters_query_' . $query_hash};
-		} else {
-			$templates = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $templates;
+		if ($ob_templates = $this -> get_cache($query_hash)) {
+			return $ob_templates;
 		}
 		
-		if (!empty($templates)) {
+		if ($templates = $wpdb -> get_results($query)) {
 			$data = array();
 		
 			foreach ($templates as $template) {
 				$data[] = $this -> init_class('wpmlTemplate', $template);
 			}
 			
+			$this -> set_cache($query_hash, $data);
 			return $data;
 		}
 		

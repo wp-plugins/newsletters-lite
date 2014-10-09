@@ -109,12 +109,14 @@ class wpmlField extends wpMailPlugin {
 			$efieldslistquery = "SELECT * FROM " . $wpdb -> prefix . $FieldsList -> table . " WHERE `special` = 'email'";
 			
 			$query_hash = md5($efieldslistquery);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$oc_efieldslist = ${'newsletters_query_' . $query_hash};
+			if ($ob_efieldslist = $this -> get_cache($query_hash)) {
+				$efieldslist = $ob_efieldslist;
+			} else {
+				$efieldslist = $wpdb -> get_row($efieldslistquery);
+				$this -> set_cache($query_hash, $efieldslist);
 			}
 			
-			if (empty($oc_efieldslist) && !$efieldslist = $wpdb -> get_row($efieldslistquery)) {
+			if (!$efieldslist) {
 				$efieldslistdata = array(
 					'field_id'				=>	$emailfield_id,
 					'list_id'				=>	"0",
@@ -148,12 +150,14 @@ class wpmlField extends wpMailPlugin {
 			$lfieldslistquery = "SELECT * FROM " . $wpdb -> prefix . $FieldsList -> table . " WHERE `special` = 'list'";
 			
 			$query_hash = md5($lfieldslistquery);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$oc_lfieldslist = ${'newsletters_query_' . $query_hash};
+			if ($ob_lfieldslist = $this -> get_cache($query_hash)) {
+				$lfieldslist = $ob_lfieldslist;
+			} else {
+				$lfieldslist = $wpdb -> get_row($lfieldslistquery);
+				$this -> set_cache($query_hash, $lfieldslist);
 			}
 			
-			if (empty($oc_efieldslist) && !$lfieldslist = $wpdb -> get_row($lfieldslistquery)) {
+			if (!$lfieldslist) {
 				$lfieldslistdata = array(
 					'field_id'				=>	$listfield_id,
 					'list_id'				=>	"0",
@@ -173,14 +177,13 @@ class wpmlField extends wpMailPlugin {
 		$emailfieldquery = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE slug = 'email'";
 		
 		$query_hash = md5($emailfieldquery);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_emailfield = $this -> get_cache($query_hash)) {
+			return $ob_emailfield;
 		}
 		
 		if ($emailfield = $wpdb -> get_row($emailfieldquery)) {
 			$emailfield -> error = $emailfield -> errormessage;
-			${'newsletters_query_' . $query_hash} = $emailfield;
+			$this -> set_cache($query_hash, $emailfield);
 			return $emailfield;
 		}
 		
@@ -200,14 +203,13 @@ class wpmlField extends wpMailPlugin {
 		$listfieldquery = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE slug = 'list'";
 		
 		$query_hash = md5($listfieldquery);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_listfield = $this -> get_cache($query_hash)) {
+			return $ob_listfield;
 		}
 		
 		if ($listfield = $wpdb -> get_row($listfieldquery)) {
 			$listfield -> error = $listfield -> errormessage;
-			${'newsletters_query_' . $query_hash} = $listfield;
+			$this -> set_cache($query_hash, $listfield);
 			return $listfield;
 		}
 		
@@ -245,15 +247,14 @@ class wpmlField extends wpMailPlugin {
 		$query .= " LIMIT 1";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_field = $this -> get_cache($query_hash)) {
+			return $ob_field;
 		}
 		
 		if ($field = $wpdb -> get_row($query)) {
 			if (!empty($field)) {
 				$data = $this -> init_class('wpmlField', $field);
-				${'newsletters_query_' . $query_hash} = $data;
+				$this -> set_cache($query_hash, $data);
 				return $data;
 			}
 		}
@@ -634,15 +635,14 @@ class wpmlField extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `id` = '" . $field_id . "' LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				return ${'newsletters_query_' . $query_hash};
+			if ($ob_field = $this -> get_cache($query_hash)) {
+				return $ob_field;
 			}
 		
 			if ($field = $wpdb -> get_row($query)) {
 				$this -> data = (array) $this -> data;
 				$this -> data[$this -> model] = $this -> init_class($this -> model, $field);
-				${'newsletters_query_' . $query_hash} = $this -> data[$this -> model];
+				$this -> set_cache($query_hash, $this -> data[$this -> model]);
 				return $this -> data[$this -> model];
 			}
 		}
@@ -679,9 +679,8 @@ class wpmlField extends wpMailPlugin {
 		$query = "SELECT " . $selectfields . " FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_fields = $this -> get_cache($query_hash)) {
+			return $ob_fields;	
 		}
 		
 		if ($fields = $wpdb -> get_results($query)) {
@@ -692,7 +691,7 @@ class wpmlField extends wpMailPlugin {
 					$data[] = $this -> init_class($this -> model, $field);
 				}
 				
-				${'newsletters_query_' . $query_hash} = $data;
+				$this -> set_cache($query_hash, $data);
 				return $data;
 			}
 		}

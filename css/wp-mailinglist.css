@@ -305,7 +305,8 @@ table tbody tr.arow {
     padding: 2px 5px;
 }
 
-.ui-tooltip {
+.newsletters .ui-tooltip,
+.wpml .ui-tooltip {
     padding: 8px;
     position: absolute;
     z-index: 9999;
@@ -322,7 +323,8 @@ table tbody tr.arow {
     -webkit-border-radius: 4px;
 }
 
-.ui-tooltip-content {
+.newsletters .ui-tooltip-content,
+.wpml .ui-tooltip-content {
 	color: #fff;
 	font-size: 12px;
 	background-color: #000;

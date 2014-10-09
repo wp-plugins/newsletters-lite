@@ -19,6 +19,7 @@ class wpmlMailinglist extends wpMailPlugin {
 		'group_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'doubleopt'			=>	"ENUM('Y','N') NOT NULL DEFAULT 'Y'",
 		'adminemail'		=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'redirect'			=>	"TEXT NOT NULL",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'key'				=>	"PRIMARY KEY (`id`)",
@@ -36,6 +37,7 @@ class wpmlMailinglist extends wpMailPlugin {
 		'group_id'			=> 	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'doubleopt'			=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'Y'"),
 		'adminemail'		=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'redirect'			=>	array("TEXT", "NOT NULL"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'				=>	"PRIMARY KEY (`id`)",					   
@@ -139,12 +141,11 @@ class wpmlMailinglist extends wpMailPlugin {
 		}
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$count = ${'newsletters_query_' . $query_hash};
+		if ($ob_count = $this -> get_cache($query_hash)) {
+			$count = $ob_count;
 		} else {
 			$count = $wpdb -> get_var($query);
-			${'newsletters_query_' . $query_hash} = $count;
+			$this -> set_cache($query_hash, $count);
 		}
 		
 		if (!empty($count)) {
@@ -161,21 +162,18 @@ class wpmlMailinglist extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $mailinglist_id . "' LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$list = ${'newsletters_query_' . $query_hash};
-			} else {
-				$list = $wpdb -> get_row($query);
-				${'newsletters_query_' . $query_hash} = $list;
+			if ($ob_list = $this -> get_cache($query_hash)) {
+				return $ob_list;
 			}
 		
-			if (!empty($list)) {
+			if ($list = $wpdb -> get_row($query)) {
 				$data = $this -> init_class($this -> model, $list);
 				
 				if ($assign == true) {
 					$this -> data = array($this -> model => $data);				
 				}
-					
+				
+				$this -> set_cache($query_hash, $data);
 				return $data;
 			}
 		}
@@ -218,12 +216,11 @@ class wpmlMailinglist extends wpMailPlugin {
         $query = "SELECT `id`, `title`, `paid`, `price`, `interval` FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` " . $privatecond . " ORDER BY `title` ASC";
         
         $query_hash = md5($query);
-        global ${'newsletters_query_' . $query_hash};
-        if (!empty(${'newsletters_query_' . $query_hash})) {
-	        $lists = ${'newsletters_query_' . $query_hash};
+        if ($ob_lists = $this -> get_cache($query_hash)) {
+	        $lists = $ob_lists;
         } else {
 	        $lists = $wpdb -> get_results($query);
-	        ${'newsletters_query_' . $query_hash} = $lists;
+	        $this -> set_cache($query_hash, $lists);
         }
 
 		if (!empty($lists)) {			
@@ -255,12 +252,11 @@ class wpmlMailinglist extends wpMailPlugin {
 			$query = "SELECT * FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $list_id . "'";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$list = ${'newsletters_query_' . $query_hash};
+			if ($ob_list = $this -> get_cache($query_hash)) {
+				$list = $ob_list;
 			} else {
 				$list = $wpdb -> get_row($query);
-				${'newsletters_query_' . $query_hash} = $list;
+				$this -> set_cache($query_hash, $list);
 			}
 		
 			if (!empty($list)) {
@@ -279,12 +275,11 @@ class wpmlMailinglist extends wpMailPlugin {
 			$query = "SELECT `title` FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $id . "' LIMIT 1";
 			
 			$query_hash = md5($query);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {
-				$title = ${'newsletters_query_' . $query_hash};
+			if ($ob_title = $this -> get_cache($query_hash)) {
+				$title = $ob_title;
 			} else {
 				$title = $wpdb -> get_var($query);
-				${'newsletters_query_' . $query_hash} = $title;
+				$this -> set_cache($query_hash, $title);
 			}
 		
 			if (!empty($title)) {
@@ -303,21 +298,18 @@ class wpmlMailinglist extends wpMailPlugin {
 		$query = "SELECT " . $fields . " FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` " . $privatecond . " ORDER BY `title` ASC";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$lists = ${'newsletters_query_' . $query_hash};
-		} else {
-			$lists = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $lists;
+		if ($ob_lists = $this -> get_cache($query_hash)) {
+			return $ob_lists;
 		}
 		
-		if (!empty($lists)) {
+		if ($lists = $wpdb -> get_results($query)) {
 			$data = array();
 		
 			foreach ($lists as $list) {
 				$data[] = $this -> init_class('wpmlMailinglist', $list);
 			}
 			
+			$this -> set_cache($query_hash, $data);
 			return $data;
 		}
 		
@@ -388,8 +380,8 @@ class wpmlMailinglist extends wpMailPlugin {
 				}
 			
 				$query = (!empty($id)) ?
-				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `doubleopt` = '" . $doubleopt . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `maxperinterval` = '" . $maxperinterval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :
-				"INSERT INTO `" . $wpdb -> prefix . "" . $this -> table_name . "` (`title`, `group_id`, `doubleopt`, `adminemail`, `privatelist`, `paid`, `tcoproduct`, `price`, `interval`, `maxperinterval`, `created`, `modified`) VALUES ('" . $title . "', '" . $group_id . "', '" . $doubleopt . "', '" . $adminemail . "', '" . $privatelist . "', '" . $paid . "', '" . $tcoproduct . "', '" . $price . "', '" . $interval . "', '" . $maxperinterval . "', '" . $created . "', '" . $modified . "');";
+				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `doubleopt` = '" . $doubleopt . "', `redirect` = '" . $redirect . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `maxperinterval` = '" . $maxperinterval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :
+				"INSERT INTO `" . $wpdb -> prefix . "" . $this -> table_name . "` (`title`, `group_id`, `doubleopt`, `redirect`, `adminemail`, `privatelist`, `paid`, `tcoproduct`, `price`, `interval`, `maxperinterval`, `created`, `modified`) VALUES ('" . $title . "', '" . $group_id . "', '" . $doubleopt . "', '" . $redirect . "', '" . $adminemail . "', '" . $privatelist . "', '" . $paid . "', '" . $tcoproduct . "', '" . $price . "', '" . $interval . "', '" . $maxperinterval . "', '" . $created . "', '" . $modified . "');";
 				
 				if ($wpdb -> query($query)) {
 					$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;

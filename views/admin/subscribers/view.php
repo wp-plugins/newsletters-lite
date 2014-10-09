@@ -144,7 +144,7 @@
 	</table>
 	
 	<h3 id="emails"><?php _e('Emails', $this -> plugin_name); ?></h3>
-	<?php $this -> render('emails' . DS . 'loop', array('emails' => $emails, 'paginate' => $paginate), true, 'admin'); ?>
+	<?php $this -> render('emails' . DS . 'loop', array('emails' => $emails, 'subscriber' => $subscriber, 'paginate' => $paginate), true, 'admin'); ?>
 	
 	<?php if (!empty($orders)) : ?>
 		<h3 id="orders"><?php _e('Subscription Orders', $this -> plugin_name); ?></h3>

@@ -44,7 +44,7 @@ class wpmlAutoresponder extends wpMailPlugin {
 				$this -> {$dkey} = stripslashes_deep($dval);
 			}
 			
-			if (!empty($data -> recursive) && $data -> recursive == true) {
+			//if (!empty($data -> recursive) && $data -> recursive == true) {
 				/* Mailing List Associations */
 				$this -> mailinglists = array();
 				$Db -> model = $AutorespondersList -> model;
@@ -55,7 +55,7 @@ class wpmlAutoresponder extends wpMailPlugin {
 						$this -> mailinglists[] = $Db -> find(array('id' => $autoresponderslist -> list_id));
 					}
 				}
-			}
+			//}
 		}
 		
 		$Db -> model = $this -> model;

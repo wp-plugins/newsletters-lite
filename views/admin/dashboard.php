@@ -52,12 +52,11 @@ $unsubscribes = $Db -> count();
 $query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "`";
 
 $query_hash = md5($query);
-global ${'newsletters_query_' . $query_hash};
-if (!empty(${'newsletters_query_' . $query_hash})) {
-	$bounces = ${'newsletters_query_' . $query_hash};
+if ($ob_bounces = $this -> get_cache($query_hash)) {
+	$bounces = $ob_bounces;
 } else {
 	$bounces = $wpdb -> get_var($query);
-	${'newsletters_query_' . $query_hash} = $bounces;
+	$this -> set_cache($query_hash, $bounces);
 }
 
 $bounces = (empty($bounces)) ? 0 : $bounces;

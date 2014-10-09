@@ -105,13 +105,12 @@ class wpmlQueue extends wpMailPlugin {
 		}
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			return ${'newsletters_query_' . $query_hash};
+		if ($ob_count = $this -> get_cache($query_hash)) {
+			return $ob_count;
 		}
 		
 		if ($count = $wpdb -> get_var($query)) {
-			${'newsletters_query_' . $query_hash} = $count;
+			$this -> set_cache($query_hash, $count);
 			return $count;
 		}
 		
@@ -124,21 +123,18 @@ class wpmlQueue extends wpMailPlugin {
 		$query = "SELECT * FROM `" . $wpdb -> prefix . "mailqueue` LIMIT " . $limit . "";
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$emails = ${'newsletters_query_' . $query_hash};
-		} else {
-			$emails = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $emails;
+		if ($ob_emails = $this -> get_cache($query_hash)) {
+			return $ob_emails;
 		}
 		
-		if (!empty($emails)) {
+		if ($emails = $wpdb -> get_results($query)) {
 			$data = array();
 		
 			foreach ($emails as $email) {
 				$data[] = $this -> init_class('wpmlQueue', $email);
 			}
 			
+			$this -> set_cache($query_hash, $data);
 			return $data;
 		}
 				
@@ -173,21 +169,18 @@ class wpmlQueue extends wpMailPlugin {
 		if (!empty($limit)) { $query .= " LIMIT " . $limit . ""; }
 		
 		$query_hash = md5($query);
-		global ${'newsletters_query_' . $query_hash};
-		if (!empty(${'newsletters_query_' . $query_hash})) {
-			$emails = ${'newsletters_query_' . $query_hash};
-		} else {
-			$emails = $wpdb -> get_results($query);
-			${'newsletters_query_' . $query_hash} = $emails;
+		if ($ob_emails = $this -> get_cache($query_hash)) {
+			return $ob_emails;
 		}
 		
-		if (!empty($emails)) {
+		if ($emails = $wpdb -> get_results($query)) {
 			$data = array();
 			
 			foreach ($emails as $email) {
 				$data[] = $this -> init_class($this -> model, $email);
 			}
 			
+			$this -> set_cache($query_hash, $data);
 			return $data;
 		}
 		
@@ -222,18 +215,6 @@ class wpmlQueue extends wpMailPlugin {
 				$user_id = $user -> ID;
 				$existsquery = "SELECT `id` FROM `" . $wpdb -> prefix . $this -> table . "` WHERE `user_id` = '" . $user -> ID . "' AND `slug` = '" . $slug . "' LIMIT 1";
 			}
-				
-			/*$query_hash = md5($existsquery);
-			global ${'newsletters_query_' . $query_hash};
-			if (!empty(${'newsletters_query_' . $query_hash})) {			
-				$exists = ${'newsletters_query_' . $query_hash};
-			} else {
-				if ($wpdb -> get_var($existsquery)) {
-					$exists = true;
-				}
-				
-				${'newsletters_query_' . $query_hash} = $exists;
-			}*/
 		
 			if (true || $exists == false) {
 				$subject = addslashes($subject);

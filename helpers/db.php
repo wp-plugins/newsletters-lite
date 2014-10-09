@@ -55,7 +55,7 @@ class wpmlDbHelper extends wpMailPlugin {
 				if (empty($object -> errors)) {
 					switch ($object -> model) {
 						case 'Theme'			:
-							$object -> data -> content = mysql_real_escape_string($object -> data -> content);
+							$object -> data -> content = esc_sql($object -> data -> content);
 							break;
 					}
 					
@@ -375,8 +375,8 @@ class wpmlDbHelper extends wpMailPlugin {
 							$this -> delete_all(array('history_id' => $record_id));
 							
 							/* Remove autoresponders associated */
-							$this -> model = $Autoresponder -> model;
-							$this -> delete_all(array('history_id' => $record_id));
+							//$this -> model = $Autoresponder -> model;
+							//$this -> delete_all(array('history_id' => $record_id));
 							
 							///remove all queued emails
 							$this -> model = $Queue -> model;

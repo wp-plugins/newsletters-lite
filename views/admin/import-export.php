@@ -126,12 +126,11 @@
 					$fieldsquery = "SELECT `id`, `title`, `slug` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 					
 					$query_hash = md5($fieldsquery);
-					global ${'newsletters_query_' . $query_hash};
-					if (!empty(${'newsletters_query_' . $query_hash})) {
-						$fields = ${'newsletters_query_' . $query_hash};
+					if ($ob_fields = $this -> get_cache($query_hash)) {
+						$fields = $ob_fields;
 					} else {
 						$fields = $wpdb -> get_results($fieldsquery);
-						${'newsletters_query_' . $query_hash} = $fields;
+						$this -> set_cache($query_hash, $fields);
 					}
 					
 					?>

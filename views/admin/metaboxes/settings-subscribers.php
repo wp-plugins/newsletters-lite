@@ -217,13 +217,32 @@
 				</td>
 			</tr>
 			<tr>
-				<th><label for="customactivateredirect_N"><?php _e('Custom Activate Redirect', $this -> plugin_name); ?></label></th>
+				<th><label for="customactivateredirect_N"><?php _e('Confirm Redirect', $this -> plugin_name); ?></label></th>
 				<td>
 					<label><input onclick="jQuery('#customactivateredirect_div').show();" <?php echo ($this -> get_option('customactivateredirect') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="customactivateredirect" value="Y" id="customactivateredirect_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
 					<label><input onclick="jQuery('#customactivateredirect_div').hide();" <?php echo ($this -> get_option('customactivateredirect') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="customactivateredirect" value="N" id="customactivateredirect_N" /> <?php _e('No', $this -> plugin_name); ?></label>
-					<span class="howto"><?php _e('Defaults to the subscriber management section.', $this -> plugin_name); ?></span>
+					<span class="howto"><?php _e('Defaults to the subscriber management section. This URL can be configured per mailing list as well.', $this -> plugin_name); ?></span>
 				</td>
 			</tr>
+		</tbody>
+	</table>
+	
+	<div id="customactivateredirect_div" style="display:<?php echo ($this -> get_option('customactivateredirect') == "Y") ? 'block' : 'none'; ?>;">
+		<table class="form-table">
+			<tbody>
+				<tr>
+					<th><label for="activateredirecturl"><?php _e('Confirm Redirect URL', $this -> plugin_name); ?></label></th>
+					<td>
+						<input type="text" class="widefat" name="activateredirecturl" value="<?php echo esc_attr(stripslashes($this -> get_option('activateredirecturl'))); ?>" id="activateredirecturl" />
+						<span class="howto"><?php _e('Link/URL to which subscribers will be redirected upon activation.', $this -> plugin_name); ?></span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<table class="form-table">
+		<tbody>
 			<tr>
 				<th><label for="activateaction_none"><?php _e('Inactive Subscriptions', $this -> plugin_name); ?></label></th>
 				<td>
@@ -263,20 +282,6 @@
 						<?php $activatereminder = $this -> get_option('activatereminder'); ?>
 						<?php echo sprintf(__('Send an activate reminder to inactive subscriptions %s days after subscribing', $this -> plugin_name), '<input type="text" class="widefat" style="width:45px;" name="activatereminder" value="' . esc_attr(stripslashes($activatereminder)) . '" id="activatereminder" />'); ?>
 						<span class="howto"><?php _e('Send a confirmation reminder to a subscriber X days after subscribing.', $this -> plugin_name); ?></span>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	
-	<div id="customactivateredirect_div" style="display:<?php echo ($this -> get_option('customactivateredirect') == "Y") ? 'block' : 'none'; ?>;">
-		<table class="form-table">
-			<tbody>
-				<tr>
-					<th><label for="activateredirecturl"><?php _e('Activate Redirect URL', $this -> plugin_name); ?></label></th>
-					<td>
-						<input type="text" class="widefat" name="activateredirecturl" value="<?php echo esc_attr(stripslashes($this -> get_option('activateredirecturl'))); ?>" id="activateredirecturl" />
-						<span class="howto"><?php _e('Link/URL to which subscribers will be redirected upon activation.', $this -> plugin_name); ?></span>
 					</td>
 				</tr>
 			</tbody>

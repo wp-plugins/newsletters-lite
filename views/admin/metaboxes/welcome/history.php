@@ -39,7 +39,8 @@
 	</table>
 
 	<p class="textright">
-		<a href="?page=<?php echo $this -> sections -> history; ?>" class="button button-secondary button-large"><?php _e('View All Emails', $this -> plugin_name); ?></a>
+		<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> send); ?>" class="button button-secondary button-large"><?php _e('Create Newsletter', $this -> plugin_name); ?></a>
+		<a href="?page=<?php echo $this -> sections -> history; ?>" class="button button-primary button-large"><?php _e('View All Emails', $this -> plugin_name); ?></a>
 	</p>
 <?php else : ?>
 	<p>

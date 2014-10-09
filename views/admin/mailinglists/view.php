@@ -5,9 +5,9 @@
 	
 	<div class="tablenav">
 		<div class="alignleft">
-			<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=offsite&amp;listid=<?php echo $mailinglist -> id; ?>" title="<?php _e('Generate offsite code for this list', $this -> plugin_name); ?>" class="button"><?php _e('Offsite Form', $this -> plugin_name); ?></a>
-			<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=save&amp;id=<?php echo $mailinglist -> id; ?>" title="<?php _e('Change the details of this mailing list', $this -> plugin_name); ?>" class="button"><?php _e('Change', $this -> plugin_name); ?></a>
-			<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=delete&amp;id=<?php echo $mailinglist -> id; ?>" title="<?php _e('Remove this mailing list permanently', $this -> plugin_name); ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this mailing list?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=offsite&amp;listid=<?php echo $mailinglist -> id; ?>" class="button"><?php _e('Offsite Form', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=save&amp;id=<?php echo $mailinglist -> id; ?>" class="button"><?php _e('Edit', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=delete&amp;id=<?php echo $mailinglist -> id; ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this mailing list?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
 		</div>
 	</div>
 	<table class="widefat">
@@ -42,6 +42,12 @@
             	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
             		<th><?php _e('Admin Email', $this -> plugin_name); ?></th>
             		<td><?php echo $mailinglist -> adminemail; ?></td>
+            	</tr>
+            <?php endif; ?>
+            <?php if (!empty($mailinglist -> redirect)) : ?>
+            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+            		<th><?php _e('Confirm Redirect URL', $this -> plugin_name); ?></th>
+            		<td><?php echo '<a href="' . esc_attr(stripslashes($mailinglist -> redirect)) . '" target="_blank">' . $mailinglist -> redirect . '</a>'; ?></td>
             	</tr>
             <?php endif; ?>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
