@@ -110,7 +110,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						
 						<p>
 							<a href="" onclick="addcontentarea(); return false;" class="button button-secondary"><?php _e('Add Content Area', $this -> plugin_name); ?></a>
-							<span id="contentarea_loading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
+							<span id="contentarea_loading" style="display:none;"><span class="newsletters_loading"></span></span>
 						</p>
 						<div id="contentareas">
 							<?php
@@ -246,11 +246,11 @@ jQuery(document).ready(function() {
     jQuery('input:not(:button,:submit),textarea,select').change(function() {
     	<?php $createpreview = $this -> get_option('createpreview'); ?>
     	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
-    		previewrunner();
+    		//previewrunner();
     	<?php endif; ?>
     	<?php $createspamscore = $this -> get_option('createspamscore'); ?>
     	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>
-    		spamscorerunner();
+    		//spamscorerunner();
     	<?php endif; ?>
     
         window.onbeforeunload = function () {

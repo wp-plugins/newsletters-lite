@@ -236,7 +236,7 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 					<a id="dkimwizard" href="" onclick="dkimwizard({domain:jQuery('#dkim_domain').val(), selector:jQuery('#dkim_selector').val()}); return false;" class="button button-primary"><?php _e('Run DKIM Wizard &raquo;', $this -> plugin_name); ?></a>
 				</span>
 				
-				<span id="testsettingsloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" border="0" style="border:none;" /></span>
+				<span id="testsettingsloading" style="display:none;"><span class="newsletters_loading"></span></span>
 			</td>
 		</tr>
 	</tbody>

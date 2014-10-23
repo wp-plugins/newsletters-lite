@@ -292,7 +292,7 @@ global $wpdb, $Mailinglist, $Template;
                                     	<?php $select = wp_dropdown_categories(array('show_option_none' => __('- Select Category -', $this -> plugin_name), 'echo' => 0, 'name' => "posts_single_category", 'id' => "posts_category_menu", 'hide_empty' => 0, 'show_count' => 1)); ?>
                                         <?php $select = preg_replace("#<select([^>]*)>#", '<select$1 onchange="posts_changeCategory();" style="width:210px;">', $select); ?>
                                         <?php echo $select; ?>
-                                        <span id="posts_multiple_message" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
+                                        <span id="posts_multiple_message" style="display:none;"><span class="newsletters_loading"></span></span>
                                     </td>
                                 </tr>
                                 <?php if ($post_types = $this -> get_custom_post_types()) : ?>

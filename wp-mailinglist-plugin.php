@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.1.1';
+		var $version = '4.4.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -104,7 +104,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			global $wpdb;
 			$wpdb -> query("SET sql_mode = '';");
-			$wpdb -> query("SET innodb_lock_wait_timeout = 360;");
+			//$wpdb -> query("SET innodb_lock_wait_timeout = 360;");
 			
 			$debugging = get_option('tridebugging');
 			$this -> debugging = (empty($debugging)) ? $this -> debugging : true;
@@ -581,22 +581,22 @@ if (!class_exists('wpMailPlugin')) {
 					
 					/* Unsubscribes */
 					$g -> set_data($unsubscribes_data);
-					$g -> line_hollow(3, 5, '#e66f00', 'Unsubscribes', 10);
+					$g -> line_hollow(3, 5, '#e66f00', __('Unsubscribes', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');		
 					
 					/* Subscribers */
 					$g -> set_data($subscribers_data);
-					$g -> line_hollow(3, 5, '#629632', 'Subscribers', 10);
+					$g -> line_hollow(3, 5, '#629632', __('Subscribers', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					/* Bounced Emails */
 					$g -> set_data($bounces_data);
-					$g -> line_hollow(3, 5, '#CC0000', 'Bounced Emails', 10);
+					$g -> line_hollow(3, 5, '#CC0000', __('Bounced Emails', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					/* Emails Sent */
 					$g -> set_data($emails_data);
-					$g -> line_hollow(3, 5, '#5FB7DD', 'Emails Sent', 10);
+					$g -> line_hollow(3, 5, '#5FB7DD', __('Emails Sent', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					$g -> attach_to_y_right_axis(1);
@@ -730,22 +730,22 @@ if (!class_exists('wpMailPlugin')) {
 					
 					/* Unsubscribes */
 					$g -> set_data($unsubscribes_data);
-					$g -> line_hollow(3, 5, '#e66f00', 'Unsubscribes', 10);
+					$g -> line_hollow(3, 5, '#e66f00', __('Unsubscribes', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');		
 					
 					/* Subscribers */
 					$g -> set_data($subscribers_data);
-					$g -> line_hollow(3, 5, '#629632', 'Subscribers', 10);
+					$g -> line_hollow(3, 5, '#629632', __('Subscribers', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					/* Bounced Emails */
 					$g -> set_data($bounces_data);
-					$g -> line_hollow(3, 5, '#CC0000', 'Bounced Emails', 10);
+					$g -> line_hollow(3, 5, '#CC0000', __('Bounced Emails', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					/* Emails Sent */
 					$g -> set_data($emails_data);
-					$g -> line_hollow(3, 5, '#5FB7DD', 'Emails Sent', 10);
+					$g -> line_hollow(3, 5, '#5FB7DD', __('Emails Sent', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					$g -> attach_to_y_right_axis(1);
@@ -879,22 +879,22 @@ if (!class_exists('wpMailPlugin')) {
 					
 					/* Unsubscribes */
 					$g -> set_data($unsubscribes_data);
-					$g -> line_hollow(3, 5, '#e66f00', 'Unsubscribes', 10);
+					$g -> line_hollow(3, 5, '#e66f00', __('Unsubscribes', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');		
 					
 					/* Subscribers */
 					$g -> set_data($subscribers_data);
-					$g -> line_hollow(3, 5, '#629632', 'Subscribers', 10);
+					$g -> line_hollow(3, 5, '#629632', __('Subscribers', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					/* Bounced Emails */
 					$g -> set_data($bounces_data);
-					$g -> line_hollow(3, 5, '#CC0000', 'Bounced Emails', 10);
+					$g -> line_hollow(3, 5, '#CC0000', __('Bounced Emails', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					/* Emails Sent */
 					$g -> set_data($emails_data);
-					$g -> line_hollow(3, 5, '#5FB7DD', 'Emails Sent', 10);
+					$g -> line_hollow(3, 5, '#5FB7DD', __('Emails Sent', $this -> plugin_name), 10);
 					$g -> set_tool_tip('#x_label#<br>#key#: #val#');
 					
 					$g -> attach_to_y_right_axis(1);
@@ -2444,24 +2444,29 @@ if (!class_exists('wpMailPlugin')) {
 							$subscriber = $wpdb -> get_row($subscriber_query);
 									
 							if (!empty($subscriber)) {
-								if (empty($subscriber -> mandatory) || $subscriber -> mandatory == "N") {
-									/* Management Auth */
-									if (empty($data['cookieauth'])) {
-										$Auth -> set_emailcookie($subscriber -> email);
-										$subscriberauth = $Auth -> gen_subscriberauth();
-										$Db -> model = $Subscriber -> model;
-										$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
-										$Auth -> set_cookie($subscriberauth);
-									}
-								
-									$subscriber -> mailinglists = $mailinglists;
+								if ($subscriber -> authkey == $_GET['authkey']) {
+									if (empty($subscriber -> mandatory) || $subscriber -> mandatory == "N") {
+										/* Management Auth */
+										if (empty($data['cookieauth'])) {
+											$Auth -> set_emailcookie($subscriber -> email);
+											$subscriberauth = $Auth -> gen_subscriberauth();
+											$Db -> model = $Subscriber -> model;
+											$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
+											$Auth -> set_cookie($subscriberauth);
+										}
 									
-									if (empty($subscriber -> mailinglists)) {
-										$errors[] = __('This email was not sent to any lists.', $this -> plugin_name);
+										$subscriber -> mailinglists = $mailinglists;
+										
+										if (empty($subscriber -> mailinglists)) {
+											$errors[] = __('This email was not sent to any lists.', $this -> plugin_name);
+										}
+									} else {
+										$dorender = false;
+										$errors[] = __('You are a mandatory subscriber and cannot unsubscribe', $this -> plugin_name);
 									}
 								} else {
 									$dorender = false;
-									$errors[] = __('You are a mandatory subscriber and cannot unsubscribe', $this -> plugin_name);
+									$errors[] = __('You are not authorised to use this link', $this -> plugin_name);
 								}
 							} else {
 								$errors[] = __('Your subscriber record cannot be read, please try again.', $this -> plugin_name);
@@ -3216,6 +3221,8 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function enqueue_scripts() {	
+			global $wp_locale, $Html;
+			
 			//enqueue jQuery JS Library
 			if (apply_filters('newsletters_enqueuescript_jquery', true)) { wp_enqueue_script('jquery'); }
 			if (apply_filters('newsletters_enqueuescript_jqueryuicore', true)) { wp_enqueue_script('jquery-ui-core'); }
@@ -3224,7 +3231,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (is_admin()) {	
 				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
 					
-				if (preg_match("/(widgets\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
+				if (preg_match("/(widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {					
 					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 				}
 				
@@ -3328,6 +3335,27 @@ if (!class_exists('wpMailPlugin')) {
 				wp_enqueue_script('jquery-ui-droppable');
 				wp_enqueue_script('jquery-ui-datepicker');
 				wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
+				
+				//add our instantiator js
+			    wp_enqueue_script('datepicker-i18n', $this -> render_url('js/datepicker-i18n.js', 'admin', false), array('jquery-ui-datepicker'));
+			 
+			    //localize our js
+			    $aryArgs = array(
+			        'closeText'         => __( 'Done', $this -> plugin_name ),
+			        'currentText'       => __( 'Today', $this -> plugin_name),
+			        'monthNames'        => $Html -> strip_array_indices( $wp_locale->month ),
+			        'monthNamesShort'   => $Html -> strip_array_indices( $wp_locale->month_abbrev ),
+			        'monthStatus'       => __( 'Show a different month', $this -> plugin_name),
+			        'dayNames'          => $Html -> strip_array_indices( $wp_locale->weekday ),
+			        'dayNamesShort'     => $Html -> strip_array_indices( $wp_locale->weekday_abbrev ),
+			        'dayNamesMin'       => $Html -> strip_array_indices( $wp_locale->weekday_initial ),
+			        'dateFormat'        => $Html -> date_format_php_to_js( get_option( 'date_format' ) ),
+			        'firstDay'          => get_option( 'start_of_week' ),
+			        'isRTL'             => $wp_locale->is_rtl,
+			    );
+			 
+			    // Pass the localized array to the enqueued JS
+			    wp_localize_script('datepicker-i18n', 'objectL10n', $aryArgs);
 				
 			/* Front-End Scripts */
 			} else {									
@@ -4296,16 +4324,17 @@ if (!class_exists('wpMailPlugin')) {
 	        return $customfields;
 	    }
 		
-		function gen_auth($subscriber_id = null, $mailinglist_id = null) {
-			$authkey = md5(rand(1, 999));
-			
+		function gen_auth($subscriber_id = null, $mailinglist_id = null) {			
 			if (!empty($subscriber_id)) {
-				global $Db;
+				global $Db, $Subscriber, $SubscribersList;
+				$Db -> model = $Subscriber -> model;
+				$subscriber = $Db -> find(array('id' => $subscriber_id));
+				$authkey = (empty($subscriber -> authkey)) ? md5(rand(1, 999)) : $subscriber -> authkey;
 				
 				if (!empty($mailinglist_id)) {
-					$Db -> model = 'SubscribersList';
+					$Db -> model = $SubscribersList -> model;
 					if ($subscriberslist = $Db -> find(array('subscriber_id' => $subscriber_id, 'list_id' => $mailinglist_id))) {
-						if ($subscriberslist -> authinprog == "Y" || !empty($subscriberslist -> authkey)) {
+						if ($subscriberslist -> authinprog == "Y" && !empty($subscriberslist -> authkey) && $subscriberslist -> authkey == $authkey) {
 							$authkey = $subscriberslist -> authkey;
 						} else {
 							$Db -> save_field('authkey', $authkey, array('list_id' => $mailinglist_id, 'subscriber_id' => $subscriber_id));
@@ -4313,9 +4342,8 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 				} else {
-					$Db -> model = 'Subscriber';
-					if ($subscriber = $Db -> find(array('id' => $subscriber_id))) {
-						if ($subscriber -> authinprog == "Y" || !empty($subscriber -> authkey)) {
+					if (!empty($subscriber)) {
+						if ($subscriber -> authinprog == "Y" && !empty($subscriber -> authkey)) {
 							$authkey = $subscriber -> authkey;
 						} else {
 							$Db -> save_field('authkey', $authkey, array('id' => $subscriber_id));
@@ -4567,7 +4595,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($eunique)) {
 				if ($this -> get_option('tracking') == "Y") {
-					$tracking = '<img src="' . home_url() . '/?' . $this -> pre . 'method=track&id=' . $eunique . '" />';
+					$tracking = '<img class="newsletters-tracking" src="' . home_url() . '/?' . $this -> pre . 'method=track&id=' . $eunique . '" />';
 				}	
 			}
 			
@@ -5898,9 +5926,16 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.4.1.1") < 0) {
+				if (version_compare($cur_version, "4.4.2") < 0) {
+					global $wpdb, $FieldsList;
+					
 					$this -> update_options();
-					$version = '4.4.1.1';
+					
+					// Set the 'rel_id' field on fieldslists table as AUTO_INCREMENT
+					$query = "ALTER TABLE " . $wpdb -> prefix . $FieldsList -> table . " CHANGE `rel_id` `rel_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY";
+					$wpdb -> query($query);
+					
+					$version = '4.4.2';
 				}
 			
 				//the current version is older.
@@ -6565,6 +6600,10 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function add_action($action = null, $function = null, $priority = 10, $params = 1) {
 			add_action($action, array(&$this, $function == '' ? $action : $function), $priority, $params);
+		}
+		
+		function remove_action($action = null, $function = null) {
+			remove_action($action, array($this, $function));
 		}
 		
 		function add_filter($filter = null, $function = null, $priority = 10, $params = 1) {

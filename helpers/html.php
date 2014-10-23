@@ -8,6 +8,51 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return true;
 	}
 	
+	/**
+	 * Format array for the datepicker
+	 *
+	 * WordPress stores the locale information in an array with a alphanumeric index, and
+	 * the datepicker wants a numerical index. This function replaces the index with a number
+	 */
+	function strip_array_indices( $ArrayToStrip ) {
+	    foreach( $ArrayToStrip as $objArrayItem) {
+	        $NewArray[] =  $objArrayItem;
+	    }
+	 
+	    return( $NewArray );
+	}
+	 
+	/**
+	 * Convert the php date format string to a js date format
+	 */
+	function date_format_php_to_js( $sFormat ) {
+	    switch( $sFormat ) {
+	        //Predefined WP date formats
+	        case 'F j, Y':
+	            return( 'MM dd, yy' );
+	            break;
+	        case 'Y/m/d':
+	            return( 'yy/mm/dd' );
+	            break;
+	        case 'm/d/Y':
+	            return( 'mm/dd/yy' );
+	            break;
+	        case 'd/m/Y':
+	            return( 'dd/mm/yy' );
+	            break;
+	     }
+	}
+	
+	function is_json($string = null) {
+		if (!empty($string)) {
+			if (is_string($string) && is_object(json_decode($string))) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	function hidden_type_operator($key = null) {
 		$operator = false;
 	

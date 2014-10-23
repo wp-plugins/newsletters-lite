@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.1.1
+Version: 4.4.2
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -1910,19 +1910,23 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function save_post($post_id = null, $post = null) {	
-			global $wpdb, $post, $Db, $Html, $Post, $Mailinglist, $History, $Queue, $Subscriber, $SubscribersList;
+			global $wpdb, $post, $Db, $Html, $Shortcode, $Post, $Mailinglist, $History, $Queue, $Subscriber, $SubscribersList;
 			
-			if (empty($post)) {
-				$post = get_post($post_id);
+			// Don't do anything if it's a revision
+			if (wp_is_post_revision($post_id)) {
+				return;
 			}
 			
-			$post_status = (!empty($_POST['post_status'])) ? $_POST['post_status'] : $post -> post_status;
+			// Get the $post by ID
+			$post = get_post($post_id);
+			$post_status = $post -> post_status;
 		
 			if (!empty($post_id) && !empty($post)) {
 				switch ($post_status) {
 					/* Future scheduled post */
-					case 'future'					:						
-						if (!empty($_POST[$this -> pre . 'mailinglists'])) {					
+					case 'future'					:											
+						if (!empty($_POST[$this -> pre . 'mailinglists'])) {	
+							update_post_meta($post_id, 'newsletters_scheduled', true);				
 							update_post_meta($post_id, $this -> pre . 'mailinglists', $_POST[$this -> pre . 'mailinglists']);
 							if (!empty($_POST[$this -> pre . 'theme_id'])) { update_post_meta($post_id, $this -> pre . 'theme_id', $_POST[$this -> pre . 'theme_id']); }
 							if (!empty($_POST[$this -> pre . 'qtranslate_language'])) { update_post_meta($post_id, $this -> pre . 'qtranslate_language', $_POST[$this -> pre . 'qtranslate_language']); }
@@ -1931,6 +1935,12 @@ if (!class_exists('wpMail')) {
 						break;
 					/* Post being published */
 					case 'publish'					:
+						global $shortcode_post, $shortcode_post_language, $wpml_target;
+						$shortcode_post = $post;
+						$shortcode_post_language = $_POST['wpmlqtranslate_language'];
+						add_filter('excerpt_length', array($Shortcode, 'excerpt_length'));
+						add_filter('excerpt_more', array($Shortcode, 'excerpt_more'));
+					
 						/* Is this post being published immediately? */
 						if (!empty($_POST[$this -> pre . 'mailinglists'])) {
 							$mailinglists = $_POST[$this -> pre . 'mailinglists'];
@@ -1944,6 +1954,7 @@ if (!class_exists('wpMail')) {
 							$qtranslate_language = get_post_meta($post_id, $this -> pre . 'qtranslate_language', true);
 							$sendonpublishef = get_post_meta($post_id, $this -> pre . 'sendonpublishef', true);
 							
+							delete_post_meta($post_id, 'newsletters_scheduled');
 							delete_post_meta($post_id, $this -> pre . 'mailinglists');
 							delete_post_meta($post_id, $this -> pre . 'theme_id');
 							delete_post_meta($post_id, $this -> pre . 'qtranslate_language');
@@ -1982,7 +1993,7 @@ if (!class_exists('wpMail')) {
 										}
 										
 										$post_content .= get_the_excerpt();
-										$post_content .= ' [<a href="' . get_permalink($post -> ID) . '" title="' . $post -> post_title . '">' . __('read more', $this -> plugin_name) . '</a>]';
+										//$post_content .= ' [<a href="' . get_permalink($post -> ID) . '" title="' . $post -> post_title . '">' . __('read more', $this -> plugin_name) . '</a>]';
 										$post_content .= '<hr style="clear:both; display:block; height:1px; width:100%;" />';
 									}
 									
@@ -3214,6 +3225,12 @@ if (!class_exists('wpMail')) {
 					$this -> redirect('?page=' . $this -> sections -> autoresponders, $msg_type, $message);
 					break;
 				default						:
+				
+					$dojoin = false;
+					$conditions_and = array();
+					$autoresponders_table = $wpdb -> prefix . $Autoresponder -> table;
+					$autoresponderslist_table = $wpdb -> prefix . $AutorespondersList -> table;
+				
 					$perpage = (isset($_COOKIE[$this -> pre . 'autorespondersperpage'])) ? $_COOKIE[$this -> pre . 'autorespondersperpage'] : 15;
 					$searchterm = (!empty($_GET[$this -> pre . 'searchterm'])) ? $_GET[$this -> pre . 'searchterm'] : false;
 					$searchterm = (!empty($_POST['searchterm'])) ? $_POST['searchterm'] : $searchterm;
@@ -3227,6 +3244,42 @@ if (!class_exists('wpMail')) {
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
 					
+					$sections = $this -> sections -> autoresponders;
+					
+					if (!empty($_GET['filter'])) {
+						$sections .= '&filter=1';
+						
+						if (!empty($_GET['list'])) {
+							switch ($_GET['list']) {
+								case 'all'					:
+									$dojoin = false;
+									break;
+								case 'none'					:
+									$dojoin = false;
+									$conditions_and[$autoresponders_table . '.id'] = "NOT IN (SELECT autoresponder_id FROM " . $autoresponderslist_table . ")";
+									break;
+								default						:
+									$dojoin = true;
+									$conditions_and[$autoresponderslist_table . '.list_id'] = $_GET['list'];
+									break;
+							}
+						}
+						
+						if (!empty($_GET['status'])) {
+							switch ($_GET['status']) {
+								case 'active'				:
+									$conditions_and[$autoresponders_table . '.status'] = 'active';
+									break;
+								case 'inactive'				:
+									$conditions_and[$autoresponders_table . '.status'] = 'inactive';
+									break;
+								default 					:
+									//do nothing, all statuses
+									break;
+							}
+						}
+					}
+					
 					$data = array();
 					if (!empty($_GET['showall'])) {
 						$Db -> model = $Autoresponder -> model;
@@ -3234,11 +3287,17 @@ if (!class_exists('wpMail')) {
 						$data[$Autoresponder -> model] = $autoresponders;
 						$data['Paginate'] = false;
 					} else {
-						$data = $this -> paginate($Autoresponder -> model, false, $this -> sections -> autoresponders, $conditions, $searchterm, $perpage, $order);
+						if ($dojoin) {
+							$data = $this -> paginate($AutorespondersList -> model, false, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$autoresponders = $data[$AutorespondersList -> model];
+						} else {
+							$data = $this -> paginate($Autoresponder -> model, false, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$autoresponders = $data[$Autoresponder -> model];	
+						}
 					}
 					
 					$this -> render_message(__('Please note that autoresponder emails are only sent to Active subscriptions. Once a subscription is Active, the autoresponder email will queue.', $this -> plugin_name));
-					$this -> render('autoresponders' . DS . 'index', array('autoresponders' => $data[$Autoresponder -> model], 'paginate' => $data['Paginate']), true, 'admin');
+					$this -> render('autoresponders' . DS . 'index', array('autoresponders' => $autoresponders, 'paginate' => $data['Paginate']), true, 'admin');
 					break;	
 			}
 		}
@@ -5110,7 +5169,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_history() {
-			global $wpdb, $Db, $Html, $History, $Email;
+			global $wpdb, $Db, $Html, $History, $HistoriesList, $Email;
 			$Db -> model = $History -> model;
 		
 			switch ($_GET['method']) {
@@ -5420,6 +5479,10 @@ if (!class_exists('wpMail')) {
 					$this -> redirect("?page=" . $this -> sections -> history . "&method=view&id=" . $_GET['history_id'], $msg_type, $message);
 					break;
 				default					:
+					$sections = $this -> sections -> history;
+					$history_table = $wpdb -> prefix . $History -> table;
+					$historieslist_table = $wpdb -> prefix . $HistoriesList -> table;
+					$conditions_and = array();
 					$perpage = (isset($_COOKIE[$this -> pre . 'historiesperpage'])) ? $_COOKIE[$this -> pre . 'historiesperpage'] : 15;
 					$searchterm = (!empty($_GET[$this -> pre . 'searchterm'])) ? $_GET[$this -> pre . 'searchterm'] : false;
 					$searchterm = (!empty($_POST['searchterm'])) ? $_POST['searchterm'] : $searchterm;
@@ -5438,6 +5501,48 @@ if (!class_exists('wpMail')) {
 					$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
 					$order = array($orderfield, $orderdirection);
 					
+					$dojoin = false;
+					
+					if (!empty($_GET['filter'])) {
+						$sections .= '&filter=1';
+						
+						if (!empty($_GET['list'])) {
+							switch ($_GET['list']) {
+								case 'all'				:
+									$dojoin = false;
+									break;
+								case 'none'				:
+									$dojoin = false;
+									$conditions_and[$history_table . '.id'] = "NOT IN (SELECT history_id FROM " . $historieslist_table . ")";
+									break;
+								default 				:
+									$dojoin = true;
+									$conditions_and[$historieslist_table . '.list_id'] = $_GET['list'];
+									break;
+							}
+						}
+						
+						if (!empty($_GET['sent'])) {
+							switch ($_GET['sent']) {
+								case 'all'				:
+								
+									break;
+								case 'draft'			:
+									$conditions_and[$history_table . '.sent'] = '0';
+									break;
+								case 'sent'				:
+									$conditions_and[$history_table . '.sent'] = 'LE 1';
+									break;
+							}
+						}
+						
+						if (!empty($_GET['theme_id'])) {
+							if ($_GET['theme_id'] != "all") {
+								$conditions_and[$history_table . '.theme_id'] = $_GET['theme_id'];
+							}					
+						}
+					}
+					
 					$conditions = apply_filters($this -> pre . '_admin_history_conditions', $conditions);
 						
 					if (!empty($_GET['showall'])) {
@@ -5446,10 +5551,16 @@ if (!class_exists('wpMail')) {
 						$data[$History -> model] = $histories;
 						$data['Paginate'] = false;
 					} else {	
-						$data = $this -> paginate($History -> model, null, $this -> sections -> history, $conditions, $searchterm, $perpage, $order);
+						if ($dojoin) {
+							$data = $this -> paginate($HistoriesList -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$histories = $data[$HistoriesList -> model];	
+						} else {
+							$data = $this -> paginate($History -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$histories = $data[$History -> model];
+						}
 					}
 					
-					$this -> render_admin('history' . DS . 'index', array('histories' => $data[$History -> model], 'paginate' => $data['Paginate']));			
+					$this -> render_admin('history' . DS . 'index', array('histories' => $histories, 'paginate' => $data['Paginate']));			
 					break;
 			}
 		}
@@ -5924,70 +6035,6 @@ if (!class_exists('wpMail')) {
 					
 					$this -> redirect($this -> referer, $msg_type, $message);
 					break;
-				case 'runschedule'		:
-					if (!empty($_GET['hook'])) {
-						if (preg_match("/(newsletters)/si", $_GET['hook'])) {
-							$hook = $_GET['hook'];
-						} else {
-							$hook = $this -> pre . '_' . $_GET['hook'];
-						}
-					
-						do_action($hook);	
-											
-						$msg_type = 'message';
-						$message = __('Task has been executed successfully!', $this -> plugin_name);
-					} else {
-						$msg_type = 'error';
-						$message = __('No task was specified, please try again.', $this -> plugin_name);	
-					}
-					
-					$this -> redirect($this -> referer, $msg_type, $message);
-					break;
-				case 'reschedule'		:
-					if (!empty($_GET['hook'])) {
-						switch ($_GET['hook']) {
-							case 'cronhook'			:
-								$this -> scheduling();
-								break;
-							case 'pophook'			:
-								$this -> pop_scheduling();
-								break;
-							case 'latestposts'		:
-								$this -> latestposts_scheduling();
-								break;
-							case 'autoresponders'	:
-								$this -> autoresponder_scheduling();
-								break;
-							case 'captchacleanup'	:
-								$this -> captchacleanup_scheduling();
-								break;
-							case 'importusers'		:
-								$this -> importusers_scheduling();
-								break;
-						}
-						
-						$msg_type = 'message';
-						$message = __('Task has been rescheduled successfully!', $this -> plugin_name);
-					} else {
-						$msg_type = 'error';
-						$message = __('No task was specified, please try again.', $this -> plugin_name);
-					}
-					
-					$this -> redirect($this -> referer, $msg_type, $message);
-					break;
-				case 'clearschedule'	:
-					if (!empty($_GET['hook'])) {
-						wp_clear_scheduled_hook($this -> pre . '_' . $_GET['hook']);
-						
-						$msg_type = 'message';
-						$message = __('Task has been unscheduled, remember to reschedule as needed.', $this -> plugin_name);
-					} else {
-						$msg_type = 'error';
-						$message = __('No task was specified, please try again.', $this -> plugin_name);
-					}
-					
-					$this -> redirect($this -> referer, $msg_type, $message);
-					break;
 				case 'reset'			:
 					$query = "TRUNCATE TABLE `" . $wpdb -> prefix . "" . $wpmlCountry -> table . "`";
 					$wpdb -> query($query);
@@ -6242,7 +6289,75 @@ if (!class_exists('wpMail')) {
 		
 		function admin_settings_tasks() {
 			
-			$this -> render('settings-cronschedules', false, true, 'admin');
+			switch ($_GET['method']) {
+				case 'runschedule'		:
+					if (!empty($_GET['hook'])) {
+						if (preg_match("/(newsletters)/si", $_GET['hook'])) {
+							$hook = $_GET['hook'];
+						} else {
+							$hook = $this -> pre . '_' . $_GET['hook'];
+						}
+					
+						do_action($hook);	
+											
+						$msg_type = 'message';
+						$message = __('Task has been executed successfully!', $this -> plugin_name);
+					} else {
+						$msg_type = 'error';
+						$message = __('No task was specified, please try again.', $this -> plugin_name);	
+					}
+					
+					$this -> redirect($this -> referer, $msg_type, $message);
+					break;
+				case 'reschedule'		:
+					if (!empty($_GET['hook'])) {
+						switch ($_GET['hook']) {
+							case 'cronhook'			:
+								$this -> scheduling();
+								break;
+							case 'pophook'			:
+								$this -> pop_scheduling();
+								break;
+							case 'latestposts'		:
+								$this -> latestposts_scheduling();
+								break;
+							case 'autoresponders'	:
+								$this -> autoresponder_scheduling();
+								break;
+							case 'captchacleanup'	:
+								$this -> captchacleanup_scheduling();
+								break;
+							case 'importusers'		:
+								$this -> importusers_scheduling();
+								break;
+						}
+						
+						$msg_type = 'message';
+						$message = __('Task has been rescheduled successfully!', $this -> plugin_name);
+					} else {
+						$msg_type = 'error';
+						$message = __('No task was specified, please try again.', $this -> plugin_name);
+					}
+					
+					$this -> redirect($this -> referer, $msg_type, $message);
+					break;
+				case 'clearschedule'	:
+					if (!empty($_GET['hook'])) {
+						wp_clear_scheduled_hook($this -> pre . '_' . $_GET['hook']);
+						
+						$msg_type = 'message';
+						$message = __('Task has been unscheduled, remember to reschedule as needed.', $this -> plugin_name);
+					} else {
+						$msg_type = 'error';
+						$message = __('No task was specified, please try again.', $this -> plugin_name);
+					}
+					
+					$this -> redirect($this -> referer, $msg_type, $message);
+					break;
+				default					:
+					$this -> render('settings-cronschedules', false, true, 'admin');	
+					break;
+			}
 		}
 		
 		function admin_settings_api() {

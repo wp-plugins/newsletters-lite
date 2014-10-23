@@ -19,3 +19,14 @@ jQuery(document).ready(function() { jQuery('.<?php echo $this -> pre; ?>button')
 	<?php echo stripslashes(get_option('wpmlcustomcsscode')); ?>
 <?php endif; ?>
 </style>
+
+<!--[if lt IE 10]>
+<style type="text/css">
+.newsletters_loading {
+	width: 16px;
+	height: 16px;
+	background: transparent url('<?php echo $this-> render_url('images/loading.gif', 'default', false); ?>') no-repeat;
+	display: inline-block;
+}
+</style>
+<![endif]-->

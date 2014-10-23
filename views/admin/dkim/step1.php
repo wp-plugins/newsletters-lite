@@ -21,7 +21,7 @@
 		<p class="submit">
 			<input onclick="jQuery.colorbox.close();" class="button button-secondary" type="button" name="close" value="<?php _e('Close', $this -> plugin_name); ?>" />
 			<input id="dkimbutton" class="button button-primary" type="submit" name="continue" value="<?php _e('Great, next step &raquo;', $this -> plugin_name); ?>" />
-			<span id="dkimloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" border="0" style="border:none;" /></span>
+			<span id="dkimloading" style="display:none;"><span class="newsletters_loading"></span></span>
 		</p>
 	</form>
 </div>

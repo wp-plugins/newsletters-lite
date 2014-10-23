@@ -322,7 +322,7 @@ function update_subscribers() {
 		data['condquery'] = condqueryarray;
 	}
 	
-	jQuery("#subscriberscount").html('<p><img src="<?php echo $this -> url(); ?>/images/loading.gif" /> <?php echo addslashes(__('loading subscriber count...', $this -> plugin_name)); ?></p>');
+	jQuery("#subscriberscount").html('<p><span class="newsletters_loading"></span> <?php echo addslashes(__('loading subscriber count...', $this -> plugin_name)); ?></p>');
 		
 	srequest = jQuery.post(ajaxurl, data, function(response) {
 		if (response == "0") {

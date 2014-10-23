@@ -9,7 +9,7 @@
                         	<option <?php echo ($this -> get_option('theme_folder') == $themefolder) ? 'selected="selected"' : ''; ?> name="<?php echo $themefolder; ?>"><?php echo $themefolder; ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <span class="howto"><?php _e('Select the folder inside "' . $this -> plugin_name . '/views/" to render template files from. eg. "default"', $this -> plugin_name); ?>
+                    <span class="howto"><?php echo sprintf(__('Select the folder inside "%s" to render template files from. eg. "default"', $this -> plugin_name), $this -> plugin_name . '/views/'); ?></span>
                 <?php else : ?>
                 	<p class="<?php echo $this -> pre; ?>error"><?php _e('No theme folders could be found inside the "' . $this -> plugin_name . '/views/" folder.', $this -> plugin_name); ?>
                 <?php endif; ?>

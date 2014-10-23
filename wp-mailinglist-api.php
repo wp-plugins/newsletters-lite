@@ -14,9 +14,15 @@ class wpMailAPI extends wpMail {
 	}
 	
 	function api_init() {		
-		global $wpdb, $Db, $Subscriber;
+		global $wpdb, $Db, $Html, $Subscriber;
 		$api_key = $this -> get_option('api_key');
-		$data = json_decode(file_get_contents('php://input'), false);
+		$input = file_get_contents('php://input');
+		
+		if ($Html -> is_json($input)) {
+			$data = json_decode($input, false);
+		} elseif (!empty($_REQUEST)) {
+			$data = (object) $_REQUEST;
+		}
 		
 		if (!empty($data)) {
 			if (!empty($data -> api_key) && $data -> api_key == $api_key) {

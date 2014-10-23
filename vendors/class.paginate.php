@@ -60,7 +60,7 @@ class wpmlpaginate extends wpMailPlugin {
 	}
 	
 	function start_paging($page = null) {
-		global $wpdb, $Html, $Subscriber, $SubscribersList;
+		global $wpdb, $Html, $Subscriber, $SubscribersList, $History, $HistoriesList, $Autoresponder, $AutorespondersList;
 	
 		$page = (empty($page)) ? 1 : $page;
 	
@@ -78,6 +78,14 @@ class wpmlpaginate extends wpMailPlugin {
 			case 'SubscribersList'				:
 				$query .= " LEFT JOIN " . $wpdb -> prefix . $Subscriber -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . $Subscriber -> table . ".id";	
 				$countquery .= " LEFT JOIN " . $wpdb -> prefix . $Subscriber -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . $Subscriber -> table . ".id";	
+				break;
+			case 'HistoriesList'				:
+				$query .= " LEFT JOIN " . $wpdb -> prefix . $History -> table . " ON " . $wpdb -> prefix . $HistoriesList -> table . ".history_id = " . $wpdb -> prefix . $History -> table . ".id";	
+				$countquery .= " LEFT JOIN " . $wpdb -> prefix . $History -> table . " ON " . $wpdb -> prefix . $HistoriesList -> table . ".history_id = " . $wpdb -> prefix . $History -> table . ".id";	
+				break;
+			case 'AutorespondersList'			:
+				$query .= " LEFT JOIN " . $wpdb -> prefix . $Autoresponder -> table . " ON " . $wpdb -> prefix . $AutorespondersList -> table . ".autoresponder_id = " . $wpdb -> prefix . $Autoresponder -> table . ".id";	
+				$countquery .= " LEFT JOIN " . $wpdb -> prefix . $Autoresponder -> table . " ON " . $wpdb -> prefix . $AutorespondersList -> table . ".autoresponder_id = " . $wpdb -> prefix . $Autoresponder -> table . ".id";	
 				break;
 		}
 		

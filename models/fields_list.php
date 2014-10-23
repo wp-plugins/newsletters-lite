@@ -13,7 +13,7 @@ class wpmlFieldsList extends wpMailPlugin {
 	var $data = array();
 
 	var $table_fields = array(
-		'rel_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
+		'rel_id'			=>	"INT(11) NOT NULL AUTO_INCREMENT",
 		'field_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'list_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'special'			=>	"TEXT NOT NULL",
@@ -22,7 +22,7 @@ class wpmlFieldsList extends wpMailPlugin {
 	);
 	
 	var $tv_fields = array(
-		'rel_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'rel_id'			=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
 		'field_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'list_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'special'			=>	array("TEXT", "NOT NULL"),

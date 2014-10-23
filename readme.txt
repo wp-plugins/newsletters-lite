@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 4.4.1.1
+Stable tag: 4.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -141,6 +141,26 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.2 =
+
+* ADD: Sent & Draft Emails section filters
+* ADD: Autoresponders section filters  
+* IMPROVE: Localize jQuery UI datepicker
+* IMPROVE: CSS class 'newsletters-tracking' on tracking image tag
+* IMPROVE: New CSS3 loading indicators
+* IMPROVE: Change dashicons icon class from "icon-" to something else
+* IMPROVE: Allow regular POST/GET on the API instead of just JSON
+* IMPROVE: To run, reschedule and unschedule tasks, user needs "Scheduled Tasks" section permission/capability
+* FIX: Some untranslatable strings
+* FIX: Scheduled post send post as newsletter immediately and not on scheduled time
+* FIX: AUTO_INCREMENT for PRIMARY KEY of fieldslist table
+* FIX: Excerpt length/text settings ineffective when sending post as newsletter
+* FIX: Some Ajax calls when creating a newsletter locks server up
+* FIX: Editing a post and send it as newsletter, add "...revision..." to a link in the newsletter
+* FIX: Unsubscribe link vulnerable
+* FIX: Offside code not working with captcha turned on under System settings
+* FIX: "Update Automatically" button does nothing in lite version  
 
 = 4.4.1.1 =
 * FIX: Autoresponders not showing in admin

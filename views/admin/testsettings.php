@@ -36,7 +36,7 @@
 	        <p>
 	        	<input class="button-secondary" onclick="jQuery.colorbox.close();" type="button" name="close" value="<?php _e('Close', $this -> plugin_name); ?>" />
 	            <input id="testsettingsbutton" class="button-primary" type="submit" name="submit" value="<?php _e('Send Test Email', $this -> plugin_name); ?>" />
-	            <span style="display:none;" id="wpml_testsettings_loading"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
+	            <span style="display:none;" id="wpml_testsettings_loading"><span class="newsletters_loading"></span></span>
 	        </p>
 	    </form>
 	    

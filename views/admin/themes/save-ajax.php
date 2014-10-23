@@ -209,7 +209,7 @@
         
         <p class="submit">
         	<input class="button-primary" type="submit" name="save" value="<?php _e('Save Theme', $this -> plugin_name); ?>" />
-        	<span id="newsletters_themeedit_loader" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
+        	<span id="newsletters_themeedit_loader" style="display:none;"><span class="newsletters_loading"></span></span>
         </p>
     </form>
 </div>

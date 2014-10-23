@@ -184,7 +184,7 @@
 						<td>
 							<?php if (!empty($email -> mailinglists)) : ?>
 								<?php $m = 1; ?>
-								<?php $mailinglists = $email -> mailinglists; ?>
+								<?php $mailinglists = maybe_unserialize($email -> mailinglists); ?>
 								<?php if (!empty($mailinglists) && (is_array($mailinglists) || is_object($mailinglists))) : ?>
 									<?php foreach ($mailinglists as $mailinglist_id) : ?>
 										<?php $mailinglist = $Mailinglist -> get($mailinglist_id, false); ?>

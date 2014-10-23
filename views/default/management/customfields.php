@@ -28,7 +28,7 @@
         
         <div class="wpmlsubmitholder">
             <input class="<?php echo $this -> pre; ?>button" type="submit" name="savefields" value="<?php _e('Save Profile', $this -> plugin_name); ?>" id="savefields" />
-            <span id="savefieldsloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/views/default/img/loading.gif" alt="loading" /></span>
+            <span id="savefieldsloading" style="display:none;"><span class="newsletters_loading"></span></span>
         </div>
     </form>
     

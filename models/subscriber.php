@@ -524,7 +524,8 @@ class wpmlSubscriber extends wpMailPlugin {
 					$this -> errors = array_merge($this -> errors, $Field -> errors);
 				}
 
-				if ($data['captcha_prefix'] != "" || (!empty($_GET[$this -> pre . 'method']) && $_GET[$this -> pre . 'method'] == "offsite")) {
+				//if ($data['captcha_prefix'] != "" || (!empty($_GET[$this -> pre . 'method']) && $_GET[$this -> pre . 'method'] == "offsite")) {
+				if ($data['captcha_prefix'] != "") {
 					$cap = 'Y';
 				} else {
 					$cap = 'N';

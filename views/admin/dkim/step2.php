@@ -31,7 +31,7 @@
 			<input onclick="jQuery.colorbox.close();" type="button" class="button button-secondary" name="close" value="<?php _e('Close', $this -> plugin_name); ?>" />
 			<input onclick="jQuery('#goto').val('step1'); jQuery('#dkimform2').submit();" type="button" class="button button-secondary" name="back" value="<?php _e('&laquo; Back', $this -> plugin_name); ?>" />
 			<input id="dkimbutton" type="submit" class="button button-primary" name="continue" value="<?php _e('All done, next step &raquo;', $this -> plugin_name); ?>" />
-			<span id="dkimloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" border="0" style="border:none;" /></span>
+			<span id="dkimloading" style="display:none;"><span class="newsletters_loading"></span></span>
 		</p>
 	</form>
 </div>

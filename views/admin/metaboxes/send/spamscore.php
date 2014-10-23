@@ -3,7 +3,7 @@
 </div>
 
 <p style="text-align:center;"><a class="button button-secondary button-small" id="spamscorerunnerbutton" href="" onclick="spamscorerunner(); return false;"><?php _e('Check Now', $this -> plugin_name); ?></a>
-<span id="spamscorerunnerloading" style="display:none;"><img src="<?php echo $this -> render_url('images/loading.gif', 'admin', false); ?>" alt="loading" /></span></p>
+<span id="spamscorerunnerloading" style="display:none;"><span class="newsletters_loading"></span></span></p>
 
 <script type="text/javascript" src="<?php echo $this -> render_url('js/justgage.js', 'admin', false); ?>"></script>
 <script type="text/javascript" src="<?php echo $this -> render_url('js/raphael.js', 'admin', false); ?>"></script>

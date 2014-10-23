@@ -143,6 +143,21 @@
 	                            </div>
 	                        </td>
 	                        <td>
+		                        <?php
+			                        
+			                    if (empty($autoresponder -> mailinglists)) {
+				                    $Db -> model = $AutorespondersList -> model;
+									if ($autoresponderslists = $Db -> find_all(array('autoresponder_id' => $autoresponder -> id))) {				
+										foreach ($autoresponderslists as $autoresponderslist) {
+											$Db -> model = $Mailinglist -> model;
+											$autoresponder -> lists[] = $autoresponderslist -> list_id;
+											$autoresponder -> mailinglists[] = $Db -> find(array('id' => $autoresponderslist -> list_id));
+										}
+									}
+			                    }  
+			                        
+			                    ?>
+		                        
 	                        	<?php if (!empty($autoresponder -> mailinglists)) : ?>
 	                            	<?php $m = 1; ?>
 	                            	<?php foreach ($autoresponder -> mailinglists as $mailinglist) : ?>

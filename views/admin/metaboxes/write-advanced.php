@@ -5,6 +5,7 @@
 global $post;
 $post_id = $post -> ID;
 
+$scheduled = get_post_meta($post_id, 'newsletters_scheduled', true);
 $postmailinglists = (empty($_POST[$this -> pre . 'mailinglists'])) ? get_post_meta($post_id, $this -> pre . 'mailinglists', true) : $_POST[$this -> pre . 'mailinglists'];
 $theme_id = (empty($_POST[$this -> pre . 'theme_id'])) ? get_post_meta($post_id, $this -> pre . 'theme_id', true) : $_POST[$this -> pre . 'theme_id'];
 $qtranslate_language = (empty($_POST[$this -> pre . 'qtranslate_language'])) ? get_post_meta($post_id, $this -> pre . 'qtranslate_language', true) : $_POST[$this -> pre . 'qtranslate_language'];
@@ -13,6 +14,11 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 ?>
 
 <div class="<?php echo $this -> pre; ?> newsletters">
+	
+	<?php if (!empty($scheduled)) : ?>
+		<p class="newsletters_success"><?php _e('Note that this post is already scheduled to send out as a newsletter.', $this -> plugin_name); ?></p>
+	<?php endif; ?>
+	
 	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
 		<div class="misc-pub-section">
 		<p><strong><?php _e('Language', $this -> plugin_name); ?></strong></h4>

@@ -29,7 +29,7 @@ $api_key = $this -> get_option('api_key');
 				<td>
 					<code><span id="api_key"><?php echo $api_key; ?></span></code>
 					<a class="button button-secondary button-small" onclick="if (confirm('<?php _e('Are you sure you want to generate a new key? The previous key will stop working.', $this -> plugin_name); ?>')) { newsletters_api_newkey(); } return false;"><?php _e('Generate New Key', $this -> plugin_name); ?></a>
-					<span id="api_key_loading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" /></span>
+					<span id="api_key_loading" style="display:none;"><span class="newsletters_loading"></span></span>
 					<span class="howto"><?php _e('Unique key to use for authentication with the API', $this -> plugin_name); ?></span>
 				</td>
 			</tr>

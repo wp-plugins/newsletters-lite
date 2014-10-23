@@ -3,7 +3,7 @@
 <p>
 	<a href="<?php echo $src; ?>" target="_blank" class="button button-secondary"><?php _e('Open in New Window', $this -> plugin_name); ?></a>
 	<a href="" id="previewrunnerbutton" onclick="previewrunner(); return false;" class="button button-primary"><?php _e('Update Preview', $this -> plugin_name); ?></a>
-	<span id="previewrunnerloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" /></span>
+	<span id="previewrunnerloading" style="display:none;"><span class="newsletters_loading"></span></span>
 </p>
 
 <iframe width="100%" height="300" frameborder="0" scrolling="auto" class="autoHeight widefat" style="width:100%; margin:15px 0 0 0; border:1px #CCCCCC solid;" src="<?php echo $src; ?>" id="previewiframe">

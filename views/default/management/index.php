@@ -116,10 +116,10 @@ function wpmlmanagement_savefields() {
 
 function wpmlmanagement_activate(subscriber_id, mailinglist_id, activate) {	
 	if (activate == "Y") {
-		jQuery('#activatelink' + mailinglist_id).html('<img src="<?php echo $this -> url(); ?>/views/default/img/loading.gif" /> <?php _e('Activating...', $this -> plugin_name); ?>');	
+		jQuery('#activatelink' + mailinglist_id).html('<span class="newsletters_loading"></span> <?php _e('Activating...', $this -> plugin_name); ?>');	
 	} else {
 		jQuery('tr#currentsubscription' + mailinglist_id).fadeOut(1000, function() { jQuery(this).remove(); });
-		jQuery('#activatelink' + mailinglist_id).html('<img src="<?php echo $this -> url(); ?>/views/default/img/loading.gif" /> <?php _e('Removing...', $this -> plugin_name); ?>');
+		jQuery('#activatelink' + mailinglist_id).html('<span class="newsletters_loading"></span> <?php _e('Removing...', $this -> plugin_name); ?>');
 	}
 
 	jQuery.post(wpmlajaxurl + "action=managementactivate", {'subscriber_id':subscriber_id, 'mailinglist_id':mailinglist_id, 'activate':activate}, function(response) {
@@ -132,7 +132,7 @@ function wpmlmanagement_activate(subscriber_id, mailinglist_id, activate) {
 
 function wpmlmanagement_subscribe(subscriber_id, mailinglist_id) {
 	jQuery('.subscribebutton').button('option', "disabled", true);
-	jQuery('#subscribenowlink' + mailinglist_id).html('<img src="<?php echo $this -> url(); ?>/views/default/img/loading.gif" /> <?php _e('Subscribing...', $this -> plugin_name); ?>');
+	jQuery('#subscribenowlink' + mailinglist_id).html('<span class="newsletters_loading"></span> <?php _e('Subscribing...', $this -> plugin_name); ?>');
 	
 	jQuery.post(wpmlajaxurl + "action=managementsubscribe", {'subscriber_id':subscriber_id, 'mailinglist_id':mailinglist_id}, function(response) {
 		wpmlmanagement_reloadsubscriptions("current", subscriber_id);

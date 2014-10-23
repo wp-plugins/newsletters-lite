@@ -22,7 +22,7 @@
 				<tr class="alternate">
 					<th>
 						<?php _e('Next schedule event', $this -> plugin_name); ?>
-						<?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings . '&method=runschedule&hook=cronhook', array('class' => "button button-secondary button-small", 'onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now?', $this -> plugin_name) . "')) { return false; }")); ?>
+						<?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&method=runschedule&hook=cronhook', array('class' => "button button-secondary button-small", 'onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now?', $this -> plugin_name) . "')) { return false; }")); ?>
 					</th>
 					<td>
 	                	<?php if ($this -> get_option('scheduling') == "Y") : ?>
@@ -36,7 +36,7 @@
 										jQuery('#countdown').countdown({
 											format:'HMS',
 											until:'+<?php echo (wp_next_scheduled('wpml_cronhook') - time()); ?>',
-											onExpiry:function() { window.location = "<?php echo '?page=' . $this -> sections -> settings . '&method=runschedule&hook=cronhook'; ?>"; },
+											onExpiry:function() { window.location = "<?php echo '?page=' . $this -> sections -> settings_tasks . '&method=runschedule&hook=cronhook'; ?>"; },
 										});
 									});
 									</script>								

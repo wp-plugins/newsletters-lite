@@ -95,7 +95,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 					</p>
 				</div>
 				
-				<span id="postsloading" style="display:none;"><img src="<?php echo $this -> url(); ?>/images/loading.gif" /></span>
+				<span id="postsloading" style="display:none;"><span class="newsletters_loading"></span></span>
 				
 				<div id="postsdiv" style="display:none;">
 					<p>

@@ -24,7 +24,7 @@ var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
             <input type="text" class="widefat" style="width:400px;" name="serialkey" value="<?php echo esc_attr(stripslashes($_POST['serialkey'])); ?>" /><br/>
             <input type="button" class="button-secondary" name="close" onclick="jQuery.colorbox.close();" value="<?php _e('Cancel', $this -> plugin_name); ?>" />
             <input type="submit" class="button-primary" name="submit" value="<?php _e('Submit Serial Key', $this -> plugin_name); ?>" />
-            <span style="display:none;" id="wpml_submitserial_loading"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
+            <span style="display:none;" id="wpml_submitserial_loading"><span class="newsletters_loading"></span></span>
         </form>        
     <?php else : ?>
         <p><?php _e('Serial Key:', $this -> plugin_name); ?> <strong><?php echo $this -> get_option('serialkey'); ?></strong></p>
@@ -32,7 +32,7 @@ var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
         <p>
         	<input type="button" onclick="jQuery.colorbox.close();" name="close" class="button-primary" value="<?php _e('Close', $this -> plugin_name); ?>" />
         	<input type="button" onclick="if (confirm('<?php _e('Are you sure you want to delete your serial key?', $this -> plugin_name); ?>')) { wpml_deleteserial(); } return false;" name="delete" class="button-secondary" value="<?php _e('Delete Serial', $this -> plugin_name); ?>" />
-        	<span style="display:none;" id="wpml_submitserial_loading"><img src="<?php echo $this -> url(); ?>/images/loading.gif" alt="loading" /></span>
+        	<span style="display:none;" id="wpml_submitserial_loading"><span class="newsletters_loading"></span></span>
         </p>
     <?php endif; ?>
 <?php else : ?>
