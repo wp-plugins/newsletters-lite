@@ -525,7 +525,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				}
 
 				//if ($data['captcha_prefix'] != "" || (!empty($_GET[$this -> pre . 'method']) && $_GET[$this -> pre . 'method'] == "offsite")) {
-				if ($data['captcha_prefix'] != "") {
+				if (!empty($data['captcha_prefix']) || !empty($data['recaptcha_challenge_field'])) {
 					$cap = 'Y';
 				} else {
 					$cap = 'N';
@@ -830,7 +830,7 @@ class wpmlSubscriber extends wpMailPlugin {
 									}
 								}
 							
-								$query .= " `" . $field -> slug . "` = '" . utf8_encode(esc_sql($data[$field -> slug])) . "', ";
+								$query .= " `" . $field -> slug . "` = '" . (esc_sql($data[$field -> slug])) . "', ";
 							}
 						
 							$usedfields[] = $field -> slug;

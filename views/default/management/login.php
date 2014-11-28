@@ -3,12 +3,14 @@
 <?php $this -> render('error', array('errors' => $errors), true, 'default'); ?>
 
 <?php
+
 $email = (!empty($_POST['email'])) ? $_POST['email'] : false;
 $email = (!empty($_GET['email'])) ? $_GET['email'] : $email;
+
 ?>
 
 <div class="<?php echo $this -> pre; ?>" id="subscriberauthloginformdiv">
-    <form id="subscriberauthloginform" action="<?php echo $Html -> retainquery('method=login', get_permalink($this -> get_managementpost())); ?>" method="post">
+    <form id="subscriberauthloginform" action="<?php echo $Html -> retainquery('newsletters_method=management_login&method=login', get_permalink($this -> get_managementpost())); ?>" method="post">
         <label><?php _e('Email Address:', $this -> plugin_name); ?></label>
         <input type="text" name="email" value="<?php echo esc_attr(stripslashes($email)); ?>" id="email" />
         <input type="submit" name="authenticate" value="<?php _e('Send Confirmation', $this -> plugin_name); ?>" id="authenticate" />

@@ -621,8 +621,7 @@ class vcard_convert extends Contact_Vcard_Parse
 	 *
 	 * @access private
 	 */
-	function utf8_convert($str, $from=null)
-	{
+	function utf8_convert($str, $from=null) {
 		if (!$from)
 			$from = $this->charset;
 

@@ -499,6 +499,47 @@ if (!class_exists('wpMail')) {
 			
 			if (!empty($_GET['newsletters_method'])) {
 				switch ($_GET['newsletters_method']) {
+					case 'management_login'				:
+						global $Subscriber, $Auth, $newsletters_errors;
+						
+						$newsletters_errors = array();
+					
+						if (!empty($_POST)) {
+							if (!empty($_POST['email'])) {
+								if ($Subscriber -> email_validate($_POST['email'])) {
+									$Db -> model = $Subscriber -> model;
+									
+									if ($subscriber = $Db -> find(array('email' => $_POST['email']))) {
+										if ($subscriberauth = $Auth -> gen_subscriberauth()) {
+											$Auth -> set_emailcookie($_POST['email']);
+											
+											$Db -> model = $Subscriber -> model;
+											$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
+											
+											$subject = __($this -> get_option('managementloginsubject'));
+											$message = $this -> render_email('management-login', array('email' => $_POST['email'], 'subscriberauth' => $subscriberauth), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false);
+											
+											if ($this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false)) {
+												$newsletters_errors[] = __('Authentication email has been sent, please check your inbox.', $this -> plugin_name);
+											} else {
+												$newsletters_errors[] = __('Authentication email could not be sent.', $this -> plugin_name);	
+											}
+										} else {
+											$newsletters_errors[] = __('Authentication string could not be created.', $this -> plugin_name);	
+										}
+									} else {
+										$newsletters_errors[] = __('Subscriber with that email address cannot be found, please try a different email address.', $this -> plugin_name);	
+									}
+								} else {
+									$newsletters_errors[] = __('Please fill in a valid email address.', $this -> plugin_name);	
+								}
+							} else {
+								$newsletters_errors[] = $emailfield -> error; 
+							}
+						} else {
+							$newsletters_errors[] = __('No data was posted.', $this -> plugin_name);	
+						}
+						break;
 					case 'delete_transient'				:
 						if (!empty($_GET['transient'])) {
 							delete_transient($_GET['transient']);
@@ -1687,7 +1728,7 @@ if (!class_exists('wpMail')) {
 				if (empty($schedulecrontype) || $schedulecrontype == "wp") {
 					$schedules = $this -> cron_schedules($schedules);
 					$interval = $this -> get_option('scheduleinterval');
-					$expiration = ($schedules[$interval]['interval'] * 2);
+					$expiration = ($schedules[$interval]['interval']);
 				} else {
 					$expiration = 150;
 				}					
@@ -4490,7 +4531,7 @@ if (!class_exists('wpMail')) {
 													if (!empty($_POST['fields'])) {										
 														foreach ($_POST['fields'] as $field => $value) {
 															if (empty($datasets[$d][$field])) {
-																$datasets[$d][$field] = utf8_encode($row[($_POST[$field . 'column'] - 1)]);
+																$datasets[$d][$field] = ($row[($_POST[$field . 'column'] - 1)]);
 															}
 														}
 													}

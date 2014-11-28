@@ -8,8 +8,8 @@
 	
 	<div class="tablenav">
 		<div class="alignleft actions">				
-			<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('Change the details of this subscriber', $this -> plugin_name); ?>" class="button"><?php _e('Change', $this -> plugin_name); ?></a>
-			<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=delete&amp;id=<?php echo $subscriber -> id; ?>" title="<?php _e('Remove this subscriber', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this subscriber?', $this -> plugin_name); ?>')) { return false; }" class="button button-highlighted"><?php _e('Delete', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save&amp;id=<?php echo $subscriber -> id; ?>" class="button"><?php _e('Edit', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=delete&amp;id=<?php echo $subscriber -> id; ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this subscriber?', $this -> plugin_name); ?>')) { return false; }" class="button button-highlighted"><?php _e('Delete', $this -> plugin_name); ?></a>
 			<a href="#emails" class="button"><?php _e('Emails Sent', $this -> plugin_name); ?></a>
 			<?php if (!empty($orders)) : ?>
 				<a href="#orders" class="button"><?php _e('Paid Orders', $this -> plugin_name); ?></a>

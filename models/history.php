@@ -711,7 +711,7 @@ class wpmlHistory extends wpMailPlugin {
 	 *
 	 */
 	function delete($id = null) {
-		global $wpdb, $Db, $Email, $Autoresponder, $HistoriesAttachment, $HistoriesList, $Queue;
+		global $wpdb, $Db, $Email, $wpmlClick, $Autoresponder, $HistoriesAttachment, $HistoriesList, $Queue;
 	
 		if (!empty($id)) {
 			if ($wpdb -> query("DELETE FROM `" . $wpdb -> prefix . "" . $this -> table_name . "` WHERE `id` = '" . $id . "' LIMIT 1")) {
@@ -731,7 +731,7 @@ class wpmlHistory extends wpMailPlugin {
 				$Db -> model = $Queue -> model;
 				$Db -> delete_all(array('history_id' => $id));
 				
-				$this -> Click -> delete_all(array('history_id' => $id));
+				$wpmlClick -> delete_all(array('history_id' => $id));
 			
 				return true;
 			}

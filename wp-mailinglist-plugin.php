@@ -2369,7 +2369,10 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function sc_management($atts = array(), $content = null) {
-			global $wpdb, $Db, $Subscriber, $SubscribersList, $Auth, $Field, $Unsubscribe, $Autoresponderemail;
+			global $wpdb, $Db, $Subscriber, $SubscribersList, $Auth, $Field, $Unsubscribe, $Autoresponderemail, 
+			$newsletters_errors;
+			
+			$errors = array();
 			
 			$output = "";
 			$defaults = array();
@@ -2607,41 +2610,8 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					break;
 				case 'login'				:
-					if (!empty($_POST)) {
-						if (!empty($_POST['email'])) {
-							if ($Subscriber -> email_validate($_POST['email'])) {
-								$Db -> model = $Subscriber -> model;
-								
-								if ($subscriber = $Db -> find(array('email' => $_POST['email']))) {
-									if ($subscriberauth = $Auth -> gen_subscriberauth()) {
-										$Auth -> set_emailcookie($_POST['email']);
-										
-										$Db -> model = $Subscriber -> model;
-										$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
-										
-										$subject = __($this -> get_option('managementloginsubject'));
-										$message = $this -> render_email('management-login', array('email' => $_POST['email'], 'subscriberauth' => $subscriberauth), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false);
-										
-										if ($this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false)) {
-											$errors[] = __('Authentication email has been sent, please check your inbox.', $this -> plugin_name);
-										} else {
-											$errors[] = __('Authentication email could not be sent.', $this -> plugin_name);	
-										}
-									} else {
-										$errors[] = __('Authentication string could not be created.', $this -> plugin_name);	
-									}
-								} else {
-									$errors[] = __('Subscriber with that email address cannot be found, please try a different email address.', $this -> plugin_name);	
-								}
-							} else {
-								$errors[] = __('Please fill in a valid email address.', $this -> plugin_name);	
-							}
-						} else {
-							$errors[] = $emailfield -> error; 
-						}
-					} else {
-						$errors[] = __('No data was posted.', $this -> plugin_name);	
-					}
+				
+					$errors = array_merge($errors, $newsletters_errors);
 					
 					if (empty($errors)) {
 						//$this -> redirect(get_permalink($this -> get_option('managementpost')));
@@ -2978,7 +2948,7 @@ if (!class_exists('wpMailPlugin')) {
 			return $enabled;
 		}
 		
-		function language_join($texts = array(), $tagTypeMap = array()) {
+		function language_join($texts = array(), $tagTypeMap = array(), $strip_tags = false) {
 			if(!is_array($texts)) $texts = $this -> language_split($texts, false);
 			$split_regex = "#<!--more-->#ism";
 			$max = 0;
@@ -2998,6 +2968,11 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				foreach($languages as $language) {
 					if (isset($texts[$language][$i]) && $texts[$language][$i] !== '') {
+						
+						if ($strip_tags) {
+							$texts[$language][$i] = strip_tags($texts[$language][$i]);
+						}
+						
 						if (empty($tagTypeMap[$language]))
 							$text .= '<!--:'.$language.'-->'.$texts[$language][$i].'<!--:-->';
 						else
@@ -3474,6 +3449,7 @@ if (!class_exists('wpMailPlugin')) {
 		function initialize_classes() {
 			global $wpdb;
 			
+			// New models here $this -> {$model}
 			if (!empty($this -> models)) {
 				foreach ($this -> models as $model) {								
 					if (empty($this -> {$model}) || !is_object($this -> {$model})) {
@@ -5927,13 +5903,11 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				if (version_compare($cur_version, "4.4.2") < 0) {
-					global $wpdb, $FieldsList;
-					
 					$this -> update_options();
 					
 					// Set the 'rel_id' field on fieldslists table as AUTO_INCREMENT
-					$query = "ALTER TABLE " . $wpdb -> prefix . $FieldsList -> table . " CHANGE `rel_id` `rel_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY";
-					$wpdb -> query($query);
+					global $wpdb, $Db, $FieldsList;
+					$query = "ALTER TABLE " . $wpdb -> prefix . $FieldsList -> table . " CHANGE `rel_id` `rel_id` INT(11) NOT NULL AUTO_INCREMENT";
 					
 					$version = '4.4.2';
 				}

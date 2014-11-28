@@ -344,10 +344,10 @@ class wpmlField extends wpMailPlugin {
 		
 		if ($this -> language_do()) {		
 			if (true) {
-				$this -> data[$this -> model] -> title = $this -> language_join($this -> data[$this -> model] -> title);
-				$this -> data[$this -> model] -> caption = $this -> language_join($this -> data[$this -> model] -> caption);
-				$this -> data[$this -> model] -> watermark = $this -> language_join($this -> data[$this -> model] -> watermark);
-				$this -> data[$this -> model] -> errormessage = $this -> language_join($this -> data[$this -> model] -> errormessage);
+				$this -> data[$this -> model] -> title = $this -> language_join($this -> data[$this -> model] -> title, false, true);
+				$this -> data[$this -> model] -> caption = $this -> language_join($this -> data[$this -> model] -> caption, false, true);
+				$this -> data[$this -> model] -> watermark = $this -> language_join($this -> data[$this -> model] -> watermark, false, true);
+				$this -> data[$this -> model] -> errormessage = $this -> language_join($this -> data[$this -> model] -> errormessage, false, true);
 				
 				$languages = array();
 				$fieldoptions = array();
