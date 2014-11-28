@@ -16,6 +16,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 			<a href="?page=<?php echo $this -> sections -> send; ?>&amp;method=history&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Send this history email again or edit the draft', $this -> plugin_name); ?>" class="button button-primary"><?php _e('Send/Edit', $this -> plugin_name); ?></a>
 			<a onclick="jQuery.colorbox({href:'<?php echo $preview_src; ?>'}); return false;" href="#" class="button"><?php _e('Preview', $this -> plugin_name); ?></a>
 			<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=delete&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Remove this history email permanently', $this -> plugin_name); ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this history email?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
+			<?php echo $Html -> link(__('Duplicate', $this -> plugin_name), '?page=' . $this -> sections -> history . '&amp;method=duplicate&amp;id=' . $history -> id, array('class' => "button")); ?>
 		</div>
 	</div>
 	<?php $class = ''; ?>
@@ -63,6 +64,16 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
                     <?php endif; ?>
                 </td>
             </tr>
+            <?php if (!empty($history -> post_id)) : ?>
+            	<?php $post = get_post($history -> post_id); ?>
+            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+	            	<th><?php _e('Post', $this -> plugin_name); ?>
+	            	<?php echo $Html -> help(__('If a post/page was published from this newsletter, it will be linked/associated and shown here.', $this -> plugin_name)); ?></th>
+	            	<td>
+		            	<a href="<?php echo get_permalink($history -> post_id); ?>" target="_blank"><?php echo __($post -> post_title); ?></a>
+	            	</td>
+            	</tr>
+            <?php endif; ?>
             <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
             	<th><?php _e('Author', $this -> plugin_name); ?></th>
             	<td>

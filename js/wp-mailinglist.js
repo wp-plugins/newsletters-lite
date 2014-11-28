@@ -22,6 +22,16 @@ jQuery(document).ready(function(){
 	});
 });
 
+function newsletters_change_filter(section, filter, value) {
+	var expires;
+	var date = new Date();
+    date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+    expires = date.toGMTString();
+    
+    document.cookie = "newsletters_filter_" + section + "=1; expires=" + expires + "; path=/";
+	document.cookie = "newsletters_filter_" + section + "_" + filter + "=" + value + "; expires=" + expires + "; path=/";
+}
+
 function hsl2rgb(hsl) {
     var h = hsl[0], s = hsl[1], l = hsl[2];
     var m1, m2, hue;

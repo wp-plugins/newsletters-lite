@@ -9,7 +9,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		<div class="tablenav">
 			<div class="alignleft">
                 <?php if ($this -> get_option('bouncemethod') == "pop") : ?>
-                    <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-bounced" title="<?php _e('Check for bounced emails', $this -> plugin_name); ?>" class="button" onclick="if (!confirm('<?php _e('Are you sure you wish to check your POP3 mailbox for bounced emails?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Check Bounced Emails', $this -> plugin_name); ?></a>
+                    <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-bounced" class="button" onclick="if (!confirm('<?php _e('Are you sure you wish to check your POP3 mailbox for bounced emails?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Check for Bounces', $this -> plugin_name); ?></a>
                 <?php endif; ?>
                 <?php if (!empty($paidsubscriptions) && $paidsubscriptions == "Y") : ?>
                 	<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-expired" class="button"><?php _e('Check Expired', $this -> plugin_name); ?></a>
@@ -28,8 +28,8 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 						<option value="inactive"><?php _e('Deactivate', $this -> plugin_name); ?></option>
 					</optgroup>
 					<optgroup  label="<?php _e('Mailing Lists', $this -> plugin_name); ?>">
-						<option value="assignlists"><?php _e('Assign Lists (appends)', $this -> plugin_name); ?></option>
-						<option value="setlists"><?php _e('Set Lists (overwrites)', $this -> plugin_name); ?></option>
+						<option value="assignlists"><?php _e('Add Lists (appends)...', $this -> plugin_name); ?></option>
+						<option value="setlists"><?php _e('Set Lists (overwrites)...', $this -> plugin_name); ?></option>
 					</optgroup>
 				</select>
 				<input type="submit" name="execute" class="button" value="<?php _e('Apply', $this -> plugin_name); ?>" />
@@ -40,6 +40,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		<div id="listsdiv" style="display:none;">
 			<?php if ($lists = $Mailinglist -> select(true)) : ?>
 				<p>
+					<label style="font-weight:bold;"><input type="checkbox" name="checkboxall" value="1" id="checkboxall" onclick="jqCheckAll(this, false, 'lists');" /> <?php _e('Select all', $this -> plugin_name); ?></label><br/>
 					<?php foreach ($lists as $lid => $lval) : ?>
 						<label><input type="checkbox" name="lists[]" value="<?php echo $lid; ?>" /> <?php echo $lval; ?> (<?php echo $SubscribersList -> count(array('list_id' => $lid)); ?> <?php _e('subscribers', $this -> plugin_name); ?>)</label><br/>
 					<?php endforeach; ?>
@@ -217,7 +218,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 								</div>
 							</td>
 							<?php if (apply_filters($this -> pre . '_admin_subscribers_registeredcolumn', true)) : ?>
-								<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> registered) || $subscriber -> registered == "N") ? '<span class="newsletters_error">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
+								<td><label for="checklist<?php echo $subscriber -> id; ?>"><?php echo (empty($subscriber -> registered) || $subscriber -> registered == "N") ? '<span class="newsletters_error">' . __('No', $this -> plugin_name) : '<span class="newsletters_success">' . __('Yes', $this -> plugin_name); ?></span></label></td>
 							<?php endif; ?>
 							<?php if (!empty($screen_custom) && in_array('mandatory', $screen_custom)) : ?>
 								<td>
@@ -234,7 +235,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 								<?php if (!empty($subscriber -> Mailinglist)) : ?>
 									<?php $m = 1; ?>
 									<?php foreach ($subscriber -> Mailinglist as $list) : ?>
-										<?php echo $Html -> link(__($list -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span style="color:green;">' . __('active', $this -> plugin_name) : '<span class="newsletters_error">' . __('inactive', $this -> plugin_name); ?></span>)
+										<?php echo $Html -> link(__($list -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list -> id); ?> (<?php echo ($SubscribersList -> field('active', array('subscriber_id' => $subscriber -> id, 'list_id' => $list -> id)) == "Y") ? '<span class="newsletters_success">' . __('active', $this -> plugin_name) : '<span class="newsletters_error">' . __('inactive', $this -> plugin_name); ?></span>)
 										<?php if ($m < count($subscriber -> Mailinglist)) : ?>
 											<?php echo ', '; ?>
 										<?php endif; ?>

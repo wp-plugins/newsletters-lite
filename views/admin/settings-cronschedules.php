@@ -158,6 +158,19 @@ $emailscount = $Db -> count();
 	                </td>
 	            </tr>
 	        <?php endif; ?>
+	        <tr>
+            	<th>
+                	<?php _e('Optimize Database', $this -> plugin_name); ?>
+                    <div class="row-actions">
+                    	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=runschedule&amp;hook=newsletters_optimizehook', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+                        <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=reschedule&amp;hook=newsletters_optimizehook', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
+                        <span class="delete"><?php echo $Html -> link(__('Stop Schedule', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=clearschedule&amp;hook=newsletters_optimizehook', array('onclick' => "if (!confirm('" . __('Are you sure you wish to clear this scheduled task?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?></span>
+                    </div>
+                </th>
+                <td>
+                	<?php echo $Html -> next_scheduled('newsletters_optimizehook'); ?>
+                </td>
+            </tr>
 	        <?php if ($this -> is_plugin_active('captcha')) : ?>
 	        	<tr>
 	        		<th>                

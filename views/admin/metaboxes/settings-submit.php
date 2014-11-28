@@ -21,7 +21,7 @@ $debugging = get_option('tridebugging');
 			</div>
 			<div class="misc-pub-section misc-pub-section-last">
 				<label><input <?php echo (!empty($debugging) && $debugging == 1) ? 'checked="checked"' : ''; ?> type="checkbox" name="debugging" value="1" id="debugging" /> <?php _e('Turn on debugging', $this -> plugin_name); ?></label>
-				<?php echo $Html -> help(__('Ticking/checking this setting and saving the settings will turn on debugging. It will turn on PHP error reporting and also WordPress database errors. It will help you to troubleshoot problems where something is not working as expected or a blank page is appearing.', $this -> plugin_name)); ?>
+				<?php echo $Html -> help(sprintf(__('Ticking/checking this setting and saving the settings will turn on debugging. It will turn on PHP error reporting and also WordPress database errors. It will help you to troubleshoot problems where something is not working as expected or a blank page is appearing. Certain things are also logged in the %s', $this -> plugin_name), '<a target="_blank" href="' . plugins_url() . '/' . $this -> plugin_name . '/' . basename(NEWSLETTERS_LOG_FILE) . '">' . __('log file', $this -> plugin_name) . '</a>')); ?>
 			</div>
 		</div>
 	</div>

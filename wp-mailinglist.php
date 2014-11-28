@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.2
+Version: 4.4.3
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -946,17 +946,20 @@ if (!class_exists('wpMail')) {
 							$pval = urlencode(stripslashes($pval));
 							$req .= "&" . $pkey . "=" . $pval . "";
 						}
+						
+						$paypalsandbox = $this -> get_option('paypalsandbox');
 					
 						$custom = unserialize(urldecode($_POST['custom']));						
-						$ppurl = ($this -> get_option('paypalsandbox') == "Y") ? 'www.sandbox.paypal.com' : 'www.paypal.com';
-						$ppport = ($this -> get_option('paypalsandbox') == "Y") ? 443 : 80;
+						$ppurl = ($paypalsandbox == "Y") ? 'www.sandbox.paypal.com' : 'www.paypal.com';
+						//$ppport = ($this -> get_option('paypalsandbox') == "Y") ? 443 : 443;
+						$ppport = 443;
 						$header = '';
 						$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
 						$header .= "Host: " . $ppurl . "\r\n";
 						$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
 						$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
-						$fhost = ($this -> get_option('paypalsandbox') == "Y") ? 'ssl://' . $ppurl : $ppurl;						
-						$fp = fsockopen($fhost, $ppport, $errno, $errstr, 30);
+						//$fhost = ($this -> get_option('paypalsandbox') == "Y") ? 'ssl://' . $ppurl : $ppurl;						
+						$fhost = 'tls://' . $ppurl;
 						$item_name = $_POST['item_name'];
 						$item_number = $_POST['item_number'];
 						$payment_status = $_POST['payment_status'];
@@ -965,111 +968,151 @@ if (!class_exists('wpMail')) {
 						$txn_id = $_POST['txn_id'];
 						$txn_type = $_POST['txn_type'];
 						$receiver_email = $_POST['receiver_email'];
-						$payer_email = $_POST['payer_email'];				
+						$payer_email = $_POST['payer_email'];	
 						
-						if (!$fp) {
-							$message = __('An HTTP error has occurred. PayPal cannot be contacted.', $this -> plugin_name);
+						$verified = false;
+						
+						$message = sprintf(__('Received IPN call - %s', $this -> plugin_name), $req);
+						
+						if (function_exists('curl_init')) {							
+							$ch = curl_init('https://' . $ppurl . '/cgi-bin/webscr');
+							curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+							curl_setopt($ch, CURLOPT_POST, 1);
+							curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+							curl_setopt($ch, CURLOPT_POSTFIELDS, $req);
+							curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+							curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+							curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+							curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close'));							
+							$fullresult = curl_exec($ch);
+							
+							if (curl_errno($ch)) {
+								$this -> log_error(sprintf(__('PayPal IPN: Curl error - %s', $this -> plugin_name), curl_error($ch)));
+							}
+							
+							if (strcmp($fullresult, "VERIFIED") == 0) {	
+								$verified = true;	
+							}
+							
+							curl_close($ch);
 						} else {
-							fputs($fp, $header . $req);
+							$fp = fsockopen($fhost, $ppport, $errno, $errstr, 30);
 							
-							while (!feof($fp)) {
-								$res = fgets($fp, 1024);
-								$doupdate = false;
-								if (strcmp($res, "VERIFIED") == 0) {			
-									switch ($payment_status) {
-										case 'Failed'				:
-											$message = __('The payment has failed. Please try again', $this -> plugin_name);
-											break;
-										case 'Denied'				:
-											$message = __('The payment has been denied. This payment could already be pending', $this -> plugin_name);
-											break;
-										default						:
-											if (!empty($custom['subscriber_id']) && !empty($custom['mailinglist_id'])) {
-												switch ($txn_type) {
-													case 'subscr_payment'		:
-														if ($payment_status == "Pending") {
-															$message = __('Thank you for your PayPal subscription. Your payment is currently pending. Please wait for the merchant to accept it', $this -> plugin_name);	
-														} elseif ($payment_status == "Completed") {
-															$doupdate = true;
-														}
-														break;
-													case 'subscr_cancel'		:
-														$mailinglists = @explode(",", $_GET['mailinglist_id']);
-														foreach ($mailinglists as $list_id) {
-															$sl_conditions = array('subscriber_id' => $custom['subscriber_id'], 'list_id' => $list_id);
-															$SubscribersList -> save_field('active', "N", $sl_conditions);
-														}
-														$message = __('PayPal subscription has been cancelled', $this -> plugin_name);
-														break;
-													default						:												
-														if ($payment_status == "Completed" || ($_POST['test_ipn'] && $payment_status == "Pending")) {													
-															$doupdate = true;
-														}
-														break;
-												}
-											}
-											break;
-									}
-								} elseif (strcmp($res, "INVALID") == 0) {
-									//why on earth?
-									$message = __('PayPal has marked the transaction as invalid', $this -> plugin_name);
-								}
-							}
-							
-							//everything is fine, lets continue
-							if ($doupdate == true) {
-								$subscriber = $Subscriber -> get($custom['subscriber_id'], false);
-								$list_id = $custom['mailinglist_id'];
-								$mailinglist = $Mailinglist -> get($list_id, false);
-								$subscriber -> mailinglist_id = $mailinglist -> id;
-	
-								if ($payment_amount == $mailinglist -> price) {								
-									$sl_conditions = array('subscriber_id' => $subscriber -> id, 'list_id' => $mailinglist -> id);
-									
-									$subscriberslist = $SubscribersList -> find($sl_conditions);
-									$SubscribersList -> save_field('active', "Y", $sl_conditions);
-									$SubscribersList -> save_field('paid', "Y", $sl_conditions);
-									$SubscribersList -> save_field('paid_date', $Html -> gen_date(), $sl_conditions);
-									$SubscribersList -> save_field('paid_sent', "0", $sl_conditions);
-									$SubscribersList -> save_field('modified', $Html -> gen_date(), $sl_conditions);
-									
-									if ($this -> get_option('paypalsubscriptions') == "Y") {
-										$SubscribersList -> save_field('ppsubscription', "Y", $sl_conditions);
-									}
-									
-									$this -> autoresponders_send($subscriber, $mailinglist);
-									
-									$orderdata = array(
-										'list_id'				=>	$list_id,
-										'subscriber_id'			=>	$custom['subscriber_id'],
-										'completed'				=>	'Y',
-										'amount'				=>	$mailinglist -> price,
-										'product_id'			=>	$subscriberslist -> rel_id,
-										'order_number'			=>	$subscriberslist -> rel_id,
-										'pmethod'				=>	'pp',
-									);
-									
-									if ($wpmlOrder -> save($orderdata, true)) {									
-										//success
-									}
-									
-									$message = __('Payment received and subscription activated', $this -> plugin_name);
-									
-									if ($this -> get_option('adminordernotify') == "Y") {
-										$subscriber -> mailinglists = array($list_id);
-										$to = null;
-										$to -> email = $this -> get_option('adminemail');
-										$subject = $this -> et_subject('order', $subscriber);
-										$fullbody = $this -> et_message('order', $subscriber);
-										$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-										$this -> execute_mail($to, false, $subject, $message, $attachment = false, $history_id = false, false, false);
-									}
-								}
+							if (!$fp) {
+								$message = __('An HTTP error has occurred. PayPal cannot be contacted.', $this -> plugin_name);
+								$this -> log_error(sprintf(__('PayPal IPN: %s - %s', $this -> plugin_name), $errno, $errstr));
 							} else {
-								//Send a message to the administrator?
+								fputs($fp, $header . $req);
+								
+								while (!feof($fp)) {
+									$res = fgets($fp, 1024);									
+									
+									if (strcmp($res, "VERIFIED") == 0) {
+										$verified = true;
+									}
+								}
+								
+								fclose($fp);
 							}
+						}	
 						
-							fclose($fp);
+						$doupdate = false;
+						if (!empty($verified) && $verified == true) {			
+							switch ($payment_status) {
+								case 'Failed'				:
+									$message = __('The payment has failed. Please try again', $this -> plugin_name);
+									break;
+								case 'Denied'				:
+									$message = __('The payment has been denied. This payment could already be pending', $this -> plugin_name);
+									break;
+								default						:
+									if (!empty($custom['subscriber_id']) && !empty($custom['mailinglist_id'])) {
+										switch ($txn_type) {
+											case 'subscr_payment'		:
+												if ($payment_status == "Pending") {
+													$message = __('Thank you for your PayPal subscription. Your payment is currently pending. Please wait for the merchant to accept it', $this -> plugin_name);	
+												} elseif ($payment_status == "Completed") {
+													$doupdate = true;
+												}
+												break;
+											case 'subscr_cancel'		:
+												$mailinglists = @explode(",", $_GET['mailinglist_id']);
+												foreach ($mailinglists as $list_id) {
+													$sl_conditions = array('subscriber_id' => $custom['subscriber_id'], 'list_id' => $list_id);
+													$SubscribersList -> save_field('active', "N", $sl_conditions);
+												}
+												$message = __('PayPal subscription has been cancelled', $this -> plugin_name);
+												break;
+											default						:												
+												if ($payment_status == "Completed" || ($_POST['test_ipn'] && $payment_status == "Pending")) {													
+													$doupdate = true;
+												}
+												break;
+										}
+									} else {
+										$message = __('Subscriber or list ID empty', $this -> plugin_name);
+									}
+									break;
+							}
+						} else {
+							//why on earth?
+							$message = __('PayPal has marked the transaction as invalid', $this -> plugin_name);
+						}		
+							
+						//everything is fine, lets continue
+						if ($doupdate == true) {
+							$subscriber = $Subscriber -> get($custom['subscriber_id'], false);
+							$list_id = $custom['mailinglist_id'];
+							$mailinglist = $Mailinglist -> get($list_id, false);
+							$subscriber -> mailinglist_id = $mailinglist -> id;
+
+							if ($payment_amount == $mailinglist -> price) {								
+								$sl_conditions = array('subscriber_id' => $subscriber -> id, 'list_id' => $mailinglist -> id);
+								
+								$subscriberslist = $SubscribersList -> find($sl_conditions);
+								$SubscribersList -> save_field('active', "Y", $sl_conditions);
+								$SubscribersList -> save_field('paid', "Y", $sl_conditions);
+								$SubscribersList -> save_field('paid_date', $Html -> gen_date(), $sl_conditions);
+								$SubscribersList -> save_field('paid_sent', "0", $sl_conditions);
+								$SubscribersList -> save_field('modified', $Html -> gen_date(), $sl_conditions);
+								
+								if ($this -> get_option('paypalsubscriptions') == "Y") {
+									$SubscribersList -> save_field('ppsubscription', "Y", $sl_conditions);
+								}
+								
+								$this -> autoresponders_send($subscriber, $mailinglist);
+								
+								$orderdata = array(
+									'list_id'				=>	$list_id,
+									'subscriber_id'			=>	$custom['subscriber_id'],
+									'completed'				=>	'Y',
+									'amount'				=>	$mailinglist -> price,
+									'product_id'			=>	$subscriberslist -> rel_id,
+									'order_number'			=>	$subscriberslist -> rel_id,
+									'reference'				=>	$txn_id,
+									'pmethod'				=>	'pp',
+								);
+								
+								if ($wpmlOrder -> save($orderdata, true)) {									
+									//success
+								}
+								
+								$message = __('Payment received and subscription activated', $this -> plugin_name);
+								
+								if ($this -> get_option('adminordernotify') == "Y") {
+									$subscriber -> mailinglists = array($list_id);
+									$to = new stdClass();
+									$to -> email = $this -> get_option('adminemail');
+									$subject = $this -> et_subject('order', $subscriber);
+									$fullbody = $this -> et_message('order', $subscriber);
+									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+									$this -> execute_mail($to, false, $subject, $message, $attachment = false, $history_id = false, false, false);
+								}
+							}
+						} else {
+							//Send a message to the administrator?
+							$this -> log_error(sprintf(__('PayPal IPN: %s', $this -> plugin_name), $message));
 						}
 						
 						if (!empty($message)) {						
@@ -1121,6 +1164,7 @@ if (!class_exists('wpMail')) {
 										'amount'				=>	$_POST['total'],
 										'product_id'			=>	1,
 										'order_number'			=>	$_POST['order_number'],
+										'reference'				=>	$ordernumber,
 										'pmethod'				=>	'2co',
 									);
 									
@@ -1163,25 +1207,35 @@ if (!class_exists('wpMail')) {
 								if (!empty($json)) {
 									$json_message = json_decode($json -> Message);
 									
-									if ($json -> Type == "SubscriptionConfirmation") {									
-										if ($curl_handle = curl_init()) {
-											curl_setopt($curl_handle, CURLOPT_URL, $json -> SubscribeURL);
-											curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 30);
-											curl_exec($curl_handle);
-											curl_close($curl_handle);
+									if ($json -> Type == "SubscriptionConfirmation") {				
+										$subscribe_url = $json -> SubscribeURL;
+										
+										$this -> log_error(sprintf(__('Amazon SNS subscription confirm: %s', $this -> plugin_name), $subscribe_url));
+															
+										if (function_exists('curl_init')) {
+											if ($curl_handle = curl_init($subscribe_url)) {
+												curl_setopt($curl_handle, CURLOPT_URL, $subscribe_url);
+												curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 30);
+												curl_exec($curl_handle);
+												curl_close($curl_handle);
+											}
+										} else {											
+											$raw_response = wp_remote_request($subscribe_url);	
 										}
 									} elseif ($json -> Type == "Notification") {									
-										if ($json_message -> notificationType == "Bounce") {
+										if ($json_message -> notificationType == "Bounce") {											
 											if (!empty($json_message -> bounce -> bouncedRecipients)) {
 												foreach ($json_message -> bounce -> bouncedRecipients as $recipient) {
 													if ($recipient -> action == "failed") {
+														$this -> log_error(sprintf(__('Amazon SNS bounce: %s', $this -> plugin_name), $recipient -> emailaddress));
 														$result = $this -> bounce($recipient -> emailAddress, "sns");
 													}
 												}
 											}
-										} elseif ($json_message -> notificationType == "Complaint") {
+										} elseif ($json_message -> notificationType == "Complaint") {											
 											if (!empty($json_message -> complaint -> complainedRecipients)) {
 												foreach ($json_message -> complaint -> complainedRecipients as $recipient) {
+													$this -> log_error(sprintf(__('Amazon SNS complaint: %s', $this -> plugin_name), $recipient -> emailaddress));
 													$result = $this -> bounce($recipient -> emailAddress, "sns");
 												}
 											}
@@ -3964,7 +4018,8 @@ if (!class_exists('wpMail')) {
 							$Db -> model = $wpmlOrder -> model;
 							$orders = $Db -> find_all(array('subscriber_id' => $subscriber -> id));
 							$conditions['subscriber_id'] = $subscriber -> id;
-							$data = $this -> paginate($Email -> model, false, $this -> sections -> subscribers . '&method=view&id=' . $subscriber -> id, $conditions, false, 15);							
+							$order = array($wpdb -> prefix . $Email -> table . ".modified", "DESC");
+							$data = $this -> paginate($Email -> model, false, $this -> sections -> subscribers . '&method=view&id=' . $subscriber -> id, $conditions, false, 15, $order);							
 							$this -> render_admin('subscribers' . DS . 'view', array('subscriber' => $subscriber, 'orders' => $orders, 'emails' => $data[$Email -> model], 'paginate' => $data['Paginate']));
 						} else {						
 							$message = __('Subscriber cannot be read', $this -> plugin_name);
@@ -4290,11 +4345,17 @@ if (!class_exists('wpMail')) {
 					$sections = $this -> sections -> subscribers;
 					$conditions_and = array();
 					
-					if (!empty($_GET['filter'])) {
-						$sections .= '&filter=1';
+					$newsletters_filter_subscribers = (!empty($_GET['filter']) || (!empty($_COOKIE['newsletters_filter_subscribers']))) ? true : false;
 					
-						if (!empty($_GET['list'])) {
-							switch ($_GET['list']) {
+					if (!empty($newsletters_filter_subscribers)) {
+						$sections .= '&filter=1';
+						
+						//** list filter
+						$newsletters_filter_subscribers_list = (!empty($_GET['list'])) ? $_GET['list'] : false;
+						$newsletters_filter_subscribers_list = (!empty($_COOKIE['newsletters_filter_subscribers_list'])) ? $_COOKIE['newsletters_filter_subscribers_list'] : $newsletters_filter_subscribers_list;
+					
+						if (!empty($newsletters_filter_subscribers_list)) {
+							switch ($newsletters_filter_subscribers_list) {
 								case 'all'				:
 									$dojoin = false;
 									break;
@@ -4304,27 +4365,36 @@ if (!class_exists('wpMail')) {
 									break;
 								default					:
 									$dojoin = true;
-									$conditions_and[$subscriberslists_table . '.list_id'] = $_GET['list'];	
+									$conditions_and[$subscriberslists_table . '.list_id'] = $newsletters_filter_subscribers_list;	
 									break;
 							}
 							
-							$sections .= '&list=' . $_GET['list'];
+							$sections .= '&list=' . $newsletters_filter_subscribers_list;
 						}
 						
-						if (!empty($_GET['status'])) {
-							if ($_GET['status'] != "all") {
-								$status = ($_GET['status'] == "active") ? "Y" : "N";
+						//** status filter (active/inactive)
+						
+						$newsletters_filter_subscribers_status = (!empty($_COOKIE['newsletters_filter_subscribers_status'])) ? $_COOKIE['newsletters_filter_subscribers_status'] : false;
+						$newsletters_filter_subscribers_status = (!empty($_GET['status'])) ? $_GET['status'] : $newsletters_filter_subscribers_status;
+						
+						if (!empty($newsletters_filter_subscribers_status)) {
+							if ($newsletters_filter_subscribers_status != "all") {
+								$status = ($newsletters_filter_subscribers_status == "active") ? "Y" : "N";
 								$conditions_and[$subscriberslists_table . '.active'] = $status;
 								$dojoin = true;
 							}
 							
-							$sections .= '&status=' . $_GET['status'];
+							$sections .= '&status=' . $newsletters_filter_subscribers_status;
 						}
 						
-						if (!empty($_GET['registered']) && $_GET['registered'] != "all") {
-							$conditions_and[$subscribers_table . '.registered'] = $_GET['registered'];
+						//** registered filter
 							
-							$sections .= '&registered=' . $_GET['registered'];
+						$newsletters_filter_subscribers_registered = (empty($_GET['registered'])) ? $_COOKIE['newsletters_filter_subscribers_registered'] : $_GET['registered'];
+						
+						if (!empty($newsletters_filter_subscribers_registered) && $newsletters_filter_subscribers_registered != "all") {
+							$conditions_and[$subscribers_table . '.registered'] = $newsletters_filter_subscribers_registered;
+							
+							$sections .= '&registered=' . $newsletters_filter_subscribers_registered;
 						}
 					}
 					
@@ -4341,7 +4411,7 @@ if (!class_exists('wpMail')) {
 						$data[$Subscriber -> model] = $subscribers;
 						$data['Paginate'] = false;
 					} else {
-						if ($dojoin) {
+						if ($dojoin) {							
 							$data = $this -> paginate($SubscribersList -> model, null, $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
 							$subscribers = $data[$SubscribersList -> model];
 						} else {
@@ -5210,20 +5280,118 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function admin_history() {
-			global $wpdb, $Db, $Html, $History, $HistoriesList, $Email;
+			global $wpdb, $Db, $Html, $History, $HistoriesList, $Email, $Subscriber, $SubscribersList, $wpmlClick;
 			$Db -> model = $History -> model;
+			
+			$emails_table = $wpdb -> prefix . $Email -> table;
+			$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
+			$histories_table = $wpdb -> prefix . $History -> table;
+			$clicks_table = $wpdb -> prefix . $wpmlClick -> table;
 		
 			switch ($_GET['method']) {
 				case 'view'				:
 					if (!empty($_GET['id'])) {
-						if ($history = $History -> get($_GET['id'])) {
-							$conditions = array('history_id' => $_GET['id']);
+						if ($history = $History -> get($_GET['id'])) {							
+							$sections = $this -> sections -> history . '&method=view&id=' . $history -> id;
+							
+							$conditions = array($wpdb -> prefix . $Email -> table . '.history_id' => $_GET['id']);
 							$perpage = (isset($_COOKIE[$this -> pre . 'emailsperpage'])) ? $_COOKIE[$this -> pre . 'emailsperpage'] : 20;
+							
 							$orderfield = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
 							$orderdirection = (empty($_GET['order'])) ? 'DESC' : strtoupper($_GET['order']);
+							
+							switch ($orderfield) {
+								case 'clicked'						:
+									$orderfield = "clicked";
+									break;
+								case 'subscriber_id'				:
+									$orderfield = $subscribers_table . ".email";
+									break;
+								default 							:
+									$orderfield = $emails_table . "." . $orderfield;
+									break;
+							}
+							
 							$order = array($orderfield, $orderdirection);
-							$data = $Email -> get_all_paginated($conditions, false, $this -> sections -> history . '&amp;method=view&amp;id=' . $_GET['id'], $perpage, $order, '#emailssent');
-							$this -> render_admin('history' . DS . 'view', array('history' => $history, 'emails' => $data[$Email -> model], 'paginate' => $data['Pagination']));
+							
+							$conditions_and = array();
+							$dojoin = false;
+							
+							if (!empty($_GET['filter'])) {
+								$sections .= '&filter=1';
+								
+								// status
+								if (!empty($_GET['status'])) {
+									switch ($_GET['status']) {
+										case 'all'				:
+											$dojoin = false;
+											break;
+										case 'sent'				:
+											$dojoin = false;
+											$conditions_and[$emails_table . '.status'] = "sent";
+											break;
+										case 'unsent'			:
+											$dojoin = false;
+											$conditions_and[$emails_table . '.status'] = "unsent";
+											break;
+									}
+								}
+								
+								// read
+								if (!empty($_GET['read'])) {
+									switch ($_GET['read']) {
+										case 'Y'			:
+											$dojoin = false;
+											$conditions_and[$emails_table . '.read'] = "Y";
+											break;
+										case 'N'			:
+											$dojoin = false;
+											$conditions_and[$emails_table . '.read'] = "N";
+											break;
+										case 'all'			:
+										default 			:
+											$dojoin = false;
+											break;
+									}
+								}
+								
+								// clicked
+								if (!empty($_GET['clicked'])) {
+									switch ($_GET['clicked']) {
+										case 'Y'			:
+											$conditions_and['clicked'] = "Y";
+											break;
+										case 'N'			:
+											$conditions_and['clicked'] = "N";
+											break;
+										case 'all'			:
+										default 			:
+											//do nothing...
+											break;
+									}
+								}
+								
+								if (!empty($_GET['bounced'])) {
+									switch ($_GET['bounced']) {
+										case 'Y'			:
+											$conditions_and['bounced'] = "Y";
+											$conditions_and[$emails_table . '.bounced'] = "Y";
+											break;
+										case 'N'			:
+											$conditions_and['bounced'] = "N";
+											$conditions_and[$emails_table . '.bounced'] = "N";
+											break;
+										case 'all'			:
+										default 			:
+											//do nothing...
+											break;
+									}
+								}
+							}
+							
+							//$data = $Email -> get_all_paginated($conditions, false, $this -> sections -> history . '&amp;method=view&amp;id=' . $_GET['id'], $perpage, $order, '#emailssent');
+							$data = $this -> paginate($Email -> model, $emails_table . ".*", $sections, $conditions, $searchterm, $perpage, $order, $conditions_and);
+							$this -> render_admin('history' . DS . 'view', array('history' => $history, 'emails' => $data[$Email -> model], 'paginate' => $data['Paginate']));
 						} else {
 							$message = __('History email cannot be read', $this -> plugin_name);
 							$this -> redirect($this -> url, 'error', $message);
@@ -5253,7 +5421,7 @@ if (!class_exists('wpMail')) {
 						$nextid = $tablestatus -> Auto_increment;					
 						$query = "CREATE TEMPORARY TABLE `historytmp` SELECT * FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $_GET['id'] . "'";
 						$wpdb -> query($query);
-						$query = "UPDATE `historytmp` SET `id` = '" . $nextid . "', `sent` = '0', `created` = '" . $Html -> gen_date() . "', `modified` = '" . $Html -> gen_date() . "' WHERE `id` = '" . $_GET['id'] . "'";
+						$query = "UPDATE `historytmp` SET `id` = '" . $nextid . "', `post_id` = '0', `sent` = '0', `created` = '" . $Html -> gen_date() . "', `modified` = '" . $Html -> gen_date() . "' WHERE `id` = '" . $_GET['id'] . "'";
 						$wpdb -> query($query);
 						$query = "INSERT INTO `" . $wpdb -> prefix . $History -> table . "` SELECT * FROM `historytmp` WHERE `id` = '" . $nextid . "'";
 						$wpdb -> query($query);
@@ -5268,6 +5436,187 @@ if (!class_exists('wpMail')) {
 					}
 					
 					$this -> redirect($this -> url, $msgtype, $message);
+					break;
+				case 'emails-mass'		:
+					if (!empty($_POST['action'])) {
+						if (!empty($_POST['emails'])) {
+							switch ($_POST['action']) {
+								case 'subscribers_delete'		:
+									foreach ($_POST['emails'] as $email_id) {
+										$Db -> model = $Email -> model;
+										if ($email = $Db -> find(array('id' => $email_id), array('subscriber_id'))) {
+											if (!empty($email -> subscriber_id)) {
+												$Db -> model = $Subscriber -> model;
+												$Db -> delete($email -> subscriber_id);
+											}
+										}
+									}
+									
+									$msg_type = 'message';
+									$message = __('Selected subscribers deleted', $this -> plugin_name);
+									break;
+								case 'subscribers_addlists'		:
+									if (!empty($_POST['lists'])) {
+										foreach ($_POST['emails'] as $email_id) {
+											$Db -> model = $Email -> model;
+											if ($email = $Db -> find(array('id' => $email_id), array('subscriber_id'))) {
+												foreach ($_POST['lists'] as $list_id) {													
+													$sl_data = array(
+														'subscriber_id'			=>	$email -> subscriber_id,
+														'list_id'				=>	$list_id,
+														'active'				=>	"Y",
+													);	
+													
+													$SubscribersList -> save($sl_data, true);
+												}
+											}
+										}
+										
+										$msg_type = 'message';
+										$message = __('Selected lists added to subscribers', $this -> plugin_name);
+									} else {
+										$msg_type = 'error';
+										$message = __('No lists were selected', $this -> plugin_name);
+									}
+									break;
+								case 'subscribers_setlists'		:
+									if (!empty($_POST['lists'])) {
+										foreach ($_POST['emails'] as $email_id) {
+											$Db -> model = $Email -> model;
+											if ($email = $Db -> find(array('id' => $email_id), array('subscriber_id'))) {
+												if (!empty($email -> subscriber_id)) {
+													$SubscribersList -> delete_all(array('subscriber_id' => $email -> subscriber_id));
+													
+													foreach ($_POST['lists'] as $list_id) {
+														$sl_data = array(
+															'subscriber_id'					=>	$email -> subscriber_id,
+															'list_id'						=>	$list_id,
+															'active'						=>	"Y",
+														);
+														
+														$SubscribersList -> save($sl_data, true);
+													}
+												}
+											}
+										}
+										
+										$msg_type = 'message';
+										$message = __('Selected lists set to subscribers', $this -> plugin_name);
+									} else {
+										$msg_type = 'error';
+										$message = __('No lists were selected', $this -> plugin_name);
+									}
+									break;
+								case 'subscribers_dellists'		:
+									if (!empty($_POST['lists'])) {
+										foreach ($_POST['emails'] as $email_id) {
+											$Db -> model = $Email -> model;
+											if ($email = $Db -> find(array('id' => $email_id), array('subscriber_id'))) {
+												if (!empty($email -> subscriber_id)) {
+													foreach ($_POST['lists'] as $list_id) {
+														$SubscribersList -> delete_all(array('subscriber_id' => $email -> subscriber_id, 'list_id' => $list_id));
+													}
+												}
+											}
+										}
+										
+										$msg_type = 'error';
+										$message = __('Selected lists removed from subscriber', $this -> plugin_name);
+									} else {
+										$msg_type = 'error';
+										$message = __('No lists were selected', $this -> plugin_name);
+									}
+									break;
+								case 'delete'					:
+									foreach ($_POST['emails'] as $email_id) {
+										$Db -> model = $Email -> model;
+										$Db -> delete($email_id);
+									}
+									
+									$msg_type = 'message';
+									$message = __('Selected emails have been deleted', $this -> plugin_name);
+									break;
+								case 'export'					:
+									$history_id = $_POST['id'];
+									$email_ids = implode(",", $_POST['emails']);
+									$emailsquery = "SELECT * FROM " . $wpdb -> prefix . $Email -> table . " WHERE id IN (" . $email_ids . ")";
+									
+									if ($emails = $wpdb -> get_results($emailsquery)) {										
+										/* CSV Headings */
+										$data = "";
+										$data .= '"' . __('Email Address', $this -> plugin_name) . '",';
+										$data .= '"' . __('Mailing List', $this -> plugin_name) . '",';
+										$data .= '"' . __('Sent/Unsent', $this -> plugin_name) . '",';
+										$data .= '"' . __('Read/Opened', $this -> plugin_name) . '",';
+										$data .= '"' . __('Sent Date', $this -> plugin_name) . '",';
+										$data .= "\r\n";
+										
+										foreach ($emails as $email) {
+											$this -> remove_server_limits();
+											
+											if (!empty($email -> subscriber_id)) {
+												$Db -> model = $Subscriber -> model;
+												$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
+												/* Subscriber */
+												$Db -> model = $Subscriber -> model;
+					                        	$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
+												$data .= '"' . $subscriber -> email . '",';
+												
+												/* Mailing List */
+												$Db -> model = $Mailinglist -> model;
+					                        	$mailinglist = $Db -> find(array('id' => $email -> mailinglist_id));
+												$data .= '"' . __($mailinglist -> title) . '",';
+											} elseif (!empty($email -> user_id)) {
+												$user = $this -> userdata($email -> user_id);
+												$data .= '"' . $user -> user_email . '",';
+												$data .= '"' . '' . '",';
+											}
+											
+											/* Read/Opened Status */
+											$data .= '"' . $email -> status . '",';
+											$data .= '"' . ((!empty($email -> read) && $email -> read == "Y") ? __('Yes', $this -> plugin_name) : __('No', $this -> plugin_name)) . '",';
+											$data .= '"' . (date_i18n("Y-m-d H:i:s", strtotime($email -> modified))) . '",';
+											$data .= "\r\n";	
+										}
+										
+										if (!empty($data)) {
+											$exportfile = 'history' . $history_id . '-emails-' . date_i18n("Ymd", time()) . '.csv';
+											$exportpath = $Html -> uploads_path() . DS . $this -> plugin_name . DS . 'export' . DS;
+											$exportfull = $exportpath . $exportfile;
+											
+											if ($fh = fopen($exportfull, "w")) {
+												fwrite($fh, $data);
+												fclose($fh);
+												@chmod($exportfull, 0777);
+												
+												$exportfileabs = $Html -> uploads_url() . '/' . $exportfile;	
+												$msg_type = 'message';
+												//$message = __('CSV has been exported with filename "' . $exportfile . '".', $this -> plugin_name) . ' <a href="' . $exportfileabs . '" title="' . __('Download the CSV', $this -> plugin_name) . '">' . __('Download the CSV', $this -> plugin_name) . '</a>';
+												$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $history_id . '&newsletters_exportlink=' . $exportfile));
+											} else {
+												$msg_type = 'error';
+												$message = sprintf(__('CSV file could not be created, please check write permissions on "%s" folder.', $this -> plugin_name), $exportpath);	
+											}
+										} else {
+											$msg_type = 'error';
+											$message = __('CSV data could not be formulated, no emails maybe? Please try again', $this -> plugin_name);
+										}
+									} else {
+										$msg_type = 'error';
+										$message = __('No history/draft emails are available to export!', $this -> plugin_name);
+									}
+									break;
+							}
+						} else {
+							$msg_type = 'error';
+							$message = __('No emails were selected', $this -> plugin_name);
+						}
+					} else {
+						$msg_type = 'error';
+						$message = __('No action was specified', $this -> plugin_name);
+					}
+					
+					$this -> redirect($this -> referer, $msg_type, $message);
 					break;
 				case 'mass'				:
 					if (!empty($_POST['action'])) {
@@ -6100,6 +6449,7 @@ if (!class_exists('wpMail')) {
 						delete_option('tridebugging');
 						$this -> delete_option('themeintextversion');
 						$this -> delete_option('emailarchive');
+						$this -> delete_option('excerpt_settings');
 						
 						if (!empty($_FILES)) {
 							foreach ($_FILES as $fkey => $fval) {
@@ -6351,8 +6701,11 @@ if (!class_exists('wpMail')) {
 					$this -> redirect($this -> referer, $msg_type, $message);
 					break;
 				case 'reschedule'		:
-					if (!empty($_GET['hook'])) {
+					if (!empty($_GET['hook'])) {						
 						switch ($_GET['hook']) {
+							case 'newsletters_optimizehook'					:
+								$this -> optimize_scheduling();
+								break;
 							case 'cronhook'			:
 								$this -> scheduling();
 								break;
@@ -6384,7 +6737,13 @@ if (!class_exists('wpMail')) {
 					break;
 				case 'clearschedule'	:
 					if (!empty($_GET['hook'])) {
-						wp_clear_scheduled_hook($this -> pre . '_' . $_GET['hook']);
+						if (preg_match("/(newsletters)/si", $_GET['hook'])) {
+							$hook = $_GET['hook'];
+						} else {
+							$hook = $this -> pre . '_' . $_GET['hook'];
+						}
+						
+						wp_clear_scheduled_hook($hook);
 						
 						$msg_type = 'message';
 						$message = __('Task has been unscheduled, remember to reschedule as needed.', $this -> plugin_name);

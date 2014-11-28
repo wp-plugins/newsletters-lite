@@ -6,9 +6,9 @@
 // Copyright (C) 2007 - 2008 Tribulant Software
 ///////////////////////////////////////////////
 
-global $wpdb, $wpmlsql;
+global $wpdb;
 
-$wpmlsql['wpmlcountries'] = "INSERT INTO `" . $wpdb -> prefix . "wpmlcountries` (`id`, `value`) VALUES 
+$countriesquery = "INSERT INTO `" . $wpdb -> prefix . "wpmlcountries` (`id`, `value`) VALUES 
 (1, 'Afghanistan'),
 (2, '&Aring;land&nbsp;Islands'),
 (3, 'Albania'),

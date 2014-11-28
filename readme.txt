@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 4.4.2
+Stable tag: 4.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -141,6 +141,30 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.3 =
+* ADD: Setting to turn on/off the excerpt length/text settings
+* ADD: Filters, bulk actions, etc... under "Emails Sent" per sent/draft email  
+* IMPROVE: Sorting improvements to emails sent of sent/draft email  
+* IMPROVE: "Duplicate" button when viewing individual sent/draft email  
+* IMPROVE: Show post link when viewing individual sent/draft email  
+* IMPROVE: Show database optimize cron schedule under Scheduled Tasks  
+* IMPROVE: Deprecated upgrade-functions.php  
+* IMPROVE: Undefined property $indexes  
+* IMPROVE: PayPal IPN notify-validate CURL alternative to fsockopen()  
+* IMPROVE: Change PayPal protocol from SSL to TLS  
+* IMPROVE: Amazon SNS bounce wp_remote_request as alternative to CURL  
+* IMPROVE: Retain/save filters selected under Newsletters > Subscribers  
+* FIX: Pagination missing under "Emails Sent" of history email  
+* FIX: Mailing list(s) column incorrect under Emails Sent of history email  
+* FIX: Duplicate newsletter inherits post as well  
+* FIX: Click track not tracking links added to the theme  
+* FIX: Subscribers section filters + sorting database error  
+* FIX: Language tags break custom fields upon save  
+* FIX: Double authentication email with WordPress SEO plugin and some themes  
+* FIX: Delete history/draft email fatal error  
+* FIX: ReCaptcha not working on subscribe form  
+* FIX: ISO-8859-1 (eg umlauts) characters break on subscribers  
 
 = 4.4.2 =
 

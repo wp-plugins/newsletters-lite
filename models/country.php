@@ -22,6 +22,8 @@ class wpmlCountry extends wpMailPlugin {
 		'key'				=>	"PRIMARY KEY (`id`)",					   
 	);
 	
+	var $indexes = array('value');
+	
 	function wpmlCountry($data = array()) {
 		global $wpdb, $Db;
 	
@@ -35,9 +37,9 @@ class wpmlCountry extends wpMailPlugin {
 				
 				$this -> tables[$this -> pre . $this -> controller] = $this -> fields;
 				$this -> check_table($this -> pre . $this -> controller);
-				$this -> vendor($this -> controller, 'sql', false);
-				require_once(ABSPATH . 'wp-admin' . DS . 'upgrade-functions.php');
-				dbDelta($wpmlsql, true);
+				
+				include($this -> plugin_base() . DS . 'vendors' . DS . 'sql.countries.php');
+				$wpdb -> query($countriesquery);
 				
 				$this -> update_option('countriesinserted', "Y");
 			}

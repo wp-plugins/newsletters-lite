@@ -20,7 +20,7 @@
 		<?php endif; ?>
 	
 		<p>
-			<span id="sendajaxcount"><strong><span id="sendajaxcountinside" style="color:green;">0</span></strong></span> <span id="sendajaxfailedcount">(<strong><span id="sendajaxfailedcountinside" class="newsletters_error">0</span></strong> failed)</span> <?php _e('out of', $this -> plugin_name); ?> <strong><?php echo count($subscribers); ?></strong>
+			<span id="sendajaxcount"><strong><span id="sendajaxcountinside" class="newsletters_success">0</span></strong></span> <span id="sendajaxfailedcount">(<strong><span id="sendajaxfailedcountinside" class="newsletters_error">0</span></strong> failed)</span> <?php _e('out of', $this -> plugin_name); ?> <strong><?php echo count($subscribers); ?></strong>
 			<?php if (empty($_POST['sendtype']) || $_POST['sendtype'] == "send") : ?>
 				<span id="havebeenqueued"><?php _e('emails have been sent out.', $this -> plugin_name); ?></span>
 			<?php else : ?>

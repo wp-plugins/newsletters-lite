@@ -49,6 +49,7 @@ class wpmlOrder extends wpMailPlugin {
 		'product_id'	=>	"INT(11) NOT NULL DEFAULT '0'",
 		'order_number'	=>	"INT(11) NOT NULL DEFAULT '0'",
 		'pmethod'		=>	"ENUM('pp','2co') NOT NULL DEFAULT 'pp'",
+		'reference'		=>	"VARCHAR(250) NOT NULL DEFAULT ''",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'key'			=>	"PRIMARY KEY (`id`), INDEX(`subscriber_id`), INDEX(`list_id`)"
@@ -63,6 +64,7 @@ class wpmlOrder extends wpMailPlugin {
 		'product_id'	=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'order_number'	=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'pmethod'		=>	array("ENUM('pp','2co')", "NOT NULL DEFAULT 'pp'"),
+		'reference'		=>	array("VARCHAR(250)", "NOT NULL DEFAULT ''"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'			=>	"PRIMARY KEY (`id`), INDEX(`subscriber_id`), INDEX(`list_id`)"					   

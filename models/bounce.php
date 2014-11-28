@@ -9,6 +9,7 @@ class wpmlBounce extends wpMailPlugin {
 	var $fields = array(
 		'id'				=>	"INT(11) NOT NULL AUTO_INCREMENT",
 		'email'				=>	"VARCHAR(250) NOT NULL DEFAULT ''",
+		'status'			=>	"TEXT NOT NULL",
 		'count'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'history_id'		=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
@@ -19,6 +20,7 @@ class wpmlBounce extends wpMailPlugin {
 	var $tv_fields = array(
 		'id'				=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
 		'email'				=>	array("VARCHAR(250)", "NOT NULL DEFAULT ''"),
+		'status'			=>	array("TEXT", "NOT NULL"),
 		'count'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'history_id'		=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),

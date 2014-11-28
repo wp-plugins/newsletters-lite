@@ -45,7 +45,7 @@
 							<?php $Db -> model = $Mailinglist -> model; ?>
 							<?php if ($mailinglist = $Db -> find(array('id' => $sl -> list_id))) : ?>
 								<?php echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $sl -> list_id); ?>
-								(<span <?php echo ($sl -> active == "Y") ? 'style="color:green;">' . __('active', $this -> plugin_name) : 'class="newsletters_error">' . __('inactive', $this -> plugin_name); ?></span>)
+								(<span <?php echo ($sl -> active == "Y") ? 'class="newsletters_success">' . __('active', $this -> plugin_name) : 'class="newsletters_error">' . __('inactive', $this -> plugin_name); ?></span>)
 								<?php if ($m < count($subscriberslists)) : ?>
 									<?php echo ', '; ?>
 								<?php endif; ?>

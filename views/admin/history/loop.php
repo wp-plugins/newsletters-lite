@@ -269,7 +269,7 @@
 	                    		<?php 
 	                    		
 	                    		$post = get_post($email -> post_id);
-	                    		edit_post_link($post -> post_title, null, null, $email -> post_id);
+	                    		edit_post_link(__($post -> post_title), null, null, $email -> post_id);
 	                    		
 	                    		?>
 	                    	<?php else : ?>

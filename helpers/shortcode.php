@@ -362,20 +362,30 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	}
 	
 	function excerpt_length($length = null) {
-		$length = $this -> get_option('excerpt_length');		
+		$excerpt_settings = $this -> get_option('excerpt_settings');
+		
+		if (!empty($excerpt_settings)) {
+			$length = $this -> get_option('excerpt_length');		
+		}
+			
 		return $length;
 	}
 	
 	function excerpt_more($more = null) {
-		global $shortcode_post, $shortcode_post_language, $wpml_target;
-		$excerpt_more = ($this -> language_do()) ? $this -> language_use($shortcode_post_language, $this -> language_join($this -> get_option('excerpt_more'))) : $this -> get_option('excerpt_more');
+		$excerpt_settings = $this -> get_option('excerpt_settings');
 		
-		global ${'newsletters_acolor'};
-		if (!empty(${'newsletters_acolor'})) {
-			$style = ' style="color:' . ${'newsletters_acolor'} . ';"';
+		if (!empty($excerpt_settings)) {
+			global $shortcode_post, $shortcode_post_language, $wpml_target;
+			$excerpt_more = ($this -> language_do()) ? $this -> language_use($shortcode_post_language, $this -> language_join($this -> get_option('excerpt_more'))) : $this -> get_option('excerpt_more');
+			
+			global ${'newsletters_acolor'};
+			if (!empty(${'newsletters_acolor'})) {
+				$style = ' style="color:' . ${'newsletters_acolor'} . ';"';
+			}
+			
+			$more = ' <a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a>';
 		}
-		
-		$more = ' <a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a>';
+			
 		return $more;
 	}
 	

@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.2';
+		var $version = '4.4.3';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -3206,7 +3206,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (is_admin()) {	
 				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
 					
-				if (preg_match("/(widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {					
+				if (preg_match("/(widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {									
 					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 				}
 				
@@ -3754,8 +3754,9 @@ if (!class_exists('wpMailPlugin')) {
 								break;
 						}
 						
-						$indexes = $this -> indexes[$oldname];
-						if (!empty($indexes)) {
+						if (!empty($this -> indexes[$oldname])) {
+							$indexes = $this -> indexes[$oldname];
+							
 							foreach ($indexes as $index) {
 								$query = "SHOW INDEX FROM `" . $name . "` WHERE `Key_name` = '" . $index . "'";
 								if (!$wpdb -> get_row($query)) {
@@ -5205,7 +5206,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			global $wpdb, $History;
 			if (!empty($history_id)) { 
-				$query = "SELECT `from`, `fromname`, `text` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "'";
+				$query = "SELECT `from`, `fromname`, `text`, `mailinglists` FROM `" . $wpdb -> prefix . $History -> table . "` WHERE `id` = '" . $history_id . "'";
 				$his = $wpdb -> get_row($query);
 				$history = stripslashes_deep($his); 
 			}
@@ -5396,7 +5397,7 @@ if (!class_exists('wpMailPlugin')) {
 						'subscriber_id'			=>	(!empty($subscriber) ? $subscriber -> id : 0),
 						'user_id'				=>	(!empty($user) ? $user -> ID : 0),
 						'mailinglist_id'		=>	(!empty($subscriber -> mailinglist_id) ? $subscriber -> mailinglist_id : ''),
-						'mailinglists'			=>	(!empty($subscriber) ? maybe_serialize($Subscriber -> mailinglists($subscriber -> id, $subscriber -> mailinglists, false, "Y")) : ''),
+						'mailinglists'			=>	(empty($history -> mailinglists) ? maybe_serialize($Subscriber -> mailinglists($subscriber -> id, $subscriber -> mailinglists, false, "Y")) : $history -> mailinglists),
 						'history_id'			=>	$history_id,
 						'read'					=>	"N",
 						'status'				=>	"sent",
@@ -5409,6 +5410,19 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			return $sent;
+		}
+		
+		function log_error($error = null) {
+			$debugging = get_option('tridebugging');
+			$this -> debugging = (empty($debugging)) ? $this -> debugging : true;
+			
+			if (!empty($error) && $this -> debugging == true) {
+				error_log(date_i18n('[Y-m-d H:i:s] ') . $error . PHP_EOL, 3, NEWSLETTERS_LOG_FILE);
+				
+				return true;
+			}
+			
+			return false;
 		}
 		
 		/**
@@ -5902,14 +5916,14 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.4.2") < 0) {
+				if (version_compare($cur_version, "4.4.3") < 0) {
 					$this -> update_options();
 					
 					// Set the 'rel_id' field on fieldslists table as AUTO_INCREMENT
 					global $wpdb, $Db, $FieldsList;
 					$query = "ALTER TABLE " . $wpdb -> prefix . $FieldsList -> table . " CHANGE `rel_id` `rel_id` INT(11) NOT NULL AUTO_INCREMENT";
 					
-					$version = '4.4.2';
+					$version = '4.4.3';
 				}
 			
 				//the current version is older.
@@ -6059,6 +6073,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['commentformlabel'] = __('Receive news updates via email from this site', $this -> plugin_name);
 			$options['commentformautocheck'] = "N";
 			$options['commentformlist'] = "1";
+			$options['excerpt_settings'] = 1;
 			$options['excerpt_length'] = 55;
 			$options['excerpt_more'] = __('Read more', $this -> plugin_name);
 			$options['latestposts'] = "N";
@@ -6500,7 +6515,7 @@ if (!class_exists('wpMailPlugin')) {
 			                                        $Db -> save_field('bouncecount', ($subscriber -> bouncecount + 1), array('id' => $subscriber -> id));
 			                                    }
 			                                    
-			                                    $bouncedata = array('email' => $subscriber -> email, 'history_id' => $bouncedemail -> history_id);
+			                                    $bouncedata = array('email' => $subscriber -> email, $the_facts['status'], 'history_id' => $bouncedemail -> history_id);
 			                                    $Bounce -> save($bouncedata);
 			                                    
 			                                    do_action('newsletters_subscriber_bounce', $subscriber -> id, ($subscriber -> bouncecount + 1), $bouncedemail -> history_id);
@@ -6978,42 +6993,6 @@ if (!class_exists('wpMailPlugin')) {
 					$wpml_textmessage = $body;
 				}
 				
-				$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';				
-				if (preg_match_all($pattern, $body, $regs)) {				
-					$body = apply_filters('newsletters_emailbody_links', $body, $history_id, $regs);
-				
-					/* Bit.ly if shortlinks are enabled */
-					if (!empty($shortlinks) && $shortlinks == true && $this -> get_option('shortlinks') == "Y") {								
-						if (!empty($regs[1])) {
-							$results = $regs[1];
-							foreach($results as $k => $v) {							
-								if (apply_filters('wpml_bitlink_loop', true, $v, $regs)) {
-									$bitlink = $this -> make_bitly_url($v);								
-									if (!empty($bitlink)) {									
-										$pattern = '/[\'"](' . preg_quote($v, '/') . ')[\'"]/si';									
-										$body = preg_replace($pattern, '"' . $bitlink . '"', $body);
-										$regs[1][$k] = $bitlink;
-									}
-								}
-							}
-						}
-					}
-				
-					/* Click Tracking */
-					if ($this -> get_option('clicktrack') == "Y") {					
-						if (!empty($regs[1])) {
-							$results = $regs[1];
-							foreach ($results as $rkey => $result) {
-								if (apply_filters('wpml_hashlink_loop', true, $result, $regs)) {
-									$hashlink = $this -> hashlink($result, $history_id, $subscriber -> id, $user -> id);								
-									$pattern = '/[\'"](' . preg_quote($result, '/') . ')[\'"]/si';									
-									$body = preg_replace($pattern, '"' . $hashlink . '"', $body);
-								}
-							}
-						}
-					}	
-				}
-				
 				if (!empty($history_id)) {
 					$this -> history_id = $history_id;
 				}
@@ -7028,6 +7007,7 @@ if (!class_exists('wpMailPlugin')) {
 							ob_start();					
 							echo do_shortcode(stripslashes($theme -> content));
 							$theme_content = ob_get_clean();
+							$theme_content = apply_filters('newsletters_theme_before_wpmlcontent_replace', $theme_content);
 							
 							$body = '<div class="newsletters_content">' . apply_filters($this -> pre . '_wpmlcontent_before_replace', $body) . '</div>';
 							$new_body = preg_replace("/\[wpmlcontent\]/si", $body, $theme_content);
@@ -7045,6 +7025,44 @@ if (!class_exists('wpMailPlugin')) {
 					if (!empty($themeintextversion)) {
 						global $wpml_textmessage;
 						$wpml_textmessage = $body;
+					}
+					
+					//** Bit.ly and Click tracking
+					
+					$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';				
+					if (preg_match_all($pattern, $body, $regs)) {				
+						$body = apply_filters('newsletters_emailbody_links', $body, $history_id, $regs);
+					
+						/* Bit.ly if shortlinks are enabled */
+						if (!empty($shortlinks) && $shortlinks == true && $this -> get_option('shortlinks') == "Y") {								
+							if (!empty($regs[1])) {
+								$results = $regs[1];
+								foreach($results as $k => $v) {							
+									if (apply_filters('wpml_bitlink_loop', true, $v, $regs)) {
+										$bitlink = $this -> make_bitly_url($v);								
+										if (!empty($bitlink)) {									
+											$pattern = '/[\'"](' . preg_quote($v, '/') . ')[\'"]/si';									
+											$body = preg_replace($pattern, '"' . $bitlink . '"', $body);
+											$regs[1][$k] = $bitlink;
+										}
+									}
+								}
+							}
+						}
+					
+						/* Click Tracking */
+						if ($this -> get_option('clicktrack') == "Y") {					
+							if (!empty($regs[1])) {
+								$results = $regs[1];
+								foreach ($results as $rkey => $result) {
+									if (apply_filters('wpml_hashlink_loop', true, $result, $regs)) {
+										$hashlink = $this -> hashlink($result, $history_id, $subscriber -> id, $user -> id);								
+										$pattern = '/[\'"](' . preg_quote($result, '/') . ')[\'"]/si';									
+										$body = preg_replace($pattern, '"' . $hashlink . '"', $body);
+									}
+								}
+							}
+						}	
 					}
 				
 					return $body;

@@ -28,24 +28,27 @@
     	
     	<div class="alignleft actions">
     		<?php _e('Filters:', $this -> plugin_name); ?>
-    		<select name="list">
-    			<option <?php echo (!empty($_GET['list']) && $_GET['list'] == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Mailing Lists', $this -> plugin_name); ?></option>
-    			<option <?php echo (!empty($_GET['list']) && $_GET['list'] == "none") ? 'selected="selected"' : ''; ?> value="none"><?php _e('No Mailing Lists', $this -> plugin_name); ?></option>
+    		<?php $filter_list = (!empty($_COOKIE['newsletters_filter_subscribers_list'])) ? $_COOKIE['newsletters_filter_subscribers_list'] : $_GET['list']; ?>
+    		<select name="list" onchange="newsletters_change_filter('subscribers', 'list', this.value);">
+    			<option <?php echo (!empty($filter_list) && $filter_list == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Mailing Lists', $this -> plugin_name); ?></option>
+    			<option <?php echo (!empty($filter_list) && $filter_list == "none") ? 'selected="selected"' : ''; ?> value="none"><?php _e('No Mailing Lists', $this -> plugin_name); ?></option>
     			<?php if ($mailinglists = $Mailinglist -> select(true)) : ?>
     				<?php foreach ($mailinglists as $list_id => $list_title) : ?>
-    					<option <?php echo (!empty($_GET['list']) && $_GET['list'] == $list_id) ? 'selected="selected"' : ''; ?> value="<?php echo $list_id; ?>"><?php echo __($list_title); ?></option>
+    					<option <?php echo (!empty($filter_list) && $filter_list == $list_id) ? 'selected="selected"' : ''; ?> value="<?php echo $list_id; ?>"><?php echo __($list_title); ?></option>
     				<?php endforeach; ?>
     			<?php endif; ?>
     		</select>
-    		<select name="status">
-    			<option <?php echo (!empty($_GET['status']) && $_GET['status'] == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Status', $this -> plugin_name); ?></option>
-    			<option <?php echo (!empty($_GET['status']) && $_GET['status'] == "active") ? 'selected="selected"' : ''; ?> value="active"><?php _e('Active Subscriptions', $this -> plugin_name); ?></option>
-    			<option <?php echo (!empty($_GET['status']) && $_GET['status'] == "inactive") ? 'selected="selected"' : ''; ?> value="inactive"><?php _e('Inactive Subscriptions', $this -> plugin_name); ?></option>
+    		<?php $filter_status = (empty($_COOKIE['newsletters_filter_subscribers_status'])) ? $_GET['status'] : $_COOKIE['newsletters_filter_subscribers_status']; ?>
+    		<select name="status" onchange="newsletters_change_filter('subscribers', 'status', this.value);">
+    			<option <?php echo (!empty($filter_status) && $filter_status == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Status', $this -> plugin_name); ?></option>
+    			<option <?php echo (!empty($filter_status) && $filter_status == "active") ? 'selected="selected"' : ''; ?> value="active"><?php _e('Active Subscriptions', $this -> plugin_name); ?></option>
+    			<option <?php echo (!empty($filter_status) && $filter_status == "inactive") ? 'selected="selected"' : ''; ?> value="inactive"><?php _e('Inactive Subscriptions', $this -> plugin_name); ?></option>
     		</select>
-    		<select name="registered">
-    			<option <?php echo (!empty($_GET['registered']) && $_GET['registered'] == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Subscribers', $this -> plugin_name); ?></option>
-    			<option <?php echo (!empty($_GET['registered']) && $_GET['registered'] == "Y") ? 'selected="selected"' : ''; ?> value="Y"><?php _e('Registered Users', $this -> plugin_name); ?></option>
-    			<option <?php echo (!empty($_GET['registered']) && $_GET['registered'] == "N") ? 'selected="selected"' : ''; ?> value="N"><?php _e('Not Registered', $this -> plugin_name); ?></option>
+    		<?php $filter_registered = (empty($_COOKIE['newsletters_filter_subscribers_registered'])) ? $_GET['registered'] : $_COOKIE['newsletters_filter_subscribers_registered']; ?>
+    		<select name="registered" onchange="newsletters_change_filter('subscribers', 'registered', this.value);">
+    			<option <?php echo (!empty($filter_registered) && $filter_registered == "all") ? 'selected="selected"' : ''; ?> value="all"><?php _e('All Subscribers', $this -> plugin_name); ?></option>
+    			<option <?php echo (!empty($filter_registered) && $filter_registered == "Y") ? 'selected="selected"' : ''; ?> value="Y"><?php _e('Registered Users', $this -> plugin_name); ?></option>
+    			<option <?php echo (!empty($filter_registered) && $filter_registered == "N") ? 'selected="selected"' : ''; ?> value="N"><?php _e('Not Registered', $this -> plugin_name); ?></option>
     		</select>
     		<input type="submit" name="filter" value="<?php _e('Filter', $this -> plugin_name); ?>" class="button button-primary" />
     	</div>

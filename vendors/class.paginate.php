@@ -60,9 +60,14 @@ class wpmlpaginate extends wpMailPlugin {
 	}
 	
 	function start_paging($page = null) {
-		global $wpdb, $Html, $Subscriber, $SubscribersList, $History, $HistoriesList, $Autoresponder, $AutorespondersList;
+		global $wpdb, $Html, $Subscriber, $wpmlClick, $Bounce, $Email, $SubscribersList, $History, $HistoriesList, $Autoresponder, $AutorespondersList;
 	
 		$page = (empty($page)) ? 1 : $page;
+		
+		$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
+		$emails_table = $wpdb -> prefix . $Email -> table;
+		$clicks_table = $wpdb -> prefix . $wpmlClick -> table;
+		$bounces_table = $wpdb -> prefix . $Bounce -> table;
 	
 		if (!empty($page)) {
 			$this -> page = $page;
@@ -72,6 +77,16 @@ class wpmlpaginate extends wpMailPlugin {
 			$countquery = "SELECT COUNT(*) FROM `" . $this -> table . "`";
 		
 		switch ($this -> model) {
+			case 'Email'						:
+				$query .= " LEFT JOIN " . $subscribers_table . " ON " . $emails_table . ".subscriber_id = " . $subscribers_table . ".id";
+				$countquery .= " LEFT JOIN " . $subscribers_table . " ON " . $emails_table . ".subscriber_id = " . $subscribers_table . ".id";
+				
+				if (!empty($this -> order[0]) && $this -> order[0] == "clicked") {
+					$this -> order[0] = $clicks_table . ".subscriber_id";
+					$query .= " LEFT JOIN " . $clicks_table . " ON " . $emails_table . ".subscriber_id = " . $clicks_table . ".subscriber_id";
+					$countquery .= " LEFT JOIN " . $clicks_table . " ON " . $emails_table . ".subscriber_id = " . $clicks_table . ".subscriber_id";
+				}
+				break;
 			case 'Subscriber'					:
 			
 				break;
@@ -91,10 +106,68 @@ class wpmlpaginate extends wpMailPlugin {
 		
 		$didwhere = false;
 		
-		if (!empty($this -> where)) {
+		if (!empty($this -> where_and['clicked'])) {
 			$didwhere = true;
-			$query .= " WHERE (";
-			$countquery .= " WHERE (";
+			$clicked = $this -> where_and['clicked'];
+			unset($this -> where_and['clicked']);
+			$click_cond = ($clicked == "Y") ? "IN" : "NOT IN";
+			
+			$query .= " WHERE " . $emails_table . ".subscriber_id " . $click_cond . " 
+			(SELECT " . $clicks_table . ".subscriber_id FROM " . $clicks_table . "";
+			
+			$countquery .= " WHERE " . $emails_table . ".subscriber_id " . $click_cond . " 
+			(SELECT " . $clicks_table . ".subscriber_id FROM " . $clicks_table . "";
+			
+			if (!empty($this -> where[$emails_table . '.history_id'])) {
+				$query .= " WHERE " . $clicks_table . ".history_id = '" . $this -> where[$emails_table . '.history_id'] . "'";
+				$countquery .= " WHERE " . $clicks_table . ".history_id = '" . $this -> where[$emails_table . '.history_id'] . "'";
+			}
+			
+			$query .= ")";
+			$countquery .= ")";
+		}
+		
+		if (!empty($this -> where_and['bounced'])) {
+			$bounced = $this -> where_and['bounced'];
+			unset($this -> where_and['bounced']);
+			$bounce_cond = ($bounced == "Y") ? "IN" : "NOT IN";
+			
+			if (!$didwhere) {
+				$query .= " WHERE";
+				$countquery .= " WHERE";
+			} else {
+				$query .= " AND";
+				$countquery .= " AND";
+			}
+			
+			$query .= " " . $emails_table . ".subscriber_id " . $bounce_cond . " 
+			(SELECT " . $subscribers_table . ".id FROM " . $subscribers_table . " LEFT JOIN " . 
+			$bounces_table . " ON " . $subscribers_table . ".email = " . $bounces_table . ".email";
+			
+			$countquery .= " " . $emails_table . ".subscriber_id " . $bounce_cond . " 
+			(SELECT " . $subscribers_table . ".id FROM " . $subscribers_table . " LEFT JOIN " . 
+			$bounces_table . " ON " . $subscribers_table . ".email = " . $bounces_table . ".email";
+			
+			if (!empty($this -> where[$emails_table . '.history_id'])) {
+				$query .= " WHERE " . $bounces_table . ".history_id = '" . $this -> where[$emails_table . '.history_id'] . "'";
+				$countquery .= " WHERE " . $bounces_table . ".history_id = '" . $this -> where[$emails_table . '.history_id'] . "'";
+			}
+			
+			$query .= ")";
+			$countquery .= ")";
+			$didwhere = true;
+		}
+		
+		if (!empty($this -> where)) {
+			if (!$didwhere) {
+				$didwhere = true;
+				$query .= " WHERE (";
+				$countquery .= " WHERE (";
+			} else {
+				$query .= " AND (";
+				$countquery .= " AND (";
+			}
+				
 			$c = 1;
 			
 			foreach ($this -> where as $key => $val) {
@@ -159,6 +232,7 @@ class wpmlpaginate extends wpMailPlugin {
 		}
 		
 		switch ($this -> model) {
+			//case 'Email'					:
 			case 'SubscribersList'			:
 				$query .= " GROUP BY " . $this -> table . ".subscriber_id";
 				break;
@@ -166,7 +240,27 @@ class wpmlpaginate extends wpMailPlugin {
 			
 		$endRecord = $begRecord + $this -> per_page;
 		list($ofield, $odir) = $this -> order;
-		$query .= " ORDER BY IF (" . $this -> table . "." . $ofield . " = '' OR " . $this -> table . "." . $ofield . " IS NULL,1,0), " . $this -> table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
+		switch ($this -> model) {
+			case 'Email'					:
+				if ($ofield == $clicks_table . ".subscriber_id" && $odir == "DESC") {
+					$query .= " ORDER BY IF (" . $ofield . " != '' OR " . $ofield . " IS NOT NULL,1,0), " . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
+				} else {
+					$query .= " ORDER BY IF (" . $ofield . " = '' OR " . $ofield . " IS NULL,1,0), " . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";
+				}
+				
+				if ($ofield == $clicks_table . ".subscriber_id") {
+					$ofield = "clicked";
+				} elseif ($ofield == $subscribers_table . ".email") {
+					$ofield = "subscriber_id";
+				}
+				break;
+			case 'SubscribersList'			:
+				$query .= " ORDER BY IF (" . $subscribers_table . "." . $ofield . " = '' OR " . $subscribers_table . "." . $ofield . " IS NULL,1,0), " . $subscribers_table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";	
+				break;
+			default							:
+				$query .= " ORDER BY IF (" . $this -> table . "." . $ofield . " = '' OR " . $this -> table . "." . $ofield . " IS NULL,1,0), " . $this -> table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";	
+				break;
+		}
 		
 		$records = $wpdb -> get_results($query);			
 		$records_count = count($records);
@@ -176,6 +270,14 @@ class wpmlpaginate extends wpMailPlugin {
 		
 		if (empty($this -> url_page)) {
 			$this -> url_page = $this -> sub;	
+		}
+		
+		if (($ofields = explode(".", $ofield)) !== false) {
+			if (count($ofields) > 1) {
+				$ofield = $ofields[1];
+			} else {
+				$ofield = $ofields[0];
+			}
 		}
 		
 		if (count($records) < $allRecordsCount) {			

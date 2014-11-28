@@ -2,7 +2,7 @@
 	<h2><?php _e('Importing Subscribers', $this -> plugin_name); ?></h2>
 	
 	<?php if (!empty($subscribers)) : ?>		
-		<p><span id="importajaxcount"><strong><span id="importajaxcountinside" style="color:green;">0</span></strong></span> <span id="importajaxfailedcount">(<strong><span id="importajaxfailedcountinside" class="newsletters_error">0</span></strong> failed)</span> <?php _e('out of', $this -> plugin_name); ?> <strong><?php echo count($subscribers); ?></strong> <?php _e('subscribers have been imported.', $this -> plugin_name); ?></p>
+		<p><span id="importajaxcount"><strong><span id="importajaxcountinside" class="newsletters_success">0</span></strong></span> <span id="importajaxfailedcount">(<strong><span id="importajaxfailedcountinside" class="newsletters_error">0</span></strong> failed)</span> <?php _e('out of', $this -> plugin_name); ?> <strong><?php echo count($subscribers); ?></strong> <?php _e('subscribers have been imported.', $this -> plugin_name); ?></p>
 		
 		<div id="importprogressbar"></div>
 		

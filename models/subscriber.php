@@ -684,8 +684,13 @@ class wpmlSubscriber extends wpMailPlugin {
 				if ($email != $subscriber -> email) {
 					$id = $curr_id;
 					$this -> id = $curr_id;
-					$this -> data[$this -> model] -> id = $curr_id;					
-					$this -> data[$this -> model] -> mailinglists = $this -> mailinglists($subscriber_id);
+					$this -> data[$this -> model] -> id = $curr_id;			
+					
+					$cur_lists = $this -> mailinglists($curr_id);
+					$sel_lists = $mailinglists;
+					$new_lists = array_merge($cur_lists, $sel_lists);
+							
+					$this -> data[$this -> model] -> mailinglists = $new_lists;
 					
 					if (empty($justsubscribe)) {
 						$_POST['subscriber_id'] = $curr_id;

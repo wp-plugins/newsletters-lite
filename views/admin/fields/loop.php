@@ -184,7 +184,7 @@ include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
 								<?php endif; ?>
 							</td>
 							<td><code>[<?php echo $this -> pre; ?>field name="<?php echo $field -> slug; ?>"]</code></td>
-							<td><label for="checklist<?php echo $field -> id; ?>"><?php echo (empty($field -> required) || $field -> required == "N") ? '<span class="newsletters_error">' . __('No', $this -> plugin_name) : '<span style="color:green;">' . __('Yes', $this -> plugin_name); ?></span></label></td>
+							<td><label for="checklist<?php echo $field -> id; ?>"><?php echo (empty($field -> required) || $field -> required == "N") ? '<span class="newsletters_error">' . __('No', $this -> plugin_name) : '<span class="newsletters_success">' . __('Yes', $this -> plugin_name); ?></span></label></td>
 							<td>
 								<?php if (empty($field -> validation) || $field -> validation == "notempty") : ?>
 									<?php echo __('Not Empty', $this -> plugin_name); ?>
