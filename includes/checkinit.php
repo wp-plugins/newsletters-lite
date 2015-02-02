@@ -153,6 +153,8 @@ if (!class_exists('wpMailCheckinit')) {
 				add_shortcode('newsletters_' . $post_shortcode, array($Shortcode, 'shortcode_posts'));
 			}
 			
+			add_shortcode('newsletters_if', array($Shortcode, 'newsletters_if'));
+			
 			/* Ajax */
 			if (is_admin()) {
 				add_action('wp_ajax_newsletters_mailinglist_save', array($this, 'ajax_mailinglist_save'));

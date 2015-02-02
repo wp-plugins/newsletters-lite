@@ -8,6 +8,32 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		return true;
 	}
 	
+	function newsletters_if($atts = array(), $content = null) {
+		global $newsletters_history_id, $Db;
+		
+		$output = "";
+		
+		$defaults = array(
+			0				=>	false,
+			'id'			=>	false,
+		);
+		
+		extract(shortcode_atts($defaults, $atts));
+		
+		switch ($atts[0]) {
+			case 'newsletters_content'					:			
+				if (!empty($newsletters_history_id) && !empty($atts['id'])) {
+					$Db -> model = 'wpmlContent';
+					if ($contentarea = $Db -> find(array('number' => $atts['id'], 'history_id' => $newsletters_history_id))) {
+						$output = do_shortcode(stripslashes(__($content)));
+					}
+				}
+				break;
+		}
+		
+		return $output;
+	}
+	
 	function subscriberscount($atts = array(), $content = null) {
 		global $wpdb, $Subscriber, $SubscribersList, $Mailinglist;
 		$subscriberscount = 0;

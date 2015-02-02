@@ -2,6 +2,7 @@
 
 class wpmlMailinglist extends wpMailPlugin {
 
+	var $plugin_name;
 	var $name = 'mailinglist';
 	var $controller = 'mailinglists';
 	var $model = 'Mailinglist';	
@@ -230,7 +231,7 @@ class wpmlMailinglist extends wpMailPlugin {
 			$this -> intervals = $this -> get_option('intervals');
 			
 			foreach ($lists as $list) {
-				$paid = ($list -> paid == "Y") ? ' <span class="wpmlsmall">(' . __('Paid', $this -> name) . ': ' . $Html -> currency() . '' . number_format($list -> price, 2, '.', '') . ' ' . $this -> intervals[$list -> interval] . ')</span>' : '';
+				$paid = ($list -> paid == "Y") ? ' <span class="wpmlsmall">(' . __('Paid', $this -> plugin_name) . ': ' . $Html -> currency() . '' . number_format($list -> price, 2, '.', '') . ' ' . $this -> intervals[$list -> interval] . ')</span>' : '';
 				$listselect[$list -> id] = __($list -> title) . $paid;
 			}
 			

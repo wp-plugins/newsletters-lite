@@ -97,7 +97,6 @@ class wpmlBounce extends wpMailPlugin {
 	
 	function save($data = null, $validate = true) {
 		global $wpdb;
-		$wpdb -> query("ALTER TABLE `" . $wpdb -> prefix . $this -> table . "` DROP INDEX `email`");
 	
 		if (!empty($data)) {
 			$data = (empty($data[$this -> model])) ? $data : $data[$this -> model];
@@ -114,11 +113,11 @@ class wpmlBounce extends wpMailPlugin {
 				
 				if ($bounce = $wpdb -> get_row($bouncequery)) {
 					$query = "UPDATE `" . $wpdb -> prefix . $this -> table . "` "
-					. " SET `count` = '" . ((int) $bounce -> count + 1) . "', `modified` = '" . $modified . "' WHERE `id` = '" . $bounce -> id . "' LIMIT 1";
+					. " SET `count` = '" . ((int) $bounce -> count + 1) . "', `status` = '" . $status . "', `modified` = '" . $modified . "' WHERE `id` = '" . $bounce -> id . "' LIMIT 1";
 				} else {
 					$query = "INSERT INTO `" . $wpdb -> prefix . $this -> table . "` "
-					. " (`id`, `email`, `count`, `history_id`, `created`, `modified`) "
-					. " VALUES ('', '" . $email . "', '1', '" . $history_id . "', '" . $created . "', '" . $modified . "')";
+					. " (`id`, `email`, `count`, `status`, `history_id`, `created`, `modified`) "
+					. " VALUES ('', '" . $email . "', '1', '" . $status . "', '" . $history_id . "', '" . $created . "', '" . $modified . "')";
 				}
 				
 				if ($wpdb -> query($query)) {

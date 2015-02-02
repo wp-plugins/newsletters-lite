@@ -1,5 +1,5 @@
 <div class="wrap newsletters">
-	<h2><?php _e('Order Custom Fields', $this -> name); ?></h2>
+	<h2><?php _e('Order Custom Fields', $this -> plugin_name); ?></h2>
 	
 	<div class="subsubsub" style="float:none;"><?php echo $Html -> link(__('&larr; Manage All Fields', $this -> plugin_name), $this -> url); ?></div>
 	<p><?php _e('Drag and drop the custom fields below to order them.', $this -> plugin_name); ?></p>
@@ -34,6 +34,6 @@
 		});
 		</script>
 	<?php else : ?>
-		<p class="<?php echo $this -> pre; ?>error"><?php _e('No custom fields were found', $this -> name); ?></p>													
+		<p class="<?php echo $this -> pre; ?>error"><?php _e('No custom fields were found', $this -> plugin_name); ?></p>													
 	<?php endif; ?>
 </div>

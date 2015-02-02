@@ -135,8 +135,8 @@ class wpmlFieldsList extends wpMailPlugin {
 		
 		if (!empty($data)) {
 			if ($validate == true) {
-				if (empty($data['field_id'])) { $this -> errors[] = __('No field was specified', $this -> name); }
-				if (empty($data['list_id']) && $data['list_id'] != "0") { $this -> errors[] = __('No list was specified', $this -> name); }
+				if (empty($data['field_id'])) { $this -> errors[] = __('No field was specified', $this -> plugin_name); }
+				if (empty($data['list_id']) && $data['list_id'] != "0") { $this -> errors[] = __('No list was specified', $this -> plugin_name); }
 			} else {
 				$this -> errors = false;
 			}

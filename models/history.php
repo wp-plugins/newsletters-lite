@@ -496,9 +496,8 @@ class wpmlHistory extends wpMailPlugin {
 	
 		//check if validation is necessary
 		if ($validate == true) {
-			if (empty($subject)) { $this -> errors['subject'] = __('No subject specified', $this -> name); }
-			if (empty($message)) { $this -> errors['message'] = __('No message specified', $this -> name); }
-			//if (empty($mailinglists) || !is_array($mailinglists)) { $this -> errors['mailinglists'] = __('No mailing lists specified', $this -> name); }
+			if (empty($subject)) { $this -> errors['subject'] = __('No subject specified', $this -> plugin_name); }
+			if (empty($message)) { $this -> errors['message'] = __('No message specified', $this -> plugin_name); }
 		}
 		
 		//ensure that there are no errors.

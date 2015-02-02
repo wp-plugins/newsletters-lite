@@ -1429,7 +1429,7 @@ if (!class_exists('wpMailPlugin')) {
 						$Db -> save_field('order', $order, array('field_id' => $field_id));
 					}
 					
-					_e('Custom fields order has been successfully saved', $this -> name);
+					_e('Custom fields order has been successfully saved', $this -> plugin_name);
 				} else {
 					_e('No fields are available', $this -> plugin_name);
 				}
@@ -3211,25 +3211,28 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
-					// CKEditor
-					wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
-					wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
 					
-					wp_enqueue_script(
-				        'iris',
-				        admin_url('js/iris.min.js'),
-				        array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ),
-				        false,
-				        1
-				    );
-				    
-				    wp_enqueue_script(
-				        'wp-color-picker',
-				        admin_url('js/color-picker.min.js'),
-				        array( 'iris' ),
-				        false,
-				        1
-				    );
+					if (in_array($_GET['page'], (array) $this -> sections)) {
+						// CKEditor
+						wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
+						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
+					
+						wp_enqueue_script(
+					        'iris',
+					        admin_url('js/iris.min.js'),
+					        array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ),
+					        false,
+					        1
+					    );
+					    
+					    wp_enqueue_script(
+					        'wp-color-picker',
+					        admin_url('js/color-picker.min.js'),
+					        array( 'iris' ),
+					        false,
+					        1
+					    );
+					}
 				    
 				    wp_enqueue_script('jquery-ui-watermark', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.watermark.js', array('jquery'), false, true);
 				}
@@ -5274,6 +5277,10 @@ if (!class_exists('wpMailPlugin')) {
 						$phpmailer -> SMTPSecure = $smtpsecure;
 					}
 					
+					if ($this -> debugging) {
+						$phpmailer -> SMTPDebug = true;
+					}
+					
 					if ($this -> get_option('smtpauth') == "Y") {
 						$phpmailer -> SMTPAuth = true;
 						$phpmailer -> Username = $this -> get_option('smtpuser');
@@ -6490,6 +6497,7 @@ if (!class_exists('wpMailPlugin')) {
 									if (!empty($the_facts[0]['recipient']) && !empty($the_facts[0]['action'])) {
 				                        if ($the_facts[0]['action'] == "failed") {
 					                        $email = trim($the_facts[0]['recipient']);
+					                        $status = trim($the_facts[0]['status']);
 					                        
 					                 		$Db -> model = $Subscriber -> model;	                                
 			                                if ($subscriber = $Db -> find(array('email' => $email))) {	 
@@ -6515,7 +6523,12 @@ if (!class_exists('wpMailPlugin')) {
 			                                        $Db -> save_field('bouncecount', ($subscriber -> bouncecount + 1), array('id' => $subscriber -> id));
 			                                    }
 			                                    
-			                                    $bouncedata = array('email' => $subscriber -> email, $the_facts['status'], 'history_id' => $bouncedemail -> history_id);
+			                                    $bouncedata = array(
+			                                    	'email' 		=> 	$subscriber -> email, 
+			                                    	'status' 		=> 	$status, 
+			                                    	'history_id' 	=> 	$bouncedemail -> history_id
+			                                    );
+			                                    
 			                                    $Bounce -> save($bouncedata);
 			                                    
 			                                    do_action('newsletters_subscriber_bounce', $subscriber -> id, ($subscriber -> bouncecount + 1), $bouncedemail -> history_id);
@@ -6527,7 +6540,10 @@ if (!class_exists('wpMailPlugin')) {
 			                                    $subscriber -> bouncecount = ($subscriber -> bouncecount + 1);
 				                                $this -> admin_bounce_notification($subscriber);
 				                                
-				                                $pop3 -> delete($m); //remove the email from the mailbox
+				                                if (!$pop3 -> delete($m)) {
+					                            	$this -> log_error($pop3 -> ERROR);    
+				                                }
+				                                
 				                                $deleted_emails++;  
 			                                }     
 				                        }
@@ -6909,13 +6925,14 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {						
+			global $newsletters_history_id;
 			$this -> plugin_name = basename(dirname(__FILE__));
 		
 			if (!empty($file) || !empty($fullbody)) {
 				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
 				$foot = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'foot.php';
 				
-				/* Go through the parameters */
+				/* Go through the parameters */				
 				if (!empty($params)) {
 					foreach ($params as $pkey => $pval) {
 						${$pkey} = $pval;
@@ -6983,6 +7000,10 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 				
+				if (!empty($history_id)) {
+					$this -> history_id = $newsletters_history_id = $history_id;
+				}
+				
 				//pass the $body through the shortcodes
 				$body = do_shortcode($body);
 				$body = str_replace("$", "&#36;", $body);
@@ -6991,10 +7012,6 @@ if (!class_exists('wpMailPlugin')) {
 				if (empty($themeintextversion)) {
 					global $wpml_textmessage;
 					$wpml_textmessage = $body;
-				}
-				
-				if (!empty($history_id)) {
-					$this -> history_id = $history_id;
 				}
 				
 				if (empty($output) || $output == false) {					

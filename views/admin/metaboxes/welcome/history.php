@@ -20,7 +20,7 @@
 						
 						?>
 						<h4>
-							<a href="?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history -> id; ?>"><?php echo $history -> subject; ?></a>
+							<a href="?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history -> id; ?>"><?php echo __($history -> subject); ?></a>
 							<?php if (empty($history -> sent)) : ?>
 								<small><?php _e('(Draft)', $this -> plugin_name); ?></small>
 							<?php endif; ?>
@@ -31,7 +31,7 @@
 							<small class="alignright" style="border: 1px #efefef solid; padding: 1px 5px; background: #fefefe; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;"><?php echo sprintf(__('%s&#37; <span class="wpmlsuccess">opened</span> / %s&#37; <span class="wpmlpending">unsub</span> / %s&#37; <span class="wpmlerror">bounced</span> / %s <span class="wpmlneutral">clicks</span>', $this -> plugin_name), number_format($tracking, 2, '.', ''), number_format($eunsubscribeperc, 2, '.', ''), number_format($ebouncedperc, 2, '.', ''), $clicks); ?></small>
 						</h4>
 						<em><abbr title="<?php echo $history -> created; ?>"><?php echo date_i18n("M j, Y", strtotime($history -> created)); ?></abbr></em>
-						<p><?php echo $Html -> truncate(strip_tags(do_shortcode($this -> strip_set_variables($history -> message))), 300); ?></p>
+						<p><?php echo $Html -> truncate(strip_tags(do_shortcode($this -> strip_set_variables(__($history -> message)))), 300); ?></p>
 					</td>
 				</tr>
 			<?php endforeach; ?>
