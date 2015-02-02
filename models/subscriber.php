@@ -610,6 +610,11 @@ class wpmlSubscriber extends wpMailPlugin {
 						
 				if ($this -> save($data, false, false)) {					
 					$subscriber = $this -> get($this -> insertid, false);
+					$subscriberauth = $Auth -> gen_subscriberauth();
+					
+					//$Db -> model = $this -> model;
+					//$Db -> save_field('authkey', $subscriberauth, array('id' => $subscriber -> id));
+					$subscriberauth = $this -> gen_auth($subscriber -> id);
 					
 					if (!is_admin()) {
 						$Auth -> set_emailcookie($subscriber -> email);
@@ -617,7 +622,6 @@ class wpmlSubscriber extends wpMailPlugin {
 					
 					/* Management Auth */
 					if (empty($data['cookieauth'])) {							
-						$subscriberauth = $Auth -> gen_subscriberauth();
 						$Db -> model = $this -> model;
 						$Db -> save_field('cookieauth', $subscriberauth, array('id' => $subscriber -> id));
 					}
@@ -1004,6 +1008,7 @@ class wpmlSubscriber extends wpMailPlugin {
 						if (!empty($mailinglists)) {
 							foreach ($mailinglists as $mkey => $mval) {
 								$subscriber = $this -> get($subscriber_id, false);
+								$this -> gen_auth($subscriber -> id);
 								$mailinglist = $Mailinglist -> get($mval, false);
 								$this -> autoresponders_send($subscriber, $mailinglist);
 							}

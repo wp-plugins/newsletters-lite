@@ -103,13 +103,13 @@ jQuery(document).ready(function() {
 });
 
 function wpmlmanagement_savefields() {
-	jQuery('#savefields').button('option', "disabled", true);
+	jQuery('#savefieldsbutton').button('disable');
 	var formdata = jQuery('#subscribersavefieldsform').serialize();	
 	jQuery('#savefieldsloading').show();
 	
 	jQuery.post(wpmlajaxurl + "action=managementsavefields", formdata, function(response) {
 		jQuery('#savefields').html(response);
-		jQuery('#savefields').button('option', "disabled", false);
+		jQuery('#savefieldsbutton').button('enable');
 		wpml_scroll('#managementtabs');
 	});
 }
@@ -131,14 +131,14 @@ function wpmlmanagement_activate(subscriber_id, mailinglist_id, activate) {
 }
 
 function wpmlmanagement_subscribe(subscriber_id, mailinglist_id) {
-	jQuery('.subscribebutton').button('option', "disabled", true);
+	jQuery('.subscribebutton').button('disable');
 	jQuery('#subscribenowlink' + mailinglist_id).html('<span class="newsletters_loading"></span> <?php _e('Subscribing...', $this -> plugin_name); ?>');
 	
 	jQuery.post(wpmlajaxurl + "action=managementsubscribe", {'subscriber_id':subscriber_id, 'mailinglist_id':mailinglist_id}, function(response) {
 		wpmlmanagement_reloadsubscriptions("current", subscriber_id);
 		wpmlmanagement_reloadsubscriptions("customfields", subscriber_id);
 		jQuery('#newsubscriptions').html(response);
-		jQuery('.subscribebutton').button('option', "disabled", false);
+		jQuery('.subscribebutton').button('enable');
 		wpml_scroll('#managementtabs');
 	});
 }

@@ -97,7 +97,7 @@ function jqCheckAll(checker, formid, name) {
 }
 
 function wpml_scroll(selector) {
-	var targetOffset = jQuery(selector).offset().top;
+	var targetOffset = (jQuery(selector).offset().top - 50);
     jQuery('html,body').animate({scrollTop: targetOffset}, 500);
 }
 

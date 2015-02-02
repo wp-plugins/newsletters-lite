@@ -38,7 +38,9 @@ if ($this -> language_do()) {
 							
 							<script type="text/javascript">
 							jQuery(document).ready(function() {
-								jQuery('#mailinglist-title-tabs').tabs();
+								if (jQuery.isFunction(jQuery.fn.tabs)) {
+									jQuery('#mailinglist-title-tabs').tabs();
+								}
 							});
 							</script>
 						<?php else : ?>

@@ -40,7 +40,7 @@
     </table>
     
     <script type="text/javascript">
-	var count = 1;
+	var attachmentcount = 1;
 	
 	function delete_attachment(countid) {
 		jQuery('#newattachment' + countid).remove();
@@ -48,14 +48,14 @@
 	
 	function add_attachment() {
 		var atthtml = "";
-		atthtml += '<div class="newattachment" id="newattachment' + count + '" style="display:none;">';
+		atthtml += '<div class="newattachment" id="newattachment' + attachmentcount + '" style="display:none;">';
 		atthtml += '<input type="file" name="attachments[]" value="" />';
-		atthtml += ' <a class="button button-secondary button-small" href="" onclick="if (confirm(\'<?php _e('Are you sure you want to remove this?', $this -> plugin_name); ?>\')) { delete_attachment(' + count + '); } return false;"><?php _e('Remove'); ?></a>';
+		atthtml += ' <a class="button button-secondary button-small" href="" onclick="if (confirm(\'<?php _e('Are you sure you want to remove this?', $this -> plugin_name); ?>\')) { delete_attachment(' + attachmentcount + '); } return false;"><?php _e('Remove'); ?></a>';
 		atthtml += '</div>';
 		
 		jQuery('#newattachments').append(atthtml);
-		jQuery('#newattachment' + count).fadeIn();
-		count++;	
+		jQuery('#newattachment' + attachmentcount).fadeIn();
+		attachmentcount++;	
 	}
 	
 	function delete_current_attachment(attachmentid) {

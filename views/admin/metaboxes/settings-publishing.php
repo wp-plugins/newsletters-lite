@@ -61,7 +61,9 @@ $excerpt_settings = $this -> get_option('excerpt_settings');
 							
 							<script type="text/javascript">
 							jQuery(document).ready(function() {
-								jQuery('#excerptmoretabs').tabs();
+								if (jQuery.isFunction(jQuery.fn.tabs)) {
+									jQuery('#excerptmoretabs').tabs();
+								}
 							});
 							</script>
 						<?php endif; ?>

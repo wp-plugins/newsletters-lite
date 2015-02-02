@@ -207,6 +207,72 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return $difference;
 	}
 	
+	/*
+	 * Matches each symbol of PHP date format standard
+	 * with jQuery equivalent codeword
+	 * @author Tristan Jahier
+	 */
+	function dateformat_PHP_to_jQueryUI($php_format)
+	{
+	    $SYMBOLS_MATCHING = array(
+	        // Day
+	        'd' => 'dd',
+	        'D' => 'D',
+	        'j' => 'd',
+	        'l' => 'DD',
+	        'N' => '',
+	        'S' => '',
+	        'w' => '',
+	        'z' => 'o',
+	        // Week
+	        'W' => '',
+	        // Month
+	        'F' => 'MM',
+	        'm' => 'mm',
+	        'M' => 'M',
+	        'n' => 'm',
+	        't' => '',
+	        // Year
+	        'L' => '',
+	        'o' => '',
+	        'Y' => 'yy',
+	        'y' => 'y',
+	        // Time
+	        'a' => '',
+	        'A' => '',
+	        'B' => '',
+	        'g' => '',
+	        'G' => '',
+	        'h' => '',
+	        'H' => '',
+	        'i' => '',
+	        's' => '',
+	        'u' => ''
+	    );
+	    $jqueryui_format = "";
+	    $escaping = false;
+	    for($i = 0; $i < strlen($php_format); $i++)
+	    {
+	        $char = $php_format[$i];
+	        if($char === '\\') // PHP date format escaping character
+	        {
+	            $i++;
+	            if($escaping) $jqueryui_format .= $php_format[$i];
+	            else $jqueryui_format .= '\'' . $php_format[$i];
+	            $escaping = true;
+	        }
+	        else
+	        {
+	            if($escaping) { $jqueryui_format .= "'"; $escaping = false; }
+	            if(isset($SYMBOLS_MATCHING[$char]))
+	                $jqueryui_format .= $SYMBOLS_MATCHING[$char];
+	            else
+	                $jqueryui_format .= $char;
+	        }
+	    }
+	    return $jqueryui_format;
+	}
+	
 	function days_difference($date_one = null, $date_two = null) {
 		return $this -> time_difference($date_one, $date_two, 'days');
 	
@@ -232,7 +298,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				'checkbox'		=>	__('Checkboxes', $this -> plugin_name),
 				'file'			=>	__('File Upload', $this -> plugin_name),
 				'pre_country'	=>	__('Predefined : Country Select', $this -> plugin_name),
-				'pre_date'		=>	__('Predefined : Date Picker (YYYY-MM-DD)', $this -> plugin_name),
+				'pre_date'		=>	__('Predefined : Date Picker', $this -> plugin_name),
 				'pre_gender'	=>	__('Predefined : Gender', $this -> plugin_name),
 				'hidden'		=>	__('Hidden', $this -> plugin_name),
 			);	
@@ -337,14 +403,14 @@ class wpmlHtmlHelper extends wpMailPlugin {
        return $biggs;
 	}
 	
-	function next_scheduled($hook = null) {
+	function next_scheduled($hook = null, $args = null) {
 		if (!preg_match("/(newsletters)/si", $hook)) {
 			$hook = $this -> pre . '_' . $hook;
 		}
 	
-		if (!empty($hook) && $schedules = wp_get_schedules()) {		
-			if ($hookinterval = wp_get_schedule($hook)) {
-				if ($hookschedule = wp_next_scheduled($hook)) {				
+		if (!empty($hook) && $schedules = wp_get_schedules()) {	
+			if ($hookinterval = wp_get_schedule($hook, $args)) {
+				if ($hookschedule = wp_next_scheduled($hook, $args)) {				
 					return $schedules[$hookinterval]['display'] . ' - <strong>' . date_i18n("Y-m-d H:i:s", $hookschedule) . '</strong>';
 				} else {
 					return __('This task does not have a next schedule.', $this -> plugin_name);	

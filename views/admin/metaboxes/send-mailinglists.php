@@ -254,14 +254,16 @@ jQuery(document).ready(function() {
 		var mailingliststabscookieid = jQuery.cookie('mailingliststabscookie') || 0;
 	}
 		
-	jQuery('#mailingliststabs').tabs({
-		active:mailingliststabscookieid,
-		activate: function(event, ui) {
-			if (jQuery.isFunction(jQuery.fn.cookie)) {
-				jQuery.cookie("mailingliststabscookie", ui.newTab.index(), {expires:365, path:'/'});
+	if (jQuery.isFunction(jQuery.fn.tabs)) {
+		jQuery('#mailingliststabs').tabs({
+			active:mailingliststabscookieid,
+			activate: function(event, ui) {
+				if (jQuery.isFunction(jQuery.fn.cookie)) {
+					jQuery.cookie("mailingliststabscookie", ui.newTab.index(), {expires:365, path:'/'});
+				}
 			}
-		}
-	});
+		});
+	}
 });
 
 function update_subscribers() {

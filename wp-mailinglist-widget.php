@@ -147,14 +147,16 @@ class Newsletters_Widget extends WP_Widget {
 							var widgettabscookie = jQuery.cookie('widgettabscookie') || 0;
 						}
 							
-						jQuery('#languagetabs<?php echo $this -> number; ?>').tabs({
-							active: widgettabscookie,
-							activate: function(event, ui) {
-								if (jQuery.isFunction(jQuery.fn.cookie)) {
-									jQuery.cookie('widgettabscookie', ui.newTab.index(), {expires: 365, path: '/'});
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#languagetabs<?php echo $this -> number; ?>').tabs({
+								active: widgettabscookie,
+								activate: function(event, ui) {
+									if (jQuery.isFunction(jQuery.fn.cookie)) {
+										jQuery.cookie('widgettabscookie', ui.newTab.index(), {expires: 365, path: '/'});
+									}
 								}
-							}
-						});
+							});
+						}
 					});
 					</script>
 					

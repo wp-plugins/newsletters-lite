@@ -91,9 +91,13 @@
 									<?php $Db -> model = $wpmlCountry -> model; ?>
 									<?php echo $Db -> field('value', array('id' => $subscriber -> {$field -> slug})); ?>
 								<?php elseif ($field -> type == "pre_date") : ?>
-									<?php $date = @unserialize($subscriber -> {$field -> slug}); ?>
-									<?php if (!empty($date) && is_array($date)) : ?>
-										<?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+									<?php if (is_serialized($subscriber -> {$field -> slug})) : ?>
+										<?php $date = @unserialize($subscriber -> {$field -> slug}); ?>
+										<?php if (!empty($date) && is_array($date)) : ?>
+											<?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+										<?php endif; ?>
+									<?php else : ?>
+										<?php echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug})); ?>
 									<?php endif; ?>
                                 <?php elseif ($field -> type == "pre_gender") : ?>
                                 	<?php echo $Html -> gender($subscriber -> {$field -> slug}); ?>

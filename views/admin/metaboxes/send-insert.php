@@ -342,13 +342,15 @@ jQuery(document).ready(function() {
 		var inserttabscookieid = jQuery.cookie('inserttabscookie') || 0;
 	}
 		
-	jQuery('#inserttabs').tabs({
-		active:inserttabscookieid,
-		activate: function(event, ui) {
-			if (jQuery.isFunction(jQuery.fn.cookie)) {
-				jQuery.cookie("inserttabscookie", ui.newTab.index(), {expires:365, path:'/'});
+	if (jQuery.isFunction(jQuery.fn.tabs)) {
+		jQuery('#inserttabs').tabs({
+			active:inserttabscookieid,
+			activate: function(event, ui) {
+				if (jQuery.isFunction(jQuery.fn.cookie)) {
+					jQuery.cookie("inserttabscookie", ui.newTab.index(), {expires:365, path:'/'});
+				}
 			}
-		}
-	});
+		});
+	}
 });
 </script>

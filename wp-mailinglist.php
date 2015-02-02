@@ -510,7 +510,7 @@ if (!class_exists('wpMail')) {
 									$Db -> model = $Subscriber -> model;
 									
 									if ($subscriber = $Db -> find(array('email' => $_POST['email']))) {
-										if ($subscriberauth = $Auth -> gen_subscriberauth()) {
+										if ($subscriberauth = $this -> gen_auth($subscriber -> id)) {
 											$Auth -> set_emailcookie($_POST['email']);
 											
 											$Db -> model = $Subscriber -> model;
@@ -808,7 +808,9 @@ if (!class_exists('wpMail')) {
 											
 											<script type="text/javascript">
 				                            jQuery(document).ready(function() {
-					                            jQuery('.widget_newsletters .button').button();
+					                            if (jQuery.isFunction(jQuery.fn.button)) {
+					                            	jQuery('.widget_newsletters .button').button();
+					                            }
 				                            });
 				                            </script>
 											
@@ -1436,13 +1438,13 @@ if (!class_exists('wpMail')) {
 			}
 		}
 		
-		function latestposts_hook($preview = false) {			
+		function latestposts_hook($id = null, $preview = false) {			
 			global $wpdb, $post, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			
-			if ($this -> get_option('latestposts') == "Y" && $post_criteria = $this -> get_latestposts()) {
-				$latestposts_groupbycategory = $this -> get_option('latestposts_groupbycategory');
+			if (!empty($id) && $latestpostssubscription = $this -> Latestpostssubscription -> find(array('id' => $id))) {				
+				$post_criteria = $this -> get_latestposts($latestpostssubscription);
 				
-				if (!empty($latestposts_groupbycategory) && $latestposts_groupbycategory == "Y") {
+				if (!empty($latestpostssubscription -> groupbycategory) && $latestpostssubscription -> groupbycategory == "Y") {
 					$categories_args = array(
 						'type'						=>	'post',
 						'child_of'					=>	false,
@@ -1479,47 +1481,46 @@ if (!class_exists('wpMail')) {
 					
 				if (!empty($shortcode_categories) || $posts = get_posts($post_criteria)) {					
 					if (!empty($posts) || !empty($shortcode_categories)) {
-						/* multilingual */
-						if ($this -> language_do()) {
-							$latestposts_language = $this -> get_option('latestposts_language');
-							
+						if ($this -> language_do()) {							
 							foreach ($posts as $pkey => $post) {
-								$posts[$pkey] = $this -> language_use($latestposts_language, $post, false);	
+								$posts[$pkey] = $this -> language_use($latestpostssubscription -> language, $post, false);	
 							}
 						}
 						
-						$subject = $this -> get_option('latestposts_subject');
+						$subject = $latestpostssubscription -> subject;
 						global $shortcode_posts;
 						$shortcode_posts = $posts;
-						$content = $this -> et_message('latestposts', false, $latestposts_language);
+						$content = $this -> et_message('latestposts', false, $latestpostssubscription -> language);
 						$attachment = false;
 						$post_id = false;
 						
 						$history_data = array(
 							'subject'			=>	$subject,
 							'message'			=>	$content,
-							'theme_id'			=>	$this -> get_option('latestposts_theme'),
-							'mailinglists'		=>	serialize($this -> get_option('latestposts_lists')),
+							'theme_id'			=>	$latestpostssubscription -> theme_id,
+							'mailinglists'		=>	$latestpostssubscription -> lists,
 							'attachment'		=>	"N",
 							'attachmentfile'	=>	false,
 						);
 						
-						if ($latestposts_historyid = $this -> get_option('latestposts_historyid')) {
-							$history_data['id'] = $latestposts_historyid;
+						if (!empty($latestpostssubscription -> history_id)) {
+							$history_data['id'] = $latestpostssubscription -> history_id;
 						}
 							
 						$Db -> model = $History -> model;
 						$history_data['sent'] = 1;
 						$History -> save($history_data, false);
 						$history_id = $History -> insertid;						
-						$this -> update_option('latestposts_historyid', $history_id);
+						//$this -> update_option('latestposts_historyid', $history_id);
+						
+						$this -> Latestpostssubscription -> save_field('history_id', $history_id, array('id' => $latestpostssubscription -> id));
 						
 						if (!empty($preview) && $preview == true) {
 							$subscriber_id = $Subscriber -> admin_subscriber_id();
 							$subscriber = $Subscriber -> get($subscriber_id);
 							$subscriber -> mailinglists = $email -> mailinglists;
 							$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
-							$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $this -> get_option('latestposts_theme'));
+							$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $latestpostssubscription -> theme_id);
 							
 							$output = "";
 							ob_start();
@@ -1534,7 +1535,7 @@ if (!class_exists('wpMail')) {
 							$sentmailscount = 0; //number of emails sent
 							$q_queries = array();
 							
-							if ($mailinglists = $this -> get_option('latestposts_lists')) {
+							if ($mailinglists = maybe_unserialize($latestpostssubscription -> lists)) {
 								$mailinglistscondition = "(";
 								$m = 1;
 								
@@ -1559,11 +1560,11 @@ if (!class_exists('wpMail')) {
 										$subscriber -> mailinglist_id = $mailinglists[0];
 													
 										if ($this -> get_option('scheduling') == "Y") {
-											$q_queries[] = $Queue -> save($subscriber, false, $subject, $content, $attachment, $post_id, $history_id, true, $this -> get_option('latestposts_theme'));
+											$q_queries[] = $Queue -> save($subscriber, false, $subject, $content, $attachment, $post_id, $history_id, true, $latestpostssubscription -> theme_id);
 											$sentmailscount++;
 										} else {
 											$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
-											$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $this -> get_option('latestposts_theme'));
+											$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $latestpostssubscription -> theme_id);
 											$this -> execute_mail($subscriber, false, $subject, $message, $attachment, $history_id, $eunique);
 											$sentmailscount++;
 										}
@@ -1586,14 +1587,14 @@ if (!class_exists('wpMail')) {
 										if (!empty($shortcode_category['posts'])) {
 											foreach ($shortcode_category['posts'] as $post) {
 												$Db -> model = $Latestpost -> model;
-												$Db -> save(array('post_id' => $post -> ID), true);
+												$Db -> save(array('post_id' => $post -> ID, 'lps_id' => $latestpostssubscription -> id), true);
 											}
 										}
 									}	
 								} else {
 									foreach ($shortcode_posts as $post) {
 										$Db -> model = $Latestpost -> model;
-										$Db -> save(array('post_id' => $post -> ID), true);
+										$Db -> save(array('post_id' => $post -> ID, 'lps_id' => $latestpostssubscription -> id), true);
 									}
 								}
 							}
@@ -1603,10 +1604,11 @@ if (!class_exists('wpMail')) {
 					echo __('No posts with the specified criteria could be found. Are there new posts available to be sent?', $this -> plugin_name);
 				}
 			} else {
-				echo __('Latest post subscription is turned off at this time.', $this -> plugin_name);
+				echo __('No latest posts subscription was specified', $this -> plugin_name);
 			}
 			
-			echo $sentmailscount . ' ' . __('emails were sent/queued.', $this -> plugin_name);		
+			echo $sentmailscount . ' ' . __('emails were sent/queued.', $this -> plugin_name);	
+			
 			return false;
 		}
 		
@@ -1932,15 +1934,15 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function cron_schedules($schedules = array()) {
-			$schedules['2minutes']		= array('interval' => 120, 'display' => '[Newsletters] ' . __('Every 2 Minutes', $this -> plugin_name));
-			$schedules['5minutes']		= array('interval' => 300, 'display' => '[Newsletters] ' . __('Every 5 Minutes', $this -> plugin_name));
-	       	$schedules['10minutes']		= array('interval' => 600, 'display' => '[Newsletters] ' . __('Every 10 Minutes', $this -> plugin_name));
-	       	$schedules['20minutes'] 	= array('interval' => 1200, 'display' => '[Newsletters] ' . __('Every 20 Minutes', $this -> plugin_name));
-	       	$schedules['30minutes'] 	= array('interval' => 1800, 'display' => '[Newsletters] ' . __('Every 30 Minutes', $this -> plugin_name));
-	       	$schedules['40minutes'] 	= array('interval' => 2400, 'display' => '[Newsletters] ' . __('Every 40 Minutes', $this -> plugin_name));
-	       	$schedules['50minutes'] 	= array('interval' => 3000, 'display' => '[Newsletters] ' . __('Every 50 minutes', $this -> plugin_name));
-			$schedules['weekly']		= array('interval' => 604800, 'display' => '[Newsletters] ' . __('Once Weekly', $this -> plugin_name));
-			$schedules['monthly']		= array('interval' => 2664000, 'display' => '[Newsletters] ' . __('Once Monthly', $this -> plugin_name));
+			$schedules['2minutes']		= array('interval' => 120, 'display' => __('Every 2 Minutes', $this -> plugin_name));
+			$schedules['5minutes']		= array('interval' => 300, 'display' => __('Every 5 Minutes', $this -> plugin_name));
+	       	$schedules['10minutes']		= array('interval' => 600, 'display' => __('Every 10 Minutes', $this -> plugin_name));
+	       	$schedules['20minutes'] 	= array('interval' => 1200, 'display' => __('Every 20 Minutes', $this -> plugin_name));
+	       	$schedules['30minutes'] 	= array('interval' => 1800, 'display' => __('Every 30 Minutes', $this -> plugin_name));
+	       	$schedules['40minutes'] 	= array('interval' => 2400, 'display' => __('Every 40 Minutes', $this -> plugin_name));
+	       	$schedules['50minutes'] 	= array('interval' => 3000, 'display' => __('Every 50 minutes', $this -> plugin_name));
+			$schedules['weekly']		= array('interval' => 604800, 'display' => __('Once Weekly', $this -> plugin_name));
+			$schedules['monthly']		= array('interval' => 2664000, 'display' => __('Once Monthly', $this -> plugin_name));
 	    	
 	    	return $schedules;
 		}
@@ -3699,6 +3701,46 @@ if (!class_exists('wpMail')) {
 									$msg_type = 'message';
 									$message = __('Selected lists set as doublt opt-in', $this -> plugin_name);
 									break;
+								case 'merge'			:
+									global $Db, $Mailinglist, $SubscribersList, $FieldsList, $HistoriesList;
+								
+									if (!empty($_POST['list_title'])) {
+										if (count($lists) > 1) {
+											$list_data = array(
+												'title'					=>	$_POST['list_title'],
+												'privatelist'			=>	"N",
+												'paid'					=> 	"N",
+											);
+											
+											if ($Mailinglist -> save($list_data)) {
+												$new_list_id = $Mailinglist -> insertid;
+												
+												foreach ($lists as $list_id) {
+													$Db -> model = $SubscribersList -> model;
+													$Db -> save_field('list_id', $new_list_id, array('list_id' => $list_id));	
+													$Db -> model = $FieldsList -> model;
+													$Db -> save_field('list_id', $new_list_id, array('list_id' => $list_id));
+													$Db -> model = $HistoriesList -> model;
+													$Db -> save_field('list_id', $new_list_id, array('list_id' => $list_id));
+													$Mailinglist -> delete($list_id);
+												}
+												
+												$msg_type = 'message';
+												$message = __('Selected lists have been merged', $this -> plugin_name);
+											} else {
+												$msg_type = 'error';
+												$message = __('Merge list could not be created', $this -> plugin_name);
+											}
+										} else {
+											$msg_type = 'error';
+											$message = __('Select more than one list in order to merge', $this -> plugin_name);
+										}
+									} else {
+										$msg_type = 'error';
+										$message = __('Fill in a list title for the new list', $this -> plugin_name);
+									}
+								
+									break;
 								case 'setgroup'			:
 									if (!empty($_POST['setgroup_id'])) {
 										foreach ($lists as $list_id) {
@@ -4786,8 +4828,15 @@ if (!class_exists('wpMail')) {
 															$datasets[$d][$field -> slug] = (!empty($country)) ? $country : '';
 															break;
 														case 'pre_date'				:
-															$date = maybe_unserialize($subscriber -> {$field -> slug});
-															$datasets[$d][$field -> slug] = (!empty($date) && is_array($date) && (!empty($date['y']) || !empty($date['m']) || !empty($date['d']))) ? $date['y'] . '-' . $date['m'] . '-' . $date['d'] : '';
+															//$date = maybe_unserialize($subscriber -> {$field -> slug});
+															//$datasets[$d][$field -> slug] = (!empty($date) && is_array($date) && (!empty($date['y']) || !empty($date['m']) || !empty($date['d']))) ? $date['y'] . '-' . $date['m'] . '-' . $date['d'] : '';
+															
+															if (is_serialized($subscriber -> {$field -> slug})) {
+																$date = maybe_unserialize($subscriber -> {$field -> slug});
+																echo $date['y'] . '-' . $date['m'] . '-' . $date['d'];
+															} else {
+																echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug}));
+															}
 															break;
 														case 'pre_gender'			:
 															$datasets[$d][$field -> slug] = $Html -> gender($subscriber -> {$field -> slug});
@@ -6413,7 +6462,11 @@ if (!class_exists('wpMail')) {
 					$this -> redirect($this -> referer, $msg_type, $message);
 					break;
 				case 'clearlpshistory'	:
-					$clearquery = "TRUNCATE TABLE " . $wpdb -> prefix . $Latestpost -> table . "";
+					if (!empty($_GET['id'])) {
+						$clearquery = "DELETE FROM " . $wpdb -> prefix . $Latestpost -> table . " WHERE `lps_id` = '" . $_GET['id'] . "'";	
+					} else {
+						$clearquery = "TRUNCATE TABLE " . $wpdb -> prefix . $Latestpost -> table . "";
+					}
 					
 					if ($wpdb -> query($clearquery)) {
 						$msg_type = 'message';
@@ -6682,14 +6735,16 @@ if (!class_exists('wpMail')) {
 			
 			switch ($_GET['method']) {
 				case 'runschedule'		:
-					if (!empty($_GET['hook'])) {
+					if (!empty($_GET['hook'])) {	
+						$arg = (empty($_GET['id'])) ? false : $_GET['id'];
+											
 						if (preg_match("/(newsletters)/si", $_GET['hook'])) {
 							$hook = $_GET['hook'];
 						} else {
 							$hook = $this -> pre . '_' . $_GET['hook'];
 						}
 					
-						do_action($hook);	
+						do_action($hook, $arg);	
 											
 						$msg_type = 'message';
 						$message = __('Task has been executed successfully!', $this -> plugin_name);

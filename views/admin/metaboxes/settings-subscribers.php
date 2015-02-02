@@ -93,7 +93,9 @@
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#subscriberexistsmessagetabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#subscriberexistsmessagetabs').tabs();
+						}
 					});
 					</script>
             	<?php else : ?>
@@ -137,7 +139,9 @@
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#onlinelinktexttabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#onlinelinktexttabs').tabs();
+						}
 					});
 					</script>
 				<?php else : ?>
@@ -207,7 +211,9 @@
 						
 						<script type="text/javascript">
 						jQuery(document).ready(function() {
-							jQuery('#activationlinktexttabs').tabs();
+							if (jQuery.isFunction(jQuery.fn.tabs)) {
+								jQuery('#activationlinktexttabs').tabs();
+							}
 						});
 						</script>
 					<?php else : ?>

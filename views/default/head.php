@@ -11,7 +11,11 @@ var wpmlScroll = "<?php echo ($embed['scroll'] == "Y") ? 'Y' : 'N'; ?>";
 	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>?';
 <?php endif; ?>
 
-jQuery(document).ready(function() { jQuery('.<?php echo $this -> pre; ?>button').button(); });
+jQuery(document).ready(function() { 
+	if (jQuery.isFunction(jQuery.fn.button)) {
+		jQuery('.<?php echo $this -> pre; ?>button').button(); 
+	}
+});
 </script>
 
 <style type="text/css">

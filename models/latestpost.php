@@ -8,7 +8,8 @@ class wpmlLatestpost extends wpMailPlugin {
 	
 	var $fields = array(
 		'id'					=> 	"INT(11) NOT NULL AUTO_INCREMENT",
-		'post_id'				=>	"INT(11) NOT NULL UNIQUE",
+		'post_id'				=>	"INT(11) NOT NULL DEFAULT '0'",
+		'lps_id'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'created'				=> 	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'				=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'key'					=>	"PRIMARY KEY (`id`), INDEX(`post_id`)",
@@ -16,13 +17,14 @@ class wpmlLatestpost extends wpMailPlugin {
 	
 	var $tv_fields = array(
 		'id'					=> 	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
-		'post_id'				=>	array("INT(11)", "NOT NULL UNIQUE"),
+		'post_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'lps_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'created'				=> 	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'					=>	"PRIMARY KEY (`id`), INDEX(`post_id`)",					   
 	);
 	
-	var $indexes = array('post_id');
+	var $indexes = array('post_id', 'lps_id');
 	
 	function wpmlLatestpost($data = array()) {
 		global $Db;

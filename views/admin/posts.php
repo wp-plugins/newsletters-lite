@@ -2,6 +2,10 @@
 	<div style="width:600px;">
 		<h2><?php _e('Posts Logged', $this -> plugin_name); ?></h2>
 		
+		<?php if (!empty($latestpostssubscription)) : ?>
+			<h3><?php echo $latestpostssubscription -> subject; ?></h3>
+		<?php endif; ?>
+		
 		<?php if (!empty($posts)) : ?>
 			<div class="tablenav">
 			

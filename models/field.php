@@ -395,8 +395,11 @@ class wpmlField extends wpMailPlugin {
 					elseif (strlen($Html -> sanitize($title, '_')) > 64) { $this -> errors['title'] = __('This title is too long, please keep below 64 characters.', $this -> plugin_name); }
 				}
 				
+				include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
+				
 				if (empty($slug)) { $this -> errors['slug'] = __('Please fill in a slug/nicename for this custom field.', $this -> plugin_name); }
 				elseif (empty($id) && empty($oldfield) && $this -> slug_exists($slug)) { $this -> errors['slug'] = __('A custom field with this slug already exists, please choose a different one.', $this -> plugin_name); }
+				elseif (in_array($slug, $wordpress_reserved_terms)) { $this -> errors['slug'] = sprintf(__('"%s" is a reserved term, please choose something else', $this -> plugin_name), $slug); }
 				
 				if (empty($required)) { $this -> errors['required'] = __('Please choose a required status', $this -> plugin_name); }
 				else {
@@ -551,7 +554,8 @@ class wpmlField extends wpMailPlugin {
 						
 						switch ($field -> type) {
 							case 'pre_date'			:								
-								if (empty($data[$field -> slug]['y']) || empty($data[$field -> slug]['m']) || empty($data[$field -> slug]['d'])) {
+								//if (empty($data[$field -> slug]['y']) || empty($data[$field -> slug]['m']) || empty($data[$field -> slug]['d'])) {
+								if (empty($data[$field -> slug])) {
 									$this -> errors[$field -> slug] = __($field -> errormessage);
 								}
 							case 'special'			:

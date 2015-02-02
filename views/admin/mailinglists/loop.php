@@ -5,6 +5,7 @@
 				<select name="action" class="alignleft" style="width:auto;" onchange="change_action(this.value); return false;">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete Selected', $this -> plugin_name); ?></option>
+					<option value="merge"><?php _e('Merge', $this -> plugin_name); ?></option>
 					<optgroup label="<?php _e('Private', $this -> plugin_name); ?>">
 						<option value="private"><?php _e('Set as private', $this -> plugin_name); ?></option>
 						<option value="notprivate"><?php _e('Set as NOT private', $this -> plugin_name); ?></option>
@@ -15,6 +16,11 @@
 					</optgroup>
                     <option value="setgroup"><?php _e('Set Group', $this -> plugin_name); ?></option>
 				</select>
+				
+				<span id="mergeactiondiv" style="display:none;">
+					<label for="list_title"><?php _e('New list title:', $this -> plugin_name); ?></label>
+					<input type="text" name="list_title" value="" id="list_title" />
+				</span>
                 
                 <span id="setgroupactiondiv" style="display:none;">
                 	<?php if ($groupsselect = $wpmlGroup -> select()) : ?>

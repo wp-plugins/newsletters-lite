@@ -83,7 +83,9 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
         
         <script type="text/javascript">
 		jQuery(document).ready(function(e) {
-            jQuery('#languagetabs').tabs();
+			if (jQuery.isFunction(jQuery.fn.tabs)) {
+            	jQuery('#languagetabs').tabs();
+            }
         });
 		</script>
     <?php else : ?>

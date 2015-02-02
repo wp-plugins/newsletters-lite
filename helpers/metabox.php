@@ -264,7 +264,9 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 	}
 	
 	function settings_latestposts() {
+		echo '<div id="latestposts_wrapper">';
 		$this -> render('metaboxes' . DS . 'settings-latestposts', false, true, 'admin');	
+		echo '</div>';
 	}
 	
 	function settings_customcss() {

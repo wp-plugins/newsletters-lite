@@ -66,6 +66,9 @@ class wpmlDbHelper extends wpMailPlugin {
 						$oldmodel = $object -> model;
 						
 						switch ($object -> model) {
+							case 'Latestpostssubscription'	:
+								//$this -> latestposts_scheduling($object -> data -> interval, $object -> data -> startdate, array($object -> insertid));
+								break;
 							case 'Theme'					:
 								$themeoptions = array(
 									'pronews_address',
@@ -324,6 +327,12 @@ class wpmlDbHelper extends wpMailPlugin {
 				
 				if ($wpdb -> query($query)) {
 					switch ($this -> model) {
+						case 'Latestpostssubscription'	:
+							global $Latestpost;
+							wp_clear_scheduled_hook('newsletters_latestposts', array($record_id));
+							$this -> model = $Latestpost -> model;
+							$this -> delete_all(array('lps_id' => $record_id));
+							break;
 						case 'Link'					:
 							global $wpmlClick;
 							$wpmlClick -> delete_all(array('link_id' => $record_id));

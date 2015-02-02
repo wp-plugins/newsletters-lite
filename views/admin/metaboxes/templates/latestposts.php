@@ -39,7 +39,9 @@ if ($this -> language_do()) {
 				    
 				    <script type="text/javascript">
 				    jQuery(document).ready(function() {
-					    jQuery('#languagetabslatestposts').tabs();
+					    if (jQuery.isFunction(jQuery.fn.tabs)) {
+					    	jQuery('#languagetabslatestposts').tabs();
+					    }
 				    });
 				    </script>
 				<?php else : ?>

@@ -66,7 +66,8 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('newsletters_emailarchivehook', 'emailarchive_hook', 10, 1);
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
 	        $this -> add_action($this -> pre . '_pophook', 'pop_hook', 10, 1);
-			$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);
+			//$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);
+			$this -> add_action('newsletters_latestposts', 'latestposts_hook', 10, 1);
 			$this -> add_action($this -> pre . '_activateaction', 'activateaction_hook', 10, 1);
 			$this -> add_action($this -> pre . '_autoresponders', 'autoresponders_hook', 10, 1);
 			$this -> add_action($this -> pre . '_captchacleanup', 'captchacleanup_hook', 10, 1);
@@ -157,6 +158,10 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_latestposts_save', array($this, 'ajax_latestposts_save'));
+				add_action('wp_ajax_newsletters_latestposts_settings', array($this, 'ajax_latestposts_settings'));
+				add_action('wp_ajax_newsletters_latestposts_delete', array($this, 'ajax_latestposts_delete'));
+				
 				add_action('wp_ajax_newsletters_mailinglist_save', array($this, 'ajax_mailinglist_save'));
 				add_action('wp_ajax_newsletters_tinymce_snippet', array($this, 'ajax_tinymce_snippet'));
 				add_action('wp_ajax_newsletters_tinymce_dialog', array($this, 'ajax_tinymce_dialog'));
@@ -237,7 +242,7 @@ if (!class_exists('wpMailCheckinit')) {
 				$nonwwwhost = preg_replace("/^(www\.)?/si", "", $wwwhost);
 			} else {
 				$nonwwwhost = $host;
-				$wwwhost = "www." . $host;	
+				$wwwhost = "www." . $host;
 			}
 			
 			if ($_SERVER['HTTP_HOST'] == "localhost" || $_SERVER['HTTP_HOST'] == "localhost:" . $_SERVER['SERVER_PORT']) {

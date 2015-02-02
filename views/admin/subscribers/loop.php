@@ -269,10 +269,14 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		                                    <?php $Db -> model = $wpmlCountry -> model; ?>
 		                                    <?php echo $Db -> field('value', array('id' => $subscriber -> {$column -> slug})); ?>
 		                                <?php elseif ($column -> type == "pre_date") : ?>
-		                                    <?php $date = @unserialize($subscriber -> {$column -> slug}); ?>
-		                                    <?php if (!empty($date) && is_array($date)) : ?>
-		                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
-		                                    <?php endif; ?>
+		                                	<?php if (is_serialized($subscriber -> {$column -> slug})) : ?>
+			                                    <?php $date = @unserialize($subscriber -> {$column -> slug}); ?>
+			                                    <?php if (!empty($date) && is_array($date)) : ?>
+			                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+			                                    <?php endif; ?>
+			                                <?php else : ?>
+			                                	<?php echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$column -> slug})); ?>
+			                                <?php endif; ?>
 		                                <?php elseif ($column -> type == "pre_gender") : ?>
 		                                	<?php echo (!empty($subscriber -> {$column -> slug}) && $subscriber -> {$column -> slug} == "male") ? __('Male', $this -> plugin_name) : __('Female', $this -> plugin_name); ?>
 		                                <?php else : ?>

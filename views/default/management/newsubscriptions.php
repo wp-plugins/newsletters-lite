@@ -30,7 +30,7 @@
         </tbody>
     </table>
     
-    <script type="text/javascript">jQuery(document).ready(function() { jQuery('.<?php echo $this -> pre; ?>button').button(); });</script>
+    <script type="text/javascript">jQuery(document).ready(function() { if (jQuery.isFunction(jQuery.fn.button)) { jQuery('.<?php echo $this -> pre; ?>button').button(); } });</script>
 <?php else : ?>
 	<p class="<?php echo $this -> pre; ?>error"><?php _e('No other subscriptions are available', $this -> plugin_name); ?></p>
 <?php endif; ?>

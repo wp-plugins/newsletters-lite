@@ -27,12 +27,12 @@
 	    <?php endif; ?>
         
         <div class="wpmlsubmitholder">
-            <input class="<?php echo $this -> pre; ?>button" type="submit" name="savefields" value="<?php _e('Save Profile', $this -> plugin_name); ?>" id="savefields" />
+            <input id="savefieldsbutton" class="<?php echo $this -> pre; ?>button" type="submit" name="savefields" value="<?php _e('Save Profile', $this -> plugin_name); ?>" />
             <span id="savefieldsloading" style="display:none;"><span class="newsletters_loading"></span></span>
         </div>
     </form>
     
-    <script type="text/javascript">jQuery(document).ready(function() { jQuery('#savefields').button(); });</script>
+    <script type="text/javascript">jQuery(document).ready(function() { if (jQuery.isFunction(jQuery.fn.button)) { jQuery('#savefieldsbutton').button(); } });</script>
 <?php else : ?>
 	<p class="<?php echo $this -> pre; ?>error"><?php _e('No custom fields are available at this time.', $this -> plugin_name); ?></p>
 <?php endif; ?>

@@ -38,7 +38,9 @@
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#managelinktexttabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#managelinktexttabs').tabs();
+						}
 					});
 					</script>
 				<?php else : ?>
@@ -77,7 +79,9 @@
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#managementloginsubjecttabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#managementloginsubjecttabs').tabs();
+						}
 					});
 					</script>
             	<?php else : ?>

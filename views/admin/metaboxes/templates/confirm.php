@@ -39,7 +39,9 @@ if ($this -> language_do()) {
 				    
 				    <script type="text/javascript">
 				    jQuery(document).ready(function() {
-					    jQuery('#languagetabsconfirm').tabs();
+					    if (jQuery.isFunction(jQuery.fn.tabs)) {
+					    	jQuery('#languagetabsconfirm').tabs();
+					    }
 				    });
 				    </script>
 				<?php else : ?>

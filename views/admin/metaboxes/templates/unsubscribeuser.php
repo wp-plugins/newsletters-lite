@@ -39,7 +39,9 @@ if ($this -> language_do()) {
 				    
 				    <script type="text/javascript">
 				    jQuery(document).ready(function() {
-					    jQuery('#languagetabsunsubscribeuser').tabs();
+					    if (jQuery.isFunction(jQuery.fn.tabs)) {
+					    	jQuery('#languagetabsunsubscribeuser').tabs();
+					    }
 				    });
 				    </script>
 				<?php else : ?>
@@ -74,7 +76,9 @@ if ($this -> language_do()) {
 				    
 				    <script type="text/javascript">
 				    jQuery(document).ready(function() {
-					    jQuery('#languagetabsunsubscribeusermessage').tabs();
+					    if (jQuery.isFunction(jQuery.fn.tabs)) {
+					    	jQuery('#languagetabsunsubscribeusermessage').tabs();
+					    }
 				    });
 				    </script>
 				<?php else : ?>

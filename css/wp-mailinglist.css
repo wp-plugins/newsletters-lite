@@ -740,7 +740,8 @@ ul#wpmlsubmenu a.current {
 
 .wpml .postbox .scroll-list,
 .misc-pub-section .scroll-list,
-.ui-tabs .scroll-list {
+.ui-tabs .scroll-list, 
+#cboxLoadedContent .scroll-list {
     background: #FFFFFF !important;
 }
 
@@ -872,6 +873,18 @@ ul#wpmlsubmenu a.current {
     font-style: normal;
 }
 
+.newsletters-icon-view:before {
+	content: "\f177";
+}
+
+.newsletters-icon-add:before {
+	content: "\f132";
+}
+
+.newsletters-icon-edit:before {
+	content: "\f327";
+}
+
 .newsletters-icon-delete {
     position: absolute;
     top: 10px;
@@ -986,17 +999,6 @@ ul#wpmlsubmenu a.current {
 }
 
 /* Admin Menu END */
-
-/* TABLES */
-
-/*.sorting-indicator{ display:block; visibility:hidden; width:7px;height:4px;margin-top:8px;margin-left:7px;background-image:url(../images/sort.gif);background-repeat:no-repeat}
-.fixed .column-comments .sorting-indicator{margin-top:3px}
-.widefat th.sortable,.widefat th.sorted{padding:0}
-th.sortable a,th.sorted a{ display:block; visibility:visible; overflow:hidden; padding:7px 7px 8px; }
-.fixed .column-comments.sortable a,.fixed .column-comments.sorted a{ padding:8px 0; }
-th.sortable a span,th.sorted a span{float:left;cursor:pointer}
-/*th.sorted.asc .sorting-indicator,th.desc:hover span.sorting-indicator{ display:block; visibility:visible; background-position:0 0}
-th.sorted.desc .sorting-indicator,th.asc:hover span.sorting-indicator{ display:block; visibility:visible; background-position:-7px 0}*/
 
 /* TABS */
 

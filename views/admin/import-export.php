@@ -325,6 +325,8 @@
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	<?php $active = (!empty($_GET['method']) && $_GET['method'] == "export") ? 1 : 0; ?>
-	jQuery('#import-export-tabs').tabs({active:<?php echo $active; ?>});
+	if (jQuery.isFunction(jQuery.fn.tabs)) {
+		jQuery('#import-export-tabs').tabs({active:<?php echo $active; ?>});
+	}
 });
 </script>

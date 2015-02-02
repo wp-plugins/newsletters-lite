@@ -50,7 +50,9 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#resubscribetexttabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#resubscribetexttabs').tabs();
+						}
 					});
 					</script>
 				<?php else : ?>
@@ -90,7 +92,9 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#unsubscribetexttabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#unsubscribetexttabs').tabs();
+						}
 					});
 					</script>
 				<?php else : ?>
@@ -130,7 +134,9 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						jQuery('#unsubscribealltexttabs').tabs();
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#unsubscribealltexttabs').tabs();
+						}
 					});
 					</script>
 				<?php else : ?>

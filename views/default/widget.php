@@ -122,7 +122,7 @@ jQuery(document).ready(function() {
 	<?php if (!empty($ajax) && $ajax == "Y") : ?>
 		jQuery('#<?php echo $widget_id; ?>-form').submit(function() {
 			jQuery('#<?php echo $widget_id; ?>-loading').show();
-			jQuery('#<?php echo $widget_id; ?>-button').button('option', 'disabled', true);
+			jQuery('#<?php echo $widget_id; ?>-button').button('disable');
 			jQuery('#<?php echo $widget_id; ?> .wpmlfieldholder :input').attr('readonly', true);
 		
 			jQuery.ajax({
@@ -141,7 +141,9 @@ jQuery(document).ready(function() {
 			return false;
 		});
 	<?php endif; ?>
-			
-	jQuery('.widget_newsletters .button').button();
+		
+	if (jQuery.isFunction(jQuery.fn.button)) {	
+		jQuery('.widget_newsletters .button').button();
+	}
 });
 </script>

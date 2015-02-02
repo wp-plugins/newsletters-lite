@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.3';
+		var $version = '4.4.3.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -76,7 +76,7 @@ if (!class_exists('wpMailPlugin')) {
 			'wpmlGroup',
 		);
 		
-		var $models = array('Link', 'Click', 'Content');
+		var $models = array('Link', 'Click', 'Content', 'Latestpostssubscription');
 		
 		var $helpers = array('Checkinit', 'Db', 'Html', 'Form', 'Metabox', 'Shortcode', 'Auth');	
 		var $tables = array();
@@ -127,7 +127,7 @@ if (!class_exists('wpMailPlugin')) {
 		    return true;
 	    }
 	    
-	    function get_cache($hash = null, $type = 'query') {	    
+	    function get_cache($hash = null, $type = 'query') {		      
 	    	global $newsletters_cache;
 		    if (isset($newsletters_cache[$type][$hash])) {
 			    return maybe_unserialize($newsletters_cache[$type][$hash]);
@@ -770,6 +770,7 @@ if (!class_exists('wpMailPlugin')) {
 					echo $g -> render();
 					break;
 				case 'days'				:
+				default 				:
 					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
 					$records = $wpdb -> get_results($query);
 					
@@ -3183,7 +3184,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function ci_print_scripts() {
-			wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/' . $this -> plugin_name . '.js', array('jquery'), '1.0', true);	
+			wp_enqueue_script($this -> plugin_name, plugins_url() . '/' . $this -> plugin_name . '/js/wp-mailinglist.js', array('jquery'), '1.0', true);	
 			wp_enqueue_script('colorbox', plugins_url() . '/' . $this -> plugin_name . '/js/colorbox.js', array('jquery'), false, true);
 		}
 		
@@ -3196,7 +3197,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function enqueue_scripts() {	
-			global $wp_locale, $Html;
+			global $wp_locale, $Html, $Db, $Field;
 			
 			//enqueue jQuery JS Library
 			if (apply_filters('newsletters_enqueuescript_jquery', true)) { wp_enqueue_script('jquery'); }
@@ -3327,7 +3328,7 @@ if (!class_exists('wpMailPlugin')) {
 			        'dayNames'          => $Html -> strip_array_indices( $wp_locale->weekday ),
 			        'dayNamesShort'     => $Html -> strip_array_indices( $wp_locale->weekday_abbrev ),
 			        'dayNamesMin'       => $Html -> strip_array_indices( $wp_locale->weekday_initial ),
-			        'dateFormat'        => $Html -> date_format_php_to_js( get_option( 'date_format' ) ),
+			        'dateFormat'        => $Html -> date_format_php_to_js(get_option('date_format')),
 			        'firstDay'          => get_option( 'start_of_week' ),
 			        'isRTL'             => $wp_locale->is_rtl,
 			    );
@@ -3342,6 +3343,30 @@ if (!class_exists('wpMailPlugin')) {
 						if (apply_filters('newsletters_enqueuescript_jqueryuitabs', true)) { wp_enqueue_script('jquery-ui-tabs', false, array('jquery'), false, true); }
 						if (apply_filters('newsletters_enqueuescript_jquerycookie', true)) { wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'admin', false), array('jquery')); }
 					}
+				}
+				
+				$Db -> model = $Field -> model;
+				if ($field_datepicker = $Db -> find(array('type' => "pre_date"))) {					
+					wp_enqueue_script('jquery-ui-datepicker');
+				    wp_enqueue_script('datepicker-i18n', $this -> render_url('js/datepicker-i18n.js', 'admin', false), array('jquery-ui-datepicker'));
+				 
+				    //localize our js
+				    $aryArgs = array(
+				        'closeText'         => __('Done', $this -> plugin_name),
+				        'currentText'       => __('Today', $this -> plugin_name),
+				        'monthNames'        => $Html -> strip_array_indices($wp_locale -> month),
+				        'monthNamesShort'   => $Html -> strip_array_indices($wp_locale -> month_abbrev),
+				        'monthStatus'       => __('Show a different month', $this -> plugin_name),
+				        'dayNames'          => $Html -> strip_array_indices($wp_locale -> weekday),
+				        'dayNamesShort'     => $Html -> strip_array_indices($wp_locale -> weekday_abbrev),
+				        'dayNamesMin'       => $Html -> strip_array_indices($wp_locale -> weekday_initial),
+				        'dateFormat'        => $Html -> date_format_php_to_js(get_option('date_format')),
+				        'firstDay'          => get_option('start_of_week'),
+				        'isRTL'             => $wp_locale -> is_rtl,
+				    );
+				 
+				    // Pass the localized array to the enqueued JS
+				    wp_localize_script('datepicker-i18n', 'objectL10n', $aryArgs);
 				}
 			
 				//enqueue the plugin JS
@@ -3387,6 +3412,9 @@ if (!class_exists('wpMailPlugin')) {
 					wp_enqueue_style('syntaxhighlighter-theme', "http://alexgorbatchev.com/pub/sh/current/styles/shThemeEmacs.css", false, false, "all");
 				}
 			} else {
+				$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
+				wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
+				
 				if ($this -> get_option('theme_usestyle') == "Y") {
 					$load = true;	
 					$stylesource = $this -> render_url('css/style.css', 'default', false);
@@ -3538,8 +3566,25 @@ if (!class_exists('wpMailPlugin')) {
 			return true;
 		}
 		
-		function latestposts_scheduling() {		
-			wp_clear_scheduled_hook($this -> pre . '_latestposts');
+		function latestposts_scheduling($interval = null, $startdate = null, $args = null) {	
+			if (!empty($interval)) {
+				wp_clear_scheduled_hook('newsletters_latestposts', $args);
+				$schedules = wp_get_schedules();
+				
+				if (empty($startdate) || strtotime($startdate) < time()) {
+					$new_timestamp = time() + $schedules[$interval]['interval'];
+				} else {
+					$new_timestamp = strtotime($startdate);
+				}
+				
+				if (!wp_next_scheduled('newsletters_latestposts', $args)) {
+					wp_schedule_event($new_timestamp, $interval, 'newsletters_latestposts', $args);
+				}
+			}
+				
+			/*wp_clear_scheduled_hook($this -> pre . '_latestposts');
+			
+			//wp_schedule_single_event(strtotime("+7 day"), 'newsletters_ratereviewhook', array(7));
 			
 			if ($this -> get_option('latestposts') == "Y") {
 				if ($interval = $this -> get_option('latestposts_interval')) {
@@ -3557,7 +3602,7 @@ if (!class_exists('wpMailPlugin')) {
 						wp_schedule_event($new_timestamp, $interval, $this -> pre . '_latestposts');
 					}
 				}
-			}
+			}*/
 		
 			return true;	
 		}
@@ -4174,7 +4219,65 @@ if (!class_exists('wpMailPlugin')) {
 								<?php
 							}
 							break;
-						case 'pre_date'			:													
+						case 'pre_date'			:
+						
+							if (!empty($_POST[$field -> slug])) {
+								$_POST[$field -> slug] = maybe_unserialize($_POST[$field -> slug]);
+							}
+							
+							$currentDate = "";
+							if (!empty($_POST[$field -> slug])) {
+								if (is_array($_POST[$field -> slug])) {
+									$currentDate = date_i18n(get_option('date_format'), strtotime($_POST[$field -> slug]['d'] . '/' . $_POST[$field -> slug]['m'] . '/' . $_POST[$field -> slug]['y']));
+								} else {
+									$currentDate = date_i18n(get_option('date_format'), strtotime($_POST[$field -> slug]));
+								}
+							}
+							
+							if (!empty($currentDate)) {
+								$defaultDate = 'new Date(' . date_i18n("Y", strtotime($currentDate)) . ', ' . date_i18n("m", strtotime($currentDate)) . ', ' . date_i18n("d", strtotime($currentDate)) . ')';
+							} else {
+								$defaultDate = 'new Date(' . date_i18n("Y") . ', ' . date_i18n("m") . ', ' . date_i18n("d") . ')';
+							}
+							
+							?>
+							
+							<input type="text" class="<?php echo $this -> pre; ?>predate <?php echo $this -> pre; ?>text <?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" value="<?php echo $currentDate; ?>" name="<?php echo $field -> slug; ?>" id="<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>" />
+							
+							<script type="text/javascript">
+							jQuery(document).ready(function() {
+								jQuery('#<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>').datepicker({
+									changeMonth: true,
+									changeYear: true,
+									yearRange: "<?php echo date_i18n("Y", strtotime("-100 years")); ?>:<?php echo date_i18n("Y"); ?>",
+									showOn: "both",
+									buttonImage: "<?php echo plugins_url(); ?>/<?php echo $this -> plugin_name; ?>/views/default/img/calendar.gif",
+									buttonImageOnly: true,
+									dateFormat: "<?php echo $Html -> dateformat_PHP_to_jQueryUI(get_option('date_format')); ?>",
+									defaultDate: <?php echo $defaultDate; ?>
+								});
+							});
+							</script>
+							
+							<?php
+						
+							/*if (!empty($_POST[$field -> slug]) && is_array($_POST[$field -> slug])) {
+								$value = $_POST[$field -> slug]['y'] . '-' . 
+							}	
+						
+							echo '<input class="' . $this -> pre . ' widefat ' . $this -> pre . 'text' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' type="text" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($_POST[$field -> slug])) . '" />';
+						
+							?>
+							
+							<script type="text/javascript">
+							jQuery(document).ready(function() {
+								jQuery('#<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>').datepicker();
+							});	
+							</script>
+							
+							<?php */
+						
+							/*												
 							?>
 						
 							<select class="<?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" id="<?php echo $this -> pre; ?>-<?php echo $optinid; ?><?php echo $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[y]">
@@ -4209,6 +4312,9 @@ if (!class_exists('wpMailPlugin')) {
 							</select>
 							
 							<?php
+							
+							
+							*/
 							break;
 						case 'pre_gender'		:
 							?>
@@ -4264,11 +4370,11 @@ if (!class_exists('wpMailPlugin')) {
 								<th nowrap="nowrap"><?php _e($field -> title); ?></th>
 								<td>
 									<?php if ($field -> type == "radio" || $field -> type == "select") : ?>
-										<?php $fieldoptions = unserialize($field -> fieldoptions); ?>
+										<?php $fieldoptions = maybe_unserialize($field -> fieldoptions); ?>
 										<?php echo __($fieldoptions[$subscriber -> {$field -> slug}]); ?>
 									<?php elseif ($field -> type == "checkbox") : ?>
-										<?php $supoptions = unserialize($subscriber -> {$field -> slug}); ?>
-										<?php $fieldoptions = unserialize($field -> fieldoptions); ?>
+										<?php $supoptions = maybe_unserialize($subscriber -> {$field -> slug}); ?>
+										<?php $fieldoptions = maybe_unserialize($field -> fieldoptions); ?>
 										<?php if (!empty($supoptions) && is_array($supoptions)) : ?>
 											<?php foreach ($supoptions as $supopt) : ?>
 												&raquo;&nbsp;<?php echo __($fieldoptions[$supopt]); ?><br/>
@@ -4282,9 +4388,13 @@ if (!class_exists('wpMailPlugin')) {
 										<?php $Db -> model = $wpmlCountry -> model; ?>
 										<?php echo $Db -> field('value', array('id' => $subscriber -> {$field -> slug})); ?>
 									<?php elseif ($field -> type == "pre_date") : ?>
-										<?php $date = @unserialize($subscriber -> {$field -> slug}); ?>
-										<?php if (!empty($date) && is_array($date)) : ?>
-											<?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+										<?php if (is_serialized($subscriber -> {$field -> slug})) : ?>
+											<?php $date = @unserialize($subscriber -> {$field -> slug}); ?>
+											<?php if (!empty($date) && is_array($date)) : ?>
+												<?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+											<?php endif; ?>
+										<?php else : ?>
+											<?php echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug})); ?>
 										<?php endif; ?>
 									<?php else : ?>
 										<?php echo $subscriber -> {$field -> slug}; ?>
@@ -4304,12 +4414,14 @@ if (!class_exists('wpMailPlugin')) {
 	        return $customfields;
 	    }
 		
-		function gen_auth($subscriber_id = null, $mailinglist_id = null) {			
+		function gen_auth($subscriber_id = null, $mailinglist_id = null) {
+			$mailinglist_id = false;
+						
 			if (!empty($subscriber_id)) {
 				global $Db, $Subscriber, $SubscribersList;
 				$Db -> model = $Subscriber -> model;
 				$subscriber = $Db -> find(array('id' => $subscriber_id));
-				$authkey = (empty($subscriber -> authkey)) ? md5(rand(1, 999)) : $subscriber -> authkey;
+				$authkey = (empty($subscriber -> authkey)) ? md5($subscriber_id) : $subscriber -> authkey;
 				
 				if (!empty($mailinglist_id)) {
 					$Db -> model = $SubscribersList -> model;
@@ -4317,7 +4429,9 @@ if (!class_exists('wpMailPlugin')) {
 						if ($subscriberslist -> authinprog == "Y" && !empty($subscriberslist -> authkey) && $subscriberslist -> authkey == $authkey) {
 							$authkey = $subscriberslist -> authkey;
 						} else {
+							$Db -> model = $SubscribersList -> model;
 							$Db -> save_field('authkey', $authkey, array('list_id' => $mailinglist_id, 'subscriber_id' => $subscriber_id));
+							$Db -> model = $SubscribersList -> model;
 							$Db -> save_field('authinprog', "Y", array('list_id' => $mailinglist_id, 'subscriber_id' => $subscriber_id));
 						}
 					}
@@ -4326,7 +4440,9 @@ if (!class_exists('wpMailPlugin')) {
 						if ($subscriber -> authinprog == "Y" && !empty($subscriber -> authkey)) {
 							$authkey = $subscriber -> authkey;
 						} else {
+							$Db -> model = $Subscriber -> model;
 							$Db -> save_field('authkey', $authkey, array('id' => $subscriber_id));
+							$Db -> model = $Subscriber -> model;
 							$Db -> save_field('authinprog', "Y", array('id' => $subscriber_id));
 						}
 					}
@@ -4772,6 +4888,21 @@ if (!class_exists('wpMailPlugin')) {
 								case 'pre_gender'		:
 									$newreplace[] = $Html -> gender($subscriber -> {$field -> slug});
 									break;
+								case 'checkbox'			:
+									$supoptions = maybe_unserialize($subscriber -> {$field -> slug});
+									$fieldoptions = maybe_unserialize($field -> fieldoptions);
+									if (!empty($supoptions) && is_array($suboptions)) {
+										$replace = "";
+										
+										foreach ($supoptions as $supopt) {
+											$replace .= '&raquo; ' . __($fieldoptions[$supopt]) . "\r\n";
+										}
+										
+										$newreplace[] = $replace;
+									} else {
+										$newreplace[] = __('none', $this -> plugin_name);
+									}
+									break;
 								case 'radio'			:
 								case 'select'			:
 									$value = $subscriber -> {$field -> slug};
@@ -4987,9 +5118,8 @@ if (!class_exists('wpMailPlugin')) {
 				
 					$to = (object) array('email' => $adminemail);
 					$subject = $this -> et_subject('subscribe', $subscriber);
-					$fullbody = $this -> et_message('subscribe', $subscriber);
+					$fullbody = $this -> et_message('subscribe', $subscriber);					
 					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
-					
 					$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 					
 					return true;
@@ -5608,6 +5738,64 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
+		function ajax_latestposts_settings() {
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			$this -> render('metaboxes' . DS . 'settings-latestposts', false, true, 'admin');
+			
+			exit();
+			die();
+		}
+		
+		function ajax_latestposts_delete() {
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			if (!empty($_GET['id'])) {
+				if ($this -> Latestpostssubscription -> delete($_GET['id'])) {
+					echo 'success';
+				}
+			}
+			
+			exit();
+			die();
+		}
+		
+		function ajax_latestposts_save() {
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			$ajax = false;
+			$success = false;
+			
+			if (!empty($_POST)) {
+				$ajax = true;
+				
+				foreach ($_POST as $pkey => $pval) {
+					if (!empty($pval) && is_array($pval)) {
+						$_POST[$pkey] = maybe_serialize($pval);
+					}
+				}
+								
+				if ($this -> Latestpostssubscription -> save($_POST)) {
+					$success = true;
+				} else {
+					$success = false;
+				}
+				
+				$latestpostssubscription = $this -> Latestpostssubscription -> data;
+			} else {
+				if (!empty($_GET['id'])) {
+					$latestpostssubscription = $this -> Latestpostssubscription -> find(array('id' => $_GET['id']));
+				}
+			}
+			
+			$this -> render('latestposts-save', array('latestpostssubscription' => $latestpostssubscription, 'errors' => $this -> Latestpostssubscription -> errors, 'success' => $success, 'ajax' => $ajax), true, 'admin');
+			
+			exit();
+			die();
+		}
+		
 		function ajax_uploadify() {
 			define('DOING_AJAX', true);
 			define('SHORTINIT', true);
@@ -5623,7 +5811,7 @@ if (!class_exists('wpMailPlugin')) {
 	    	define('SHORTINIT', true);
 			
 			if ($this -> get_option('latestposts') == "Y") {
-				if ($content = $this -> latestposts_hook(true)) {
+				if ($content = $this -> latestposts_hook($_GET['id'], true)) {
 					echo $content;
 				}
 			}
@@ -5637,10 +5825,16 @@ if (!class_exists('wpMailPlugin')) {
 		
 			global $Db, $Latestpost;
 			
-			$Db -> model = $Latestpost -> model;
-			$posts = $Db -> find_all(null, null, array('created', "DESC"));
+			$conditions = array();
+			if (!empty($_GET['id'])) {
+				$conditions['lps_id'] = $_GET['id'];
+				$latestpostssubscription = $this -> Latestpostssubscription -> find(array('id' => $_GET['id']));
+			}
 			
-			$this -> render('posts', array('posts' => $posts), true, 'admin');
+			$Db -> model = $Latestpost -> model;
+			$posts = $Db -> find_all($conditions, null, array('created', "DESC"));
+			
+			$this -> render('posts', array('posts' => $posts, 'latestpostssubscription' => $latestpostssubscription), true, 'admin');
 			
 			exit(); die();
 		}
@@ -5656,19 +5850,29 @@ if (!class_exists('wpMailPlugin')) {
 				$Db -> delete($_POST['id']);
 			}
 			
-			echo 1;
-			
 			exit(); die();
 		}
 		
-		function get_latestposts() {
+		function get_latestposts_used($latestpostssubscription = null) {
+			global $wpdb, $Latestpost, $Db;
+			
+			if (!empty($latestpostssubscription)) {
+				$Db -> model = $Latestpost -> model;
+				$count = $Db -> count(array('lps_id' => $latestpostssubscription -> id));
+				return $count;
+			}
+			
+			return 0;
+		}
+		
+		function get_latestposts($latestpostssubscription = null) {
 			global $wpdb, $post, $Db, $Latestpost, $Template, $Html, $History, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
 			$post_criteria = false;
 		
-			if ($this -> get_option('latestposts') == "Y") {
+			if (!empty($latestpostssubscription)) {
 				$exclude = array();
-				if ($latestposts_exclude = $this -> get_option('latestposts_exclude')) {
-					if (($exclude = @explode(",", $latestposts_exclude)) !== false) {
+				if (!empty($latestpostssubscription -> exclude)) {
+					if (($exclude = @explode(",", $latestpostssubscription -> exclude)) !== false) {
 						//exclude array exists…
 						foreach ($exclude as $exkey => $exval) {
 							$exclude[$exkey] = trim($exval);
@@ -5676,14 +5880,12 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 				
-				$latestposts_order = $this -> get_option('latestposts_order');
-				$order = (!empty($latestposts_order)) ? $latestposts_order : "DESC";
-				$latestposts_orderby = $this -> get_option('latestposts_orderby');
-				$orderby = (!empty($latestposts_orderby)) ? $latestposts_orderby : "date";
+				$order = (!empty($latestpostssubscription -> order)) ? $latestpostssubscription -> order : "DESC";
+				$orderby = (!empty($latestpostssubscription -> orderby)) ? $latestpostssubscription -> orderby : "date";
 						
 				$post_criteria = array(
-					'numberposts'			=>	$this -> get_option('latestposts_number'),
-					'category'				=>	@implode(",", $this -> get_option('latestposts_categories')),
+					'numberposts'			=>	$latestpostssubscription -> number,
+					'category'				=>	@implode(",", maybe_unserialize($latestpostssubscription -> categories)),
 					'orderby'				=>	$orderby,
 					'order'					=>	$order,
 					'exclude'				=>	$exclude,
@@ -5691,13 +5893,12 @@ if (!class_exists('wpMailPlugin')) {
 					'post_status'			=>	"publish",
 				);
 				
-				$latestposts_takefrom = $this -> get_option('latestposts_takefrom');
-				if (!empty($latestposts_takefrom) && $latestposts_takefrom == "posttypes") {
+				if (!empty($latestpostssubscription -> takefrom) && $latestpostssubscription -> takefrom == "posttypes") {
 					$post_criteria['category'] = 0;
-					$post_criteria['post_type'] = $this -> get_option('latestposts_posttypes');
+					$post_criteria['post_type'] = maybe_unserialize($latestpostssubscription -> posttypes);
 				}
 				
-				$latestpostsquery = "SELECT id, post_id FROM " . $wpdb -> prefix . $Latestpost -> table . "";
+				$latestpostsquery = "SELECT id, post_id FROM " . $wpdb -> prefix . $Latestpost -> table . " WHERE `lps_id` = '" . $latestpostssubscription -> id . "'";
 				$latestposts = $wpdb -> get_results($latestpostsquery);
 				
 				if (!empty($latestposts)) {
@@ -5710,7 +5911,7 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 				
-				$olderthanquery = "SELECT ID FROM " . $wpdb -> posts . " WHERE post_date < '" . date_i18n("Y-m-d H:i:s", strtotime($this -> get_option('latestposts_olderthan'))) . "'";
+				$olderthanquery = "SELECT ID FROM " . $wpdb -> posts . " WHERE post_date < '" . date_i18n("Y-m-d H:i:s", strtotime($latestpostssubscription -> olderthan)) . "'";
 				$olderthan = $wpdb -> get_results($olderthanquery);
 				
 				if (!empty($olderthan)) {
@@ -5923,14 +6124,41 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.4.3") < 0) {
+				if (version_compare($cur_version, "4.4.3.2") < 0) {
 					$this -> update_options();
+
+					$latestposts = $this -> get_option('latestposts');
+					if (!empty($latestposts) && $latestposts == "Y") {					
+						$latestpostssubscription = array(
+							'subject'				=>	$this -> get_option('latestposts_subject'),
+							'number'				=>	$this -> get_option('latestposts_number'),
+							'language'				=>	$this -> get_option('latestposts_language'),
+							'takefrom'				=>	$this -> get_option('latestposts_takefrom'),
+							'posttypes'				=>	maybe_serialize($this -> get_option('latestposts_posttypes')),
+							'categories'			=>	maybe_serialize($this -> get_option('latestposts_categories')),
+							'groupbycategory'		=>	$this -> get_option('latestposts_groupbycategory'),
+							'exclude'				=>	$this -> get_option('latestposts_exclude'),
+							'order'					=>	$this -> get_option('latestposts_order'),
+							'orderby'				=>	$this -> get_option('latestposts_orderby'),
+							'olderthan'				=>	$this -> get_option('latestposts_olderthan'),
+							'lists'					=>	maybe_serialize($this -> get_option('latestposts_lists')),
+							'startdate'				=>	$this -> get_option('latestposts_startdate'),
+							'interval'				=>	$this -> get_option('latestposts_interval'),
+							'theme_id'				=>	$this -> get_option('latestposts_theme'),
+						);
+						
+						$this -> Latestpostssubscription -> save($latestpostssubscription);
+						$this -> latestposts_scheduling($latestpostssubscription['interval'], $latestpostssubscription['startdate'], array($this -> Latestpostssubscription -> insertid));
+					}
 					
 					// Set the 'rel_id' field on fieldslists table as AUTO_INCREMENT
-					global $wpdb, $Db, $FieldsList;
+					global $wpdb, $Db, $FieldsList, $Latestpost;
+					$query = "ALTER TABLE " . $wpdb -> prefix . $Latestpost -> table . " CHANGE `post_id` `post_id` INT(11) NOT NULL DEFAULT '0'";
+					$wpdb -> query($query);
 					$query = "ALTER TABLE " . $wpdb -> prefix . $FieldsList -> table . " CHANGE `rel_id` `rel_id` INT(11) NOT NULL AUTO_INCREMENT";
+					$wpdb -> query($query);
 					
-					$version = '4.4.3';
+					$version = '4.4.3.2';
 				}
 			
 				//the current version is older.
@@ -7098,8 +7326,10 @@ if (!class_exists('wpMailPlugin')) {
 				$atts = shortcode_parse_atts($matches['3']);
 				
 				if (!empty($this -> history_id) && !empty($atts['id'])) {
-					if ($contentarea = $this -> Content -> find(array('number' => $atts['id'], 'history_id' => $this -> history_id))) {
-						$output = stripslashes($contentarea -> content);
+					if (is_object($this -> Content)) {
+						if ($contentarea = $this -> Content -> find(array('number' => $atts['id'], 'history_id' => $this -> history_id))) {
+							$output = stripslashes($contentarea -> content);
+						}
 					}
 				}
 			}

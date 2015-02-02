@@ -59,7 +59,9 @@
 							
 							<script type="text/javascript">
 							jQuery(document).ready(function() {
-								jQuery('#commentformlabeltabs').tabs();
+								if (jQuery.isFunction(jQuery.fn.tabs)) {
+									jQuery('#commentformlabeltabs').tabs();
+								}
 							});
 							</script>
 						<?php endif; ?>
@@ -135,7 +137,9 @@
 							
 							<script type="text/javascript">
 							jQuery(document).ready(function() {
-								jQuery('#registerformlabeltabs').tabs();
+								if (jQuery.isFunction(jQuery.fn.tabs)) {
+									jQuery('#registerformlabeltabs').tabs();
+								}
 							});
 							</script>
 						<?php endif; ?>
