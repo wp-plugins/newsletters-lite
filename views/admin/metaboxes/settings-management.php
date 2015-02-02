@@ -1,3 +1,11 @@
+<!-- Manage Subscriptions Settings -->
+
+<?php
+	
+$managementshowsubscriptions = $this -> get_option('managementshowsubscriptions');	
+	
+?>
+
 <table class="form-table">
 	<tbody>
     	<tr>
@@ -89,6 +97,13 @@
             	<?php endif; ?>
                 <span class="howto"><?php _e('The subject of the email when a subscriber authenticates.', $this -> plugin_name); ?></span>
             </td>
+        </tr>
+        <tr>
+	        <th><label for="managementshowsubscriptions_Y"><?php _e('Show Current Subscriptions', $this -> plugin_name); ?></label></th>
+	        <td>
+		        <label><input <?php echo (empty($managementshowsubscriptions) || (!empty($managementshowsubscriptions) && $managementshowsubscriptions == "Y")) ? 'checked="checked"' : ''; ?> type="radio" name="managementshowsubscriptions" value="Y" id="managementshowsubscriptions_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+		        <label><input <?php echo (!empty($managementshowsubscriptions) && $managementshowsubscriptions == "N") ? 'checked="checked"' : ''; ?> type="radio" name="managementshowsubscriptions" value="N" id="managementshowsubscriptions_N" /> <?php _e('No', $this -> plugin_name); ?></label>
+	        </td>
         </tr>
         <tr>
         	<th><label for="managementallownewsubscribes_Y"><?php _e('Allow New Subscribes', $this -> plugin_name); ?></label></th>

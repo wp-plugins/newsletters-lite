@@ -29,7 +29,7 @@ if (!class_exists('wpMailCheckinit')) {
 			return false;
 		}
 		
-		function ci_initialization() {								
+		function ci_initialization() {											
 			/* RSS Feeds */
 			if ($this -> get_option('rssfeed') == "Y" && !is_admin()) { 
 				global $wp_rewrite;
@@ -87,7 +87,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('wp_dashboard_setup', 'dashboard_setup');
 			
 			//Filter hooks
-			$this -> add_filter('cron_schedules');
+			$this -> add_filter('cron_schedules', 'cron_schedules', 1, 1);
 			$this -> add_filter('screen_settings', 'screen_settings', 15, 2);
 			$this -> add_filter('plugin_action_links', 'plugin_action_links', 10, 4);
 			$this -> add_filter('the_editor', 'the_editor', 1, 1);
@@ -158,6 +158,8 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_load_new_editor', array($this, 'ajax_load_new_editor'));
+				
 				add_action('wp_ajax_newsletters_latestposts_save', array($this, 'ajax_latestposts_save'));
 				add_action('wp_ajax_newsletters_latestposts_settings', array($this, 'ajax_latestposts_settings'));
 				add_action('wp_ajax_newsletters_latestposts_delete', array($this, 'ajax_latestposts_delete'));

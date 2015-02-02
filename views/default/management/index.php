@@ -32,18 +32,20 @@ if (!empty($subscriber -> subscriptions)) {
 <div class="<?php echo $this -> pre; ?>">
 	<div id="managementtabs">
 		<ul>
-	    	<li><a href="#managementtabs1"><?php _e('Current', $this -> plugin_name); ?></a></li>
+	    	<?php if ($this -> get_option('managementshowsubscriptions') == "Y") : ?><li><a href="#managementtabs1"><?php _e('Current', $this -> plugin_name); ?></a></li><?php endif; ?>
 	        <?php if ($this -> get_option('managementallownewsubscribes') == "Y") : ?><li><a href="#managementtabs2"><?php _e('Subscribe', $this -> plugin_name); ?></a></li><?php endif; ?>
 	        <?php if ($this -> get_option('managementcustomfields') == "Y") : ?><li><a href="#managementtabs3"><?php _e('Profile', $this -> plugin_name); ?></a></li><?php endif; ?>
 	    </ul>
 	    
-	    <div id="managementtabs1">
-	    	<div id="currentsubscriptions">
-				<?php $this -> render('management' . DS . 'currentsubscriptions', array('subscriber' => $subscriber), true, 'default'); ?>
-	        </div>
-	        
-	        <br class="clear" />
-	    </div>
+	    <?php if ($this -> get_option('managementshowsubscriptions') == "Y") : ?>
+		    <div id="managementtabs1">
+		    	<div id="currentsubscriptions">
+					<?php $this -> render('management' . DS . 'currentsubscriptions', array('subscriber' => $subscriber), true, 'default'); ?>
+		        </div>
+		        
+		        <br class="clear" />
+		    </div>
+		<?php endif; ?>
 	    
 	   	<?php if ($this -> get_option('managementallownewsubscribes') == "Y") : ?>    
 	        <div id="managementtabs2">

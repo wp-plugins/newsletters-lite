@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.3.2';
+		var $version = '4.4.4';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -3552,7 +3552,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function activateaction_scheduling() {
-			wp_clear_scheduled_hook($this -> pre . '_activateaction');
+			//wp_clear_scheduled_hook($this -> pre . '_activateaction');
 			$activateaction = $this -> get_option('activateaction');
 			
 			if (!empty($activateaction) && $activateaction != "none") {
@@ -3581,38 +3581,14 @@ if (!class_exists('wpMailPlugin')) {
 					wp_schedule_event($new_timestamp, $interval, 'newsletters_latestposts', $args);
 				}
 			}
-				
-			/*wp_clear_scheduled_hook($this -> pre . '_latestposts');
-			
-			//wp_schedule_single_event(strtotime("+7 day"), 'newsletters_ratereviewhook', array(7));
-			
-			if ($this -> get_option('latestposts') == "Y") {
-				if ($interval = $this -> get_option('latestposts_interval')) {
-					$schedules = wp_get_schedules();
-					$schedules = $this -> cron_schedules($schedules);
-					
-					$latestposts_startdate = $this -> get_option('latestposts_startdate');
-					if (empty($latestposts_startdate) || strtotime($latestposts_startdate) < time() || empty($_POST['latestposts_updateinterval']) || $_POST['latestposts_updateinterval'] == "N") {
-						$new_timestamp = time() + $schedules[$interval]['interval'];
-					} else {
-						$new_timestamp = strtotime($latestposts_startdate);
-					}
-					
-					if (!wp_next_scheduled($this -> pre . '_latestposts')) {
-						wp_schedule_event($new_timestamp, $interval, $this -> pre . '_latestposts');
-					}
-				}
-			}*/
 		
 			return true;	
 		}
 	
 	    function pop_scheduling() {
-	        wp_clear_scheduled_hook($this -> pre . '_pophook');
-	
+	        wp_clear_scheduled_hook($this -> pre . '_pophook');	
 	        if ($this -> get_option('bouncemethod') == "pop") {
 	            $schedules = wp_get_schedules();
-	            $schedules = $this -> cron_schedules($schedules);
 				$interval = $this -> get_option('bouncepop_interval');
 				$new_timestamp = time() + $schedules[$interval]['interval'];
 				
@@ -3625,11 +3601,9 @@ if (!class_exists('wpMailPlugin')) {
 	    }
 		
 		function importusers_scheduling() {
-			wp_clear_scheduled_hook($this -> pre . '_importusers');
-			
+			wp_clear_scheduled_hook($this -> pre . '_importusers');			
 			if ($this -> get_option('importusers') == "Y") {
 				$schedules = wp_get_schedules();
-				$schedules = $this -> cron_schedules($schedules);
 				$interval = $this -> get_option('importusersscheduling');
 				$interval = (empty($interval)) ? "hourly" : $interval;
 				$new_timestamp = time() + $schedules[$interval]['interval'];
@@ -3641,10 +3615,8 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function autoresponder_scheduling() {
-			wp_clear_scheduled_hook($this -> pre . '_autoresponders');
-			
+			wp_clear_scheduled_hook($this -> pre . '_autoresponders');			
 			$schedules = wp_get_schedules();
-			$schedules = $this -> cron_schedules($schedules);
 			$interval = $this -> get_option('autoresponderscheduling');
 			$new_timestamp = time() + $schedules[$interval]['interval'];
 			
@@ -3656,10 +3628,8 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function captchacleanup_scheduling() {
-			wp_clear_scheduled_hook($this -> pre . '_captchacleanup');
-			
+			wp_clear_scheduled_hook($this -> pre . '_captchacleanup');			
 			$schedules = wp_get_schedules();
-			$schedules = $this -> cron_schedules($schedules);
 			$interval = $this -> get_option('captchainterval');
 			$new_timestamp = time() + $schedules[$interval]['interval'];
 			
@@ -3675,13 +3645,15 @@ if (!class_exists('wpMailPlugin')) {
 			if ($this -> get_option('scheduling') == "Y") {			
 				if ($this -> get_option('schedulecrontype') == "wp") {			
 					$schedules = wp_get_schedules();
-					$schedules = $this -> cron_schedules($schedules);
 					$interval = $this -> get_option('scheduleinterval');
+					$interval = (empty($interval)) ? '2minutes' : $interval;
 					$new_timestamp = time() + $schedules[$interval]['interval'];
 					if ($increase == true) { $new_timestamp += 300; }
 					
 					if (!wp_next_scheduled($this -> pre . '_cronhook')) {
-						wp_schedule_event($new_timestamp, $interval, $this -> pre . '_cronhook');
+						if (!wp_schedule_event($new_timestamp, $interval, $this -> pre . '_cronhook')) {
+							$this -> log_error(__('Could not schedule cron hook, please check the settings', $this -> plugin_name));
+						}
 					}
 				}
 			}
@@ -5762,6 +5734,61 @@ if (!class_exists('wpMailPlugin')) {
 			die();
 		}
 		
+		function ajax_load_new_editor() {
+			wp_enqueue_script('jquery');
+			//meta boxes
+			wp_enqueue_script('common', false, false, false, true);
+			wp_enqueue_script('wp-lists', false, false, false, true);
+			wp_enqueue_script('postbox', false, false, false, true);			
+			//editor
+			wp_enqueue_script('editor', false, false, false, true);
+			wp_enqueue_script('quicktags', false, false, false, true);
+			wp_enqueue_script('wplink', false, false, false, true);
+			wp_enqueue_script('wpdialogs-popup', false, false, false, true);
+			wp_enqueue_style('wp-jquery-ui-dialog', false, false, false, true);
+			wp_enqueue_script('word-count', false, false, false, true);
+			wp_enqueue_script('media-upload', false, false, false, true);
+			wp_admin_css();
+			wp_enqueue_script('utils', false, false, false, true);
+			
+			?>
+			
+			<div class="postbox" id="contentareabox<?php echo $_REQUEST['contentarea']; ?>">
+				<div class="handlediv" title="Click to toggle"><br></div>
+					<h3 class="hndle"><span><?php echo __('Content Area', $this -> plugin_name); ?> <?php echo $_REQUEST['contentarea']; ?></span></h3>
+					<div class="inside">
+				
+					<?php
+			
+					
+					wp_editor("", 'contentarea' . $_REQUEST['contentarea'], array(
+						'textarea_name'				=>	'contentarea[' . $_REQUEST['contentarea'] . ']',
+					));
+					
+					?>
+				
+					<table id="post-status-info" cellpadding="0" cellspacing="0">
+						<tbody>
+							<tr>
+								<td id="wp-word-count">
+									<span id="word-count"><code>[newsletters_content id="<?php echo $_REQUEST['contentarea']; ?>"]</code></span>
+								</td>
+								<td class="autosave-info">
+									<span id="autosave" style="display:none;"></span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<p><a href="" onclick="if (confirm('<?php echo __('Are you sure you want to remove this content area?', $this -> plugin_name); ?>')) { deletecontentarea('<?php echo $_REQUEST['contentarea']; ?>', ''); } return false;" class="button button-secondary"><?php _e('Delete', $this -> plugin_name); ?></a></p>
+				</div>
+			</div>
+	
+			<?php
+			
+			exit();
+			die();
+		}
+		
 		function ajax_latestposts_save() {
 			define('DOING_AJAX', true);
 			define('SHORTINIT', true);
@@ -6124,7 +6151,7 @@ if (!class_exists('wpMailPlugin')) {
 					$version = "3.9.9";
 				}
 				
-				if (version_compare($cur_version, "4.4.3.2") < 0) {
+				if (version_compare($cur_version, "4.4.4") < 0) {
 					$this -> update_options();
 
 					$latestposts = $this -> get_option('latestposts');
@@ -6158,7 +6185,7 @@ if (!class_exists('wpMailPlugin')) {
 					$query = "ALTER TABLE " . $wpdb -> prefix . $FieldsList -> table . " CHANGE `rel_id` `rel_id` INT(11) NOT NULL AUTO_INCREMENT";
 					$wpdb -> query($query);
 					
-					$version = '4.4.3.2';
+					$version = '4.4.4';
 				}
 			
 				//the current version is older.
@@ -6181,6 +6208,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['managementallowemailchange'] = "Y";
 			$options['managementformatchange'] = "Y";
 			$options['managementallownewsubscribes'] = "Y";
+			$options['managementshowsubscriptions'] = "Y";
 			$options['managementcustomfields'] = "Y"; 
 			$options['cookieformat'] = "D, j M Y H:i:s";
 			$options['defaultlistcreated'] = "N";

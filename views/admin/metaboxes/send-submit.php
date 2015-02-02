@@ -172,6 +172,7 @@
             	<?php echo $Html -> help(__('You can choose to send this newsletter immediately or you can click the "Edit" link to change the date/time to a future date/time at which it will be sent.', $this -> plugin_name)); ?>
             	
 				<div id="timestampdiv" class="hide-if-js" style="display:none;">
+					<p class="howto"><?php echo sprintf(__('Current time is %s', $this -> plugin_name), '<strong>' . date_i18n("Y-m-d H:i:s", time()) . '</strong>'); ?></p>
 					<?php touch_time(0, 0, 0, 0); ?>
 					<?php $senddate = (empty($_POST['senddate']) || strtotime($_POST['senddate']) <= time()) ? date_i18n("Y-m-d H:i:s", time()) : $_POST['senddate']; ?>
 					<input type="hidden" name="sendtype" id="sendtype" value="<?php echo ($this -> get_option('sendingprogress') == "Y") ? 'send' : 'queue'; ?>" />

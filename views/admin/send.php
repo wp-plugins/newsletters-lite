@@ -208,7 +208,7 @@ function deletecontentarea(number, history_id) {
 }
 
 function addcontentarea() {	
-	var contentarea_html = '';
+	/*var contentarea_html = '';
 	contentarea_html += '<div class="postbox" id="contentareabox' + contentarea + '">';
 	contentarea_html += '<div class="handlediv" title="Click to toggle"><br></div>';
 	contentarea_html += '<h3 class="hndle"><span><?php echo __('Content Area', $this -> plugin_name); ?> ' + contentarea + '</span></h3>';
@@ -235,9 +235,20 @@ function addcontentarea() {
 	
 	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
 		tinyMCE.execCommand("mceAddEditor", false, 'contentarea' + contentarea);
-	}
+	}*/
+	
+	jQuery('#contentarea_loading').show();
+	jQuery.post(wpmlajaxurl + '?action=newsletters_load_new_editor', {contentarea:contentarea}, function(response) {
+		jQuery('#contentareas').append(response);
 		
-	contentarea++;
+		if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
+			jQuery('#contentarea_loading').hide();
+			quicktags({id:'contentarea' + contentarea});
+			tinyMCE.execCommand("mceAddEditor", false, 'contentarea' + contentarea);	
+			wpml_scroll('#contentareabox' + contentarea);		
+			contentarea++;
+		}
+	});
 }
 
 jQuery(document).ready(function() {

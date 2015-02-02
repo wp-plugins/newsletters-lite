@@ -407,6 +407,8 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		if (!preg_match("/(newsletters)/si", $hook)) {
 			$hook = $this -> pre . '_' . $hook;
 		}
+		
+		$args = (empty($args)) ? array() : $args;
 	
 		if (!empty($hook) && $schedules = wp_get_schedules()) {	
 			if ($hookinterval = wp_get_schedule($hook, $args)) {

@@ -111,7 +111,13 @@
 			<?php endif; ?>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Emails Sent', $this -> plugin_name); ?></th>
-				<td><?php echo $subscriber -> emailssent; ?> <?php _e('newsletters', $this -> plugin_name); ?></td>
+				<?php
+					
+				$Db -> model = $Email -> model;
+				$emailssent = $Db -> count(array('subscriber_id' => $subscriber -> id));	
+					
+				?>
+				<td><?php echo $emailssent; ?> <?php _e('newsletters', $this -> plugin_name); ?></td>
 			</tr>
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Links Clicked', $this -> plugin_name); ?></th>

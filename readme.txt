@@ -3,8 +3,8 @@ Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
-Tested up to: 4.0
-Stable tag: 4.4.3
+Tested up to: 4.1
+Stable tag: 4.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -141,6 +141,26 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.4 =
+* ADD: jQuery UI datepicker for date custom field
+* ADD: Setting to hide current subscriptions in manage subscriptions page
+* ADD: Multiple, unlimited latest posts subscription instances
+* ADD: Merge mailing lists  
+* IMPROVE: Load Visual/Text tabs on new content areas with "Add Content Area"
+* IMPROVE: Show current date/time above touch_time for future scheduling
+* IMPROVE: Dynamically show "Emails Sent" value per subscriber
+* IMPROVE: Improve tracking image in default foot.php template file
+* IMPROVE: Ability to save newsletter themes without [wpmlcontent] tag
+* IMPROVE: Turn on SMTP debugging when plugin debugging is on
+* IMPROVE: Use isFunction for all jQuery functions
+* IMPROVE: Prevent use of reserved WordPress words in custom fields such as 'name'  
+* FIX: Ajax progress sending/queuing checkbox confusion
+* FIX: Checkbox custom field values incorrect in admin subscription notification
+* FIX: "Add Attachment" button conflict with some themes on Create Newsletter
+* FIX: Unwanted STYLE tags in premade themes
+* FIX: Invalid textdomain on certain strings in the core
+* FIX: "You are not authorised to use this link..." error. Auth fails  
 
 = 4.4.3 =
 * ADD: Setting to turn on/off the excerpt length/text settings
