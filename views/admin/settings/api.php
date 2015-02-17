@@ -13,7 +13,7 @@ $api_key = $this -> get_option('api_key');
 	<?php $this -> render('settings-navigation', false, true, 'admin'); ?>
 	
 	<p><?php _e('Use the JSON API to perform certain functions via API calls.', $this -> plugin_name); ?><br/>
-	<?php _e('It can be from a remote server or from a 3rd party application, plugin, theme, etc.', $this -> plugin_name); ?></p>
+	<?php _e('It can be from a remote server or from a 3rd party application, plugin, template, etc.', $this -> plugin_name); ?></p>
 	
 	<table class="form-table">
 		<tbody>

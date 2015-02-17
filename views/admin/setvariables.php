@@ -119,6 +119,12 @@
                 <td><?php _e('Display a link for subscribers to view the newsletter online', $this -> plugin_name); ?></td>
             </tr>
             <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+                <td><code>[newsletters_print]</code>
+                    <?php if (empty($noinsert) || $noinsert == false) : ?><br/><small><a href="javascript:wpml_tinymcetag('[newsletters_print]');"><?php _e('Insert into Editor', $this -> plugin_name); ?></a></small><?php endif; ?>
+                </td>
+                <td><?php _e('Output a link to print the newsletter', $this -> plugin_name); ?></td>
+            </tr>
+            <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
                 <td><code>[<?php echo $this -> pre; ?>date {format}]</code>
                     <?php if (empty($noinsert) || $noinsert == false) : ?><br/><small><a href='javascript:wpml_tinymcetag("[<?php echo $this -> pre; ?>date format=\"%d/%m/%Y\"]");'><?php _e('Insert into Editor', $this -> plugin_name); ?></a></small><?php endif; ?>
                 </td>

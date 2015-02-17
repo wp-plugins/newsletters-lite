@@ -200,6 +200,7 @@ class wpmlHistory extends wpMailPlugin {
 							
 							$fieldsquery .= ")";
 							$fieldsquery = str_replace(" AND)", "", $fieldsquery);
+							$fieldsquery = str_replace(" OR)", "", $fieldsquery);
 							$fieldsquery .= ")";
 							$fieldsquery = str_replace("))", ")", $fieldsquery);
 						}
@@ -359,6 +360,7 @@ class wpmlHistory extends wpMailPlugin {
 							
 							$fieldsquery .= ")";
 							$fieldsquery = str_replace(" AND)", "", $fieldsquery);
+							$fieldsquery = str_replace(" OR)", "", $fieldsquery);
 							$fieldsquery .= ")";
 							$fieldsquery = str_replace("))", ")", $fieldsquery);
 						}

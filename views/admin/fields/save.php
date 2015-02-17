@@ -235,12 +235,14 @@ $regex = $Html -> field_value('Field[regex]');
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th><label for=""><?php _e('Hidden Value', $this -> plugin_name); ?></label></th>
+						<th><label for=""><?php _e('Hidden Value', $this -> plugin_name); ?></label>
+						<?php echo $Html -> help(__('A hidden field is not seen by a subscriber. Custom: So that admin can fill in the value on the subscriber; Predefined: Define a static value to be used for the field; Other Variables: Dynamically fill the field with POST, GET, etc.', $this -> plugin_name)); ?></th>
 						<td>
 							<?php 
 							
 							$hidden_variable_types = array(
 								'custom'			=>	__('Custom', $this -> plugin_name),
+								'predefined'		=>	__('Predefined', $this -> plugin_name),
 								'post'				=>	__('$_POST', $this -> plugin_name),
 								'get'				=>	__('$_GET', $this -> plugin_name),
 								'global'			=>	__('$GLOBALS', $this -> plugin_name),
@@ -258,8 +260,12 @@ $regex = $Html -> field_value('Field[regex]');
 								<label><input <?php echo ((empty($hidden_type) && $hk == "custom") || (!empty($hidden_type) && $hidden_type == $hk)) ? 'checked="checked"' : ''; ?> type="radio" name="Field[hidden_type]" id="Field_hidden_type_<?php echo $hk; ?>" value="<?php echo $hk; ?>" /> <?php echo $hv; ?></label>
 							<?php endforeach; ?>
 							
-							<p id="hidden_type_paragraph" style="display:<?php echo (empty($hidden_type) || $hidden_type == "custom") ? 'none' : 'block'; ?>;">
+							<p id="hidden_type_paragraph" style="display:<?php echo (empty($hidden_type) || $hidden_type == "custom" || $hidden_type == "predefined") ? 'none' : 'block'; ?>;">
 								<code><span id="hidden_type_operator"><?php echo (empty($hidden_type)) ? "&#36;_POST" : $Html -> hidden_type_operator($hidden_type); ?></span>['<input type="text" name="Field[hidden_value]" id="Field_hidden_value" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[hidden_value]'))); ?>" />']</code>
+							</p>
+							
+							<p id="hidden_type_predefined" style="display:<?php echo (!empty($hidden_type) && $hidden_type == "predefined") ? 'block' : 'none'; ?>;">
+								<input type="text" class="widefat" name="Field[hidden_value_predefined]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[hidden_value]'))); ?>" id="Field_hidden_value_predefined" />
 							</p>
 							
 							<script type="text/javascript">
@@ -267,6 +273,7 @@ $regex = $Html -> field_value('Field[regex]');
 								jQuery('input[name="Field[hidden_type]"]').click(function() {
 									var hidden_type = jQuery(this).val();
 									jQuery('#hidden_type_paragraph').show();
+									jQuery('#hidden_type_predefined').hide();
 									
 									if (hidden_type == "post") {
 										var hidden_type_operator = "$_POST";
@@ -282,12 +289,17 @@ $regex = $Html -> field_value('Field[regex]');
 										var hidden_type_operator = "$_SERVER";
 									} else if (hidden_type == "custom") {
 										jQuery('#hidden_type_paragraph').hide();
+									} else if (hidden_type == "predefined") {
+										jQuery('#hidden_type_paragraph').hide();
+										jQuery('#hidden_type_predefined').show();
 									}
 									
 									jQuery('#hidden_type_operator').html(hidden_type_operator);
 								});
 							});
 							</script>
+							
+							<?php echo $Html -> field_error('Field[hidden_value]'); ?>
 						</td>
 					</tr>
 				</tbody>

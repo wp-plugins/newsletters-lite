@@ -81,8 +81,8 @@
 		<p><?php echo 'peed up the plugin with the WordPress Object Cache API which is now built in to cache queries through the WordPress database object.'; ?></p>
 		</div>
 		<div>
-		<h4><?php echo 'Edit themes directly while creating a newsletter'; ?></h4>
-		<p><?php echo 'You can now edit a theme directly as you are busy creating a newsletter.'; ?></p>
+		<h4><?php echo 'Edit templates directly while creating a newsletter'; ?></h4>
+		<p><?php echo 'You can now edit a template directly as you are busy creating a newsletter.'; ?></p>
 		
 		<h4><?php echo 'Paid subscriptions immediate payment'; ?></h4>
 		<p><?php echo 'This function allow paid subscribers to pay immediately for a subscription and not being redirect and ask to confirm on email.'; ?></p>

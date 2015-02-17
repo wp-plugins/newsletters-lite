@@ -10,13 +10,13 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 ?>
 
 <div class="wrap <?php echo $this -> pre; ?> newsletters">
-	<h2><?php _e('Email Templates Configuration', $this -> plugin_name); ?></h2>
+	<h2><?php _e('System Emails Configuration', $this -> plugin_name); ?></h2>
     <?php $this -> render('settings-navigation', false, true, 'admin'); ?>
     <p>
-    	<?php _e('Email templates are messages sent as notifications to users/admins on events.', $this -> plugin_name); ?><br/>
+    	<?php _e('System emails are messages sent as notifications to users/admins on events.', $this -> plugin_name); ?><br/>
     	<?php _e('You can configure each email template individually according to your needs.', $this -> plugin_name); ?><br/>
-    	<?php _e('You may use any of the', $this -> plugin_name); ?> <a class="button button-secondary" title="<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>" href="" onclick="jQuery.colorbox({title:'<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>', maxHeight:'80%', maxWidth:'80%', href:'<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>setvariables'}); return false;"> <?php _e('shortcodes/variables', $this -> plugin_name); ?></a> <?php _e('inside the subjects/messages of email templates.', $this -> plugin_name); ?><br/>
-    	<?php _e('Each template is inserted where the <code>[wpmlcontent]</code> tag is in the default theme chosen under Newsletters > Themes.', $this -> plugin_name); ?>
+    	<?php _e('You may use any of the', $this -> plugin_name); ?> <a class="button button-secondary" title="<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>" href="" onclick="jQuery.colorbox({title:'<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>', maxHeight:'80%', maxWidth:'80%', href:'<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>setvariables'}); return false;"> <?php _e('shortcodes/variables', $this -> plugin_name); ?></a> <?php _e('inside the subjects/messages of system emails.', $this -> plugin_name); ?><br/>
+    	<?php _e('Each template is inserted where the <code>[wpmlcontent]</code> tag is in the default template chosen under Newsletters > Templates.', $this -> plugin_name); ?>
     </p>
 	<form action="?page=<?php echo $this -> sections -> settings_templates; ?>" method="post">
 		<?php wp_nonce_field($this -> sections -> settings); ?>

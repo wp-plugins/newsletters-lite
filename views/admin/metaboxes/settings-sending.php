@@ -67,9 +67,9 @@ $themeintextversion = $this -> get_option('themeintextversion');
             </td>
         </tr>
         <tr>
-        	<th><label for="themeintextversion"><?php _e('Theme In TEXT Version', $this -> plugin_name); ?></label></th>
+        	<th><label for="themeintextversion"><?php _e('Template In TEXT Version', $this -> plugin_name); ?></label></th>
         	<td>
-        		<label><input <?php echo (!empty($themeintextversion)) ? 'checked="checked"' : ''; ?> type="checkbox" name="themeintextversion" value="1" id="themeintextversion" /> <?php _e('Yes, include the theme content into TEXT version emails', $this -> plugin_name); ?></label>
+        		<label><input <?php echo (!empty($themeintextversion)) ? 'checked="checked"' : ''; ?> type="checkbox" name="themeintextversion" value="1" id="themeintextversion" /> <?php _e('Yes, include the template content into TEXT version emails', $this -> plugin_name); ?></label>
         	</td>
         </tr>
         <tr>

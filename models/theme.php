@@ -112,7 +112,7 @@ class wpmlTheme extends wpMailPlugin {
 						}
 						break;
 					default				:
-						if (empty($paste)) { $this -> errors['paste'] = __('Please paste HTML code for your theme', $this -> plugin_name); }
+						if (empty($paste)) { $this -> errors['paste'] = __('Please paste HTML code for your template', $this -> plugin_name); }
 						else {
 							$this -> data -> content = stripslashes($paste);	
 						}
@@ -121,7 +121,7 @@ class wpmlTheme extends wpMailPlugin {
 				
 				if (!empty($this -> data -> content)) {					
 					if (!preg_match("/\[wpmlcontent\]/si", $this -> data -> content)) {
-						//$this -> errors['paste'] = 	__('Your theme does not have the [wpmlcontent] tag', $this -> plugin_name);
+						//$this -> errors['paste'] = 	__('Your template does not have the [wpmlcontent] tag', $this -> plugin_name);
 					}
 				}
 			}

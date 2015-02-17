@@ -26,6 +26,7 @@ $captcha_type = $this -> get_option('captcha_type');
 
 $recaptcha_publickey = $this -> get_option('recaptcha_publickey');
 $recaptcha_privatekey = $this -> get_option('recaptcha_privatekey');
+$recaptcha_language = $this -> get_option('recaptcha_language');
 $recaptcha_theme = $this -> get_option('recaptcha_theme');
 $recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 
@@ -52,6 +53,13 @@ $recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 				<td>
 					<input type="text" class="widefat" name="recaptcha_privatekey" value="<?php echo esc_attr(stripslashes($recaptcha_privatekey)); ?>" id="recaptcha_privatekey" /> 
 					<span class="howto"><?php _e('Private key provided by reCAPTCHA upon signing up.', $this -> plugin_name); ?></span>
+				</td>
+			</tr>
+			<tr>
+				<th><label for="recaptcha_language"><?php _e('Language', $this -> plugin_name); ?></label></th>
+				<td>
+					<input type="text" class="widefat" style="width:65px;" name="recaptcha_language" value="<?php echo esc_attr(stripslashes($recaptcha_language)); ?>" id="recaptcha_language" />
+					<span class="howto"><?php echo sprintf(__('Language in which to display the captcha. See the %s', $this -> plugin_name), '<a href="https://developers.google.com/recaptcha/docs/language" target="_blank">' . __('language codes', $this -> plugin_name) . '</a>'); ?></span>
 				</td>
 			</tr>
 			<tr>

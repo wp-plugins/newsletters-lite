@@ -484,7 +484,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					$name = __('Import/Export', $this -> plugin_name);
 					break;
 				case 'themes'			:
-					$name = __('Themes', $this -> plugin_name);
+					$name = __('Templates', $this -> plugin_name);
 					break;
 				case 'templates'		:
 					$name = __('Email Snippets', $this -> plugin_name);
@@ -514,7 +514,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					$name = __('Subscribers Configuration', $this -> plugin_name);
 					break;
 				case 'settings_templates'	:
-					$name = __('Email Templates Configuration', $this -> plugin_name);
+					$name = __('System Emails Configuration', $this -> plugin_name);
 					break;
 				case 'settings_system'		:
 					$name = __('System Configuration', $this -> plugin_name);

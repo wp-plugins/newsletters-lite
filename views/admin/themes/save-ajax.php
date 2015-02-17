@@ -1,8 +1,8 @@
 <div style="width:800px;" class="wrap <?php echo $this -> pre; ?> newsletters">
-	<h2><?php _e('Save a Theme', $this -> plugin_name); ?></h2>
+	<h2><?php _e('Save a Template', $this -> plugin_name); ?></h2>
     
     <p>
-    	<?php _e('This is a full HTML theme and should contain at least <code>[wpmlcontent]</code> somewhere.', $this -> plugin_name); ?><br/>
+    	<?php _e('This is a full HTML template and should contain at least <code>[wpmlcontent]</code> somewhere.', $this -> plugin_name); ?><br/>
         <?php _e('Upload your images, stylesheets and other elements via FTP or the media uploader in WordPress.', $this -> plugin_name); ?><br/>
         <?php _e('Please ensure that all links, images and other references use full, absolute URLs.', $this -> plugin_name); ?>
     </p>
@@ -10,7 +10,7 @@
     <?php $this -> render('error', array('errors' => $errors), true, 'admin'); ?>
     
     <?php if ($success) : ?>
-    	<p class="newsletters_success"><?php _e('Theme has been saved', $this -> plugin_name); ?></p>
+    	<p class="newsletters_success"><?php _e('Template has been saved', $this -> plugin_name); ?></p>
     	
     	<script type="text/javascript">
     	jQuery(document).ready(function() {
@@ -31,14 +31,14 @@
         	<tbody>
             	<tr>
                 	<th><label for="Theme.title"><?php _e('Title', $this -> plugin_name); ?></label>
-                	<?php echo $Html -> help(__('The title of this newsletter theme for internal usage.', $this -> plugin_name)); ?></th>
+                	<?php echo $Html -> help(__('The title of this newsletter template for internal usage.', $this -> plugin_name)); ?></th>
                     <td>
                     	<?php echo $Form -> text('Theme[title]'); ?>
                     </td>
                 </tr>
                 <tr>
-                	<th><label for="Theme.type_upload"><?php _e('Theme Type', $this -> plugin_name); ?></label>
-                	<?php echo $Html -> help(__('Choose how you want to save this newsletter theme. You can either paste HTML code or upload a .html file.', $this -> plugin_name)); ?></th>
+                	<th><label for="Theme.type_upload"><?php _e('Template Type', $this -> plugin_name); ?></label>
+                	<?php echo $Html -> help(__('Choose how you want to save this newsletter template. You can either paste HTML code or upload a .html file.', $this -> plugin_name)); ?></th>
                     <td>
                     	<label><input <?php echo ($Html -> field_value('Theme[type]') == "upload" || $Html -> field_value('Theme[type]') == "") ? 'checked="checked"' : ''; ?> onclick="jQuery('#typediv_upload').show(); jQuery('#typediv_paste').hide();" type="radio" name="Theme[type]" value="upload" id="Theme.type_upload" /> <?php _e('Upload an HTML File', $this -> plugin_name); ?></label>
                         <label><input <?php echo ($Html -> field_value('Theme[type]') == "paste") ? 'checked="checked"' : ''; ?> onclick="jQuery('#typediv_paste').show(); jQuery('#typediv_upload').hide();" type="radio" name="Theme[type]" value="paste" id="Theme.type_paste" /> <?php _e('HTML Code', $this -> plugin_name); ?></label>
@@ -157,7 +157,7 @@
         			<th><label for="Theme_inlinestyles_N"><?php _e('Inline Styles', $this -> plugin_name); ?></label>
         			<?php echo $Html -> help(__('Set this setting to "Yes" to automatically convert all CSS rules into inline, style attributes in the HTML elements. If you use this setting, be sure to create a backup of your original HTML for easier editing later on.', $this -> plugin_name)); ?></th>
         			<td>
-        				<label><input onclick="if (!confirm('<?php echo __('Please ensure that you create a local copy/backup of your newsletter theme HTML for editing in the future.', $this -> plugin_name); ?>')) { return false; }" type="radio" name="Theme[inlinestyles]" value="Y" id="Theme_inlinestyles_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+        				<label><input onclick="if (!confirm('<?php echo __('Please ensure that you create a local copy/backup of your newsletter template HTML for editing in the future.', $this -> plugin_name); ?>')) { return false; }" type="radio" name="Theme[inlinestyles]" value="Y" id="Theme_inlinestyles_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
         				<label><input type="radio" checked="checked" name="Theme[inlinestyles]" value="N" id="Theme_inlinestyles_N" /> <?php _e('No', $this -> plugin_name); ?></label>
         				<span class="howto"><?php _e('Convert CSS rules into inline, style attributes on elements.', $this -> plugin_name); ?></span>
         			</td>
@@ -208,7 +208,7 @@
         </table>
         
         <p class="submit">
-        	<input class="button-primary" type="submit" name="save" value="<?php _e('Save Theme', $this -> plugin_name); ?>" />
+        	<input class="button-primary" type="submit" name="save" value="<?php _e('Save Template', $this -> plugin_name); ?>" />
         	<span id="newsletters_themeedit_loader" style="display:none;"><span class="newsletters_loading"></span></span>
         </p>
     </form>
@@ -226,6 +226,6 @@ function newsletters_save_theme(form) {
 }
 
 jQuery(document).ready(function() {
-	jQuery('[name="Theme[title]"]').Watermark('<?php echo addslashes(__('Enter theme title here', $this -> plugin_name)); ?>');
+	jQuery('[name="Theme[title]"]').Watermark('<?php echo addslashes(__('Enter template title here', $this -> plugin_name)); ?>');
 });
 </script>

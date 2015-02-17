@@ -1462,7 +1462,7 @@ if (!class_exists('wpMailPlugin')) {
 					$Db -> find(array('id' => $_GET['id']));
 					$Theme -> data -> paste = $Theme -> data -> content;
 				} else {
-					$errors[] = __('No theme was specified', $this -> plugin_name);
+					$errors[] = __('No template was specified', $this -> plugin_name);
 				}
 			} else {
 				$errors[] = __('No data was specified', $this -> plugin_name);
@@ -2025,6 +2025,8 @@ if (!class_exists('wpMailPlugin')) {
 						$query .= " AND (" . $wpdb -> prefix . $Subscriber -> table . ".created >= '" . $daterangefrom . "' AND " . $wpdb -> prefix . $Subscriber -> table . ".created <= '" . $daterangeto . "')";
 					}
 				}
+				
+				$this -> debug($query);
 				
 				$query_hash = md5($query);
 				if ($ob_subscribers = $this -> get_cache($query_hash)) {
@@ -3982,6 +3984,9 @@ if (!class_exists('wpMailPlugin')) {
 								case 'post'					:
 									$hidden_value = $_POST[$field -> hidden_value];
 									break;
+								case 'predefined'			:
+									$hidden_value = esc_attr(stripslashes($field -> hidden_value));
+									break;
 								case 'custom'				:
 								default  					:
 									$hidden_value = $_POST[$field -> slug];
@@ -4569,7 +4574,7 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function gen_online_link($subscriber = null, $user = null, $history_id = null, $onlyurl = false, $theme_id = null) {	
+		function gen_online_link($subscriber = null, $user = null, $history_id = null, $onlyurl = false, $theme_id = null, $print = false) {	
 			if (!empty($history_id)) {
 				global $Db, $Html, $History;
 				$Db -> model = $History -> model;
@@ -4583,6 +4588,10 @@ if (!class_exists('wpMailPlugin')) {
 					} else {
 						$querystring = $this -> pre . 'method=newsletter&id=' . $email -> id . '&user_id=' . $user -> ID . '&authkey=' . $authkey;
 						$url = $Html -> retainquery($querystring, home_url());
+					}
+					
+					if (!empty($print) && $print == true) {
+						$url = $Html -> retainquery('print=1', $url);
 					}
 					
 					if (!empty($theme_id)) {
@@ -4605,7 +4614,8 @@ if (!class_exists('wpMailPlugin')) {
 						return $url;
 					} else {
 						if (empty($subscriber -> format) || $subscriber -> format == "html") {
-							$onlinelink = '<a href="' . $url . '" style="' . $style . '">' . __($this -> get_option('onlinelinktext')) . '</a>';
+							$text = (empty($print)) ? __($this -> get_option('onlinelinktext')) : __($this -> get_option('printlinktext'));
+							$onlinelink = '<a href="' . $url . '" style="' . $style . '">' . $text . '</a>';
 						} else {
 							$onlinelink = $url;
 						}
@@ -4808,6 +4818,7 @@ if (!class_exists('wpMailPlugin')) {
 						"/\[" . $this -> pre . "siteurl\]/", 
 						"/\[" . $this -> pre . "activate\]/", 
 						"/\[" . $this -> pre . "manage\]/", 
+						"/\[newsletters_print\]/",
 						"/\[" . $this -> pre . "online\]/", 
 						"/\[" . $this -> pre . "track\]/", 
 						"/\[" . $this -> pre . "mailinglist\]/",
@@ -4829,6 +4840,7 @@ if (!class_exists('wpMailPlugin')) {
 						home_url(), 
 						$this -> gen_activation_link($subscriber, $theme_id), 
 						$this -> gen_manage_link($subscriber, $theme_id), 
+						$this -> gen_online_link($subscriber, false, $history_id, false, $theme_id, true),
 						$this -> gen_online_link($subscriber, false, $history_id, false, $theme_id), 
 						$this -> gen_tracking_link($eunique), 
 						$this -> gen_mailinglist_names($subscriber),
@@ -6272,6 +6284,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['activateredirecturl'] = home_url();
 			$options['managelinktext'] = __('Manage Subscriptions', $this -> plugin_name);
 			$options['onlinelinktext'] = __('View in your browser', $this -> plugin_name);
+			$options['printlinktext'] = __('Print Email', $this -> plugin_name);
 			$options['scheduling'] = 'Y';
 			$options['schedulecrontype'] = "wp";
 			$options['scheduleinterval'] = "2minutes";
@@ -6318,6 +6331,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['paymentmethod'] = 'paypal';
 			$options['captcha_type'] = ($this -> is_plugin_active('captcha')) ? 'rsc' : 'none';
 			$options['recaptcha_theme'] = "custom";
+			$options['recaptcha_language'] = "en";
 			$options['recaptcha_customcss'] = '.recaptcha_widget { margin: 10px 0 15px 0; }
 			.recaptcha_widget .recaptcha_image { margin: 10px 0 5px 0; }
 			.recaptcha_widget .recaptcha_image img { width: 250px; box-shadow: none; }
@@ -6440,6 +6454,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$permissions = $this -> get_option('permissions');
 			if (empty($permissions)) { $this -> init_roles(); }
+			$this -> check_roles();
 			
 			$this -> scheduling();
 			$this -> optimize_scheduling();
@@ -7183,6 +7198,15 @@ if (!class_exists('wpMailPlugin')) {
 		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {						
 			global $newsletters_history_id;
 			$this -> plugin_name = basename(dirname(__FILE__));
+			
+			$render_hash = md5($file . $params['subject'] . $params['history_id'] . $output . $html . $renderht . $theme_id . $shortlinks . $fullbody);
+			if ($ob_output = $this -> get_cache($render_hash, 'value')) {
+				if (empty($output) || $output == false) {
+					return $ob_output;
+				} else {
+					echo $ob_output;
+				}
+			}
 		
 			if (!empty($file) || !empty($fullbody)) {
 				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
@@ -7337,7 +7361,8 @@ if (!class_exists('wpMailPlugin')) {
 							}
 						}	
 					}
-				
+					
+					$this -> set_cache($render_hash, $body, 'value');				
 					return $body;
 				} else {				
 					return true;

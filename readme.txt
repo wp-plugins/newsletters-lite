@@ -79,6 +79,12 @@ Some extensions include:
 
 <a href="http://tribulant.com/plugins/extensions/1/wordpress-newsletter-plugin">Visit the Newsletters extensions page</a>
 
+= Email/Newsletter Templates =
+
+Included with the newsletter plugin are several premade email/newsletter templates.
+
+Shop our <a href="http://tribulant.com/emailthemes/" title="newsletter templates">newsletter templates</a> for more variety and high quality, premium, responsive newsletter templates.
+
 = Languages =
 
 All language files and the instructions to use them are hosted in an <a href="https://github.com/tribulant/wp-mailinglist-languages">online repository</a>.

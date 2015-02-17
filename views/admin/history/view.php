@@ -14,7 +14,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 	<div class="tablenav">
 		<div class="alignleft actions">
 			<a href="?page=<?php echo $this -> sections -> send; ?>&amp;method=history&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Send this history email again or edit the draft', $this -> plugin_name); ?>" class="button button-primary"><?php _e('Send/Edit', $this -> plugin_name); ?></a>
-			<a onclick="jQuery.colorbox({href:'<?php echo $preview_src; ?>'}); return false;" href="#" class="button"><?php _e('Preview', $this -> plugin_name); ?></a>
+			<a onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo $preview_src; ?>'}); return false;" href="#" class="button"><?php _e('Preview', $this -> plugin_name); ?></a>
 			<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=delete&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Remove this history email permanently', $this -> plugin_name); ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this history email?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
 			<?php echo $Html -> link(__('Duplicate', $this -> plugin_name), '?page=' . $this -> sections -> history . '&amp;method=duplicate&amp;id=' . $history -> id, array('class' => "button")); ?>
 		</div>
@@ -52,13 +52,13 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 				</td>
 			</tr>
             <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-            	<th><?php _e('Theme', $this -> plugin_name); ?></th>
+            	<th><?php _e('Template', $this -> plugin_name); ?></th>
                 <td>
                 	<?php $Db -> model = $Theme -> model; ?>
                     <?php if (!empty($history -> theme_id) && $theme = $Db -> find(array('id' => $history -> theme_id))) : ?>
-                    	<a href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Theme Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
-                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
-                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Theme: %s', $this -> plugin_name), __($theme -> title)); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
+                    	<a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Template Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
+                    	<a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
+                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), __($theme -> title)); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
                     <?php else : ?>
                     	<?php _e('None', $this -> plugin_name); ?>
                     <?php endif; ?>

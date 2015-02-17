@@ -126,7 +126,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                     </tr>
                 	<tr>
                     	<th><label for=""><?php _e('Newsletter Content', $this -> plugin_name); ?></label>
-                    	<?php echo $Html -> help(__('The message/content of the newsletter which will be sent to the subscribers. It is used in conjunction with the theme chosen below and this message/content is placed into the theme where the [wpmlcontent] shortcode was specified.', $this -> plugin_name)); ?></th>
+                    	<?php echo $Html -> help(__('The message/content of the newsletter which will be sent to the subscribers. It is used in conjunction with the template chosen below and this message/content is placed into the template where the [wpmlcontent] shortcode was specified.', $this -> plugin_name)); ?></th>
                         <td>
                         	<div id="poststuff">
                                 <div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section">                                    
@@ -159,8 +159,8 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                         </td>
                     </tr>
                     <tr>
-                    	<th><label for="Autoresponder_nnewsletter_theme_id_0"><?php _e('Newsletter Theme', $this -> plugin_name); ?></label>
-                    	<?php echo $Html -> help(__('Choose the theme to use for the email that will be sent to the subscribers for this autoresponder. The content above will be put into this theme where the [wpmlcontent] shortcode was specified.', $this -> plugin_name)); ?></th>
+                    	<th><label for="Autoresponder_nnewsletter_theme_id_0"><?php _e('Newsletter Template', $this -> plugin_name); ?></label>
+                    	<?php echo $Html -> help(__('Choose the template to use for the email that will be sent to the subscribers for this autoresponder. The content above will be put into this template where the [wpmlcontent] shortcode was specified.', $this -> plugin_name)); ?></th>
                         <td>
                         	<?php if ($themes = $Theme -> select()) : ?>
                             	<div><label><input <?php echo (empty($Autoresponder -> data -> nnewsletter['theme_id'])) ? 'checked="checked"' : ''; ?> type="radio" name="Autoresponder[nnewsletter][theme_id]" id="Autoresponder_nnewsletter_theme_id_0" value="0"> <?php _e('NONE', $this -> plugin_name); ?></label></div>
@@ -170,10 +170,10 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
 	                                <?php endforeach; ?>
 	                            </div>
                             <?php else : ?>
-                            	<span class="error"><?php _e('No themes found, please add one.', $this -> plugin_name); ?></span>
+                            	<span class="error"><?php _e('No templates found, please add one.', $this -> plugin_name); ?></span>
                             <?php endif; ?>
                             <?php echo $Html -> field_error('Autorseponder[nnewsletter_theme]'); ?>
-                            <span class="howto"><?php _e('Choose the theme to use for this new newsletter.', $this -> plugin_name); ?></span>
+                            <span class="howto"><?php _e('Choose the template to use for this new newsletter.', $this -> plugin_name); ?></span>
                         </td>
                     </tr>
                 </tbody>

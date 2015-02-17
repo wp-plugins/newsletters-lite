@@ -50,7 +50,7 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 		</tr>
 		<tr>
 			<th><label for="trackingY"><?php _e('Read Tracking', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(__('Turn this setting on to enable the remote read tracking then you can use the shortcode [wpmltrack] inside your newsletter theme or content.', $this -> plugin_name)); ?></th>
+			<?php echo $Html -> help(__('Turn this setting on to enable the remote read tracking then you can use the shortcode [wpmltrack] inside your newsletter template or content.', $this -> plugin_name)); ?></th>
 			<td>
 				<label><input onclick="jQuery('#tracking_div').show();" <?php echo ($this -> get_option('tracking') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="tracking" value="Y" id="trackingY" /> <?php _e('On', $this -> plugin_name); ?></label>
 				<label><input onclick="jQuery('#tracking_div').hide();" <?php echo ($this -> get_option('tracking') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="tracking" value="N" id="trackingN" /> <?php _e('Off', $this -> plugin_name); ?></label>

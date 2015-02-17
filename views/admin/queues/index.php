@@ -110,7 +110,7 @@
     			<?php endif; ?>
     		</select>
     		<select name="theme_id">
-    			<option value=""><?php _e('All Themes', $this -> plugin_name); ?></option>
+    			<option value=""><?php _e('All Templates', $this -> plugin_name); ?></option>
     			<?php if ($themes = $Theme -> select()) : ?>
     				<?php foreach ($themes as $theme_id => $theme_title) : ?>
     					<option <?php echo (!empty($_GET['theme_id']) && $_GET['theme_id'] == $theme_id) ? 'selected="selected"' : ''; ?> value="<?php echo $theme_id; ?>"><?php echo $theme_title; ?></option>

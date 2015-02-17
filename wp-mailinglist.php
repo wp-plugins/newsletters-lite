@@ -673,9 +673,9 @@ if (!class_exists('wpMail')) {
 					case 'defaultthemes'	:
 						if (current_user_can('edit_plugins') || is_super_admin()) {
 							$this -> initialize_default_themes();
-							echo __('Stock themes have been added', $this -> plugin_name);
+							echo __('Stock templates have been added', $this -> plugin_name);
 						} else {
-							echo __('Please login as administrator for stock themes to be loaded', $this -> plugin_name);	
+							echo __('Please login as administrator for stock templates to be loaded', $this -> plugin_name);	
 						}
 						
 						exit();
@@ -693,7 +693,7 @@ if (!class_exists('wpMail')) {
 						if (!empty($_GET['id'])) {
 							global $Db, $Theme;
 							$Db -> model = $Theme -> model;
-							$subject = __('Newsletter Theme Preview', $this -> plugin_name);
+							$subject = __('Newsletter Template Preview', $this -> plugin_name);
 							$history_id = "123";
 							
 							if ($theme = $Db -> find(array('id' => $_GET['id']))) {
@@ -1266,7 +1266,7 @@ if (!class_exists('wpMail')) {
 									
 									if (true || $authkey == $subscriber -> authkey || !empty($_GET['fromfeed']) || !empty($_GET['history'])) {
 										$message = $this -> render('newsletter', array('email' => $email, 'subscriber' => $subscriber), false, 'default');
-										$content = $this -> render_email('send', array('message' => $message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $_GET['id']), false, true, true, $email -> theme_id);
+										$content = $this -> render_email('send', array('print' => $_GET['print'], 'message' => $message, 'subject' => $email -> subject, 'subscriber' => $subscriber, 'history_id' => $_GET['id']), false, true, true, $email -> theme_id);
 										$output = "";										
 										ob_start();										
 										$thecontent = do_shortcode(stripslashes($content));
@@ -1385,7 +1385,7 @@ if (!class_exists('wpMail')) {
 			if (!empty($type)) {
 				if ($type == "post" || $type == "page" || (!empty($post_types) && array_key_exists($type, $post_types))) {		
 					if (current_user_can('newsletters_send') && $this -> get_option('sendasnewsletterbox') == "Y") {
-						add_meta_box($this -> pre . 'div', __('Send as Newsletter', $this -> plugin_name) . $Html -> help(__('Use this box to send a post, page or custom post type as a newsletter to your subscribers. You can choose the list(s) to send to, the theme to use, etc. All emails sent this way are queued and you can find them under Newsletters > Email Queue after the post, page or custom post type has been saved.', $this -> plugin_name)), array($Metabox, 'write_advanced'), $type, 'normal', 'high');							
+						add_meta_box($this -> pre . 'div', __('Send as Newsletter', $this -> plugin_name) . $Html -> help(__('Use this box to send a post, page or custom post type as a newsletter to your subscribers. You can choose the list(s) to send to, the template to use, etc. All emails sent this way are queued and you can find them under Newsletters > Email Queue after the post, page or custom post type has been saved.', $this -> plugin_name)), array($Metabox, 'write_advanced'), $type, 'normal', 'high');							
 					}
 				}
 			}
@@ -2218,7 +2218,7 @@ if (!class_exists('wpMail')) {
 			$queue_count_icon = ' <span class="update-plugins count-1"><span class="update-count" id="newsletters-menu-queue-count">' . $queue_count . '</span></span>';
 			$update_icon = ($this -> has_update()) ? ' <span class="update-plugins count-1"><span class="update-count">1</span></span>' : '';
 			
-			$this -> check_roles();
+			//$this -> check_roles();
 		
 			add_menu_page(__('Newsletters', $this -> plugin_name), __('Newsletters', $this -> plugin_name) . $update_icon, 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'), false, "26.11");
 			
@@ -2228,7 +2228,7 @@ if (!class_exists('wpMail')) {
 				$this -> menus['newsletters'] = add_submenu_page($this -> sections -> welcome, __('Overview', $this -> plugin_name), __('Overview', $this -> plugin_name), 'newsletters_welcome', $this -> sections -> welcome, array($this, 'admin'));
 				$this -> menus['newsletters-settings'] = add_submenu_page($this -> sections -> welcome, __('General Configuration', $this -> plugin_name), __('Configuration', $this -> plugin_name), 'newsletters_settings', $this -> sections -> settings, array($this, 'admin_config'));
 				$this -> menus['newsletters-settings-subscribers'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Subscribers Configuration', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_settings_subscribers', $this -> sections -> settings_subscribers, array($this, 'admin_settings_subscribers'));
-				$this -> menus['newsletters-settings-templates'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Email Templates Configuration', $this -> plugin_name), __('Email Templates', $this -> plugin_name), 'newsletters_settings_templates', $this -> sections -> settings_templates, array($this, 'admin_settings_templates'));
+				$this -> menus['newsletters-settings-templates'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('System Emails Configuration', $this -> plugin_name), __('System Emails', $this -> plugin_name), 'newsletters_settings_templates', $this -> sections -> settings_templates, array($this, 'admin_settings_templates'));
 				$this -> menus['newsletters-settings-system'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('System Configuration', $this -> plugin_name), __('System', $this -> plugin_name), 'newsletters_settings_system', $this -> sections -> settings_system, array($this, 'admin_settings_system'));
 				$this -> menus['newsletters-settings-tasks'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Scheduled Tasks', $this -> plugin_name), __('Scheduled Tasks', $this -> plugin_name), 'newsletters_settings_tasks', $this -> sections -> settings_tasks, array($this, 'admin_settings_tasks'));
 				$this -> menus['newsletters-settings-api'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('API', $this -> plugin_name), __('API', $this -> plugin_name), 'newsletters_settings_api', $this -> sections -> settings_api, array($this, 'admin_settings_api'));
@@ -2247,7 +2247,7 @@ if (!class_exists('wpMail')) {
 				$this -> menus['newsletters-subscribers'] = add_submenu_page($this -> sections -> welcome, __('Subscribers', $this -> plugin_name), __('Subscribers', $this -> plugin_name), 'newsletters_subscribers', $this -> sections -> subscribers, array($this, 'admin_subscribers'));
 				$this -> menus['newsletters-fields'] = add_submenu_page($this -> sections -> welcome, __('Custom Fields', $this -> plugin_name), __('Custom Fields', $this -> plugin_name), 'newsletters_fields', $this -> sections -> fields, array($this, 'admin_fields'));
 				$this -> menus['newsletters-import'] = add_submenu_page($this -> sections -> welcome, __('Import/Export Subscribers', $this -> plugin_name), __('Import/Export', $this -> plugin_name), 'newsletters_importexport', $this -> sections -> importexport, array($this, 'admin_importexport'));
-				$this -> menus['newsletters-themes'] = add_submenu_page($this -> sections -> welcome, __('Themes', $this -> plugin_name), __('Themes', $this -> plugin_name), 'newsletters_themes', $this -> sections -> themes, array($this, 'admin_themes')); 
+				$this -> menus['newsletters-themes'] = add_submenu_page($this -> sections -> welcome, __('Templates', $this -> plugin_name), __('Templates', $this -> plugin_name), 'newsletters_themes', $this -> sections -> themes, array($this, 'admin_themes')); 
 				$this -> menus['newsletters-templates'] = add_submenu_page($this -> sections -> welcome, __('Email Snippets', $this -> plugin_name), __('Email Snippets', $this -> plugin_name), 'newsletters_templates', $this -> sections -> templates, array($this, 'admin_templates'));
 				$this -> menus['newsletters-templates-save'] = add_submenu_page($this -> menus['newsletters-templates'], __('Save an Email Snippet', $this -> plugin_name), __('Save an Email Snippet', $this -> plugin_name), 'newsletters_templates_save', $this -> sections -> templates_save, array($this, 'admin_templates'));
 				$this -> menus['newsletters-queue'] = add_submenu_page($this -> sections -> welcome, __('Email Queue', $this -> plugin_name), __('Email Queue', $this -> plugin_name) . ((!empty($queue_count)) ? $queue_count_icon : ''), 'newsletters_queue', $this -> sections -> queue, array($this, 'admin_mailqueue'));
@@ -2323,7 +2323,7 @@ if (!class_exists('wpMail')) {
 				
 			add_meta_box('mailinglistsdiv', __('Subscribers', $this -> plugin_name) . $Html ->  help(__('Tick/check the group(s) or list(s) that you want to send/queue this newsletter to. The newsletter will only be sent to active subscriptions in the chosen list(s).', $this -> plugin_name)), array($Metabox, 'send_mailinglists'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
 			add_meta_box('insertdiv', __('Insert into Newsletter', $this -> plugin_name) . $Html -> help(__('Use this box to insert various things into your newsletter such as posts, snippets, custom fields and post thumbnails.', $this -> plugin_name)), array($Metabox, 'send_insert'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
-			add_meta_box('themesdiv', __('Theme', $this -> plugin_name) . $Html -> help(__('Choose the theme that you want to use for this newsletter. The content filled into the TinyMCE editor to the left will be inserted into the theme where it has the [wpmlcontent] tag inside it.', $this -> plugin_name)), array($Metabox, 'send_theme'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
+			add_meta_box('themesdiv', __('Template', $this -> plugin_name) . $Html -> help(__('Choose the template that you want to use for this newsletter. The content filled into the TinyMCE editor to the left will be inserted into the template where it has the [wpmlcontent] tag inside it.', $this -> plugin_name)), array($Metabox, 'send_theme'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
 			add_meta_box('submitdiv', __('Send Newsletter', $this -> plugin_name), array($Metabox, 'send_submit'), "newsletters_page_" . $this -> sections -> send, 'side', 'core');
 			
 			$multimime = $this -> get_option('multimime');
@@ -2333,10 +2333,10 @@ if (!class_exists('wpMail')) {
 			
 			$createpreview = $this -> get_option('createpreview');
 			if (!empty($createpreview) && $createpreview == "Y") {
-				add_meta_box('previewdiv', __('Live Preview', $this -> plugin_name) . $Html -> help(__('The preview section below shows a preview of what the newsletter will look like with the theme, content and other elements. It updates automatically every few seconds or you can click the "Update Preview" button to manually update it. Please note that this is a browser preview and some email/webmail clients render emails differently than browsers.', $this -> plugin_name)), array($Metabox, 'send_preview'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core');
+				add_meta_box('previewdiv', __('Live Preview', $this -> plugin_name) . $Html -> help(__('The preview section below shows a preview of what the newsletter will look like with the template, content and other elements. It updates automatically every few seconds or you can click the "Update Preview" button to manually update it. Please note that this is a browser preview and some email/webmail clients render emails differently than browsers.', $this -> plugin_name)), array($Metabox, 'send_preview'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core');
 			}
 			
-			if (apply_filters('newsletters_admin_createnewsletter_variables_show', true)) { add_meta_box('setvariablesdiv', __('Variables &amp; Custom Fields', $this -> plugin_name) . $Html -> help(__('These are shortcodes which can be used inside of the newsletter theme or content where needed and as many of them as needed. The shortcodes will be replaced with their respective values for each subscriber individually. You can use this to personalize your newsletters to your subscribers easily.', $this -> plugin_name)), array($Metabox, 'send_setvariables'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
+			if (apply_filters('newsletters_admin_createnewsletter_variables_show', true)) { add_meta_box('setvariablesdiv', __('Variables &amp; Custom Fields', $this -> plugin_name) . $Html -> help(__('These are shortcodes which can be used inside of the newsletter template or content where needed and as many of them as needed. The shortcodes will be replaced with their respective values for each subscriber individually. You can use this to personalize your newsletters to your subscribers easily.', $this -> plugin_name)), array($Metabox, 'send_setvariables'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
 			if (apply_filters('newsletters_admin_createnewsletter_emailattachments_show', true)) { add_meta_box('attachmentdiv', __('Email Attachment', $this -> plugin_name) . $Html -> help(__('Attach files to your newsletter. It is possible to attach multiple files of any filetype and size to newsletters which will be sent to the subscribers. Try to keep attachments small to prevent emails from becoming too large.', $this -> plugin_name)), array($Metabox, 'send_attachment'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
 			if (apply_filters('newsletters_admin_createnewsletter_publishpost_show', true)) { add_meta_box('publishdiv', __('Publish as Post', $this -> plugin_name) . $Html -> help(__('When you queue/send this newsletter you can publish it as a post on your website. Configure these settings to publish this newsletter as a post according to your needs.', $this -> plugin_name)), array($Metabox, 'send_publish'), "newsletters_page_" . $this -> sections -> send, 'normal', 'core'); }
 			
@@ -2841,6 +2841,7 @@ if (!class_exists('wpMail')) {
 															
 															$fieldsquery .= ")";
 															$fieldsquery = str_replace(" AND)", "", $fieldsquery);
+															$fieldsquery = str_replace(" OR)", "", $fieldsquery);
 															$fieldsquery .= ")";
 															$fieldsquery = str_replace("))", ")", $fieldsquery);
 														}
@@ -4900,7 +4901,7 @@ if (!class_exists('wpMail')) {
 			$method = $_GET['method'];
 			
 			if ($this -> is_php_module('mod_security')) {
-				$error = __('Please note that Apache mod_security is turned on. Saving a theme may not be allowed due to the raw HTML. Please ask your hosting provider.', $this -> plugin_name);
+				$error = __('Please note that Apache mod_security is turned on. Saving a template may not be allowed due to the raw HTML. Please ask your hosting provider.', $this -> plugin_name);
 				$this -> render_error($error);	
 			}
 			
@@ -4908,7 +4909,7 @@ if (!class_exists('wpMail')) {
 				case 'save'			:
 					if (!empty($_POST)) {
 						if ($Db -> save($_POST)) {
-							$message = __('Theme has been saved', $this -> plugin_name);
+							$message = __('Template has been saved', $this -> plugin_name);
 							
 							if (!empty($_POST['continueediting'])) {
 								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> themes . '&method=save&id=' . $Theme -> insertid . '&continueediting=1'), 'message', $message);	
@@ -4916,7 +4917,7 @@ if (!class_exists('wpMail')) {
 								$this -> redirect('?page=' . $this -> sections -> themes, 'message', $message);
 							}
 						} else {
-							$this -> render_error(__('Theme could not be saved', $this -> plugin_name));
+							$this -> render_error(__('Template could not be saved', $this -> plugin_name));
 							$this -> render('themes' . DS . 'save', false, true, 'admin');
 						}
 					} else {
@@ -4929,14 +4930,14 @@ if (!class_exists('wpMail')) {
 					if (!empty($_GET['id'])) {
 						if ($Db -> delete($_GET['id'])) {
 							$msgtype = 'message';
-							$message = __('Theme has been removed', $this -> plugin_name);
+							$message = __('Template has been removed', $this -> plugin_name);
 						} else {
 							$msgtype = 'error';
-							$message = __('Theme could not be removed', $this -> plugin_name);
+							$message = __('Template could not be removed', $this -> plugin_name);
 						}
 					} else {
 						$msgtype = 'error';
-						$message = __('No theme was specified', $this -> plugin_name);
+						$message = __('No template was specified', $this -> plugin_name);
 					}
 					
 					$this -> redirect('?page=' . $this -> sections -> themes, $msgtype, $message);
@@ -4947,10 +4948,10 @@ if (!class_exists('wpMail')) {
 						$Db -> save_field('def', "N", array('id' => $_GET['id']));
 						
 						$msg_type = 'message';
-						$message = __('Selected theme removed as sending default', $this -> plugin_name);
+						$message = __('Selected template removed as sending default', $this -> plugin_name);
 					} else {
 						$msg_type = 'error';
-						$message = __('No theme was specified', $this -> plugin_name);
+						$message = __('No template was specified', $this -> plugin_name);
 					}
 					
 					$this -> redirect("?page=" . $this -> sections -> themes, $msg_type, $message);
@@ -4961,10 +4962,10 @@ if (!class_exists('wpMail')) {
 						$Db -> save_field('defsystem', "N", array('id' => $_GET['id']));
 						
 						$msg_type = 'message';
-						$message = __('Selected theme removed as system default', $this -> plugin_name);
+						$message = __('Selected template removed as system default', $this -> plugin_name);
 					} else {
 						$msg_type = 'error';
-						$message = __('No theme was specified', $this -> plugin_name);
+						$message = __('No template was specified', $this -> plugin_name);
 					}
 					
 					$this -> redirect("?page=" . $this -> sections -> themes, $msg_type, $message);
@@ -4978,10 +4979,10 @@ if (!class_exists('wpMail')) {
 						$Db -> save_field('def', "Y", array('id' => $_GET['id']));
 						
 						$msg_type = 'message';
-						$message = __('Selected theme has been set as the sending default', $this -> plugin_name);
+						$message = __('Selected template has been set as the sending default', $this -> plugin_name);
 					} else {
 						$msg_type = 'error';
-						$message = __('No theme was specified', $this -> plugin_name);
+						$message = __('No template was specified', $this -> plugin_name);
 					}
 					
 					$this -> redirect("?page=" . $this -> sections -> themes, $msg_type, $message);
@@ -4995,10 +4996,10 @@ if (!class_exists('wpMail')) {
 						$Db -> save_field('defsystem', "Y", array('id' => $_GET['id']));
 						
 						$msg_type = 'message';
-						$message = __('Selected theme has been set as the system default', $this -> plugin_name);
+						$message = __('Selected template has been set as the system default', $this -> plugin_name);
 					} else {
 						$msg_type = 'error';
-						$message = __('No theme was specified', $this -> plugin_name);
+						$message = __('No template was specified', $this -> plugin_name);
 					}
 					
 					$this -> redirect("?page=" . $this -> sections -> themes, $msg_type, $message);
@@ -5016,12 +5017,12 @@ if (!class_exists('wpMail')) {
 									}
 									
 									$msg_type = 'message';
-									$message = __('Selected themes have been removed', $this -> plugin_name);
+									$message = __('Selected templates have been removed', $this -> plugin_name);
 									break;
 							}
 						} else {
 							$msg_type = 'error';
-							$message = __('No themes were selected', $this -> plugin_name);
+							$message = __('No templates were selected', $this -> plugin_name);
 						}
 					} else {
 						$msg_type = 'error';
@@ -5691,7 +5692,7 @@ if (!class_exists('wpMail')) {
 										$data .= '"' . __('Id', $this -> plugin_name) . '",';
 										$data .= '"' . __('Subject', $this -> plugin_name) . '",';
 										$data .= '"' . __('Lists', $this -> plugin_name) . '",';
-										$data .= '"' . __('Theme', $this -> plugin_name) . '",';
+										$data .= '"' . __('Template', $this -> plugin_name) . '",';
 										$data .= '"' . __('Author', $this -> plugin_name) . '",';
 										$data .= '"' . __('Read %', $this -> plugin_name) . '",';
 										$data .= '"' . __('Emails Sent', $this -> plugin_name) . '",';
@@ -6605,6 +6606,7 @@ if (!class_exists('wpMail')) {
 						case 'managementloginsubject'		:
 						case 'subscriberexistsmessage'		:
 						case 'onlinelinktext'				:
+						case 'printlinktext'				:
 						case 'activationlinktext'			:
 						case 'unsubscribetext'				:
 						case 'unsubscribealltext'			:

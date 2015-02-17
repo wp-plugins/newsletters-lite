@@ -10,7 +10,7 @@ $excerpt_settings = $this -> get_option('excerpt_settings');
 	<tbody>
 		<tr>
 			<th><label for="excerpt_settings"><?php _e('Custom Excerpt Settings', $this -> plugin_name); ?></label>
-			<?php echo $Html -> help(__('By turning this on, you can specify your own excerpt length and more text. If you leave it off, the default excerpt length and more text defined by the system, a theme or the plugin will be used.', $this -> plugin_name)); ?></th>
+			<?php echo $Html -> help(__('By turning this on, you can specify your own excerpt length and more text. If you leave it off, the default excerpt length and more text defined by the system, a template or the plugin will be used.', $this -> plugin_name)); ?></th>
 			<td>
 				<label><input onclick="if (jQuery(this).is(':checked')) { jQuery('#excerpt_settings_div').show(); } else { jQuery('#excerpt_settings_div').hide(); }" <?php echo (!empty($excerpt_settings)) ? 'checked="checked"' : ''; ?> type="checkbox" name="excerpt_settings" value="1" id="excerpt_settings" /> <?php _e('Yes, use custom excerpt length and more text', $this -> plugin_name); ?></label>
 			</td>

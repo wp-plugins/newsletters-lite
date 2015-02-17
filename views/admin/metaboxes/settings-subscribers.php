@@ -151,6 +151,47 @@
 			</td>
 		</tr>	
 		<tr>
+			<th><label for="printlinktext"><?php _e('Print Link Text', $this -> plugin_name); ?></label></th>
+			<td>
+				<?php if ($this -> language_do()) : ?>
+					<?php 
+					
+					$el = $this -> language_getlanguages(); 
+					$printlinktext = $this -> language_split($this -> get_option('printlinktext'));
+					
+					?>
+					<div id="printlinktexttabs">
+						<ul>
+							<?php $tabnumber = 1; ?>
+			                <?php foreach ($el as $language) : ?>
+			                 	<li><a href="#printlinktexttab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
+			                    <?php $tabnumber++; ?>
+			                <?php endforeach; ?>
+			            </ul>
+			            
+			            <?php $tabnumber = 1; ?>
+			            <?php foreach ($el as $language) : ?>
+			            	<div id="printlinktexttab<?php echo $tabnumber; ?>">
+			            		<input type="text" name="printlinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($printlinktext[$language])); ?>" id="printlinktext_<?php echo $language; ?>" class="widefat" />
+			            	</div>
+			            	<?php $tabnumber++; ?>
+			            <?php endforeach; ?>
+					</div>
+					
+					<script type="text/javascript">
+					jQuery(document).ready(function() {
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#printlinktexttabs').tabs();
+						}
+					});
+					</script>
+				<?php else : ?>
+					<input class="widefat" type="text" id="<?php echo $this -> pre; ?>printlinktext" name="printlinktext" value="<?php echo $this -> get_option('printlinktext'); ?>" />
+				<?php endif; ?>
+				<span class="howto"><?php _e('Displays printable version of newsletter in browser. Output this with <code>[newsletters_print]</code> shortcode.', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
+		<tr>
 			<th><?php _e('Admin Notification on Subscription', $this -> plugin_name); ?></th>
 			<td>
 				<?php $adminemailonsubscription = $this -> get_option('adminemailonsubscription'); ?>

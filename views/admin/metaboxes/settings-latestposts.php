@@ -57,7 +57,7 @@ $latestpostssubscriptions = $this -> Latestpostssubscription -> find_all();
 					<a onclick="if (!confirm('<?php _e('Are you sure you want to clear the posts history for this latest posts subscription?', $this -> plugin_name); ?>')) { return false; }" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> settings . '&amp;method=clearlpshistory&id=' . $latestpostssubscription -> id); ?>" class="newsletters-icon newsletters-icon-delete-regular"></a>
 				</td>
 				<td>
-					<a href="" onclick="jQuery.colorbox({href:wpmlajaxurl + '?action=wpmllatestposts_preview&id=<?php echo $latestpostssubscription -> id; ?>'}); return false;" class="button newsletters-icon newsletters-icon-view"></a>
+					<a href="" onclick="jQuery(this).colorbox({iframe:true, width:'80%', height:'80%', href:wpmlajaxurl + '?action=wpmllatestposts_preview&id=<?php echo $latestpostssubscription -> id; ?>'}); return false;" class="button newsletters-icon newsletters-icon-view"></a>
 					<a href="" onclick="jQuery.colorbox({href:wpmlajaxurl + '?action=newsletters_latestposts_save&id=<?php echo $latestpostssubscription -> id; ?>'}); return false;" class="button editrow newsletters-icon newsletters-icon-edit"></a>
 					<a href="" onclick="if (confirm('<?php _e('Are you sure you want to delete this latest posts subscription?', $this -> plugin_name); ?>')) { latestposts_del_row('<?php echo $latestpostssubscription -> id; ?>'); } return false;" class="button delrow newsletters-icon newsletters-icon-delete-regular"></a>	
 					<span id="latestposts_loading_<?php echo $latestpostssubscription -> id; ?>" style="display:none;"><span class="newsletters_loading"></span></span>

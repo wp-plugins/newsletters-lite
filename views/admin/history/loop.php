@@ -55,7 +55,7 @@
 					<?php $colspan++; ?>
                     <th class="column-theme <?php echo ($orderby == "theme_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=theme_id&order=' . (($orderby == "theme_id") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Theme', $this -> plugin_name); ?></span>
+							<span><?php _e('Template', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -121,7 +121,7 @@
 					<th><?php _e('List(s)', $this -> plugin_name); ?></th>
                     <th class="column-theme <?php echo ($orderby == "theme_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=theme_id&order=' . (($orderby == "theme_id") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Theme', $this -> plugin_name); ?></span>
+							<span><?php _e('Template', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -199,7 +199,7 @@
 	                    <td>
 	                    	<?php $Db -> model = $Theme -> model; ?>
 	                        <?php if (!empty($email -> theme_id) && $theme = $Db -> find(array('id' => $email -> theme_id))) : ?>
-	                        	<a href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Theme Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
+	                        	<a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Template Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
 	                        <?php else : ?>
 	                        	<?php _e('None', $this -> plugin_name); ?>
 	                        <?php endif; ?>

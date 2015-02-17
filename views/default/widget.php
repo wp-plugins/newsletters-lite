@@ -59,7 +59,8 @@
 		<?php elseif ($captcha_type == "recaptcha") : ?>
 			<?php 
 			
-			$recaptcha_publickey = $this -> get_option('recaptcha_publickey'); 
+			$recaptcha_publickey = $this -> get_option('recaptcha_publickey');
+			$recaptcha_language = $this -> get_option('recaptcha_language'); 
 			$recaptcha_theme = $this -> get_option('recaptcha_theme');
 			$recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 			
@@ -86,7 +87,8 @@
 			jQuery(document).ready(function() { 
 				Recaptcha.create("<?php echo $recaptcha_publickey; ?>", "<?php echo $widget_id; ?>-recaptcha", {
 					theme:"<?php echo $recaptcha_theme; ?>",
-					tabindex:<?php echo $Html -> tabindex($widget_id); ?>
+					tabindex:<?php echo $Html -> tabindex($widget_id); ?>,
+					lang:"<?php echo $recaptcha_language; ?>"
 				}); 
 			});
 			</script>

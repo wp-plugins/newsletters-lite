@@ -93,7 +93,7 @@ $command = '<code>wget -O /dev/null "' . $commandurl . '" > /dev/null 2>&1</code
 				<?php _e('by', $this -> plugin_name); ?>
 				<select name="queuesendorderby">
 					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "history_id") ? 'selected="selected"' : ''; ?> value="history_id"><?php _e('History ID', $this -> plugin_name); ?></option>
-					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "theme_id") ? 'selected="selected"' : ''; ?> value="theme_id"><?php _e('Theme ID', $this -> plugin_name); ?></option>
+					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "theme_id") ? 'selected="selected"' : ''; ?> value="theme_id"><?php _e('Template ID', $this -> plugin_name); ?></option>
 					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "subject") ? 'selected="selected"' : ''; ?> value="subject"><?php _e('Subject', $this -> plugin_name); ?></option>
 					<option <?php echo (!empty($queuesendorderby) && $queuesendorderby == "created") ? 'selected="selected"' : ''; ?> value="created"><?php _e('Date', $this -> plugin_name); ?></option>
 				</select>

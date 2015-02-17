@@ -44,7 +44,7 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 	</div>
 	
 	<div class="misc-pub-section">
-	<p><strong><?php _e('Select a Theme', $this -> plugin_name); ?></strong></p>
+	<p><strong><?php _e('Select a Template', $this -> plugin_name); ?></strong></p>
 	<p>
 		<label><input <?php echo (empty($theme_id)) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="0" id="theme0" /> <?php _e('NONE', $this -> plugin_name); ?></label>
 		<?php $Db -> model = $Theme -> model; ?>
@@ -53,8 +53,8 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 				<?php $default_theme_id = $this -> default_theme_id('sending'); ?>
 			    <?php foreach ($themes as $theme) : ?>
 			        <label><input <?php echo ((!empty($theme_id) && $theme_id == $theme -> id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="<?php echo $theme -> id; ?>" id="theme<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> 
-			        <a href="" onclick="jQuery.colorbox({title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
-			        <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Theme: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
+			        <a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
+			        <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
 			        <br/>
 			    <?php endforeach; ?>
 			</div>

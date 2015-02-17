@@ -250,7 +250,7 @@
 	    <table class="form-table">
 	    	<tbody>
 	            <tr>
-	            	<th><label for="theme_id_0"><?php _e('Email Theme', $this -> plugin_name); ?></label></th>
+	            	<th><label for="theme_id_0"><?php _e('Email Template', $this -> plugin_name); ?></label></th>
 	                <td>
 	                	<?php $Db -> model = $Theme -> model; ?>
 	                    <?php if ($themes = $Db -> find_all(false, false, array('title', "ASC"))) : ?>
@@ -258,13 +258,13 @@
 	                    	<div class="scroll-list">
 	                        	<label><input type="radio" name="theme_id" value="0" id="theme_id_0" /> <?php _e('NONE', $this -> plugin_name); ?></label><br/>
 	                        	<?php foreach ($themes as $theme) : ?>
-	                            	<label><input <?php echo ((!empty($theme) && $theme -> id == $latestpostssubscription -> theme_id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="theme_id" value="<?php echo $theme -> id; ?>" id="theme_id_<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> <a class="newsletters_dashicons newsletters_theme_preview" href="" onclick="jQuery.colorbox({href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;"></a> <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Theme: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a><br/>
+	                            	<label><input <?php echo ((!empty($theme) && $theme -> id == $latestpostssubscription -> theme_id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="theme_id" value="<?php echo $theme -> id; ?>" id="theme_id_<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> <a class="newsletters_dashicons newsletters_theme_preview" href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;"></a> <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a><br/>
 	                            <?php endforeach; ?>
 	                        </div>
 	                    <?php else : ?>
-	                    	<p class=""><?php _e('No themes are available', $this -> plugin_name); ?></p>
+	                    	<p class=""><?php _e('No templates are available', $this -> plugin_name); ?></p>
 	                    <?php endif; ?>
-	                	<span class="howto"><?php _e('theme to use for the latest posts subscription email.', $this -> plugin_name); ?></span>
+	                	<span class="howto"><?php _e('Template to use for the latest posts subscription email.', $this -> plugin_name); ?></span>
 	                </td>
 	            </tr>
 	        </tbody>

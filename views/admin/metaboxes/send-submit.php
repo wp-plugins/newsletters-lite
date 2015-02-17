@@ -107,7 +107,7 @@
 								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "weeks") ? 'selected="selected"' : ''; ?> value="weeks">Weeks</option>
 								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "years") ? 'selected="selected"' : ''; ?> value="years">Years</option>
 							</select>
-							<?php echo $Html -> help(__('Choose the interval at which this newsletter should be sent again. All data of the newsletter such as the list(s), content, theme, etc. will be reused as configured.', $this -> plugin_name)); ?>
+							<?php echo $Html -> help(__('Choose the interval at which this newsletter should be sent again. All data of the newsletter such as the list(s), content, template, etc. will be reused as configured.', $this -> plugin_name)); ?>
 						</div>
 						<div class="form-field">
 							<?php _e('Starting', $this -> plugin_name); ?>
