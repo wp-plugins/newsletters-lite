@@ -67,7 +67,7 @@ class wpmlDbHelper extends wpMailPlugin {
 						
 						switch ($object -> model) {
 							case 'Latestpostssubscription'	:
-								//$this -> latestposts_scheduling($object -> data -> interval, $object -> data -> startdate, array($object -> insertid));
+								$this -> latestposts_scheduling($object -> data -> interval, $object -> data -> startdate, array($object -> insertid));								
 								break;
 							case 'Theme'					:
 								$themeoptions = array(
@@ -79,6 +79,7 @@ class wpmlDbHelper extends wpMailPlugin {
 									'themailer_facebook',
 									'themailer_twitter',
 									'themailer_rss',
+									'lagoon_address',
 								);
 								
 								foreach ($_POST as $pkey => $pval) {

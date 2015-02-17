@@ -159,7 +159,7 @@
 	            		?>
 	            		<select name="orderby" id="orderby">
 	            			<?php foreach ($orderby as $okey => $oval) : ?>
-	            				<option <?php echo (!empty($orderby) && $orderby == $okey) ? 'selected="selected"' : ''; ?> value="<?php echo $okey; ?>"><?php echo $oval; ?></option>
+	            				<option <?php echo (!empty($latestpostssubscription -> orderby) && $latestpostssubscription -> orderby == $okey) ? 'selected="selected"' : ''; ?> value="<?php echo $okey; ?>"><?php echo $oval; ?></option>
 	            			<?php endforeach; ?>
 	            		</select>
 	            	</td>

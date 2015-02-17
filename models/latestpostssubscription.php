@@ -25,10 +25,10 @@ if (!class_exists('wpmlLatestpostssubscription')) {
 			'theme_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 			'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 			'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
-			'key'					=>	"PRIMARY KEY (`id`)",
+			'key'					=>	"PRIMARY KEY (`id`), INDEX(`history_id`), INDEX(`theme_id`)",
 		);
 		
-		var $indexes = array();
+		var $indexes = array('history_id', 'theme_id');
 		
 		function wpmlLatestpostssubscription($data = null) {
 			$this -> table = $this -> pre . $this -> controller;

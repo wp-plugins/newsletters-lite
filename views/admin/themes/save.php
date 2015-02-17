@@ -49,6 +49,50 @@
         </div>
         
         <div id="typediv_paste" style="display:<?php echo ($Html -> field_value('Theme[type]') == "paste") ? 'block' : 'none'; ?>;">
+	        <p><input type="button" class="button button-secondary" id="thememediaupload" value="<?php _e('Add Media', $this -> plugin_name); ?>" /></p>
+	        
+	        <script type="text/javascript">
+        	jQuery(document).ready(function() {
+				var file_frame;
+				
+				jQuery('#thememediaupload').live('click', function( event ){
+					event.preventDefault();
+					
+					// If the media frame already exists, reopen it.
+					if (file_frame) {
+						file_frame.open();
+						return;
+					}
+					
+					// Create the media frame.
+					file_frame = wp.media.frames.file_frame = wp.media({
+						title: '<?php _e('Upload Media', $this -> plugin_name); ?>',
+						button: {
+							text: '<?php _e('Copy URL', $this -> plugin_name); ?>',
+						},
+						multiple: false  // Set to true to allow multiple files to be selected
+					});
+						
+					// When an image is selected, run a callback.
+					file_frame.on( 'select', function() {
+						// We set multiple to false so only get one image from the uploader
+						attachment = file_frame.state().get('selection').first().toJSON();
+						
+						// Do something with attachment.id and/or attachment.url here
+						
+						//jQuery('#Slide_attachment_id').val(attachment.id);
+						//jQuery('#Slide_image_file').val(attachment.url);
+						//jQuery('#Slide_mediaupload_image').html('<a href="' + attachment.url + '" class="colorbox" onclick="jQuery.colorbox({href:\'' + attachment.url + '\'}); return false;"><img class="slideshow_dropshadow" style="width:100px;" src="' + attachment.sizes.thumbnail.url + '" /></a>');
+						
+						window.prompt("Copy to clipboard: Ctrl+C, Enter", attachment.url);
+					});
+					
+					// Finally, open the modal
+					file_frame.open();
+				});
+        	});
+        	</script>
+	        
         	<textarea name="Theme[paste]" class="widefat" id="Theme_paste" rows="10" cols="100%"><?php echo esc_attr(stripslashes($Theme -> data -> paste)); ?></textarea>
         	
         	<script type="text/javascript">
@@ -128,6 +172,19 @@
         					<th><label for="pronews_rss"><?php _e('RSS URL', $this -> plugin_name); ?></label></th>
         					<td>
         						<input type="text" name="pronews_rss" value="<?php echo esc_attr(stripslashes($this -> get_option('pronews_rss'))); ?>" id="pronews_rss" class="widefat" />
+        						<span class="howto"></span>
+        					</td>
+        				</tr>
+        			</tbody>
+        		</table>
+        	<?php elseif ($theme_name == "lagoon") : ?>
+        		<h3><?php _e('Lagoon Settings', $this -> plugin_name); ?></h3>
+        		<table class="form-table">
+        			<tbody>
+        				<tr>
+        					<th><label for="lagoon_address"><?php _e('Address', $this -> plugin_name); ?></label></th>
+        					<td>
+        						<textarea name="lagoon_address" rows="4" class="widefat" id="lagoon_address"><?php echo esc_attr(stripslashes($this -> get_option('lagoon_address'))); ?></textarea>
         						<span class="howto"></span>
         					</td>
         				</tr>

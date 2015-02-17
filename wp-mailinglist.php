@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.4
+Version: 4.4.5
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -190,7 +190,7 @@ if (!class_exists('wpMail')) {
 				$smtpfrom = (empty($history -> from)) ? $this -> get_option('smtpfrom') : $history -> from;
 				$smtpfromname = (empty($history -> fromname)) ? $this -> get_option('smtpfromname') : $history -> fromname;
 				
-				$phpmailer -> Body = apply_filters($this -> pre . '_send_body', stripslashes($phpmailer -> Body), $phpmailer, $wpmlhistory_id);
+				$phpmailer -> Body = $this -> inlinestyles(apply_filters($this -> pre . '_send_body', stripslashes($phpmailer -> Body), $phpmailer, $wpmlhistory_id));
 				$phpmailer -> Sender = $this -> get_option('bounceemail');
 				$phpmailer -> From = $smtpfrom;
 				$phpmailer -> CharSet = get_bloginfo('charset');
@@ -1580,9 +1580,8 @@ if (!class_exists('wpMail')) {
 								}
 							}
 							
-							if (!empty($sentmailscount)) {
-							
-								if (!empty($shortcode_categories)) {
+							if (!empty($sentmailscount)) {															
+								if (!empty($shortcode_categories)) {									
 									foreach ($shortcode_categories as $shortcode_category) {
 										if (!empty($shortcode_category['posts'])) {
 											foreach ($shortcode_category['posts'] as $post) {
@@ -1591,7 +1590,7 @@ if (!class_exists('wpMail')) {
 											}
 										}
 									}	
-								} else {
+								} else {									
 									foreach ($shortcode_posts as $post) {
 										$Db -> model = $Latestpost -> model;
 										$Db -> save(array('post_id' => $post -> ID, 'lps_id' => $latestpostssubscription -> id), true);
@@ -1607,7 +1606,7 @@ if (!class_exists('wpMail')) {
 				echo __('No latest posts subscription was specified', $this -> plugin_name);
 			}
 			
-			echo $sentmailscount . ' ' . __('emails were sent/queued.', $this -> plugin_name);	
+			echo $sentmailscount . ' ' . __('emails were sent/queued.', $this -> plugin_name);
 			
 			return false;
 		}
@@ -2372,7 +2371,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('schedulingdiv', __('Email Scheduling', $this -> plugin_name) . $Html -> help(__('The purpose of email scheduling is to allow you to send thousands of emails in a load distributed way. Please take note that you cannot expect your server/hosting to send hundreds/thousands of emails all simultaneously so this is where email scheduling helps you.', $this -> plugin_name)), array($Metabox, 'settings_scheduling'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('bouncediv', __('Bounce Configuration', $this -> plugin_name), array($Metabox, 'settings_bounce'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('emailsdiv', __('History &amp; Emails Configuration', $this -> plugin_name), array($Metabox, 'settings_emails'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
-			add_meta_box('latestposts', __('Latest Posts Subscription', $this -> plugin_name), array($Metabox, 'settings_latestposts'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
+			add_meta_box('latestposts', __('Latest Posts Subscriptions', $this -> plugin_name), array($Metabox, 'settings_latestposts'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			add_meta_box('customcss', __('Theme, Scripts &amp; Custom CSS', $this -> plugin_name), array($Metabox, 'settings_customcss'), "newsletters_page_" . $this -> sections -> settings, 'normal', 'core');
 			
 			if ($this -> language_ready()) {
@@ -2391,7 +2390,7 @@ if (!class_exists('wpMail')) {
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_templates, 'side', 'core');
 			add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_templates_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_templates, 'high', 'core');
 			add_meta_box('postsdiv', __('Posts', $this -> plugin_name) . $Html -> help(__('The posts template used when using the [wpmlpost...] or [wpmlposts...] shorcodes in your newsletters.', $this -> plugin_name)), array($Metabox, 'settings_templates_posts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
-			add_meta_box('latestpostsdiv', __('Latest Posts', $this -> plugin_name) . $Html -> help(__('The posts template used for the "Latest Posts Subscription" feature which automatically sends out new posts.', $this -> plugin_name)), array($Metabox, 'settings_templates_latestposts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
+			add_meta_box('latestpostsdiv', __('Latest Posts', $this -> plugin_name) . $Html -> help(__('The posts template used for the "Latest Posts Subscriptions" feature which automatically sends out new posts.', $this -> plugin_name)), array($Metabox, 'settings_templates_latestposts'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('confirmdiv', __('Confirmation Email', $this -> plugin_name) . $Html -> help(__('Email message sent to new subscribers to confirm their subscription.', $this -> plugin_name)), array($Metabox, 'settings_templates_confirm'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('bouncediv', __('Bounce Email', $this -> plugin_name) . $Html -> help(__('Email message sent to the administrator when an email to a subscriber bounces.', $this -> plugin_name)), array($Metabox, 'settings_templates_bounce'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
 			add_meta_box('unsubscribediv', __('Unsubscribe Admin Email', $this -> plugin_name) . $Html -> help(__('Email message sent to the administrator when a subscriber unsubscribes.', $this -> plugin_name)), array($Metabox, 'settings_templates_unsubscribe'), "newsletters_page_" . $this -> sections -> settings_templates, 'normal', 'core');
@@ -4914,7 +4913,7 @@ if (!class_exists('wpMail')) {
 							if (!empty($_POST['continueediting'])) {
 								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> themes . '&method=save&id=' . $Theme -> insertid . '&continueediting=1'), 'message', $message);	
 							} else {
-								$this -> redirect('?page=' . $this -> sections -> themes, 'message', $message);
+								$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> themes, 'message', $message));
 							}
 						} else {
 							$this -> render_error(__('Template could not be saved', $this -> plugin_name));
@@ -6501,6 +6500,7 @@ if (!class_exists('wpMail')) {
 						//unset values that are not required
 						unset($_POST['save']);
 						delete_option('tridebugging');
+						$this -> delete_option('inlinestyles');
 						$this -> delete_option('themeintextversion');
 						$this -> delete_option('emailarchive');
 						$this -> delete_option('excerpt_settings');

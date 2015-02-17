@@ -144,7 +144,10 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 													<tbody>
 														<tr>
 															<td id="wp-word-count">
-																<span id="word-count"><?php echo sprintf(__('Use shortcode %s to display this content', $this -> plugin_name), '<code>[newsletters_content id="' . $contentarea -> number . '"]</code>'); ?></span>
+																<span id="word-count">
+																	<?php echo sprintf(__('Use shortcode %s to display this content', $this -> plugin_name), '<code>[newsletters_content id="' . $contentarea -> number . '"]</code>'); ?>
+																	<br/><?php echo sprintf(__('And use %s to conditionally display if it is available.', $this -> plugin_name), '<code>[newsletters_if newsletters_content id="' . $contentarea -> number . '"]...[/newsletters_if]</code>'); ?>
+																</span>
 															</td>
 															<td class="autosave-info">
 																<span id="autosave" style="display:none;"></span>
@@ -257,7 +260,7 @@ jQuery(document).ready(function() {
     jQuery('input:not(:button,:submit),textarea,select').change(function() {
     	<?php $createpreview = $this -> get_option('createpreview'); ?>
     	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
-    		//previewrunner();
+    		previewrunner();
     	<?php endif; ?>
     	<?php $createspamscore = $this -> get_option('createspamscore'); ?>
     	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>

@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.1
-Stable tag: 4.4.4
+Stable tag: 4.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -147,6 +147,26 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.5 =
+* ADD: Conditional tag/shortcode [newsletters_if...]
+* ADD: Ability to specify a predefined value for a hidden custom field
+* ADD: Google reCAPTCHA localization/language setting
+* ADD: Setting to apply STYLE tags as inline styles before sending the email
+* ADD: Include print link and version in newsletter  
+* IMPROVE: New CSS to inline styles API integration
+* IMPROVE: Faster sending by rendering the email only once
+* IMPROVE: Change "Themes" to "Templates" throughout the plugin
+* IMPROVE: Change "Email Templates" tab to "System Emails" in configuration
+* IMPROVE: "Get More Themes" button under Newsletters > Themes section
+* IMPROVE: Open theme previews in iFrame to prevent conflict with dashboard
+* IMPROVE: Don't check permissions on each page load  
+* FIX: Latest posts order of posts not saved
+* FIX: Latest posts start date/time not effective on schedule
+* FIX: Latest posts not logging posts correctly, sending old posts again
+* FIX: Notification emails not going to admin email on mailing list
+* FIX: Fields conditions "any" breaks MySQL query
+* FIX: Unable to edit address of Lagoon template  
 
 = 4.4.4 =
 * ADD: jQuery UI datepicker for date custom field

@@ -17,7 +17,7 @@ var previewrequest = false;
 var history_id = "<?php echo $_POST['ishistory']; ?>";
 <?php endif; ?>
 
-function previewrunner() {
+function previewrunner() {	
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 	var formvalues = jQuery('form#post').serialize();
 	var content = jQuery("iframe#content_ifr").contents().find("body#tinymce").html();
@@ -42,7 +42,6 @@ function previewrunner() {
 			
 			if (history_id != "") { 
 				jQuery('#ishistory').val(history_id); 
-
 				jQuery('#edit-slug-box').show();
 				jQuery('#sample-permalink').html(newsletter_url);
 				jQuery('#view-post-btn a').attr('href', newsletter_url);
@@ -50,7 +49,6 @@ function previewrunner() {
 			}
 		},
 		complete: function(response) {		
-			//setTimeout(previewrunner, 30000);
 			if (typeof previewcontent != 'undefined') { jQuery('#previewiframe').contents().find('html').html(previewcontent); }
 			jQuery('#previewrunnerbutton').removeAttr('disabled');
 			jQuery('#previewrunnerloading').hide();

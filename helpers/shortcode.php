@@ -21,7 +21,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		extract(shortcode_atts($defaults, $atts));
 		
 		switch ($atts[0]) {
-			case 'newsletters_content'					:			
+			case 'newsletters_content'					:						
 				if (!empty($newsletters_history_id) && !empty($atts['id'])) {
 					$Db -> model = 'wpmlContent';
 					if ($contentarea = $Db -> find(array('number' => $atts['id'], 'history_id' => $newsletters_history_id))) {

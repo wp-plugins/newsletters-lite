@@ -27,7 +27,7 @@ $histories = $Db -> find_all(false, false, array('modified', "DESC"), 5);
 						<td class="first b b-ad">
 							<?php echo __($history -> subject); ?>
 						</td>
-						<td class="t ad" style="text-align:right; width:40%;">
+						<td class="t ad" style="text-align:right; width:100px;">
 							<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $history -> id); ?>"><?php _e('View', $this -> plugin_name); ?></a>
 							<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> send . '&amp;method=history&amp;id=' . $history -> id); ?>"><?php _e('Edit', $this -> plugin_name); ?></a>
 						</td>

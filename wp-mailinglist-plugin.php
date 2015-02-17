@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.4';
+		var $version = '4.4.5';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -2026,8 +2026,6 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 				
-				$this -> debug($query);
-				
 				$query_hash = md5($query);
 				if ($ob_subscribers = $this -> get_cache($query_hash)) {
 					$subscribers = $ob_subscribers;
@@ -2695,7 +2693,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function language_use($lang = null, $text = null, $show_available = false) {
 		
-			if(!$this -> language_isenabled($lang)) { 
+			if (!$this -> language_isenabled($lang)) { 
 				return $text;
 			}
 			
@@ -2710,7 +2708,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if(is_object($text) && get_class($text) == '__PHP_Incomplete_Class') {
 				foreach(get_object_vars($text) as $key => $t) {
-					$text->$key = $this -> language_use($lang,$text->$key,$show_available);
+					$text->$key = $this -> language_use($lang,$text -> $key,$show_available);
 				}
 				return $text;
 			}
@@ -3216,6 +3214,8 @@ if (!class_exists('wpMailPlugin')) {
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
 					
 					if (in_array($_GET['page'], (array) $this -> sections)) {
+						wp_enqueue_media();
+						
 						// CKEditor
 						wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
 						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
@@ -3764,7 +3764,7 @@ if (!class_exists('wpMailPlugin')) {
 							}
 						}
 						
-						global $Db, $Subscriber, $Field;
+						global $wpdb, $Db, $Subscriber, $Field, $Latestpost;
 						switch ($oldname) {
 							case $Subscriber -> table			:							
 								$Db -> model = $Field -> model;
@@ -3773,6 +3773,10 @@ if (!class_exists('wpMailPlugin')) {
 										$this -> add_field($oldname, $field -> slug);
 									}
 								}
+								break;
+							case $Latestpost -> table 			:
+								$query = "ALTER TABLE `" . $wpdb -> prefix . $Latestpost -> table . "` DROP INDEX `post_id`";
+								$wpdb -> query($query);
 								break;
 						}
 						
@@ -5081,10 +5085,23 @@ if (!class_exists('wpMailPlugin')) {
 			global $wpdb, $Mailinglist;
 		
 			if (!empty($subscriber)) {
-				if ($this -> get_option('adminemailonsubscription') == "Y") {
-					$adminemail = $this -> get_option('adminemail');
+				if ($this -> get_option('adminemailonsubscription') == "Y") {					
+					if (!empty($subscriber -> mailinglists)) {
+						foreach ($subscriber -> mailinglists as $mailinglist_id) {
+							$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $mailinglist_id . "'";
+							if ($email = $wpdb -> get_var($adminemailquery)) {
+								if (!empty($email)) {									
+									$to = (object) array('email' => $email);
+									$subject = $this -> et_subject('subscribe', $subscriber);
+									$fullbody = $this -> et_message('subscribe', $subscriber);					
+									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+									$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
+								}
+							}
+						}
+					}
 					
-					if (!empty($subscriber -> mailinglist_id)) {
+					/*if (!empty($subscriber -> mailinglist_id)) {
 						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
 						
 						$query_hash = md5($adminemailquery);
@@ -5098,8 +5115,9 @@ if (!class_exists('wpMailPlugin')) {
 						if (!empty($email)) {
 							$adminemail = $email;
 						}
-					}
+					}*/
 				
+					$adminemail = $this -> get_option('adminemail');
 					$to = (object) array('email' => $adminemail);
 					$subject = $this -> et_subject('subscribe', $subscriber);
 					$fullbody = $this -> et_message('subscribe', $subscriber);					
@@ -5136,10 +5154,23 @@ if (!class_exists('wpMailPlugin')) {
 			global $wpdb, $Mailinglist, $Subscriber;
 			
 			if (!empty($subscriber) && !empty($mailinglist)) {			
-				if ($this -> get_option('adminemailonunsubscription') == "Y") {				
-					$adminemail = $this -> get_option('adminemail');
+				if ($this -> get_option('adminemailonunsubscription') == "Y") {									
+					if (!empty($subscriber -> mailinglists)) {
+						foreach ($subscriber -> mailinglists as $mailinglist_id) {
+							$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $mailinglist_id . "'";
+							if ($email = $wpdb -> get_var($adminemailquery)) {
+								if (!empty($email)) {
+									$to = (object) array('email' => $email);
+									$subject = $this -> et_subject('subscribe', $subscriber);
+									$fullbody = $this -> et_message('subscribe', $subscriber);					
+									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+									$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
+								}
+							}
+						}
+					}
 					
-					if (!empty($subscriber -> mailinglist_id)) {
+					/*if (!empty($subscriber -> mailinglist_id)) {
 						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
 
 						$query_hash = md5($adminemailquery);
@@ -5153,7 +5184,9 @@ if (!class_exists('wpMailPlugin')) {
 						if (!empty($email)) {
 							$adminemail = $email;
 						}
-					}
+					}*/
+					
+					$adminemail = $this -> get_option('adminemail');
 					
 					if (is_array($mailinglist)) {
 						$subscriber -> mailinglists = $mailinglist;
@@ -5312,6 +5345,47 @@ if (!class_exists('wpMailPlugin')) {
 			return $result;
 		}
 		
+		function inlinestyles($html = null) {
+			$inlinestyles = $this -> get_option('inlinestyles');
+			
+			if (!empty($inlinestyles)) {
+				$url = "http://premailer.dialect.ca/api/0.1/documents";
+				
+				$postfields = array(
+					'html'						=>	$html,
+					'adapter'					=>	'hpricot', //nokogiri
+					'preserve_styles'			=>	true,
+					'remove_ids'				=>	false,
+					'remove_classes'			=>	false,
+					'remove_comments'			=>	false,
+				);
+				
+				if (function_exists('curl_init') && $ch = curl_init($url)) {
+					curl_setopt($ch, CURLOPT_URL, $url);
+					curl_setopt($ch, CURLOPT_POST, true);
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);	
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					curl_setopt($ch, CURLOPT_HEADER, false);
+					$result = curl_exec($ch);
+					curl_close($ch);					
+					$result = json_decode($result);
+					
+					if (!empty($result -> status) && $result -> status == "201") {
+						$remote = wp_remote_get(trim($result -> documents -> html));
+						if (!is_wp_error($remote)) {
+							$html = trim(html_entity_decode(urldecode($remote['body'])));
+						} else {
+							$this -> log_error($remote -> get_error_message());
+						}
+					} else {
+						$this -> log_error($result -> status . ' - ' . $result -> message);
+					}
+				}
+			}
+			
+			return $html;
+		}
+		
 		function execute_mail($subscriber = null, $user = null, $subject = null, $message = null, $attachments = null, $history_id = null, $eunique = null, $shortlinks = true) {
 			global $wpdb, $Db, $Html, $Email, $History, $phpmailer, $Mailinglist, $Subscriber, $SubscribersList, $orig_message, $wpml_message, $wpml_textmessage, $fromwpml;
 			$sent = false;
@@ -5441,7 +5515,7 @@ if (!class_exists('wpMailPlugin')) {
 					}
 					
 					$phpmailer -> Subject = stripslashes($subject);
-					$phpmailer -> Body = apply_filters($this -> pre . '_send_body', stripslashes($message), $phpmailer, $history_id);
+					$phpmailer -> Body = $this -> inlinestyles(apply_filters($this -> pre . '_send_body', stripslashes($message), $phpmailer, $history_id));
 					
 					if ($this -> get_option('multimime') == "Y") {
 						if (!empty($history -> text)) {
@@ -5769,9 +5843,8 @@ if (!class_exists('wpMailPlugin')) {
 				<div class="handlediv" title="Click to toggle"><br></div>
 					<h3 class="hndle"><span><?php echo __('Content Area', $this -> plugin_name); ?> <?php echo $_REQUEST['contentarea']; ?></span></h3>
 					<div class="inside">
-				
-					<?php
-			
+						
+					<?php 
 					
 					wp_editor("", 'contentarea' . $_REQUEST['contentarea'], array(
 						'textarea_name'				=>	'contentarea[' . $_REQUEST['contentarea'] . ']',
@@ -6198,6 +6271,17 @@ if (!class_exists('wpMailPlugin')) {
 					$wpdb -> query($query);
 					
 					$version = '4.4.4';
+				}
+				
+				if (version_compare($cur_version, "4.4.5") < 0) {
+					global $wpdb, $Db, $Latestpost;
+					
+					$this -> update_options();
+					
+					$query = "ALTER TABLE `" . $wpdb -> prefix . $Latestpost -> table . "` DROP INDEX `post_id`";
+					$wpdb -> query($query);
+					
+					$version = '4.4.5';
 				}
 			
 				//the current version is older.
