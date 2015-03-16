@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.5';
+		var $version = '4.4.6';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -161,6 +161,23 @@ if (!class_exists('wpMailPlugin')) {
 		    }
 		    
 		    return true;
+	    }
+	    
+	    function get_device() {
+		    $device = false;
+		    
+		    require_once($this -> plugin_base() . DS . 'vendors' . DS . 'mobile-detect' . DS . 'Mobile_Detect.php');
+			$detect = new Mobile_Detect();
+			
+			if ($detect -> isTablet()) {
+				$device = "tablet";
+			} elseif ($detect -> isMobile()) {
+				$device = "mobile";
+			} else {
+				$device = "desktop";
+			}
+			
+			return $device;
 	    }
 	    
 	    function is_php_module($module = null) {
@@ -2815,6 +2832,9 @@ if (!class_exists('wpMailPlugin')) {
 					case 'qtranslate'				:
 						$url = qtrans_convertURL($url, $language);
 						break;
+					case 'qtranslate-x'				:
+						$url = qtranxf_convertURL($url, $language);
+						break;
 					case 'wpml'						:
 						if (function_exists('icl_get_languages')) {
 							$languages = icl_get_languages();
@@ -2841,6 +2861,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			switch ($newsletters_languageplugin) {
 				case 'qtranslate'				:
+				case 'qtranslate-x'				:
 					global $q_config;
 					$default = $q_config['default_language'];
 					break;
@@ -2866,6 +2887,7 @@ if (!class_exists('wpMailPlugin')) {
 				
 				switch ($newsletters_languageplugin) {
 					case 'qtranslate'				:
+					case 'qtranslate-x'				:
 						global $q_config;
 						$name = $q_config['language_name'][$language];
 						break;
@@ -2890,6 +2912,9 @@ if (!class_exists('wpMailPlugin')) {
 			if (empty($newsletters_languageplugin)) {			
 				if ($this -> is_plugin_active('qtranslate')) {
 					$newsletters_languageplugin = "qtranslate";
+					return true;
+				} elseif ($this -> is_plugin_active('qtranslate-x')) {
+					$newsletters_languageplugin = 'qtranslate-x';
 					return true;
 				} elseif ($this -> is_plugin_active('wpml')) {
 					if (!empty($_GET['lang']) && $_GET['lang'] == "all") {
@@ -2918,7 +2943,10 @@ if (!class_exists('wpMailPlugin')) {
 				case 'qtranslate'			:
 					$current = qtrans_getLanguage();
 					break;
-				case 'wpml';
+				case 'qtranslate-x'			:
+					$current = qtranxf_getLanguage();
+					break;
+				case 'wpml'					:
 					$current = ICL_LANGUAGE_CODE;
 					break;
 			}
@@ -2937,6 +2965,7 @@ if (!class_exists('wpMailPlugin')) {
 		
 			switch ($newsletters_languageplugin) {
 				case 'qtranslate'			:
+				case 'qtranslate-x'			:
 					global $q_config;
 					$flag = '<img src="' . content_url() . '/' . $q_config['flag_location'] . '/' . $q_config['flag'][$language] . '" alt="' . $language . '" />';
 					break;
@@ -2965,6 +2994,9 @@ if (!class_exists('wpMailPlugin')) {
 				switch ($newsletters_languageplugin) {
 					case 'qtranslate'				:
 						$enabled = qtrans_isEnabled($language);
+						break;
+					case 'qtranslate-x'				:
+						$enabled = qtranxf_isEnabled($language);
 						break;
 					case 'wpml'						:
 						if (function_exists('icl_get_languages')) {
@@ -3094,6 +3126,11 @@ if (!class_exists('wpMailPlugin')) {
 				case 'qtranslate'					:
 					if (function_exists('qtrans_getSortedLanguages')) {
 						$languages = qtrans_getSortedLanguages();
+					}
+					break;
+				case 'qtranslate-x'					:
+					if (function_exists('qtranxf_getSortedLanguages')) {
+						$languages = qtranxf_getSortedLanguages();
 					}
 					break;
 				case 'wpml'							:
@@ -3298,7 +3335,7 @@ if (!class_exists('wpMailPlugin')) {
 						$_GET['page'] == $this -> sections -> settings_templates ||
 						$_GET['page'] == $this -> sections -> settings_subscribers ||
 						$_GET['page'] == $this -> sections -> settings_system ||
-						$_GET['page'] == $this -> sections -> extensions_settings) {																									
+						$_GET['page'] == $this -> sections -> extensions_settings) {																																
 							//meta boxes
 							wp_enqueue_script('common', false, false, false, true);
 							wp_enqueue_script('wp-lists', false, false, false, true);
@@ -6304,7 +6341,7 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.4';
 				}
 				
-				if (version_compare($cur_version, "4.4.5") < 0) {
+				if (version_compare($cur_version, "4.4.6") < 0) {
 					global $wpdb, $Db, $Latestpost;
 					
 					$this -> update_options();
@@ -6312,7 +6349,7 @@ if (!class_exists('wpMailPlugin')) {
 					$query = "ALTER TABLE `" . $wpdb -> prefix . $Latestpost -> table . "` DROP INDEX `post_id`";
 					$wpdb -> query($query);
 					
-					$version = '4.4.5';
+					$version = '4.4.6';
 				}
 			
 				//the current version is older.
@@ -6978,6 +7015,58 @@ if (!class_exists('wpMailPlugin')) {
                         } else {
                             $Db -> save_field('bouncecount', ($subscriber -> bouncecount + 1), array('id' => $subscriber -> id));
                         }
+                        
+                        $bouncedata = array('email' => $subscriber -> email);
+                        $Bounce -> save($bouncedata);
+                        $subscriber -> bouncecount = ($subscriber -> bouncecount + 1);
+                        $this -> admin_bounce_notification($subscriber);
+                        $deleted_emails++;  
+                    }
+	            	
+	            	return array($deleted_subscribers, $deleted_emails);
+	            	break;
+	            case 'mandrill-bounce'							:
+	            	$Db -> model = $Subscriber -> model;	                                
+                    if ($subscriber = $Db -> find(array('email' => $email))) {	 
+                    	$subscriber_id = $subscriber -> id;                               
+                        $bouncecount = $this -> get_option('bouncecount');
+                        $dodelete = false;
+
+                        if (empty($bouncecount) || $bouncecount < 1 || $bouncecount == 1) {
+                            $dodelete = true;
+                        } else {
+                            if (($subscriber -> bouncecount + 1) >= $bouncecount) {
+                                $dodelete = true;
+                            }
+                        }
+                        
+                        $Db -> model = $Subscriber -> model;
+                        if ($dodelete == true) {
+                        	if ($this -> get_option('deleteonbounce') == "Y") {
+                                $Db -> delete($subscriber -> id);
+                                $deleted_subscribers++;
+	                           }
+                        } else {
+                            $Db -> save_field('bouncecount', ($subscriber -> bouncecount + 1), array('id' => $subscriber -> id));
+                        }
+                        
+                        $bouncedata = array('email' => $subscriber -> email);
+                        $Bounce -> save($bouncedata);
+                        $subscriber -> bouncecount = ($subscriber -> bouncecount + 1);
+                        $this -> admin_bounce_notification($subscriber);
+                        $deleted_emails++;  
+                    }
+	            	
+	            	return array($deleted_subscribers, $deleted_emails);
+	            	break;
+	            case 'mandrill-delete'				:
+	            	$Db -> model = $Subscriber -> model;	                                
+                    if ($subscriber = $Db -> find(array('email' => $email))) {	 
+                    	$subscriber_id = $subscriber -> id;
+                        
+                        $Db -> model = $Subscriber -> model;
+                        $Db -> delete($subscriber -> id);
+                        $deleted_subscribers++;
                         
                         $bouncedata = array('email' => $subscriber -> email);
                         $Bounce -> save($bouncedata);
@@ -7673,6 +7762,9 @@ if (!class_exists('wpMailPlugin')) {
 							break;
 						case 'qtranslate'							:
 							$path = 'qtranslate' . DS . 'qtranslate.php';
+							break;
+						case 'qtranslate-x'							:
+							$path = 'qtranslate-x' . DS . 'qtranslate.php';
 							break;
 						case 'wpml'									:
 							$path = 'sitepress-multilingual-cms' . DS . 'sitepress.php';

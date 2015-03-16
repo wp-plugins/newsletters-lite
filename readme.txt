@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.1
-Stable tag: 4.4.5
+Stable tag: 4.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -147,6 +147,41 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.6 =
+* ADD: TinyMCE editor for multilingual system emails
+* ADD: Link to delete post on newsletter previously published
+* ADD: Support for qTranslate X multilingual newsletters
+* ADD: Mandrill webhook bounce configuration
+* ADD: Setting to include custom fields in HTML offsite code
+* ADD: Subscribe redirect URL per mailing list
+* IMPROVE: Prevent plugin files in Google index
+* IMPROVE: Class attribute on read more links of posts for easier styling
+* IMPROVE: wpMandrill plugin compatibility
+* IMPROVE: Latest posts scheduled task not showing correctly
+* IMPROVE: Better printer friendly version of newsletter from print link
+* IMPROVE: Remove personal information from links like unsubscribe URL
+* IMPROVE: Manage Subscriptions pages for WPML multilingual 
+* FIX: "Send Default" template overrides previous, manual choice
+* FIX: Tracking links/images break when tracking is turned off afterwards
+* FIX: TinyMCE adding paragraphs to system email templates
+* FIX: Quotes in some settings cause problems
+* FIX: Edit newsletter template on post/page includes no editor
+* FIX: Template cache causing issues with custom fields
+* FIX: "sent date" of newsletters on the subscriber
+* FIX: Emails archive even if the archiving setting is turned off
+* FIX: Manage subscriptions "Activate" button remains
+* FIX: Cannot undo publishing of post on a newsletter
+* FIX: Email format of subscriber overwrites when subscribing again
+* FIX: Manage subscriptions cache issue on profile save
+* FIX: Autoresponders not adding when subscribing on Manage Subscriptions
+* FIX: Admin subscribe notification not working from manage subscriptions
+* FIX: Manage subscriptions subscribe notification shows old subscriber info
+* FIX: Clear subscriber search not working
+* FIX: Cannot save custom value hidden field
+* FIX: Manage subscriptions "Current" listing buggy when removing
+* FIX: Conflict with QuForm Builder
+* FIX: Redirect on subscribe not working for offsite code 
 
 = 4.4.5 =
 * ADD: Conditional tag/shortcode [newsletters_if...]

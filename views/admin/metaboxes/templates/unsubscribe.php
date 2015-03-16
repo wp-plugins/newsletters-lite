@@ -67,7 +67,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_unsubscribe')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabunsubscribemessage<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_unsubscribe[<?php echo $language; ?>]" id="etmessage_unsubscribe_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	true,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_unsubscribe[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_unsubscribe_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_unsubscribe[<?php echo $language; ?>]" id="etmessage_unsubscribe_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>

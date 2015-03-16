@@ -42,7 +42,7 @@
 		<tr>
 			<th><label for="bounceemail"><?php echo __('Bounce Receival Email', $this -> plugin_name); ?></label></th>
 			<td>
-				<input class="widefat" type="text" size="25" id="bounceemail" name="bounceemail" value="<?php echo $this -> get_option('bounceemail'); ?>" />
+				<input class="widefat" type="text" size="25" id="bounceemail" name="bounceemail" value="<?php echo esc_attr(stripslashes($this -> get_option('bounceemail'))); ?>" />
 				<span class="howto"><?php _e('Email address to receive bounce notifications on. The Return-Path header on all emails is set to this value.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
@@ -51,7 +51,8 @@
             <td>
                 <label><input onclick="jQuery('#bouncemethod_server_div').show(); jQuery('#bouncemethod_pop_div').hide(); jQuery('#bouncemethod_sns_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "cgi") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="cgi" id="bouncemethod_cgi" /> <?php _e('Email Piping (CGI)', $this -> plugin_name); ?></label>
                 <label><input onclick="jQuery('#bouncemethod_pop_div').show(); jQuery('#bouncemethod_sns_div').hide(); jQuery('#bouncemethod_server_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "pop") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="pop" id="bouncemethod_pop" /> <?php _e('POP3 Email Fetch', $this -> plugin_name); ?></label>
-                <label><input onclick="jQuery('#bouncemethod_sns_div').show(); jQuery('#bouncemethod_pop_div').hide(); jQuery('#bouncemethod_server_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "sns") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="sns" id="bouncemethod_sns" /> <?php _e('Amazon SNS', $this -> plugin_name); ?></label>
+                <label><input onclick="jQuery('#bouncemethod_sns_div').show(); jQuery('#bouncemethod_mandrill_div').hide(); jQuery('#bouncemethod_pop_div').hide(); jQuery('#bouncemethod_server_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "sns") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="sns" id="bouncemethod_sns" /> <?php _e('Amazon SNS', $this -> plugin_name); ?></label>
+                <label><input onclick="jQuery('#bouncemethod_mandrill_div').show(); jQuery('#bouncemethod_sns_div').hide(); jQuery('#bouncemethod_pop_div').hide(); jQuery('#bouncemethod_server_div').hide();" <?php echo ($this -> get_option('bouncemethod') == "mandrill") ? 'checked="checked"' : ''; ?> type="radio" name="bouncemethod" value="mandrill" id="bouncemethod_mandrill" /> <?php _e('Mandrill Webhook', $this -> plugin_name); ?></label>
                 <span class="howto"><?php _e('Method to use to record bounced emails to subscribers.', $this -> plugin_name); ?></span>
             </td>
         </tr>
@@ -67,7 +68,7 @@
 					<?php $servertypes = array('cpanel' => 'cPanel (or other)', 'plesk' => 'Plesk'); ?>
 					<select class="widefat" style="width:auto;" id="<?php echo $this -> pre; ?>servertype" name="servertype">
 						<?php foreach ($servertypes as $skey => $sval) : ?>
-							<option <?php echo ($this -> get_option('servertype') == $skey) ? 'selected="selected"' : ''; ?> value="<?php echo $skey; ?>"><?php echo $sval; ?></option>
+							<option <?php echo ($this -> get_option('servertype') == $skey) ? 'selected="selected"' : ''; ?> value="<?php echo esc_attr(stripslashes($skey)); ?>"><?php echo $sval; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -86,7 +87,7 @@
                     <select class="widefat" style="width:auto;" name="bouncepop_interval" id="bouncepop_interval">
                         <option value="0"><?php _e('- Select -', $this -> plugin_name); ?></option>
                         <?php foreach ($popintervals as $key => $val) : ?>
-                            <option <?php echo ($this -> get_option('bouncepop_interval') == $key) ? 'selected="selected"' : ''; ?> value="<?php echo $key; ?>"><?php echo $val['display']; ?></option>
+                            <option <?php echo ($this -> get_option('bouncepop_interval') == $key) ? 'selected="selected"' : ''; ?> value="<?php echo esc_attr(stripslashes($key)); ?>"><?php echo $val['display']; ?></option>
                         <?php endforeach; ?>
                     </select>
                     <span class="howto"><?php _e('How often should the mailbox be checked for bounced emails.', $this -> plugin_name); ?></span>
@@ -133,6 +134,10 @@
 
 <div id="bouncemethod_sns_div" style="display:<?php echo ($this -> get_option('bouncemethod') == "sns") ? 'block' : 'none'; ?>;">
 	<p><?php echo sprintf(__('Note that Amazon SNS is only available when you are sending emails through Amazon SES. Please see our documentation for setting up Amazon SES with SNS. Your Amazon SNS topic subscription endpoint URL is %s.', $this -> plugin_name), '<code>' . home_url('/') . '?' . $this -> pre . 'method=bounce&type=sns</code>'); ?></p>
+</div>
+
+<div id="bouncemethod_mandrill_div" style="display:<?php echo ($this -> get_option('bouncemethod') == "mandrill") ? 'block' : 'none'; ?>;">
+	<p><?php echo sprintf(__('Note that Mandrill Webhooks are only available when you are sending emails through Mandrill. Please see our documentation for setting up Webhooks with Mandrill. Your Mandrill Webhook Post to URL is %s.', $this -> plugin_name), '<code>' . home_url('/') . '?' . $this -> pre . 'method=bounce&type=mandrill</code>'); ?></p>
 </div>
 
 <script type="text/javascript">

@@ -67,7 +67,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_schedule')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabschedulemessage<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_schedule[<?php echo $language; ?>]" id="etmessage_schedule_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	true,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_schedule[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_schedule_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_schedule[<?php echo $language; ?>]" id="etmessage_schedule_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -82,7 +95,20 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_schedule')), 'etmessage_schedule'); ?>
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	true,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_schedule',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(stripslashes($this -> get_option('etmessage_schedule')), 'etmessage_schedule', $settings); 
+					
+					?>
+					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_schedule')), 'etmessage_schedule');*/ ?>
 					<?php /*<textarea name="etmessage_schedule" id="etmessage_schedule" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_schedule'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>

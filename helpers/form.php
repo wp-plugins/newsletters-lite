@@ -107,7 +107,7 @@ class wpmlFormHelper extends wpMailPlugin {
 		
 		<?php if (!empty($buttons)) : ?>
 			<?php foreach ($buttons as $bkey => $bval) : ?>
-				<label><input id="<?php echo $Html -> field_id($name); ?><?php echo $bval; ?>" <?php echo ((!empty($value) && $value == $bkey) || (empty($value) && !empty($default) && $bkey == $default)) ? 'checked="checked"' : ''; ?> onclick="<?php echo $onclick; ?>" type="radio" name="<?php echo $name; ?>" value="<?php echo $bkey; ?>" /> <?php echo __($bval); ?></label><?php echo $separator; ?>
+				<label><input id="<?php echo $Html -> field_id($name); ?><?php echo $bval; ?>" <?php echo ((!empty($value) && $value == $bkey) || (empty($value) && !empty($default) && $bkey == $default)) ? 'checked="checked"' : ''; ?> onclick="<?php echo $onclick; ?>" type="radio" name="<?php echo $name; ?>" value="<?php echo esc_attr(stripslashes($bkey)); ?>" /> <?php echo __($bval); ?></label><?php echo $separator; ?>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		
@@ -134,7 +134,7 @@ class wpmlFormHelper extends wpMailPlugin {
 		
 		<?php if (!empty($boxes)) : ?>
 			<?php foreach ($boxes as $bkey => $bval) : ?>
-				<label><input <?php echo (is_array($Html -> field_value($name)) && in_array($bkey, $Html -> field_value($name))) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $name; ?>" id="<?php echo $Html -> field_id($name); ?>checklist<?php echo $bkey; ?>" value="<?php echo $bkey; ?>" /> <?php echo __($bval); ?></label><?php echo $separator; ?>
+				<label><input <?php echo (is_array($Html -> field_value($name)) && in_array($bkey, $Html -> field_value($name))) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $name; ?>" id="<?php echo $Html -> field_id($name); ?>checklist<?php echo $bkey; ?>" value="<?php echo esc_attr(stripslashes($bkey)); ?>" /> <?php echo __($bval); ?></label><?php echo $separator; ?>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		
@@ -159,7 +159,7 @@ class wpmlFormHelper extends wpMailPlugin {
 			<option value="">- <?php _e('Select', $this -> plugin_name); ?> -</option>
 			<?php if (!empty($selects)) : ?>
 				<?php foreach ($selects as $skey => $sval) : ?>
-					<option <?php echo ($Html -> field_value($name) == $skey) ? 'selected="selected"' : ''; ?> value="<?php echo $skey; ?>"><?php echo __($sval); ?></option>
+					<option <?php echo ($Html -> field_value($name) == $skey) ? 'selected="selected"' : ''; ?> value="<?php echo esc_attr(stripslashes($skey)); ?>"><?php echo __($sval); ?></option>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</select>
@@ -183,7 +183,7 @@ class wpmlFormHelper extends wpMailPlugin {
 		
 		ob_start();
 		
-		?><input type="submit" name="<?php echo $Html -> sanitize($name); ?>" value="<?php echo $name; ?>" class="<?php echo $class; ?>" /><?php
+		?><input type="submit" name="<?php echo $Html -> sanitize($name); ?>" value="<?php echo esc_attr(stripslashes($name)); ?>" class="<?php echo $class; ?>" /><?php
 		
 		$submit = ob_get_clean();
 		return $submit;

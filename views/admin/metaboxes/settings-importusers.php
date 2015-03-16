@@ -100,12 +100,12 @@ $importuserslists = $this -> get_option('importuserslists');
 												<select name="importusersfieldspre[<?php echo $field_id; ?>]">
 													<option value=""><?php _e('- Select -', $this -> plugin_name); ?></option>
 													<?php foreach ($usermeta_fields as $usermeta_field_name => $usermeta_field) : ?>
-														<option <?php echo (!empty($importusersfieldspre[$field_id]) && $importusersfieldspre[$field_id] == $usermeta_field_name) ? 'selected="selected"' : ''; ?> value="<?php echo $usermeta_field_name; ?>"><?php echo __($usermeta_field); ?></option>
+														<option <?php echo (!empty($importusersfieldspre[$field_id]) && $importusersfieldspre[$field_id] == $usermeta_field_name) ? 'selected="selected"' : ''; ?> value="<?php echo esc_attr(stripslashes($usermeta_field_name)); ?>"><?php echo __($usermeta_field); ?></option>
 													<?php endforeach; ?>
 												</select>
 											<?php endif; ?>
 											<?php _e('or meta key:', $this -> plugin_name); ?>
-											<input type="text" name="importusersfields[<?php echo $field_id; ?>]" value="<?php echo esc_attr($importusersfields[$field_id]); ?>" id="importusersfields_<?php echo $field_id; ?>" />
+											<input type="text" name="importusersfields[<?php echo $field_id; ?>]" value="<?php echo esc_attr(stripslashes($importusersfields[$field_id])); ?>" id="importusersfields_<?php echo $field_id; ?>" />
 										</td>
 									</tr>
 								<?php endforeach; ?>

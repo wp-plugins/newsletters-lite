@@ -41,7 +41,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
                     	<tbody>
                         	<tr>
                                 <th><label for="<?php echo $this -> pre; ?>embed_acknowledgement_<?php echo $language; ?>"><?php _e('Acknowledgement', $this -> plugin_name); ?></label></th>
-                                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_acknowledgement_<?php echo $language; ?>" name="embed[acknowledgement][<?php echo $language; ?>]" value="<?php echo $embed['acknowledgement'][$language]; ?>" /></td>
+                                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_acknowledgement_<?php echo $language; ?>" name="embed[acknowledgement][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($embed['acknowledgement'][$language])); ?>" /></td>
                             </tr>
                             <tr>
                                 <th><label for="<?php echo $this -> pre; ?>embed_ajax_<?php echo $language; ?>"><?php _e('Ajax Features', $this -> plugin_name); ?></label></th>
@@ -52,7 +52,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
                             </tr>
                             <tr>
                                 <th><label for="<?php echo $this -> pre; ?>embed_button_<?php echo $language; ?>"><?php _e('Button Text', $this -> plugin_name); ?></label></th>
-                                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_button_<?php echo $language; ?>" name="embed[button][<?php echo $language; ?>]" value="<?php echo $embed['button'][$language]; ?>" /></td>
+                                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_button_<?php echo $language; ?>" name="embed[button][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($embed['button'][$language])); ?>" /></td>
                             </tr>
                             <tr>
                                 <th><label for="embed_scrollY_<?php echo $language; ?>"><?php _e('Scroll to Subscription Form', $this -> plugin_name); ?></label></th>
@@ -97,7 +97,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
             <tr>
                 <th><label for="<?php echo $this -> pre; ?>embed_acknowledgement"><?php _e('Acknowledgement', $this -> plugin_name); ?></label></th>
                 <td>
-                	<input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_acknowledgement" name="embed[acknowledgement]" value="<?php echo $embed['acknowledgement']; ?>" />
+                	<input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_acknowledgement" name="embed[acknowledgement]" value="<?php echo esc_attr(stripslashes($embed['acknowledgement'])); ?>" />
                 	<span class="howto"><?php _e('Acknowledgement message to show after a successful subscribe.', $this -> plugin_name); ?></span>
                 </td>
             </tr>
@@ -118,7 +118,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
             </tr>
             <tr>
                 <th><label for="<?php echo $this -> pre; ?>embed_button"><?php _e('Button Text', $this -> plugin_name); ?></label></th>
-                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_button" name="embed[button]" value="<?php echo $embed['button']; ?>" /></td>
+                <td><input type="text" class="widefat" id="<?php echo $this -> pre; ?>embed_button" name="embed[button]" value="<?php echo esc_attr(stripslashes($embed['button'])); ?>" /></td>
             </tr>
             <tr>
                 <th><label for="embed_scrollY"><?php _e('Scroll to Subscription Form', $this -> plugin_name); ?></label></th>

@@ -113,14 +113,14 @@ $inlinestyles = $this -> get_option('inlinestyles');
 			<tr>
 				<th><label for="<?php echo $this -> pre; ?>shorlinkLogin"><?php _e('Login', $this -> plugin_name); ?></label></th>
 				<td>
-                	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>shortlinkLogin" name="shortlinkLogin" value="<?php echo $this -> get_option('shortlinkLogin'); ?>" />
+                	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>shortlinkLogin" name="shortlinkLogin" value="<?php echo esc_attr(stripslashes($this -> get_option('shortlinkLogin'))); ?>" />
                     <span class="howto"><?php _e('your registered Bit.ly username/login', $this -> plugin_name); ?></span>
                 </td>
 			</tr>
 			<tr>
 				<th><label for="<?php echo $this -> pre; ?>shorlinkAPI"><?php _e('API Key', $this -> plugin_name); ?></label></th>
 				<td>
-                	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>shortlinkAPI" name="shortlinkAPI" value="<?php echo $this -> get_option('shortlinkAPI'); ?>" />
+                	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>shortlinkAPI" name="shortlinkAPI" value="<?php echo esc_attr(stripslashes($this -> get_option('shortlinkAPI'))); ?>" />
                     <span class="howto"><?php _e('you can obtain your Bit.ly API key from your account settings', $this -> plugin_name); ?></span>
                 </td>
 			</tr>

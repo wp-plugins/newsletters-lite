@@ -67,7 +67,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_expire')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabexpiremessage<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_expire[<?php echo $language; ?>]" id="etmessage_expire_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	true,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_expire[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_expire_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_expire[<?php echo $language; ?>]" id="etmessage_expire_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -82,7 +95,20 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_expire')), 'etmessage_expire'); ?>
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	true,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_expire',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(stripslashes($this -> get_option('etmessage_expire')), 'etmessage_expire', $settings); 
+					
+					?>
+					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_expire')), 'etmessage_expire');*/ ?>
 					<?php /*<textarea name="etmessage_expire" id="etmessage_expire" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_expire'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>

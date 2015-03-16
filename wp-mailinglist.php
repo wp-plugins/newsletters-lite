@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.5
+Version: 4.4.6
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -495,6 +495,7 @@ if (!class_exists('wpMail')) {
 						'history_id'		=>	$_GET['history_id'],
 						'user_id'			=>	$_GET['user_id'],
 						'subscriber_id'		=>	$_GET['subscriber_id'],
+						'device'			=>	$this -> get_device()
 					);
 					
 					$link -> link = html_entity_decode($link -> link);
@@ -723,6 +724,7 @@ if (!class_exists('wpMail')) {
 						$Db -> model = $Email -> model;
 						$Db -> save_field('read', "Y", array('eunique' => $_GET['id']));
 						$Db -> save_field('status', "sent", array('eunique' => $_GET['id']));
+						$Db -> save_field('device', $this -> get_device(), array('eunique' => $_GET['id']));
 						
 						$tracking = $this -> get_option('tracking');
 						$tracking_image = $this -> get_option('tracking_image');
@@ -1231,6 +1233,20 @@ if (!class_exists('wpMail')) {
 						break;
 					case 'bounce'			:					
 						switch ($_GET['type']) {
+							case 'mandrill'			:
+								if (isset($_POST['mandrill_events'])) {																						
+									$events = json_decode(stripslashes($_POST['mandrill_events']));
+									foreach ($events as $event) {
+										if ($event -> event === 'soft_bounce') {
+											$this -> log_error(sprintf(__('Mandrill bounce: %s', $this -> plugin_name), $event -> msg -> email));
+											$result = $this -> bounce($event -> msg -> email, "mandrill-bounce");										
+										} else {
+											$this -> log_error(sprintf(__('Mandrill hard bounce, rejection, or spam: %s', $this->plugin_name), $event -> msg -> email));
+											$result = $this -> bounce($event -> msg -> email, "mandrill-delete");
+										}
+									}
+								}
+								break;
 							case 'sns'			:																						
 								$json = json_decode(file_get_contents("php://input"));
 								if (!empty($json)) {
@@ -1949,9 +1965,22 @@ if (!class_exists('wpMail')) {
 			/* Check multilingual Support */
 			if (is_admin()) {
 				if ($this -> language_do()) {
-					if ($this -> is_plugin_screen('send')) {		
-						remove_filter('the_editor', 'qtrans_modifyRichEditor');	
-						remove_action('wp_tiny_mce_init', 'qtrans_TinyMCE_init');
+					if ($this -> is_plugin_screen('send') || $this -> is_plugin_screen('settings_templates')) {								
+						global $newsletters_languageplugin;
+						
+						switch ($newsletters_languageplugin) {
+							case 'qtranslate'					:
+								remove_filter('the_editor', 'qtrans_modifyRichEditor');	
+								remove_action('wp_tiny_mce_init', 'qtrans_TinyMCE_init');	
+								break;
+							case 'qtranslate-x'					:
+								remove_filter('the_editor', 'qtranxf_modifyRichEditor');	
+								remove_action('wp_tiny_mce_init', 'qtranxf_TinyMCE_init');
+								break;
+							default 							:
+								//do nothing...
+								break;
+						}
 					}
 				}
 			}
@@ -6545,7 +6574,7 @@ if (!class_exists('wpMail')) {
 					break;
 				default					:							
 					//make sure that data has been posted
-					if (!empty($_POST)) {					
+					if (!empty($_POST)) {											
 						//unset values that are not required
 						unset($_POST['save']);
 						delete_option('tridebugging');
@@ -6598,8 +6627,7 @@ if (!class_exists('wpMail')) {
 												$val[$vkey] = $this -> language_join($vval);
 											}
 										}
-									}
-									
+									}									
 									$this -> update_option('embed', $val);
 									break;
 								case 'excerpt_more'			:

@@ -15,7 +15,7 @@ $queuesendorderby = $this -> get_option('queuesendorderby');
 			<th><label for="<?php echo $this -> pre; ?>emailsperinterval"><?php _e('Emails per Interval', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('Specify the number of emails to send per interval. Rather keep the interval short and this number lower to prevent the procedure which sends out the emails to timeout due to too many emails at once.', $this -> plugin_name)); ?></th>
 			<td>
-				<input class="widefat" style="width:45px;" type="text" value="<?php echo $this -> get_option('emailsperinterval'); ?>" id="<?php echo $this -> pre; ?>emailsperinterval" name="emailsperinterval" />
+				<input class="widefat" style="width:45px;" type="text" value="<?php echo esc_attr(stripslashes($this -> get_option('emailsperinterval'))); ?>" id="<?php echo $this -> pre; ?>emailsperinterval" name="emailsperinterval" />
 				<span class="howto"><?php _e('Recommended below 100', $this -> plugin_name); ?></span>
 			</td>
 		</tr>

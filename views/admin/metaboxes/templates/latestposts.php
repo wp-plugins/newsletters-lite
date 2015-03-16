@@ -30,7 +30,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_latestposts')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetablatestposts<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_latestposts[<?php echo $language; ?>]" id="etmessage_latestposts_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	false,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_latestposts[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_latestposts_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_latestposts[<?php echo $language; ?>]" id="etmessage_latestposts_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -45,7 +58,20 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_latestposts')), 'etmessage_latestposts'); ?>
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	false,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_latestposts',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(stripslashes($this -> get_option('etmessage_latestposts')), 'etmessage_latestposts', $settings); 
+					
+					?>
+					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_latestposts')), 'etmessage_latestposts');*/ ?>
 				<?php endif; ?>
 				
 				<div class="howto">

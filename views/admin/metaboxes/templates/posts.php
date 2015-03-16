@@ -28,9 +28,23 @@ if ($this -> language_do()) {
 				            
 				            <?php $tabnumber = 1; ?>
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_posts')); ?>
+				            
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabposts<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_posts[<?php echo $language; ?>]" id="etmessage_posts_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	false,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_posts[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_posts_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_posts[<?php echo $language; ?>]" id="etmessage_posts_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -45,7 +59,19 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_posts')), 'etmessage_posts'); ?>
+					<?php 
+						
+					$settings = array(
+						'wpautop'			=>	false,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_posts',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+						
+					wp_editor(stripslashes($this -> get_option('etmessage_posts')), 'etmessage_posts', $settings); 
+					
+					?>
 					<?php /*<textarea name="etmessage_schedule" id="etmessage_schedule" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_schedule'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 				

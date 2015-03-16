@@ -11,6 +11,7 @@ if (!class_exists('wpmlClick')) {
 			'history_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 			'user_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 			'subscriber_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+			'device'				=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
 			'created'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 			'modified'				=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 			'key'					=>	"PRIMARY KEY (`id`), INDEX(`link_id`), INDEX(`history_id`), INDEX(`user_id`), INDEX(`subscriber_id`)"

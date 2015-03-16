@@ -19,7 +19,7 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 		<p class="newsletters_success"><?php _e('Note that this post is already scheduled to send out as a newsletter.', $this -> plugin_name); ?></p>
 	<?php endif; ?>
 	
-	<?php if ($this -> is_plugin_active('qtranslate')) : ?>
+	<?php if ($this -> is_plugin_active('qtranslate') || $this -> is_plugin_active('qtranslate-x')) : ?>
 		<div class="misc-pub-section">
 		<p><strong><?php _e('Language', $this -> plugin_name); ?></strong></h4>
 	    <p><?php _e('Choose which title/content in the editor above should be sent to the mailing list(s) chosen below.', $this -> plugin_name); ?></p>

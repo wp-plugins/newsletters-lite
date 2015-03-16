@@ -67,7 +67,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_order')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabordermessage<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_order[<?php echo $language; ?>]" id="etmessage_order_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	true,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_order[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_order_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_order[<?php echo $language; ?>]" id="etmessage_order_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -82,7 +95,20 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_order')), 'etmessage_order'); ?>
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	true,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_order',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(stripslashes($this -> get_option('etmessage_order')), 'etmessage_order', $settings); 
+					
+					?>
+					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_order')), 'etmessage_order');*/ ?>
 					<?php /*<textarea name="etmessage_order" id="etmessage_order" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_order'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>

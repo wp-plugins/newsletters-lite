@@ -33,6 +33,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		'authinprog'	=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
         'bouncecount'   =>  "INT(1) NOT NULL DEFAULT '0'",
         'mandatory'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
+        'device'		=>	"VARCHAR(100) NOT NULL DEFAULT ''",
 		'created'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'		=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'key'			=>	"PRIMARY KEY (`id`), INDEX(`email`), INDEX(`user_id`)",
@@ -51,6 +52,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		'authinprog'	=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
         'bouncecount'   =>  array("INT(1)", "NOT NULL DEFAULT '0'"),
         'mandatory'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
+        'device'		=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
 		'created'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'		=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'			=>	"PRIMARY KEY (`id`), INDEX(`email`), INDEX(`user_id`)",					   
@@ -661,6 +663,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			'active' 			=>	"N",
             'bouncecount'       =>  0,
 			'user_id'			=>	0,
+			'device'			=>	$this -> get_device(),
 			'created' 			=> 	$Html -> gen_date(), 
 			'modified' 			=> 	$Html -> gen_date()
 		);

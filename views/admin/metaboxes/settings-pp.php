@@ -4,7 +4,7 @@
 			<th><label for="<?php echo $this -> pre; ?>paypalemail"><?php _e('PayPal Email Address', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('Your registered PayPal email that will receive the payments.', $this -> plugin_name)); ?></th>
 			<td>
-				<input type="text" class="widefat" name="paypalemail" value="<?php echo $this -> get_option('paypalemail'); ?>" id="<?php echo $this -> pre; ?>paypalemail" />
+				<input type="text" class="widefat" name="paypalemail" value="<?php echo esc_attr(stripslashes($this -> get_option('paypalemail'))); ?>" id="<?php echo $this -> pre; ?>paypalemail" />
 				<span class="howto"><?php _e('Your registered PayPal email that will receive the payments.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>

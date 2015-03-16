@@ -67,7 +67,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_bounce')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabbouncemessage<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_bounce[<?php echo $language; ?>]" id="etmessage_bounce_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	true,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_bounce[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_bounce_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_bounce[<?php echo $language; ?>]" id="etmessage_bounce_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -82,7 +95,20 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_bounce')), 'etmessage_bounce'); ?>
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	true,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_bounce',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(stripslashes($this -> get_option('etmessage_bounce')), 'etmessage_bounce', $settings); 
+					
+					?>
+					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_bounce')), 'etmessage_bounce');*/ ?>
 					<?php /*<textarea name="etmessage_bounce" id="etmessage_bounce" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_bounce'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>

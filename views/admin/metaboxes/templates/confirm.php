@@ -67,7 +67,20 @@ if ($this -> language_do()) {
 				            <?php $texts = $this -> language_split($this -> get_option('etmessage_confirm')); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabconfirmmessage<?php echo $tabnumber; ?>">
-				            		<textarea name="etmessage_confirm[<?php echo $language; ?>]" id="etmessage_confirm_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>
+					            	<?php 
+					
+									$settings = array(
+										'wpautop'			=>	true,
+										'media_buttons'		=>	true,
+										'textarea_name'		=>	'etmessage_confirm[' . $language . ']',
+										'textarea_rows'		=>	10,
+										'quicktags'			=>	true,
+									);
+									
+									wp_editor(stripslashes($texts[$language]), 'etmessage_confirm_' . $language, $settings); 
+									
+									?>
+				            		<?php /*<textarea name="etmessage_confirm[<?php echo $language; ?>]" id="etmessage_confirm_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -80,7 +93,20 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_confirm')), 'etmessage_confirm'); ?>
+					<?php 
+					
+					$settings = array(
+						'wpautop'			=>	true,
+						'media_buttons'		=>	true,
+						'textarea_name'		=>	'etmessage_confirm',
+						'textarea_rows'		=>	10,
+						'quicktags'			=>	true,
+					);
+					
+					wp_editor(stripslashes($this -> get_option('etmessage_confirm')), 'etmessage_confirm', $settings); 
+					
+					?>
+					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_confirm')), 'etmessage_confirm');*/ ?>
 					<?php /*<textarea name="etmessage_confirm" id="etmessage_confirm" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_confirm'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>

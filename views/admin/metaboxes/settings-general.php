@@ -22,7 +22,7 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 			<th><label for="<?php echo $this -> pre; ?>adminemail"><?php _e('Administrator Email', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('This email address is used for general notification purposes throughout the plugin. You may use multiple, comma separated email addresses for multiple administrators eg. email1@domain.com,email2@domain.com,email3@domain.com,etc.', $this -> plugin_name)); ?></th>
 			<td>
-				<input type="text" class="widefat" id="<?php echo $this -> pre; ?>adminemail" name="adminemail" value="<?php echo $this -> get_option('adminemail'); ?>" />
+				<input type="text" class="widefat" id="<?php echo $this -> pre; ?>adminemail" name="adminemail" value="<?php echo esc_attr(stripslashes($this -> get_option('adminemail'))); ?>" />
 				<span class="howto"><?php _e('Email address of the administrator for notification purposes.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
@@ -30,7 +30,7 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 			<th><label for="smtpfrom"><?php _e('From Address', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('This email address is used for the "From:" header in all outgoing emails and it will appear in the recipient email/webmail client as the sender from which the email was sent.', $this -> plugin_name)); ?></th>
 			<td>
-            	<input onkeyup="jQuery('#updatereturnpath_div').show(); if (jQuery('#updatereturnpath').attr('checked')) { jQuery('#bounceemail').val(jQuery(this).val()); }" class="widefat" type="text" id="smtpfrom" name="smtpfrom" value="<?php echo $this -> get_option('smtpfrom'); ?>" />
+            	<input onkeyup="jQuery('#updatereturnpath_div').show(); if (jQuery('#updatereturnpath').attr('checked')) { jQuery('#bounceemail').val(jQuery(this).val()); }" class="widefat" type="text" id="smtpfrom" name="smtpfrom" value="<?php echo esc_attr(stripslashes($this -> get_option('smtpfrom'))); ?>" />
             	
             	<div id="updatereturnpath_div" style="display:none;">
             		<label><input onclick="jQuery('#bounceemail').val(jQuery('#smtpfrom').val());" type="checkbox" name="updatereturnpath" value="1" id="updatereturnpath" /> <?php _e('Update "Bounce Receival Email" setting with this value as well?', $this -> plugin_name); ?></label>
@@ -44,7 +44,7 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 			<th><label for="<?php echo $this -> pre; ?>smtpfromname"><?php _e('From Name', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('Use your business name, website name or even your own name which will appear to the recipient in their email/webmail client so that they immediately know from whom the email was sent.', $this -> plugin_name)); ?></th>
 			<td>
-            	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>smtpfromname" name="smtpfromname" value="<?php echo $this -> get_option('smtpfromname'); ?>" />
+            	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>smtpfromname" name="smtpfromname" value="<?php echo esc_attr(stripslashes($this -> get_option('smtpfromname'))); ?>" />
                 <span class="howto"><?php _e('This is the name that will be displayed in the From field to your subscribers.', $this -> plugin_name); ?></span>
             </td>
 		</tr>
@@ -129,14 +129,14 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 					<label for="<?php echo $this -> pre; ?>smtphost"><?php _e('SMTP Host Name', $this -> plugin_name); ?></label>
 				</th>
 				<td>
-                	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>smtphost" name="smtphost" value="<?php echo $this -> get_option('smtphost'); ?>" />
+                	<input class="widefat" type="text" id="<?php echo $this -> pre; ?>smtphost" name="smtphost" value="<?php echo esc_attr(stripslashes($this -> get_option('smtphost'))); ?>" />
                     <span class="howto"><?php _e('SMTP host name eg. "localhost". For Gmail, use "smtp.gmail.com".', $this -> plugin_name); ?></span>
                 </td>
 			</tr>
 			<tr>
 				<th><label for="<?php echo $this -> pre; ?>smtpport"><?php _e('SMTP Port', $this -> plugin_name); ?></label></th>
 				<td>
-                	<input class="widefat" style="width:65px;" type="text" name="smtpport" value="<?php echo $this -> get_option('smtpport'); ?>" id="<?php echo $this -> pre; ?>smtpport" />
+                	<input class="widefat" style="width:65px;" type="text" name="smtpport" value="<?php echo esc_attr(stripslashes($this -> get_option('smtpport'))); ?>" id="<?php echo $this -> pre; ?>smtpport" />
                     <span class="howto"><?php _e('This is the SMTP port number to connect to. This is usually port 25.', $this -> plugin_name); ?></span>
                 </td>
 			</tr>
@@ -167,11 +167,11 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 			<tbody>
 				<tr>
 					<th><label for="<?php echo $this -> pre; ?>smtpuser"><?php _e('SMTP Username', $this -> plugin_name); ?></label></th>
-					<td><input autocomplete="off" class="widefat" type="text" id="<?php echo $this -> pre; ?>smtpuser" name="smtpuser" value="<?php echo $this -> get_option('smtpuser'); ?>" /></td>
+					<td><input autocomplete="off" class="widefat" type="text" id="<?php echo $this -> pre; ?>smtpuser" name="smtpuser" value="<?php echo esc_attr(stripslashes($this -> get_option('smtpuser'))); ?>" /></td>
 				</tr>
 				<tr>
 					<th><label for="<?php echo $this -> pre; ?>smtppass"><?php _e('SMTP Password', $this -> plugin_name); ?></label></th>
-					<td><input autocomplete="off" class="widefat" type="text" id="<?php echo $this -> pre; ?>smtppass" name="smtppass" value="<?php echo $this -> get_option('smtppass'); ?>" /></td>
+					<td><input autocomplete="off" class="widefat" type="text" id="<?php echo $this -> pre; ?>smtppass" name="smtppass" value="<?php echo esc_attr(stripslashes($this -> get_option('smtppass'))); ?>" /></td>
 				</tr>
 			</tbody>
 		</table>

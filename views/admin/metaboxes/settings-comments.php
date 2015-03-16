@@ -21,7 +21,7 @@
                 	<?php if ($mailinglists = $Mailinglist -> select(true)) : ?>
                     	<select name="commentformlist" id="commentformlist">
                         	<?php foreach ($mailinglists as $id => $name) : ?>
-                            	<option <?php echo ($this -> get_option('commentformlist') == $id) ? 'selected="selected"' : ''; ?> value="<?php echo $id; ?>"><?php echo $name; ?></option>
+                            	<option <?php echo ($this -> get_option('commentformlist') == $id) ? 'selected="selected"' : ''; ?> value="<?php echo esc_attr(stripslashes($id)); ?>"><?php echo $name; ?></option>
                             <?php endforeach; ?>
                         </select>
                     <?php endif; ?>
