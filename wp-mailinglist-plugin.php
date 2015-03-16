@@ -17,6 +17,7 @@ if (!class_exists('wpMailPlugin')) {
 			//'about'						=>	"newsletters-about",
 			'welcome'					=> 	"newsletters",
 			'submitserial'				=>	"newsletters-submitserial",
+			'forms'						=>	"newsletters-forms",
 			'send'						=>	"newsletters-create",
 			'autoresponders'			=>	"newsletters-autoresponders",
 			'autoresponderemails'		=>	"newsletters-autoresponderemails",
@@ -4529,9 +4530,9 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 					
-					$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&' . $this -> pre . 'subscriber_id=' . $subscriber -> id . '&' . $this -> pre . 'subscriber_email=' . $subscriber -> email . '&' . $this -> pre . 'mailinglist_id=' . $mailinglists . '&authkey=' . $authkey;
+					$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&' . $this -> pre . 'subscriber_id=' . $subscriber -> id . '&' . $this -> pre . 'mailinglist_id=' . $mailinglists . '&authkey=' . $authkey;
 				} elseif (!empty($user)) {
-					$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&user_id=' . $user -> ID . '&user_email=' . $user -> user_email . '&authkey=' . $authkey;
+					$querystring = 'method=unsubscribe&' . $this -> pre . 'history_id=' . $history_id . '&user_id=' . $user -> ID . '&authkey=' . $authkey;
 				}
 					
 				$url = $Html -> retainquery($querystring, $this -> get_managementpost(true));
@@ -4562,7 +4563,7 @@ if (!class_exists('wpMailPlugin')) {
 					$subscriberauth = $subscriber -> cookieauth;
 				}
 				
-				$url = $Html -> retainquery('method=loginauth&email=' . $subscriber -> email . '&subscriberauth=' . $subscriberauth, $this -> get_managementpost(true));
+				$url = $Html -> retainquery('method=loginauth&subscriberauth=' . $subscriberauth, $this -> get_managementpost(true));
 				
 				if (!empty($theme_id)) {
 					global $wpdb, $Theme;
@@ -4628,6 +4629,10 @@ if (!class_exists('wpMailPlugin')) {
 						$style = "color:" . $acolor . ";";
 					}
 					
+					if (!empty($print)) {
+						$url = 'http://www.printfriendly.com/print?url=' . urlencode($url);
+					}
+					
 					if (!empty($onlyurl) && $onlyurl == true) {
 						return $url;
 					} else {
@@ -4671,7 +4676,7 @@ if (!class_exists('wpMailPlugin')) {
 				
 				$mailinglist_id = (empty($subscriber -> mailinglists)) ? $subscriber -> mailinglist_id : @implode(",", $subscriber -> mailinglists);
 				
-				$querystring = $this -> pre . 'method=activate&' . $this -> pre . 'subscriber_id=' . $subscriber -> id . '&' . $this -> pre . 'subscriber_email=' . $subscriber -> email . '&' . $this -> pre . 'mailinglist_id=' . $mailinglist_id . '&authkey=' . $authkey;
+				$querystring = $this -> pre . 'method=activate&' . $this -> pre . 'subscriber_id=' . $subscriber -> id . '&' . $this -> pre . 'mailinglist_id=' . $mailinglist_id . '&authkey=' . $authkey;
 				$url = $Html -> retainquery($querystring, $this -> get_managementpost(true));
 				
 				if (empty($subscriber -> format) || $subscriber -> format == "html") {
@@ -5578,7 +5583,7 @@ if (!class_exists('wpMailPlugin')) {
 					$headers .= 'Content-Type: text/html; charset="UTF-8"' . "\r\n";
 					$headers .= 'From: ' . $smtpfromname . ' <' . $smtpfrom . '>' . "\r\n";	
 					
-					$atts = false;
+					$atts = array();
 					if (!empty($attachments) && is_array($attachments)) {						
 						foreach ($attachments as $attachment) {
 							$atts[] = $attachment['filename'];
@@ -7303,14 +7308,14 @@ if (!class_exists('wpMailPlugin')) {
 			global $newsletters_history_id;
 			$this -> plugin_name = basename(dirname(__FILE__));
 			
-			$render_hash = md5($file . $params['subject'] . $params['history_id'] . $output . $html . $renderht . $theme_id . $shortlinks . $fullbody);
+			/*$render_hash = md5($file . $params['subject'] . $params['history_id'] . $output . $html . $renderht . $theme_id . $shortlinks . $fullbody);
 			if ($ob_output = $this -> get_cache($render_hash, 'value')) {
 				if (empty($output) || $output == false) {
 					return $ob_output;
 				} else {
 					echo $ob_output;
 				}
-			}
+			}*/
 		
 			if (!empty($file) || !empty($fullbody)) {
 				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
@@ -7466,7 +7471,7 @@ if (!class_exists('wpMailPlugin')) {
 						}	
 					}
 					
-					$this -> set_cache($render_hash, $body, 'value');				
+					//$this -> set_cache($render_hash, $body, 'value');				
 					return $body;
 				} else {				
 					return true;

@@ -315,22 +315,31 @@ if (!class_exists('wpMail')) {
 			return true;
 		}
 		
-		function emailarchive_hook() {		
-			global $wpdb, $Html, $Email;
-			$emailarchive_olderthan = $this -> get_option('emailarchive_olderthan');
-			$interval = (empty($emailarchive_olderthan)) ? 90 : $emailarchive_olderthan;
-			$condition = " WHERE DATE_SUB(NOW(), INTERVAL " . $interval . " DAY) > created";
-			
-			$outfile_file = 'emailarchive.txt';
-			$outfile_path = $Html -> uploads_path() . DS . $this -> plugin_name . DS  . 'export' . DS;
-			$outfile_full = $outfile_path . $outfile_file;
-			
-			$query = "SELECT * FROM " . $wpdb -> prefix . $Email -> table . $condition;
-			$command = 'mysql -h ' . DB_HOST . ' -u ' . DB_USER . ' -p' . DB_PASSWORD . ' ' . DB_NAME . ' -N -B -e "' . $query . '" | sed "s/\t/,/g" >> ' . $outfile_full;
-			$exec = exec($command, $output);
-			
-			$query = "DELETE FROM " . $wpdb -> prefix . $Email -> table . $condition;
-			$wpdb -> query($query);
+		function emailarchive_hook() {
+			$emailarchive = $this -> get_option('emailarchive');
+			if (!empty($emailarchive)) {		
+				global $wpdb, $Html, $Email;
+				$emailarchive_olderthan = $this -> get_option('emailarchive_olderthan');
+				$interval = (empty($emailarchive_olderthan)) ? 90 : $emailarchive_olderthan;
+				$condition = " WHERE DATE_SUB(NOW(), INTERVAL " . $interval . " DAY) > created";
+				
+				$outfile_file = 'emailarchive.txt';
+				$outfile_path = $Html -> uploads_path() . DS . $this -> plugin_name . DS  . 'export' . DS;
+				$outfile_full = $outfile_path . $outfile_file;
+				
+				$fh = fopen($outfile_full, "w");
+				fclose($fh);
+				@chmod($outfile_full, 0777);
+				
+				if (file_exists($outfile_full) && is_writable($outfile_full)) {
+					$query = "SELECT * FROM " . $wpdb -> prefix . $Email -> table . $condition;
+					$command = 'mysql -h ' . DB_HOST . ' -u ' . DB_USER . ' -p' . DB_PASSWORD . ' ' . DB_NAME . ' -N -B -e "' . $query . '" | sed "s/\t/,/g" >> ' . $outfile_full;
+					$exec = exec($command, $output);
+					
+					$query = "DELETE FROM " . $wpdb -> prefix . $Email -> table . $condition;
+					$wpdb -> query($query);
+				}
+			}
 			
 			return true;
 		}
@@ -2249,6 +2258,7 @@ if (!class_exists('wpMail')) {
 				$this -> menus['newsletters-settings-system'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('System Configuration', $this -> plugin_name), __('System', $this -> plugin_name), 'newsletters_settings_system', $this -> sections -> settings_system, array($this, 'admin_settings_system'));
 				$this -> menus['newsletters-settings-tasks'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('Scheduled Tasks', $this -> plugin_name), __('Scheduled Tasks', $this -> plugin_name), 'newsletters_settings_tasks', $this -> sections -> settings_tasks, array($this, 'admin_settings_tasks'));
 				$this -> menus['newsletters-settings-api'] = add_submenu_page("newsletters_page_" . $this -> sections -> settings, __('API', $this -> plugin_name), __('API', $this -> plugin_name), 'newsletters_settings_api', $this -> sections -> settings_api, array($this, 'admin_settings_api'));
+				//$this -> menus['newsletters-forms'] = add_submenu_page($this -> sections -> welcome, __('Subscribe Forms', $this -> plugin_name), __('Subscribe Forms', $this -> plugin_name), 'newsletters_forms', $this -> sections -> forms, array($this, 'admin_forms'));
 				$this -> menus['newsletters-send'] = add_submenu_page($this -> sections -> welcome, __('Create Newsletter', $this -> plugin_name), __('Create Newsletter', $this -> plugin_name), 'newsletters_send', $this -> sections -> send, array($this, 'admin_send'));
 				$this -> menus['newsletters-history'] = add_submenu_page($this -> sections -> welcome, __('Sent &amp; Draft Emails', $this -> plugin_name), __('Sent &amp; Draft Emails', $this -> plugin_name), 'newsletters_history', $this -> sections -> history, array($this, 'admin_history'));
 				
@@ -2528,6 +2538,15 @@ if (!class_exists('wpMail')) {
 		
 		function admin_index() {	
 			$this -> render_admin('index', false, true, 'admin');
+		}
+		
+		function admin_forms() {
+			
+			switch ($_GET['method']) {
+				default 								:
+					$this -> render('forms' . DS . 'index', false, true, 'admin');
+					break;
+			}
 		}
 		
 		function admin_send() {
@@ -6472,6 +6491,7 @@ if (!class_exists('wpMail')) {
 					$this -> redirect($this -> referer, $msg_type, $message);
 					break;
 				case 'checkdb'			:
+					$this -> check_roles();
 					$this -> check_tables();
 					
 					if (!empty($this -> tablenames)) {
