@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.1
-Stable tag: 4.4.6
+Stable tag: 4.4.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -148,7 +148,7 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 
 == Changelog ==
 
-= 4.4.6 =
+= 4.4.6.1 =
 * ADD: TinyMCE editor for multilingual system emails
 * ADD: Link to delete post on newsletter previously published
 * ADD: Support for qTranslate X multilingual newsletters

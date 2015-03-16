@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.6';
+		var $version = '4.4.6.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -6341,7 +6341,7 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.4';
 				}
 				
-				if (version_compare($cur_version, "4.4.6") < 0) {
+				if (version_compare($cur_version, "4.4.6.1") < 0) {
 					global $wpdb, $Db, $Latestpost;
 					
 					$this -> update_options();
@@ -6349,7 +6349,7 @@ if (!class_exists('wpMailPlugin')) {
 					$query = "ALTER TABLE `" . $wpdb -> prefix . $Latestpost -> table . "` DROP INDEX `post_id`";
 					$wpdb -> query($query);
 					
-					$version = '4.4.6';
+					$version = '4.4.6.1';
 				}
 			
 				//the current version is older.
