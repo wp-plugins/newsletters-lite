@@ -1194,7 +1194,17 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			
 				if ($this -> get_option('subscriberedirect') == "Y") {
-					$this -> redirect($this -> get_option('subscriberedirecturl'), false, false, true);
+					$subscriberedirecturl = $this -> get_option('subscriberedirecturl');
+					
+					if (!empty($_POST['list_id']) && (!is_array($_POST['list_id']) || count($_POST['list_id']) == 1)) {
+						if ($subscribelist = $Mailinglist -> get($_POST['list_id'][0])) {
+							if (!empty($subscribelist -> subredirect)) {
+								$subscriberedirecturl = $subscribelist -> subredirect;
+							}
+						}
+					}
+					
+					$this -> redirect($subscriberedirecturl, false, false, true);
 				}
 			} else {			
 				$errors = $Subscriber -> errors;
@@ -3963,7 +3973,7 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function render_field($field_id = null, $fieldset = true, $optinid = null, $showcaption = true, $watermark = true, $instance = null) {
+		function render_field($field_id = null, $fieldset = true, $optinid = null, $showcaption = true, $watermark = true, $instance = null, $offsite = false) {
 			global $Field, $Html, $wpmltabindex, $Mailinglist, $Subscriber;
 		
 			if (!empty($field_id)) {
@@ -4012,7 +4022,7 @@ if (!class_exists('wpMailPlugin')) {
 									break;
 							}
 							
-							if (!is_admin() || defined('DOING_AJAX')) {
+							if (!is_admin() || defined('DOING_AJAX') || (!empty($_GET['method']) && $_GET['method'] == "offsitewizard")) {
 								echo '<input type="hidden" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
 							} else {
 								echo '<input type="text" class="widefat" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
@@ -4025,7 +4035,7 @@ if (!class_exists('wpMailPlugin')) {
 						
 							echo '<input class="' . $this -> pre . ' widefat ' . $this -> pre . 'text' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' type="text" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($_POST[$field -> slug])) . '" />';
 							
-							if (!empty($field -> watermark) && $watermark == true) {
+							if (!empty($field -> watermark) && $watermark == true && empty($offsite)) {
 								?>
 								
 								<script type="text/javascript">
@@ -4151,36 +4161,38 @@ if (!class_exists('wpMailPlugin')) {
 							<input type="file" <?php echo $Html -> tabindex($optinid); ?> name="file_upload_<?php echo $field -> id; ?>" id="file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>" />
 							<input type="hidden" name="<?php echo $field -> slug; ?>" value="<?php echo esc_attr(stripslashes($_POST[$field -> slug])); ?>" id="<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>" />
 							
-							<script type="text/javascript">
-							jQuery(document).ready(function() {
-								jQuery('#file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>').uploadify({
-									'swf'      			: 	'<?php echo $this -> url(); ?>/images/uploadify/uploadify.swf',
-									//'uploader' 			: 	'<?php echo $this -> url(); ?>/vendors/uploadify/upload.php',
-									'uploader'			:	'<?php echo admin_url('admin-ajax.php?action=newsletters_uploadify'); ?>',
-									'buttonText'		:	'<?php _e('Select File', $this -> plugin_name); ?>',
-									'debug'				:	false,
-									'multi'				:	false,
-									'uploadLimit'		:	'1',
-									<?php if (!empty($filetypes)) : ?>'fileTypeExts'	:	'<?php echo $filetypes; ?>',<?php endif; ?>
-									<?php if (!empty($field -> filesizelimit)) : ?>'fileSizeLimit'	:	'<?php echo $field -> filesizelimit; ?>',<?php endif; ?>
-									'removeCompleted'	:	false,
-									/*'onUploadStart'		:	function(file) {
-										<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", true);<?php endif; ?>
-									},*/
-									'onUploadError' 	: 	function(file, errorCode, errorMsg, errorString) {
-										console.log('The file ' + file.name + ' could not be uploaded: ' + errorString);
-									},
-									'onUploadSuccess' 	: 	function(file, data, response) {
-										console.log('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
-										console.log('Updating field #<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>');
-										jQuery('#<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>').val(data);
-									}/*,
-									'onUploadComplete'	:	function(file) {
-										<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", false);<?php endif; ?>
-									}*/
+							<?php if (empty($offsite)) : ?>
+								<script type="text/javascript">
+								jQuery(document).ready(function() {
+									jQuery('#file_upload_<?php echo $field -> id; ?><?php echo $optinid; ?>').uploadify({
+										'swf'      			: 	'<?php echo $this -> url(); ?>/images/uploadify/uploadify.swf',
+										//'uploader' 			: 	'<?php echo $this -> url(); ?>/vendors/uploadify/upload.php',
+										'uploader'			:	'<?php echo admin_url('admin-ajax.php?action=newsletters_uploadify'); ?>',
+										'buttonText'		:	'<?php _e('Select File', $this -> plugin_name); ?>',
+										'debug'				:	false,
+										'multi'				:	false,
+										'uploadLimit'		:	'1',
+										<?php if (!empty($filetypes)) : ?>'fileTypeExts'	:	'<?php echo $filetypes; ?>',<?php endif; ?>
+										<?php if (!empty($field -> filesizelimit)) : ?>'fileSizeLimit'	:	'<?php echo $field -> filesizelimit; ?>',<?php endif; ?>
+										'removeCompleted'	:	false,
+										/*'onUploadStart'		:	function(file) {
+											<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", true);<?php endif; ?>
+										},*/
+										'onUploadError' 	: 	function(file, errorCode, errorMsg, errorString) {
+											console.log('The file ' + file.name + ' could not be uploaded: ' + errorString);
+										},
+										'onUploadSuccess' 	: 	function(file, data, response) {
+											console.log('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+											console.log('Updating field #<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>');
+											jQuery('#<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>').val(data);
+										}/*,
+										'onUploadComplete'	:	function(file) {
+											<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", false);<?php endif; ?>
+										}*/
+									});
 								});
-							});
-							</script>
+								</script>
+							<?php endif; ?>
 							
 							<?php						
 							break;
@@ -4225,20 +4237,22 @@ if (!class_exists('wpMailPlugin')) {
 							
 							<input type="text" class="<?php echo $this -> pre; ?>predate <?php echo $this -> pre; ?>text <?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" value="<?php echo $currentDate; ?>" name="<?php echo $field -> slug; ?>" id="<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>" />
 							
-							<script type="text/javascript">
-							jQuery(document).ready(function() {
-								jQuery('#<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>').datepicker({
-									changeMonth: true,
-									changeYear: true,
-									yearRange: "<?php echo date_i18n("Y", strtotime("-100 years")); ?>:<?php echo date_i18n("Y"); ?>",
-									showOn: "both",
-									buttonImage: "<?php echo plugins_url(); ?>/<?php echo $this -> plugin_name; ?>/views/default/img/calendar.gif",
-									buttonImageOnly: true,
-									dateFormat: "<?php echo $Html -> dateformat_PHP_to_jQueryUI(get_option('date_format')); ?>",
-									defaultDate: <?php echo $defaultDate; ?>
+							<?php if (empty($offsite)) : ?>
+								<script type="text/javascript">
+								jQuery(document).ready(function() {
+									jQuery('#<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>').datepicker({
+										changeMonth: true,
+										changeYear: true,
+										yearRange: "<?php echo date_i18n("Y", strtotime("-100 years")); ?>:<?php echo date_i18n("Y"); ?>",
+										showOn: "both",
+										buttonImage: "<?php echo plugins_url(); ?>/<?php echo $this -> plugin_name; ?>/views/default/img/calendar.gif",
+										buttonImageOnly: true,
+										dateFormat: "<?php echo $Html -> dateformat_PHP_to_jQueryUI(get_option('date_format')); ?>",
+										defaultDate: <?php echo $defaultDate; ?>
+									});
 								});
-							});
-							</script>
+								</script>
+							<?php endif; ?>
 							
 							<?php
 						
@@ -4314,7 +4328,7 @@ if (!class_exists('wpMailPlugin')) {
 						echo '<span class="' . $this -> pre . 'customfieldcaption">' . __(stripslashes($field -> caption)) . '</span>';
 					}
 					
-					echo '</div>';
+					echo '</div>' . "\r\n";
 					
 					if (!empty($field -> type) && $field -> type == "file") {
 						if (!empty($field -> filesizelimit)) { echo '<small>' . sprintf(__('Maximum file size of <strong>%s</strong>', $this -> plugin_name), $field -> filesizelimit) . '</small><br/>'; }	
@@ -5645,6 +5659,10 @@ if (!class_exists('wpMailPlugin')) {
 			return true;
 		}
 		
+		function debug_trace() {
+			$this -> debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+		}
+		
 		function add_option($name = null, $value = null) {
 			global $wpml_add_option_count;
 		
@@ -6727,12 +6745,14 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function the_content($content = null) {
-			global $post, $Db, $History;
-			$Db -> model = $History -> model;
-			if ($history = $Db -> find(array('post_id' => $post -> ID))) {
-				if (!empty($history -> attachments)) {
-					$post_attachments = $this -> render('post-attachments', array('attachments' => $history -> attachments), false, 'default');
-					$content .= $post_attachments;
+			if (!is_admin()) {
+				global $post, $Db, $History;
+				$Db -> model = $History -> model;
+				if ($history = $Db -> find(array('post_id' => $post -> ID))) {
+					if (!empty($history -> attachments)) {
+						$post_attachments = $this -> render('post-attachments', array('attachments' => $history -> attachments), false, 'default');
+						$content .= $post_attachments;
+					}
 				}
 			}
 			

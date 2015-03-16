@@ -737,7 +737,7 @@ if (!class_exists('wpMail')) {
 						
 						break;
 					case 'offsite'			:	
-						global $Html, $Subscriber;			
+						global $Html, $Subscriber, $Mailinglist;			
 						
 						$atts['list'] = $_GET['list'];
 						$number = 'embed' . rand(999, 9999);
@@ -793,7 +793,15 @@ if (!class_exists('wpMail')) {
 											$success = true;
 											
 											if ($this -> get_option('subscriberedirect') == "Y") {
-												$this -> redirect($this -> get_option('subscriberedirecturl'), false, false, true);
+												$subscriberedirecturl = $this -> get_option('subscriberedirecturl');
+												
+												if ($subscribelist = $Mailinglist -> get($subscriber -> list_id)) {
+													if (!empty($subscribelist -> subredirect)) {
+														$subscriberedirecturl = $subscribelist -> subredirect;
+													}
+												}
+												
+												$this -> redirect($subscriberedirecturl, false, false, true);
 											}
 										}
 									}
@@ -847,7 +855,17 @@ if (!class_exists('wpMail')) {
 								}
 							
 								if ($this -> get_option('subscriberedirect') == "Y") {							
-									$this -> redirect($this -> get_option('subscriberedirecturl'));
+									$subscriberedirecturl = $this -> get_option('subscriberedirecturl');
+					
+									if (!empty($_POST['list_id']) && (!is_array($_POST['list_id']) || count($_POST['list_id']) == 1)) {
+										if ($subscribelist = $Mailinglist -> get($_POST['list_id'][0])) {
+											if (!empty($subscribelist -> subredirect)) {
+												$subscriberedirecturl = $subscribelist -> subredirect;
+											}
+										}
+									}
+									
+									$this -> redirect($subscriberedirecturl, false, false, true);
 								} else {
 									$url = $Html -> retainquery($this -> pre . 'method=optin&success=1', $_SERVER['REQUEST_URI']);
 									$this -> redirect($url);
@@ -3833,8 +3851,14 @@ if (!class_exists('wpMail')) {
 						$options['wpoptinid'] = $wpoptinid;
 						
 						$fields = false;
-						if (empty($_POST['fields']) || (!empty($_POST['fields']) && $_POST['fields'] == "Y")) {
-							$fields = $FieldsList -> fields_by_list($listid);
+						if (!empty($_POST['formtype']) && $_POST['formtype'] == "popup") {
+							if (empty($_POST['fields']) || (!empty($_POST['fields']) && $_POST['fields'] == "Y")) {
+								$fields = $FieldsList -> fields_by_list($listid);
+							}
+						} elseif ($_POST['formtype'] == "html") {
+							if (empty($_POST['html_fields']) || (!empty($_POST['html_fields']) && $_POST['html_fields'] == "Y")) {
+								$fields = $FieldsList -> fields_by_list($listid);
+							}
 						}
 						
 						ob_start();

@@ -20,6 +20,7 @@ class wpmlMailinglist extends wpMailPlugin {
 		'group_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'doubleopt'			=>	"ENUM('Y','N') NOT NULL DEFAULT 'Y'",
 		'adminemail'		=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'subredirect'		=>	"TEXT NOT NULL",
 		'redirect'			=>	"TEXT NOT NULL",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
@@ -38,6 +39,7 @@ class wpmlMailinglist extends wpMailPlugin {
 		'group_id'			=> 	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'doubleopt'			=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'Y'"),
 		'adminemail'		=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'subredirect'		=>	array("TEXT", "NOT NULL"),
 		'redirect'			=>	array("TEXT", "NOT NULL"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
@@ -383,8 +385,8 @@ class wpmlMailinglist extends wpMailPlugin {
 				}
 			
 				$query = (!empty($id)) ?
-				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `doubleopt` = '" . $doubleopt . "', `redirect` = '" . $redirect . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `maxperinterval` = '" . $maxperinterval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :
-				"INSERT INTO `" . $wpdb -> prefix . "" . $this -> table_name . "` (`title`, `group_id`, `doubleopt`, `redirect`, `adminemail`, `privatelist`, `paid`, `tcoproduct`, `price`, `interval`, `maxperinterval`, `created`, `modified`) VALUES ('" . $title . "', '" . $group_id . "', '" . $doubleopt . "', '" . $redirect . "', '" . $adminemail . "', '" . $privatelist . "', '" . $paid . "', '" . $tcoproduct . "', '" . $price . "', '" . $interval . "', '" . $maxperinterval . "', '" . $created . "', '" . $modified . "');";
+				"UPDATE `" . $wpdb -> prefix . "" . $this -> table_name . "` SET `title` = '" . $title . "', `group_id` = '" . $group_id . "', `doubleopt` = '" . $doubleopt . "', `subredirect` = '" . $subredirect . "', `redirect` = '" . $redirect . "', `adminemail` = '" . $adminemail . "', `privatelist` = '" . $privatelist . "', `paid` = '" . $paid . "', `tcoproduct` = '" . $tcoproduct . "', `price` = '" . $price . "', `interval` = '" . $interval . "', `maxperinterval` = '" . $maxperinterval . "', `modified` = '" . $modified . "' WHERE `id` = '" . $id . "' LIMIT 1" :
+				"INSERT INTO `" . $wpdb -> prefix . "" . $this -> table_name . "` (`title`, `group_id`, `doubleopt`, `subredirect`, `redirect`, `adminemail`, `privatelist`, `paid`, `tcoproduct`, `price`, `interval`, `maxperinterval`, `created`, `modified`) VALUES ('" . $title . "', '" . $group_id . "', '" . $doubleopt . "', '" . $subredirect . "', '" . $redirect . "', '" . $adminemail . "', '" . $privatelist . "', '" . $paid . "', '" . $tcoproduct . "', '" . $price . "', '" . $interval . "', '" . $maxperinterval . "', '" . $created . "', '" . $modified . "');";
 				
 				if ($wpdb -> query($query)) {
 					$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;

@@ -1,14 +1,14 @@
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Offsite Wizard', $this -> plugin_name); ?></h2>
-	<form action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=offsitewizard" method="post">
+	<form action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=offsitewizard#code" method="post">
 		<table class="form-table">
 			<tbody>
 				<tr>
 					<th><label for="formtype_popup"><?php _e('Form Type', $this -> plugin_name); ?></label></th>
 					<td>
-						<label><input onclick="jQuery('#formtype_popup_div').show();" <?php echo (empty($_POST['formtype']) || $_POST['formtype'] == "popup") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="popup" id="formtype_popup" /> <?php _e('Popup', $this -> plugin_name); ?></label>
-						<label><input onclick="jQuery('#formtype_popup_div').hide();" <?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "iframe") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="iframe" id="formtype_iframe" /> <?php _e('iFrame', $this -> plugin_name); ?></label>
-						<label><input onclick="jQuery('#formtype_popup_div').hide();" <?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "html") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="html" id="formtype_html" /> <?php _e('HTML', $this -> plugin_name); ?></label>
+						<label><input onclick="jQuery('#formtype_popup_div').show(); jQuery('#formtype_html_div').hide();" <?php echo (empty($_POST['formtype']) || $_POST['formtype'] == "popup") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="popup" id="formtype_popup" /> <?php _e('Popup', $this -> plugin_name); ?></label>
+						<label><input onclick="jQuery('#formtype_popup_div').hide(); jQuery('#formtype_html_div').hide();" <?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "iframe") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="iframe" id="formtype_iframe" /> <?php _e('iFrame', $this -> plugin_name); ?></label>
+						<label><input onclick="jQuery('#formtype_popup_div').hide(); jQuery('#formtype_html_div').show();" <?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "html") ? 'checked="checked"' : ''; ?> type="radio" name="formtype" value="html" id="formtype_html" /> <?php _e('HTML', $this -> plugin_name); ?></label>
 						<span class="howto"><?php _e('Should this offsite form open as a popup upon submission or just use an iFrame to load in itself?', $this -> plugin_name); ?></span>
 					</td>
 				</tr>
@@ -29,6 +29,21 @@
 				</tr>
 			</tbody>
 		</table>
+		
+		<div id="formtype_html_div" style="display:<?php echo (!empty($_POST['formtype']) && $_POST['formtype'] == "html") ? 'block' : 'none'; ?>;">
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th><label for="html_fields_Y"><?php _e('Show Custom Fields', $this -> plugin_name); ?></label></th>
+						<td>
+							<label><input <?php echo (empty($_POST['html_fields']) || (!empty($_POST['html_fields']) && $_POST['html_fields'] == "Y")) ? 'checked="checked"' : ''; ?> type="radio" name="html_fields" value="Y" id="html_fields_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
+							<label><input <?php echo (!empty($_POST['html_fields']) && $_POST['html_fields'] == "N") ? 'checked="checked"' : ''; ?> type="radio" name="html_fields" value="N" id="html_fields_N" /> <?php _e('No', $this -> plugin_name); ?></label>
+							<span class="howto"><?php _e('Should custom fields be generated in this HTML code?', $this -> plugin_name); ?></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		
 		<div id="formtype_popup_div" style="display:<?php echo (empty($_POST['formtype']) || $_POST['formtype'] == "popup") ? 'block' : 'none'; ?>;">
 			<table class="form-table">
@@ -90,9 +105,9 @@
 	
 	<?php if (!empty($code)) : ?>
 		<label>
-			<h3><label for="<?php echo $this -> pre; ?>code"><?php _e('Offsite Code', $this -> plugin_name); ?></label></h3>
+			<h3 id="code"><label for="<?php echo $this -> pre; ?>code"><?php _e('Offsite Code', $this -> plugin_name); ?></label></h3>
 			<p class="howto"><?php _e('HTML and Javascript code to accept subscriptions on external websites into this one.', $this -> plugin_name); ?></p>
-			<textarea wrap="off" name="code" rows="10" cols="100%" id="<?php echo $this -> pre; ?>code" onclick="this.select();" style="width:100%;" class="widefat scroll-list"><?php echo htmlentities(trim($code)); ?></textarea>
+			<textarea wrap="off" name="code" rows="15" cols="100%" class="widefat" id="<?php echo $this -> pre; ?>code" onclick="this.select();"><?php echo htmlentities(trim($code)); ?></textarea>
 			<span class="howto"><?php _e('Copy and paste the code into any webpage.', $this -> plugin_name); ?></span>
 		</label>
 	<?php endif; ?>

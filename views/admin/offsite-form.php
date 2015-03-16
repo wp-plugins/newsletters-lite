@@ -4,10 +4,10 @@
 	
 		<?php if (!empty($fields)) : ?>
 			<?php foreach ($fields as $field) : ?>
-				<?php $this -> render_field($field -> id, true, $options['wpoptinid'], true, false); ?>
+				<?php $this -> render_field($field -> id, true, $options['wpoptinid'], true, false, false, true); ?>
 			<?php endforeach; ?>
 		<?php else : ?>
-			<?php $this -> render_field($Field -> email_field_id(), true, $options['wpoptinid'], true, false); ?>
+			<?php $this -> render_field($Field -> email_field_id(), true, $options['wpoptinid'], true, false, false, true); ?>
 		<?php endif; ?>
 		<div>
 			<input class="button ui-button" type="submit" name="subscribe" value="<?php echo $options['button']; ?>" />

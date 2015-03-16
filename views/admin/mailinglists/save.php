@@ -94,6 +94,13 @@ if ($this -> language_do()) {
                 	</td>
                 </tr>
                 <tr>
+	                <th><label for="Mailinglist.subredirect"><?php _e('Subscribe Redirect URL', $this -> plugin_name); ?></label></th>
+	                <td>
+		                <?php echo $Form -> text('Mailinglist[subredirect]'); ?>
+		                <span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Leave empty for default, global behaviour. Else fill in a subscribe redirect URL for this list', $this -> plugin_name); ?></span>
+	                </td>
+                </tr>
+                <tr>
                 	<th><label for="Mailinglist.redirect"><?php _e('Confirm Redirect URL', $this -> plugin_name); ?></label></th>
                 	<td>
                 		<?php echo $Form -> text('Mailinglist[redirect]'); ?>
@@ -169,6 +176,7 @@ if ($this -> language_do()) {
 jQuery(document).ready(function() {
 	jQuery('[name="Mailinglist[title]"]').Watermark('<?php echo addslashes(__('Enter mailing list title here', $this -> plugin_name)); ?>');
 	jQuery('[name="Mailinglist[adminemail]"]').Watermark('<?php echo addslashes(__('Enter a valid email address', $this -> plugin_name)); ?>');
+	jQuery('[name="Mailinglist[subredirect]"]').Watermark('<?php echo addslashes(__('http://domain.com/custom/url/to/go/to/', $this -> plugin_name)); ?>');
 	jQuery('[name="Mailinglist[redirect]"]').Watermark('<?php echo addslashes(__('http://domain.com/custom/url/to/go/to/', $this -> plugin_name)); ?>');
 });
 </script>

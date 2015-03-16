@@ -454,7 +454,7 @@ class wpmlField extends wpMailPlugin {
 						if (!empty($sizelimit) && !empty($sizetype)) {
 							$filesizelimit = $sizelimit . $sizetype;
 						}
-					} elseif ($type == "hidden") {
+					} elseif ($type == "hidden") {						
 						switch ($hidden_type) {
 							case 'predefined'				:
 								if (!empty($hidden_value_predefined)) {
@@ -463,8 +463,10 @@ class wpmlField extends wpMailPlugin {
 									$this -> errors['hidden_value'] = __('Please fill in a value', $this -> plugin_name);
 								}
 								break;
-							default 						:
+							case 'custom'					:
 								//do nothing...
+								break;
+							default 						:
 								if (empty($hidden_value)) {
 									$this -> errors['hidden_value'] = __('Please fill in a value', $this -> plugin_name);
 								}	
