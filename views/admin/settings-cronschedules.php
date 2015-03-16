@@ -69,6 +69,7 @@ $emailscount = $Db -> count();
                     <?php endif; ?>
                 </td>
             </tr>
+            <?php /*
             <!-- Latest Posts = "wpml_latestposts" -->
             <tr>
             	<th>
@@ -86,7 +87,7 @@ $emailscount = $Db -> count();
                     	<?php _e('Latest posts subscription is turned OFF.', $this -> plugin_name); ?>
                     <?php endif; ?>
                 </td>
-            </tr>
+            </tr>*/ ?>
             <!-- Autoresponder emails = "wpml_autoresponders" -->
             <tr class="alternate">
             	<th>

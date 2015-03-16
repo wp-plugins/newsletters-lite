@@ -13,6 +13,7 @@
 				<th><label for=""><?php _e('Existing Post', $this -> plugin_name); ?></label></th>
 				<td>
 					<a href="<?php echo get_permalink($post -> ID); ?>" target="_blank"><?php echo __($post -> post_title); ?></a>
+					<a class="newsletters-icon-delete-regular" href="<?php echo get_delete_post_link($post -> ID); ?>" onclick="if (!confirm('<?php _e('Are you sure you want to delete this post?', $this -> plugin_name); ?>')) { return false; }"></a>
 				</td>
 			</tr>
 		<?php endif; ?>

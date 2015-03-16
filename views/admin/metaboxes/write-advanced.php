@@ -13,7 +13,7 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 
 ?>
 
-<div class="<?php echo $this -> pre; ?> newsletters">
+<div class="<?php echo $this -> pre; ?> newsletters newsletters_write_advanced">
 	
 	<?php if (!empty($scheduled)) : ?>
 		<p class="newsletters_success"><?php _e('Note that this post is already scheduled to send out as a newsletter.', $this -> plugin_name); ?></p>
@@ -36,54 +36,69 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 	<?php endif; ?>
 	
 	<div class="misc-pub-section">
-	<p><strong><?php _e('Full Post or Excerpt', $this -> plugin_name); ?></strong></p>
-	<p>
-	<label><input <?php echo ((!empty($sendonpublishef) && $sendonpublishef == "fp") || ($this -> get_option('sendonpublishef') == "fp")) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>sendonpublishef" value="fp" /> <?php _e('Full Post', $this -> plugin_name); ?></label>
-	<label><input <?php echo ((!empty($sendonpublishef) && $sendonpublishef == "ep") || ($this -> get_option('sendonpublishef') == "ep")) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>sendonpublishef" value="ep" /> <?php _e('Excerpt of Post', $this -> plugin_name); ?></label>
-	</p>
+		<p><strong><?php _e('Full Post or Excerpt', $this -> plugin_name); ?></strong></p>
+		<p>
+		<label><input <?php echo ((!empty($sendonpublishef) && $sendonpublishef == "fp") || ($this -> get_option('sendonpublishef') == "fp")) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>sendonpublishef" value="fp" /> <?php _e('Full Post', $this -> plugin_name); ?></label>
+		<label><input <?php echo ((!empty($sendonpublishef) && $sendonpublishef == "ep") || ($this -> get_option('sendonpublishef') == "ep")) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>sendonpublishef" value="ep" /> <?php _e('Excerpt of Post', $this -> plugin_name); ?></label>
+		</p>
 	</div>
 	
-	<div class="misc-pub-section">
-	<p><strong><?php _e('Select a Template', $this -> plugin_name); ?></strong></p>
-	<p>
-		<label><input <?php echo (empty($theme_id)) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="0" id="theme0" /> <?php _e('NONE', $this -> plugin_name); ?></label>
-		<?php $Db -> model = $Theme -> model; ?>
-		<?php if ($themes = $Db -> find_all(false, false, array('title', "ASC"))) : ?>
-			<div class="scroll-list">
-				<?php $default_theme_id = $this -> default_theme_id('sending'); ?>
-			    <?php foreach ($themes as $theme) : ?>
-			        <label><input <?php echo ((!empty($theme_id) && $theme_id == $theme -> id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="<?php echo $theme -> id; ?>" id="theme<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> 
-			        <a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
-			        <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
-			        <br/>
-			    <?php endforeach; ?>
-			</div>
-		<?php endif; ?>
-	</p>
-	</div>
-	
-	<div class="misc-pub-section">
-	<p><strong><?php _e('Select Mailing List(s)', $this -> plugin_name); ?></strong></p>
-	<div class="scroll-list">
-		<table class="widefat">
-			<tbody>
-				<?php if ($mailinglists = $Mailinglist -> select($privatelists = true)) : ?>
-					<tr>
-						<th><input type="checkbox" name="mailinglistsselectall" value="1" id="mailinglistsselectall" onclick="jqCheckAll(this, 'post', 'wpmlmailinglists');" /></th>
-						<td><label for="mailinglistsselectall" style="font-weight:bold;"><?php _e('Select All', $this -> plugin_name); ?></label></td>
-					</tr>
-					<?php foreach ($mailinglists as $id => $title) : ?>
-						<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
-							<th><input id="checklist<?php echo $id; ?>" <?php echo (!empty($postmailinglists) && in_array($id, $postmailinglists)) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $this -> pre; ?>mailinglists[]" value="<?php echo $id; ?>" /></th>
-							<td><label for="checklist<?php echo $id; ?>"><?php echo $title; ?> (<?php echo $SubscribersList -> count(array('list_id' => $id, 'active' => "Y")); ?> <?php _e('active subscribers', $this -> plugin_name); ?>)</label></td>
+	<div class="misc-pub-section newsletters_templates">
+		<p><strong><?php _e('Select a Template', $this -> plugin_name); ?></strong></p>
+		<p>
+			<?php $Db -> model = $Theme -> model; ?>
+			<?php if ($themes = $Db -> find_all(false, false, array('title', "ASC"))) : ?>
+				<div class="scroll-list">
+					<table class="widefat">
+						<tbody>
+					<?php $default_theme_id = $this -> default_theme_id('sending'); ?>
+						<tr>
+							<th class="check-column"><label><input <?php echo (empty($theme_id)) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="0" id="theme0" /></label></th>
+							<td><?php _e('NONE', $this -> plugin_name); ?></td>
 						</tr>
-					<?php endforeach; ?>
-				<?php else : ?>
-					<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
-				<?php endif; ?>
-			</tbody>
-		</table>
+				    <?php foreach ($themes as $theme) : ?>
+				        <?php /*<label><input <?php echo ((!empty($theme_id) && $theme_id == $theme -> id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="<?php echo $theme -> id; ?>" id="theme<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> 
+				        <a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
+				        <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
+				        <br/>*/ ?>
+				       <tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+					        <th class="check-column"><input <?php echo ((!empty($theme_id) && $theme_id == $theme -> id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="<?php echo $this -> pre; ?>theme_id" value="<?php echo $theme -> id; ?>" id="theme<?php echo $theme -> id; ?>" /></th>
+					        <td>
+						        <label for="theme<?php echo $theme -> id; ?>"><?php echo __($theme -> title); ?></label>
+						        <a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
+								<a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
+					        </td>
+				        </tr>
+				    <?php endforeach; ?>
+						</tbody>
+					</table>
+				</div>
+			<?php endif; ?>
+		</p>
 	</div>
+	
+	<div class="misc-pub-section newsletters_mailinglists">
+		<p><strong><?php _e('Select Mailing List(s)', $this -> plugin_name); ?></strong></p>
+		<div class="scroll-list">
+			<table class="widefat">
+				<tbody>
+					<?php if ($mailinglists = $Mailinglist -> select($privatelists = true)) : ?>
+						<tr>
+							<th class="check-column"><input type="checkbox" name="mailinglistsselectall" value="1" id="mailinglistsselectall" onclick="jqCheckAll(this, 'post', 'wpmlmailinglists');" /></th>
+							<td><label for="mailinglistsselectall" style="font-weight:bold;"><?php _e('Select All', $this -> plugin_name); ?></label></td>
+						</tr>
+						<?php foreach ($mailinglists as $id => $title) : ?>
+							<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+								<th class="check-column"><input id="checklist<?php echo $id; ?>" <?php echo (!empty($postmailinglists) && in_array($id, $postmailinglists)) ? 'checked="checked"' : ''; ?> type="checkbox" name="<?php echo $this -> pre; ?>mailinglists[]" value="<?php echo $id; ?>" /></th>
+								<td><label for="checklist<?php echo $id; ?>"><?php echo $title; ?> (<?php echo $SubscribersList -> count(array('list_id' => $id, 'active' => "Y")); ?> <?php _e('active subscribers', $this -> plugin_name); ?>)</label></td>
+							</tr>
+						<?php endforeach; ?>
+					<?php else : ?>
+						<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
+					<?php endif; ?>
+				</tbody>
+			</table>
+		</div>
 	</div>
 	
 	<br class="clear" />

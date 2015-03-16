@@ -102,7 +102,7 @@
 	    
 	    <?php
 	    
-	    $orderby = (empty($_GET['orderby'])) ? 'modified' : $_GET['orderby'];
+	    $orderby = (empty($_GET['orderby'])) ? 'created' : $_GET['orderby'];
 		$order = (empty($_GET['order'])) ? 'desc' : strtolower($_GET['order']);
 		$otherorder = ($order == "desc") ? 'asc' : 'desc';
 		
@@ -161,8 +161,8 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-	                <th class="column-modified <?php echo ($orderby == "modified") ? 'sorted ' . $order : 'sortable desc'; ?>">
-						<a href="<?php echo $Html -> retainquery('orderby=modified&order=' . (($orderby == "modified") ? $otherorder : "asc")); ?>#emailssent">
+	                <th class="column-created <?php echo ($orderby == "created") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=created&order=' . (($orderby == "created") ? $otherorder : "asc")); ?>#emailssent">
 							<span><?php _e('Sent Date', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
@@ -219,8 +219,8 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-	                <th class="column-modified <?php echo ($orderby == "modified") ? 'sorted ' . $order : 'sortable desc'; ?>">
-						<a href="<?php echo $Html -> retainquery('orderby=modified&order=' . (($orderby == "modified") ? $otherorder : "asc")); ?>#emailssent">
+	                <th class="column-created <?php echo ($orderby == "created") ? 'sorted ' . $order : 'sortable desc'; ?>">
+						<a href="<?php echo $Html -> retainquery('orderby=created&order=' . (($orderby == "created") ? $otherorder : "asc")); ?>#emailssent">
 							<span><?php _e('Sent Date', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
@@ -317,7 +317,7 @@
 		                    	<?php echo (!empty($email -> bounced) && $email -> bounced == "Y") ? '<span class="' . $this -> pre . 'error">' . __('Yes', $this -> plugin_name) . '</span>' : '<span class="newsletters_success">' . __('No', $this -> plugin_name) . '</span>'; ?>
 		                    </td>
 		                    <td>
-		                    	<abbr title="<?php echo $email -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> modified)); ?></abbr>
+		                    	<abbr title="<?php echo $email -> created; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> created)); ?></abbr>
 		                    </td>
 		                </tr>
 		            <?php endforeach; ?>

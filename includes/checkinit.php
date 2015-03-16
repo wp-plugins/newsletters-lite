@@ -54,6 +54,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('user_register', 'user_register', 10, 1);
 			$this -> add_action('save_post', 'save_post', 10, 2);
 			$this -> add_action('delete_post', 'delete_post', 10, 1);
+			$this -> add_action('trashed_post', 'delete_post', 10, 1);
 			$this -> add_action('init', 'init', 11, 1);
 			$this -> add_action('wp_login', 'end_session', 10, 1);
 			$this -> add_action('wp_logout', 'end_session', 10, 1);

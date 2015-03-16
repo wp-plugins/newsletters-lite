@@ -478,7 +478,7 @@ if (!class_exists('wpMail')) {
 			$wpmlmethod = (empty($_POST[$this -> pre . 'method'])) ? null : $_POST[$this -> pre . 'method'];
 			$method = (empty($_GET[$this -> pre . 'method'])) ? $wpmlmethod : $_GET[$this -> pre . 'method'];
 			
-			if ($this -> get_option('clicktrack') == "Y" && !empty($_GET[$this -> pre . 'link'])) {
+			if (!empty($_GET[$this -> pre . 'link'])) {
 				if ($link = $this -> Link -> find(array('hash' => $_GET[$this -> pre . 'link']))) {
 				
 					$email_conditions = array('history_id' => $_GET['history_id']);
@@ -728,7 +728,7 @@ if (!class_exists('wpMail')) {
 						$tracking_image = $this -> get_option('tracking_image');
 						$tracking_image_file = $this -> get_option('tracking_image_file');
 						
-						if (!empty($tracking) && $tracking == "Y") {
+						//if (!empty($tracking) && $tracking == "Y") {
 							if (!empty($tracking_image) && $tracking_image == "custom") {
 								$tracking_image_full = $Html -> uploads_path() . DS . $this -> plugin_name . DS . $tracking_image_file;
 								$imginfo = getimagesize($tracking_image_full);
@@ -740,7 +740,7 @@ if (!class_exists('wpMail')) {
 								imagejpeg($image);
 								imagedestroy($image);
 							}
-						}
+						//}
 						
 						exit();
 						
@@ -1542,7 +1542,7 @@ if (!class_exists('wpMail')) {
 						
 						$this -> Latestpostssubscription -> save_field('history_id', $history_id, array('id' => $latestpostssubscription -> id));
 						
-						if (!empty($preview) && $preview == true) {
+						if (!empty($preview) && $preview == true) {							
 							$subscriber_id = $Subscriber -> admin_subscriber_id();
 							$subscriber = $Subscriber -> get($subscriber_id);
 							$subscriber -> mailinglists = $email -> mailinglists;
@@ -2212,7 +2212,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function delete_post($post_id = null) {
-			global $Db, $Post, $Latestpost;
+			global $Db, $Post, $Latestpost, $History;
 		
 			if (!empty($post_id)) {
 				$Db -> model = $Post -> model;
@@ -2220,6 +2220,9 @@ if (!class_exists('wpMail')) {
 				
 				$Db -> model = $Latestpost -> model;
 				$Db -> delete_all(array('post_id' => $post_id));
+				
+				$Db -> model = $History -> model;
+				$Db -> save_field('post_id', "0", array('post_id' => $post_id));
 			}
 		}
 		
@@ -4408,6 +4411,8 @@ if (!class_exists('wpMail')) {
 					if (!empty($_POST['searchterm'])) {
 						$searchurl = $Html -> retainquery($this -> pre . 'page=1&' . $this -> pre . 'searchterm=' . urlencode($searchterm));
 						$this -> redirect($searchurl);
+					} elseif (isset($_POST['searchterm'])) {
+						$this -> redirect($Html -> retainquery($this -> pre . 'page=1&' . $this -> pre . 'searchterm='));
 					}
 					
 					$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
@@ -6647,6 +6652,7 @@ if (!class_exists('wpMail')) {
 					switch ($key) {
 						// Actions for multilingual strings
 						case 'managelinktext'				:
+						case 'managementpost'				:
 						case 'managementloginsubject'		:
 						case 'subscriberexistsmessage'		:
 						case 'onlinelinktext'				:

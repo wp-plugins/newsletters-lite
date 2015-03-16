@@ -78,6 +78,9 @@ class wpmlpaginate extends wpMailPlugin {
 		
 		switch ($this -> model) {
 			case 'Email'						:
+				$query = "SELECT DISTINCT " . $this -> table . ".* FROM `" . $this -> table . "`";
+				$countquery = "SELECT COUNT(DISTINCT " . $this -> table . ".id) FROM `" . $this -> table . "`";
+			
 				$query .= " LEFT JOIN " . $subscribers_table . " ON " . $emails_table . ".subscriber_id = " . $subscribers_table . ".id";
 				$countquery .= " LEFT JOIN " . $subscribers_table . " ON " . $emails_table . ".subscriber_id = " . $subscribers_table . ".id";
 				

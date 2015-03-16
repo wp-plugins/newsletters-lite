@@ -12,7 +12,41 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
         	<th><label for="managementpost"><?php _e('Management Post ID', $this -> plugin_name); ?></label></th>
             <td>
             	<?php $this -> get_managementpost(); ?>
-            	<input type="text" name="managementpost" value="<?php echo esc_attr(stripslashes($this -> get_option('managementpost'))); ?>" id="managementpost" class="widefat" style="width:65px;" />
+            	<?php if ($this -> language_do()) : ?>
+            		<?php 
+					
+					$el = $this -> language_getlanguages(); 
+					$managementpost = $this -> language_split($this -> get_option('managementpost'));
+					
+					?>
+					<div id="managementposttabs">
+						<ul>
+							<?php $tabnumber = 1; ?>
+			                <?php foreach ($el as $language) : ?>
+			                 	<li><a href="#managementposttab<?php echo $tabnumber; ?>"><?php echo $this -> language_flag($language); ?></a></li>   
+			                    <?php $tabnumber++; ?>
+			                <?php endforeach; ?>
+			            </ul>
+			            
+			            <?php $tabnumber = 1; ?>
+			            <?php foreach ($el as $language) : ?>
+			            	<div id="managementposttab<?php echo $tabnumber; ?>">
+			            		<input type="text" name="managementpost[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($managementpost[$language])); ?>" id="managementpost_<?php echo $language; ?>" class="widefat" />
+			            	</div>
+			            	<?php $tabnumber++; ?>
+			            <?php endforeach; ?>
+					</div>
+					
+					<script type="text/javascript">
+					jQuery(document).ready(function() {
+						if (jQuery.isFunction(jQuery.fn.tabs)) {
+							jQuery('#managementposttabs').tabs();
+						}
+					});
+					</script>
+            	<?php else : ?>
+            		<input type="text" name="managementpost" value="<?php echo esc_attr(stripslashes($this -> get_option('managementpost'))); ?>" id="managementpost" class="widefat" style="width:65px;" />
+            	<?php endif; ?>
             	<span class="howto"><?php echo sprintf(__('ID of the WordPress post with the %s shortcode in it.', $this -> plugin_name), '<code>[' . $this -> pre . 'management]</code>'); ?></span>
             </td>
         </tr>

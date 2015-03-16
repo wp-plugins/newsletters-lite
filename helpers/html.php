@@ -360,15 +360,18 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return $output;
 	}
 	
-	function get_gravatar($email, $s = 45, $d = 'mm', $r = 'g', $img = true, $atts = array() ) {
-		$url = 'http://www.gravatar.com/avatar/';
-		$url .= md5( strtolower( trim( $email ) ) );
-		$url .= "?s=$s&d=$d&r=$r";
+	function get_gravatar($email = null, $s = 50, $d = 'mm', $r = 'g', $img = true, $atts = array() ) {
+		$src = 'http://www.gravatar.com/avatar/';
+		$src .= md5( strtolower( trim( $email ) ) );
+		$src .= "?s=$s&d=$d&r=$r";
 		if ($img) {
-			$url = '<img class="newsletters_gravatar" src="' . $url . '"';
+			$url = '';
+			$url .= '<div class="newsletters_gravatar_wrapper">';
+			$url .= '<img class="newsletters_gravatar newsletters_circular" src="' . $src . '"';
 			foreach ( $atts as $key => $val )
 				$url .= ' ' . $key . '="' . $val . '"';
 			$url .= ' />';
+			$url .= '</div>';
 		}
 		return $url;
 	}

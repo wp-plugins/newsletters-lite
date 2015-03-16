@@ -149,7 +149,16 @@ if (!class_exists('wpMailPlugin')) {
 	    
 	    function delete_all_cache($type = 'query') {	
 	    	global $newsletters_cache;    
-		    $newsletters_cache[$type] = array();
+		    
+		    switch ($type) {
+			    case 'all'					:
+			    	$newsletters_cache = array();
+			    	break;
+			    case 'query'				:
+			    default 					:
+		    		$newsletters_cache[$type] = array();
+		    		break;
+		    }
 		    
 		    return true;
 	    }
@@ -1595,6 +1604,9 @@ if (!class_exists('wpMailPlugin')) {
 	    }
 	    
 	    function ajax_spamscorerunner() {
+		    define('DOING_AJAX', true);
+	    	define('SHORTINIT', true);
+		    
 	    	global $Html, $Subscriber, $newsletters_presend, $newsletters_emailraw;
 	    	$newsletters_presend = true;
 	    	$subscriber_id = $Subscriber -> admin_subscriber_id();
@@ -1774,7 +1786,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($_POST['subscriber_id'])) {
 				$Db -> model = $Subscriber -> model;
 				
-				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']))) {
+				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']), false, false, true, true, false)) {
 					$lists = array();
 					if (!empty($subscriber -> subscriptions)) {
 						foreach ($subscriber -> subscriptions as $subscription) {
@@ -1808,7 +1820,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($_POST)) {
 				$Db -> model = $Subscriber -> model;
 				
-				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']))) {
+				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']), false, false, true, true, false)) {
 					$lists = array();
 					if (!empty($subscriber -> subscriptions)) {
 						foreach ($subscriber -> subscriptions as $subscription) {
@@ -1849,6 +1861,10 @@ if (!class_exists('wpMailPlugin')) {
 							
 							$success = true;
 							$successmessage = __('Additional data has been saved.', $this -> plugin_name);
+							
+							$this -> delete_all_cache('all');
+							$Db -> model = $Subscriber -> model;
+							$subscriber = $Subscriber -> find(array('id' => $subscriber -> id), false, false, true, true, false);
 						}
 					} else {
 						$errors[] = __('No data was posted.', $this -> plugin_name);	
@@ -1874,7 +1890,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($_POST['subscriber_id'])) {
 				$Db -> model = $Subscriber -> model;
 				
-				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']))) {				
+				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']), false, false, true, true, false)) {				
 					$this -> render('management' . DS . 'currentsubscriptions', array('subscriber' => $subscriber), true, 'default');
 				}
 			}
@@ -1892,7 +1908,7 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($_POST['subscriber_id'])) {
 				$Db -> model = $Subscriber -> model;
 							
-				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']))) {				
+				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']), false, false, true, true, false)) {				
 					if ($mailinglists = $Mailinglist -> select(false)) {
 						foreach ($mailinglists as $mkey => $mval) {
 							$otherlists[$mkey] = $mkey;	
@@ -2084,8 +2100,9 @@ if (!class_exists('wpMailPlugin')) {
 			if (!empty($_POST['subscriber_id']) && !empty($_POST['mailinglist_id'])) {
 				$Db -> model = $Subscriber -> model;
 				
-				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']))) {
+				if ($subscriber = $Db -> find(array('id' => $_POST['subscriber_id']), false, false, true, true, false)) {
 					$data['email'] = $subscriber -> email;
+					$data['format'] = $subscriber -> format;
 					$data['cookieauth'] = $Auth -> read_cookie();
 					$Db -> model = $Mailinglist -> model;
 					
@@ -2101,6 +2118,10 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if ($Subscriber -> optin($data, false, false, false)) {
 						$success = true;
+						
+						$this -> delete_all_cache('all');
+						$Db -> model = $Subscriber -> model;
+						$subscriber = $Subscriber -> find(array('id' => $subscriber -> id), false, false, true, true, false);
 						
 						if ($mailinglist -> paid == "Y") {
 							$successmessage = __('Subscription successful, please click the "Pay Now" button under current subscriptions to make a payment and activate your subscription.', $this -> plugin_name);
@@ -2159,8 +2180,7 @@ if (!class_exists('wpMailPlugin')) {
 							$Db -> model = $SubscribersList -> model;
 							
 							if ($_POST['activate'] == "N") {
-								if ($Db -> delete_all(array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']))) {																
-								
+								if ($Db -> delete_all(array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']))) {								
 									$Db -> model = $Unsubscribe -> model;
 									$unsubscribe_data = array('email' => $subscriber -> email, 'mailinglist_id' => $_POST['mailinglist_id']);
 									$Db -> save($unsubscribe_data, true);
@@ -2180,6 +2200,7 @@ if (!class_exists('wpMailPlugin')) {
 									}
 									
 									$this -> admin_unsubscription_notification($subscriber, $_POST['mailinglist_id']);
+									$this -> delete_all_cache('all');
 								
 									if (!empty($deleted) || $deleted == true) {
 										$message = __('Subscription removed and subscriber record deleted', $this -> plugin_name);
@@ -2203,7 +2224,7 @@ if (!class_exists('wpMailPlugin')) {
 									if ($Db -> save_field('active', "Y", array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']))) {
 										$success = true;
 										$successmessage = __('Subscription has been activated.', $this -> plugin_name);
-										
+										$this -> delete_all_cache('all');
 										$subscriber = $Auth -> logged_in();
 									} else {
 										$errors[] = __('Subscription could not be activated.', $this -> plugin_name);	
@@ -3224,36 +3245,23 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
 					
-					if (in_array($_GET['page'], (array) $this -> sections)) {
+					//if (in_array($_GET['page'], (array) $this -> sections)) {
 						wp_enqueue_media();
 						
 						// CKEditor
 						wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
 						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
 					
-						wp_enqueue_script(
-					        'iris',
-					        admin_url('js/iris.min.js'),
-					        array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ),
-					        false,
-					        1
-					    );
-					    
-					    wp_enqueue_script(
-					        'wp-color-picker',
-					        admin_url('js/color-picker.min.js'),
-					        array( 'iris' ),
-					        false,
-					        1
-					    );
-					}
+						wp_enqueue_script('iris', admin_url('js/iris.min.js'), array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1);
+					    wp_enqueue_script('wp-color-picker', admin_url('js/color-picker.min.js'), array( 'iris' ), false, 1);
+					//}
 				    
 				    wp_enqueue_script('jquery-ui-watermark', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.watermark.js', array('jquery'), false, true);
+				    wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 				}
 			
 				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {					
 					wp_enqueue_script('jquery-autoheight', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.autoheight.js', array('jquery'), false, true);
-					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 					
 					//countdown script
 					if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> queue) {
@@ -5693,7 +5701,7 @@ if (!class_exists('wpMailPlugin')) {
 			require_once(ABSPATH . WPINC . DS . 'rewrite.php');
 			if (!is_object($wp_rewrite)) { $wp_rewrite = new WP_Rewrite(); }
 			
-			$managementpost = get_option($this -> pre . 'managementpost');
+			$managementpost = __(get_option($this -> pre . 'managementpost'));
 			$query = "SELECT `ID` FROM `" . $wpdb -> posts . "` WHERE `ID` = '" . $managementpost . "' AND `post_status` = 'publish'";
 			
 			$query_hash = md5($query);

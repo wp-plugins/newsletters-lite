@@ -409,7 +409,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				$style = ' style="color:' . ${'newsletters_acolor'} . ';"';
 			}
 			
-			$more = ' <a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a>';
+			$more = ' <a class="newsletters_readmore" target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a>';
 		}
 			
 		return $more;
