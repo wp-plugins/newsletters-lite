@@ -22,7 +22,6 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 	<?php endif; ?>
 	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> send; ?>" method="post" id="post" name="post" enctype="multipart/form-data">
 		<?php wp_nonce_field($this -> sections -> send); ?>
-		<input type="hidden" name="newsletters_obstart" value="1" />
 		<input type="hidden" name="group" value="all" />
 		<input type="hidden" id="ishistory" name="ishistory" value="<?php echo $_POST['ishistory']; ?>" />
 		<input type="hidden" name="inctemplate" value="<?php echo $_POST['inctemplate']; ?>" />

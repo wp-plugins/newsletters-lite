@@ -24,20 +24,54 @@ class wpmlAuthHelper extends wpMailPlugin {
 	}
 	
 	function read_cookie($create = false) {		
-		if (isset($_COOKIE[$this -> cookiename])) {
-			return $_COOKIE[$this -> cookiename];
-		} elseif (isset($_SESSION[$this -> cookiename])) {
-			return $_SESSION[$this -> cookiename];
+		$managementauthtype = $this -> get_option('managementauthtype');
+		
+		switch ($managementauthtype) {
+			case 1			:
+				if (isset($_COOKIE[$this -> cookiename])) {
+					return $_COOKIE[$this -> cookiename];
+				}
+				break;
+			case 2			:
+				if (isset($_SESSION[$this -> cookiename])) {
+					return $_SESSION[$this -> cookiename];
+				}
+				break;
+			case 3			:
+			default 		:
+				if (isset($_COOKIE[$this -> cookiename])) {
+					return $_COOKIE[$this -> cookiename];
+				} elseif (isset($_SESSION[$this -> cookiename])) {
+					return $_SESSION[$this -> cookiename];
+				}					
+				break;
 		}
 		
 		return false;
 	}
 	
 	function read_emailcookie() {
-		if (isset($_COOKIE[$this -> emailcookiename])) {
-			return $_COOKIE[$this -> emailcookiename];
-		} elseif (isset($_SESSION[$this -> emailcookiename])) {
-			return $_SESSION[$this -> emailcookiename];
+		$managementauthtype = $this -> get_option('managementauthtype');
+		
+		switch ($managementauthtype) {
+			case 1					:
+				if (isset($_COOKIE[$this -> emailcookiename])) {
+					return $_COOKIE[$this -> emailcookiename];
+				}
+				break;
+			case 2					:
+				if (isset($_SESSION[$this -> emailcookiename])) {
+					return $_SESSION[$this -> emailcookiename];
+				}
+				break;
+			case 3					:
+			default 				:
+				if (isset($_COOKIE[$this -> emailcookiename])) {
+					return $_COOKIE[$this -> emailcookiename];
+				} elseif (isset($_SESSION[$this -> emailcookiename])) {
+					return $_SESSION[$this -> emailcookiename];
+				}	
+				break;
 		}
 		
 		return false;
@@ -51,20 +85,43 @@ class wpmlAuthHelper extends wpMailPlugin {
 		if (is_feed()) {
 			return false;
 		}
+		
+		$managementauthtype = $this -> get_option('managementauthtype');
 	
-		if (!empty($email)) {			
-			if (!empty($_COOKIE[$this -> emailcookiename]) && $_COOKIE[$this -> emailcookiename]) {
-				return true;
+		if (!empty($email)) {
+			switch ($managementauthtype) {
+				case 1					:
+					if (!empty($_COOKIE[$this -> emailcookiename]) && $_COOKIE[$this -> emailcookiename]) {
+						return true;
+					}
+					
+					if (!headers_sent()) {
+						setcookie($this -> emailcookiename, $email, strtotime($days));
+					} else {
+						$this -> javascript_cookie($this -> emailcookiename, $email);	
+					}
+					
+					$_COOKIE[$this -> emailcookiename] = $email;
+					break;
+				case 2					:
+					$_SESSION[$this -> emailcookiename] = $email;
+					break;
+				case 3					:
+				default 				:
+					if (!empty($_COOKIE[$this -> emailcookiename]) && $_COOKIE[$this -> emailcookiename]) {
+						return true;
+					}
+					
+					if (!headers_sent()) {
+						setcookie($this -> emailcookiename, $email, strtotime($days));
+					} else {
+						$this -> javascript_cookie($this -> emailcookiename, $email);	
+					}
+					
+					$_COOKIE[$this -> emailcookiename] = $email;
+					$_SESSION[$this -> emailcookiename] = $email;	
+					break;
 			}
-			
-			if (!headers_sent()) {
-				setcookie($this -> emailcookiename, $email, strtotime($days));
-			} else {
-				$this -> javascript_cookie($this -> emailcookiename, $email);	
-			}
-			
-			$_COOKIE[$this -> emailcookiename] = $email;
-			$_SESSION[$this -> emailcookiename] = $email;
 		}
 		
 		return false;
@@ -75,19 +132,42 @@ class wpmlAuthHelper extends wpMailPlugin {
 			return false;	
 		}
 		
-		if (!empty($value)) {			
-			if (!empty($_COOKIE[$this -> cookiename]) && $_COOKIE[$this -> cookiename] == $value) {
-				return true;
+		$managementauthtype = $this -> get_option('managementauthtype');
+		
+		if (!empty($value)) {	
+			switch ($managementauthtype) {
+				case 1						:
+					if (!empty($_COOKIE[$this -> cookiename]) && $_COOKIE[$this -> cookiename] == $value) {
+						return true;
+					}
+					
+					if (!headers_sent()) {
+						setcookie($this -> cookiename, $value, strtotime($days));
+					} else {
+						$this -> javascript_cookie($this -> cookiename, $value);	
+					}
+					
+					$_COOKIE[$this -> cookiename] = $value;
+					break;
+				case 2						:
+					$_SESSION[$this -> cookiename] = $value;
+					break;
+				case 3						:
+				default 					:
+					if (!empty($_COOKIE[$this -> cookiename]) && $_COOKIE[$this -> cookiename] == $value) {
+						return true;
+					}
+					
+					if (!headers_sent()) {
+						setcookie($this -> cookiename, $value, strtotime($days));
+					} else {
+						$this -> javascript_cookie($this -> cookiename, $value);	
+					}
+					
+					$_COOKIE[$this -> cookiename] = $value;
+					$_SESSION[$this -> cookiename] = $value;	
+					break;
 			}
-			
-			if (!headers_sent()) {
-				setcookie($this -> cookiename, $value, strtotime($days));
-			} else {
-				$this -> javascript_cookie($this -> cookiename, $value);	
-			}
-			
-			$_COOKIE[$this -> cookiename] = $value;
-			$_SESSION[$this -> cookiename] = $value;
 		}
 			
 		return true;

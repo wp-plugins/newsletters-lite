@@ -45,6 +45,7 @@ jQuery(document).ready(function() {
 		var ctx = document.getElementById("canvas").getContext("2d");
 		var barChart = new Chart(ctx).Bar(barChartData, {
 			barShowStroke: false,
+			multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>",
 			legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul><br class=\"clear\" />"
 		});
 		var legend = barChart.generateLegend();
@@ -52,10 +53,3 @@ jQuery(document).ready(function() {
 	});
 });
 </script>
-
-<?php
-
-//include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
-//newsletters_open_flash_chart_object("100%", "300", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&type=' . $type . '&from=' . $fromdate . '&to=' . $todate, false, $this -> url());
-
-?>

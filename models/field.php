@@ -76,7 +76,16 @@ class wpmlField extends wpMailPlugin {
 	
 		if (!empty($data)) {
 			foreach ($data as $key => $val) {
-				$this -> {$key} = stripslashes_deep($val);
+				//$this -> {$key} = stripslashes_deep($val);
+				
+				switch ($key) {
+					case 'regex'			:
+						$this -> {$key} = $val;
+						break;
+					default 				:
+						$this -> {$key} = stripslashes_deep($val);
+						break;
+				}
 			}
 		}
 		

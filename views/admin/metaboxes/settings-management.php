@@ -2,6 +2,7 @@
 
 <?php
 	
+$managementauthtype = $this -> get_option('managementauthtype');
 $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions');	
 	
 ?>
@@ -131,6 +132,14 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
             	<?php endif; ?>
                 <span class="howto"><?php _e('The subject of the email when a subscriber authenticates.', $this -> plugin_name); ?></span>
             </td>
+        </tr>
+        <tr>
+	        <th><label for="managementauthtype_3"><?php _e('Authentication Type', $this -> plugin_name); ?></label></th>
+	        <td>
+		        <label><input <?php echo (!empty($managementauthtype) && $managementauthtype == 1) ? 'checked="checked"' : ''; ?> type="radio" name="managementauthtype" value="1" id="managementauthtype_1" /> <?php _e('Cookie', $this -> plugin_name); ?></label>
+		        <label><input <?php echo (!empty($managementauthtype) && $managementauthtype == 2) ? 'checked="checked"' : ''; ?> type="radio" name="managementauthtype" value="2" id="managementauthtype_2" /> <?php _e('Session', $this -> plugin_name); ?></label>
+		        <label><input <?php echo (!empty($managementauthtype) && $managementauthtype == 3) ? 'checked="checked"' : ''; ?> type="radio" name="managementauthtype" value="3" id="managementauthtype_3" /> <?php _e('Both (Cookie & Session)', $this -> plugin_name); ?></label>
+	        </td>
         </tr>
         <tr>
 	        <th><label for="managementshowsubscriptions_Y"><?php _e('Show Current Subscriptions', $this -> plugin_name); ?></label></th>

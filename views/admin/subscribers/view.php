@@ -3,6 +3,7 @@
 		<?php echo $Html -> get_gravatar($subscriber -> email); ?>
 	</div>
 	<h2><?php _e('View Subscriber:', $this -> plugin_name); ?> <?php echo $subscriber -> email; ?></h2>
+	<br class="clear" />
 	
 	<div style="float:none;" class="subsubsub"><?php echo $Html -> link(__('&larr; All Subscribers', $this -> plugin_name), $this -> url, array('title' => __('Manage All Subscribers', $this -> plugin_name))); ?></div>
 	

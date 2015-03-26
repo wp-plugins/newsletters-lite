@@ -162,7 +162,7 @@ $regex = $Html -> field_value('Field[regex]');
 						<tr>
 							<th><label for="Field_regex"><?php _e('Custom Regex', $this -> plugin_name); ?></label></th>
 							<td>
-								<input type="text" name="Field[regex]" value="<?php echo esc_attr(stripslashes($regex)); ?>" id="Field_regex" class="widefat" />
+								<input type="text" name="Field[regex]" value="<?php echo esc_attr(($regex)); ?>" id="Field_regex" class="widefat" />
 								<span class="howto"><?php echo sprintf(__('Specify a custom PHP regular expression, eg. %s', $this -> plugin_name), "<code>/^[0-9]*$/</code>"); ?></span>
 							</td>
 						</tr>

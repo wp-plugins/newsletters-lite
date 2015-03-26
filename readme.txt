@@ -3,8 +3,8 @@ Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
-Tested up to: 4.1
-Stable tag: 4.4.6.1
+Tested up to: 4.1.1
+Stable tag: 4.4.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -147,6 +147,35 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.4.7 =
+* ADD: Bar chart/graph for each individual newsletter sent
+* ADD: New pie/doughnut charts for read/unsubscribe/bounce/etc
+* ADD: 'thumbnail_...' attributes for posts shortcodes
+* ADD: [newsletters_online_url] shortcode for URL only
+* ADD: Template IMG SRC prepend URL setting
+* ADD: More filter/action hooks
+* ADD: Manage subscriptions setting to choose between cookie/session 
+* IMPROVE: Thumbnail/image size, align and hspace in TinyMCE editor icon/button
+* IMPROVE: New dashboard widget design
+* IMPROVE: New HTML5 chart library integration for pie, bar, line, etc charts
+* IMPROVE: Use get_avatar() function for subscribers pictures
+* IMPROVE: Log Mandrill bounce deferral
+* IMPROVE: Prevent plugin files in Google index
+* IMPROVE: Remove personal information from links like unsubscribe URL
+* IMPROVE: Google reCAPTCHA API update
+* IMPROVE: Bounce status saved for POP, Mandrill and Amazon SNS
+* IMPROVE: 'align' and 'hspace' parameters for 'wpmlpost_thumbnail' shortcode 
+* FIX: Javascript errors on editor button with no custom post types
+* FIX: Sent/Draft filter not working in newsletters history
+* FIX: Custom fields regex escaping slashes are stripped
+* FIX: Confirmation email still sends on single opt-in mailing list
+* FIX: "Subscription is invalid" error message
+* FIX: Autoresponders not logging when double opt-in is turned off on mailing list
+* FIX: “Fatal error: Cannot redeclare class Mobile_Detect “
+* FIX: History emails filters don't stick on paging
+* FIX: History shortcode content being escaped. Do stripslashes
+* FIX: Admin widget language tabs not working on first load 
 
 = 4.4.6.1 =
 * ADD: TinyMCE editor for multilingual system emails

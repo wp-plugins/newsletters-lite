@@ -22,6 +22,10 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	    return( $NewArray );
 	}
 	
+	function bar_chart($id = null, $attributes = array(), $data = array(), $options = array()) {
+		
+	}
+	
 	function pie_chart($id = null, $attributes = array(), $data = array(), $options = array()) {
 		
 		$default_attributes = array(
@@ -675,13 +679,28 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		return false;
 	}
 	
+	function reCaptchaErrorMessage($errorCode = null) {
+	    $messages = array(
+		    'missing-input-secret'		=>	__('The secret parameter is missing.', $this -> plugin_name),
+			'invalid-input-secret'		=>	__('The secret parameter is invalid or malformed.', $this -> plugin_name),
+			'missing-input-response'	=>	__('Captcha code is missing', $this -> plugin_name),
+			'invalid-input-response'	=>	__('Captcha code is invalid.', $this -> plugin_name),
+	    );
+	    
+	    if (!empty($messages[$errorCode])) {
+		    return $messages[$errorCode];
+	    }
+	    
+	    return false;
+    }
+	
 	function tabi() {
 		global $wpmltabindex;
 		if (empty($wpmltabindex) || !$wpmltabindex) { $wpmltabindex = 1; };
 		return $wpmltabindex;
 	}
 	
-	function tabindex($optinid = null) {
+	function tabindex($optinid = null, $onlynumber = false) {
 		global $wpmltabindex;
 		
 		if (empty($wpmltabindex) || !$wpmltabindex) {
@@ -690,7 +709,13 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		
 		$wpmltabindex++;
 		$string = $optinid . $wpmltabindex;
-		$tabindex = 'tabindex="9' . preg_replace("/[^0-9]+/si", "", $string) . '"';
+		$string = preg_replace("/[^0-9]+/si", "", $string);
+		
+		if (empty($onlynumber)) {
+			$tabindex = 'tabindex="9' . $string . '"';
+		} else {
+			$tabindex = '9' . $string;
+		}
 		return $tabindex;
 	}
 	

@@ -66,7 +66,7 @@ $recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 				<th><label for="recaptcha_theme"><?php _e('Theme', $this -> plugin_name); ?></label>
 				<?php echo $Html -> help(__('Choose the reCAPTCHA theme to show to your users. Some premade themes by reCAPTCHA are available or you can use the Custom theme and style it according to your needs.', $this -> plugin_name)); ?></th>
 				<td>
-					<?php $themes = array('red' => "Red", 'white' => "White", 'blackglass' => "Black Glass", 'clean' => "Clean", 'custom' => "Custom"); ?>
+					<?php $themes = array('light' => __('Light', $this -> plugin_name), 'dark' => __('Dark', $this -> plugin_name)); ?>
 					<select onchange="if (this.value == 'custom') { jQuery('#recaptcha_theme_custom_div').show(); } else { jQuery('#recaptcha_theme_custom_div').hide(); }" name="recaptcha_theme" id="recaptcha_theme">
 						<option value=""><?php _e('- Select -', $this -> plugin_name); ?></option>
 						<?php foreach ($themes as $theme_key => $theme_value) : ?>
@@ -74,7 +74,6 @@ $recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 						<?php endforeach; ?>
 					</select>
 					<span class="howto"><?php _e('Pick the reCAPTCHA theme that you want to use.', $this -> plugin_name); ?></span>
-					
 					<div id="recaptcha_theme_custom_div" style="display:<?php echo (!empty($recaptcha_theme) && $recaptcha_theme == "custom") ? 'block' : 'none'; ?>;">
 						<h4><?php _e('Custom CSS', $this -> plugin_name); ?></h4>
 						<textarea class="widefat" rows="8" cols="100%" name="recaptcha_customcss"><?php echo htmlentities(trim($recaptcha_customcss)); ?></textarea>

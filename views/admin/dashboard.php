@@ -5,11 +5,6 @@
 		$from = date("Y-m-d", strtotime("-6 days"));
 		$to = date("Y-m-d", time());
 		
-		
-		
-		//include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
-		//newsletters_open_flash_chart_object("100%", "180", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&from=' . $from . '&to=' . $to, false, $this -> url());
-		
 		?>
 		<div id="chart-legend" class="newsletters-chart-legend"></div>
 		<canvas id="canvas" style="width:100%; height:200px;"></canvas>
@@ -25,6 +20,7 @@
 			var ctx = document.getElementById("canvas").getContext("2d");
 			var barChart = new Chart(ctx).Bar(barChartData, {
 				barShowStroke: false,
+				multiTooltipTemplate: "<%= datasetLabel %>: <%= value %>",
 				legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul><br class=\"clear\" />"
 			});
 			var legend = barChart.generateLegend();

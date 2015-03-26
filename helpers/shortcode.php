@@ -76,6 +76,8 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	
 		$defaults = array(
 			'post_id'			=>	false,
+			'align'				=>	"left",
+			'hspace'			=>	15,
 			'size'				=>	"thumbnail",
 			'alt'				=>	$thepost -> post_title,
 			'link'				=>	$thepost -> guid,
@@ -87,7 +89,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		if (function_exists('has_post_thumbnail') && has_post_thumbnail($thepost -> ID)) {
 			$output .= (!empty($link)) ? '<a href="' . $link . '" title="' . esc_attr(__($title)) . '">' : '';
 			
-			$thumbnail_attr = array('align' => "left", 'style' => "margin-right:15px;", 'hspace' => "15", 'title' => __($title), 'alt' => $alt);
+			$thumbnail_attr = array('align' => $align, 'style' => "margin-right:" . $hspace . "px;", 'hspace' => $hspace, 'title' => __($title), 'alt' => $alt);
 			$thumbnail_attr = apply_filters('newsletters_post_thumbnail_attr', $thumbnail_attr, $thepost -> ID);
 			
 			$output .= get_the_post_thumbnail($thepost -> ID, $size, $thumbnail_attr);
@@ -535,7 +537,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		if (!empty($emails)) {
 			$content = $this -> render('history', array('emails' => $emails, 'history_index' => $index), false, 'default');
-			$content = do_shortcode($content);
+			$content = stripslashes(do_shortcode($content));
 			return $content;
 		}
 		

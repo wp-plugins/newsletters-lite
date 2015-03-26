@@ -124,6 +124,34 @@
 							tooltip: 'Either full post or excerpt'
 						});
 						
+						if (tinymce.settings.newsletters_thumbnail_sizes.length > 0) {
+							newsletters_post_body.push({
+								type: 'listbox',
+								name: 'newsletters_post_thumbnail_size',
+								label: 'Thumbnail Size',
+								values: tinymce.settings.newsletters_thumbnail_sizes,
+								tooltip: 'Choose the size of the thumbnail'
+							});
+						}
+						
+						if (tinymce.settings.newsletters_thumbnail_align.length > 0) {
+							newsletters_post_body.push({
+								type: 'listbox',
+								name: 'newsletters_post_thumbnail_align',
+								label: 'Thumbnail Align',
+								values: tinymce.settings.newsletters_thumbnail_align,
+								tooltip: 'Choose the alignment of the thumbnail'
+							});
+						}
+						
+						newsletters_post_body.push({
+							type: 'textbox',
+							name: 'newsletters_post_thumbnail_hspace',
+							label: 'Thumbnail Space',
+							value: '15',
+							tooltip: 'The spacing of the thumbnail',
+						});
+						
 						newsletters_post_body.push({
 							type: 'listbox',
 							name: 'newsletters_post_category',
@@ -161,6 +189,9 @@
 								
 								newsletters_post += ' eftype="' + e.data.newsletters_post_eftype + '"';
 								newsletters_post += ' post_id="' + e.data.newsletters_post_id + '"';
+								newsletters_post += ' thumbnail_size="' + e.data.newsletters_post_thumbnail_size + '"';
+								newsletters_post += ' thumbnail_align="' + e.data.newsletters_post_thumbnail_align + '"';
+								newsletters_post += ' thumbnail_hspace="' + e.data.newsletters_post_thumbnail_hspace + '"';
 								
 								if (e.data.newsletters_post_id == false || e.data.newsletters_post_id.length <= 0) {
 									alert('Choose a post');
@@ -212,6 +243,34 @@
 							label: 'Type',
 							values: [{text:'Excerpt', value:'excerpt'}, {text:'Full Post', value:'full'}],
 							tooltip: 'Either full post or excerpt'
+						});
+
+						if (tinymce.settings.newsletters_thumbnail_sizes.length > 0) {
+							newsletters_posts_body.push({
+								type: 'listbox',
+								name: 'newsletters_posts_thumbnail_size',
+								label: 'Thumbnail Size',
+								values: tinymce.settings.newsletters_thumbnail_sizes,
+								tooltip: 'Choose the size of the thumbnail'
+							});
+						}
+						
+						if (tinymce.settings.newsletters_thumbnail_align.length > 0) {
+							newsletters_posts_body.push({
+								type: 'listbox',
+								name: 'newsletters_posts_thumbnail_align',
+								label: 'Thumbnail Align',
+								values: tinymce.settings.newsletters_thumbnail_align,
+								tooltip: 'Choose the alignment of the thumbnail'
+							});
+						}
+						
+						newsletters_posts_body.push({
+							type: 'textbox',
+							name: 'newsletters_posts_thumbnail_hspace',
+							label: 'Thumbnail Space',
+							value: '15',
+							tooltip: 'The spacing of the thumbnail',
 						});
 						
 						newsletters_posts_body.push({
@@ -278,14 +337,19 @@
 								newsletters_posts += ' orderby="' + e.data.newsletters_posts_orderby + '"';
 								newsletters_posts += ' order="' + e.data.newsletters_posts_order + '"';
 								newsletters_posts += ' category="' + e.data.newsletters_posts_category + '"';
+								newsletters_posts += ' thumbnail_size="' + e.data.newsletters_posts_thumbnail_size + '"';
+								newsletters_posts += ' thumbnail_align="' + e.data.newsletters_posts_thumbnail_align + '"';
+								newsletters_posts += ' thumbnail_hspace="' + e.data.newsletters_posts_thumbnail_hspace + '"';
 								
 								if (e.data.newsletters_posts_category == false || e.data.newsletters_posts_category.length <= 0) {
 									alert('Choose a category');
 									return false;
 								}
 								
-								if (e.data.newsletters_posts_posttype.length > 0) {
-									newsletters_posts += ' post_type="' + e.data.newsletters_posts_posttype + '"';
+								if (tinymce.settings.newsletters_post_types.length > 0) {
+									if (e.data.newsletters_posts_posttype.length > 0) {
+										newsletters_posts += ' post_type="' + e.data.newsletters_posts_posttype + '"';
+									}
 								}
 								
 								newsletters_posts += ']';

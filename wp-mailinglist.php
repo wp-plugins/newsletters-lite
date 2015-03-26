@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.6.1
+Version: 4.4.7
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -84,7 +84,6 @@ if (!class_exists('wpMail')) {
 			global $wpdb, $Db, $post, $Template, $Mailinglist;
 		
 			$init_array['content_css'] .= "," . $this -> render_url('css/editor-style.css', 'admin', false);
-			$init_array['content_css'] .= "," . $this -> render_url('css/editor-style-theme.css', 'admin', false);	
 
 			$snippets = array();
 			$templatesquery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " ORDER BY title ASC";
@@ -135,15 +134,38 @@ if (!class_exists('wpMail')) {
 			
 			$init_array['newsletters_loading_image'] = $this -> url() . '/images/loading.gif';
 			
-			if ($post_types = $this -> get_custom_post_types()) {
+			if ($post_types = $this -> get_custom_post_types()) {				
 				$newsletters_post_types = array();
 				$newsletters_post_types[] = array('text' => __('- Select -', $this -> plugin_name), 'value' => false);
 				foreach ($post_types as $ptype_key => $ptype) {
 					$newsletters_post_types[] = array('text' => $ptype -> labels -> name, 'value' => $ptype_key);
 				}
+				
 				$newsletters_post_types = json_encode($newsletters_post_types);
 				$init_array['newsletters_post_types'] = $newsletters_post_types;
-			}			
+			} else {
+				$init_array['newsletters_post_types'] = "{}";
+			}
+			
+			//tinymce.settings.newsletters_thumbnail_sizes
+			if ($image_sizes = get_intermediate_image_sizes()) {
+				$newsletters_thumbnail_sizes = array();
+				foreach ($image_sizes as $size) {
+					$newsletters_thumbnail_sizes[] = array('text' => $size, 'value' => $size);
+				}
+				
+				$init_array['newsletters_thumbnail_sizes'] = json_encode($newsletters_thumbnail_sizes);
+			} else {
+				$init_array['newsletters_thumbnail_sizes'] = "{}";
+			}
+			
+			//tinymce.settings.newsletters_thumbnail_align
+			$newsletters_thumbnail_align = array(
+				array('text' => __('Left', $this -> plugin_name), 'value' => "left"),
+				array('text' => __('Right', $this -> plugin_name), 'value' => "right"),
+				array('text' => __('None', $this -> plugin_name), 'value' => "none"),
+			);
+			$init_array['newsletters_thumbnail_align'] = json_encode($newsletters_thumbnail_align);
 					
 			return $init_array;
 		}
@@ -461,19 +483,21 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function end_session() {
-			session_destroy();
+			$managementauthtype = $this -> get_option('managementauthtype');
+			if (!empty($managementauthtype) && ($managementauthtype == 2 || $managementauthtype == 3)) {
+				session_destroy();
+			}
 		}
 		
-		function init() {	
-			if (!empty($_REQUEST['newsletters_obstart'])) {
-				ob_start();
-			}
-		
+		function init() {		
 			global $Db, $Email, $Html, $History, $Mailinglist, $wpmlOrder, $Subscriber, $SubscribersList;			
 			//$this -> init_textdomain();
 			
-			if (!session_id() && !headers_sent()) {
-				session_start();
+			$managementauthtype = $this -> get_option('managementauthtype');
+			if (!empty($managementauthtype) && ($managementauthtype == 2 || $managementauthtype == 3)) {
+				if (!session_id() && !headers_sent()) {
+					session_start();
+				}
 			}
 		
 			$wpmlmethod = (empty($_POST[$this -> pre . 'method'])) ? null : $_POST[$this -> pre . 'method'];
@@ -903,11 +927,14 @@ if (!class_exists('wpMail')) {
 					case 'activate'			:
 						global $wpdb, $Auth, $Mailinglist, $Html, $Db, $History, $HistoriesAttachment, $Email, $Subscriber, $Autoresponderemail, $Autoresponder, $AutorespondersList;
 					
-						if (!empty($_GET[$this -> pre . 'subscriber_email']) && !empty($_GET[$this -> pre . 'subscriber_id']) && !empty($_GET[$this -> pre . 'mailinglist_id'])) {
+						if (!empty($_GET[$this -> pre . 'subscriber_id'])) {
 							$subscriber_id = $_GET[$this -> pre . 'subscriber_id'];
-							$mailinglists = @explode(",", $_GET[$this -> pre . 'mailinglist_id']);
 							
-							$mailinglistsstring = $_GET[$this -> pre . 'mailinglist_id'];
+							if (!empty($_GET[$this -> pre . 'mailinglist_id'])) {
+								$mailinglists = @explode(",", $_GET[$this -> pre . 'mailinglist_id']);
+								$mailinglistsstring = $_GET[$this -> pre . 'mailinglist_id'];
+							}
+							
 							$subscriber = $Subscriber -> get($subscriber_id, false);
 							$Auth -> set_emailcookie($subscriber -> email, "+30 days");
 							
@@ -922,21 +949,23 @@ if (!class_exists('wpMail')) {
 							$Auth -> set_cookie($subscriberauth, "+30 days", true);
 							$paidlists = false;
 							
-							foreach ($mailinglists as $list_id) {
-								if ($mailinglist = $Mailinglist -> get($list_id, false)) {
-									if ($mailinglist -> paid == "N" || empty($mailinglist -> paid)) {
-										if ($SubscribersList -> save_field('active', "Y", array('subscriber_id' => $subscriber_id, 'list_id' => $list_id))) {										
-											$msgtype = "success";
-											$message = __('Subscription has been activated', $this -> plugin_name);
-											$subscriber = $Subscriber -> get($subscriber_id, false);
-											$subscriber -> mailinglist_id = $mailinglist -> id;
-											$Db -> model = $Subscriber -> model;
-											$Db -> save_field('ip_address', $_SERVER['REMOTE_ADDR'], array('id' => $subscriber -> id));
-											$this -> autoresponders_send($subscriber, $mailinglist);
-											do_action($this -> pre . '_subscriber_activated', $subscriber);
+							if (!empty($mailinglists)) {
+								foreach ($mailinglists as $list_id) {
+									if ($mailinglist = $Mailinglist -> get($list_id, false)) {
+										if ($mailinglist -> paid == "N" || empty($mailinglist -> paid)) {
+											if ($SubscribersList -> save_field('active', "Y", array('subscriber_id' => $subscriber_id, 'list_id' => $list_id))) {										
+												$msgtype = "success";
+												$message = __('Subscription has been activated', $this -> plugin_name);
+												$subscriber = $Subscriber -> get($subscriber_id, false);
+												$subscriber -> mailinglist_id = $mailinglist -> id;
+												$Db -> model = $Subscriber -> model;
+												$Db -> save_field('ip_address', $_SERVER['REMOTE_ADDR'], array('id' => $subscriber -> id));
+												$this -> autoresponders_send($subscriber, $mailinglist);
+												do_action($this -> pre . '_subscriber_activated', $subscriber);
+											}
+										} else {
+											$paidlists[] = $list_id;
 										}
-									} else {
-										$paidlists[] = $list_id;
 									}
 								}
 							}
@@ -1238,7 +1267,7 @@ if (!class_exists('wpMail')) {
 								if (isset($_POST['mandrill_events'])) {																						
 									$events = json_decode(stripslashes($_POST['mandrill_events']));
 									foreach ($events as $event) {
-										if ($event -> event === 'soft_bounce') {
+										if ($event -> event === 'soft_bounce' || $event -> event === "deferral") {
 											$this -> log_error(sprintf(__('Mandrill bounce: %s', $this -> plugin_name), $event -> msg -> email));
 											$result = $this -> bounce($event -> msg -> email, "mandrill-bounce", $event -> msg -> bounce_description);										
 										} else {

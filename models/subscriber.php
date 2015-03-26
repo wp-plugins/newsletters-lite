@@ -498,7 +498,7 @@ class wpmlSubscriber extends wpMailPlugin {
 	
 	function optin($data = array(), $validate = true, $checkexists = true, $confirm = true) {
 		//global Wordpress variables
-		global $wpdb, $Db, $Auth, $SubscribersList, $Field, $Mailinglist;
+		global $wpdb, $Db, $Auth, $Html, $SubscribersList, $Field, $Mailinglist;
 		$this -> errors = array();
 		$number = $_REQUEST['uninumber'];
 		$emailfield = $Field -> email_field();
@@ -527,7 +527,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				}
 
 				//if ($data['captcha_prefix'] != "" || (!empty($_GET[$this -> pre . 'method']) && $_GET[$this -> pre . 'method'] == "offsite")) {
-				if (!empty($data['captcha_prefix']) || !empty($data['recaptcha_challenge_field'])) {
+				if (!empty($data['captcha_prefix']) || !empty($data['captcha_recaptcha'])) {
 					$cap = 'Y';
 				} else {
 					$cap = 'N';
@@ -540,12 +540,24 @@ class wpmlSubscriber extends wpMailPlugin {
 						elseif (!$captcha -> check($data['captcha_prefix'], $data['captcha_code'])) { $this -> errors['captcha_code'] = __('Your code does not match the code in the image.', $this -> plugin_name); }
 						$captcha -> remove($data['captcha_prefix']);
 					} elseif ($captcha_type == "recaptcha") {					
-						require_once($this -> plugin_base() . DS . 'vendors' . DS . 'recaptcha' . DS . 'recaptchalib.php');
+						/*require_once($this -> plugin_base() . DS . 'vendors' . DS . 'recaptcha' . DS . 'recaptchalib.php');
 						$privatekey = $this -> get_option('recaptcha_privatekey');
 						$resp = recaptcha_check_answer ($privatekey, $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 						
 						if (empty($resp)) { $this -> errors['captcha_code'] = __('No response was received from reCAPTCHA, please try again.', $this -> plugin_name); }
-						elseif (!$resp -> is_valid) { $this -> errors['captcha_code'] = __('Your code does not match the code in the image.', $this -> plugin_name); }
+						elseif (!$resp -> is_valid) { $this -> errors['captcha_code'] = __('Your code does not match the code in the image.', $this -> plugin_name); }*/
+						
+						$secret = $this -> get_option('recaptcha_privatekey');
+						require_once($this -> plugin_base() . DS . 'vendors' . DS . 'recaptcha' . DS . 'vendor' . DS . 'autoload.php');
+						
+						if ($ReCaptcha = new \ReCaptcha\ReCaptcha($secret)) {
+							$resp = $ReCaptcha -> verify($data['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+							
+							if (!$resp -> isSuccess()) {
+								$errorCodes = $resp -> getErrorCodes();
+								$this -> errors['captcha_code'] = $Html -> reCaptchaErrorMessage($errorCodes[0]);
+							}
+						}
 					}
 				}
 				

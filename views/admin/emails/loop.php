@@ -53,13 +53,14 @@
 				<?php if ($_GET['page'] == $this -> sections -> history) : ?>
 			    	<div class="alignleft actions">
 			    		<?php $exportlink = ($_GET['page'] == $this -> sections -> history) ? '?page=' . $this-> sections -> history . '&amp;method=exportsent&amp;history_id=' . $history -> id : '?page='; ?>
-			        	<a onclick="jQuery('#newsletters-emails-action').val('export'); jQuery('#newsletters-emails-form').removeAttr('onsubmit').submit(); return false;" href="" title="<?php _e('Export sent emails to CSV', $this -> plugin_name); ?>" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
+			        	<a onclick="jQuery('#newsletters-emails-action').val('export'); jQuery('#newsletters-emails-form').removeAttr('onsubmit').submit(); return false;" href="" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
+			        	<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history); ?>" class="newsletters-icon-download button"> <?php _e('Export All', $this -> plugin_name); ?></a>
 			        </div>
 			        <div class="alignleft actions">
 				        <select name="action" id="newsletters-emails-action" onchange="emails_change_action(this.value);">
 					        <option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					        <optgroup label="<?php _e('Emails', $this -> plugin_name); ?>">
-					        	<option value="export"><?php _e('Export', $this -> plugin_name); ?></option>
+					        	<option value="export"><?php _e('Export Selected', $this -> plugin_name); ?></option>
 					        	<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
 					        </optgroup>
 					        <optgroup label="<?php _e('Subscribers', $this -> plugin_name); ?>">

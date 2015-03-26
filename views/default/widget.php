@@ -65,6 +65,14 @@
 			$recaptcha_customcss = $this -> get_option('recaptcha_customcss');
 			
 			?>
+			
+			<div id="" class="" style="">
+				<div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_publickey; ?>" data-theme="<?php echo $recaptcha_theme; ?>" data-tabindex="<?php echo $Html -> tabindex($widget_id, true); ?>"></div>
+	            <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=<?php echo $recaptcha_language; ?>"></script>
+	            <input type="hidden" name="captcha_recaptcha" value="1" />
+			</div>
+			
+			<?php /*
 			<div id="<?php echo $widget_id; ?>-recaptcha" style="display:none;" class="recaptcha_widget">
 				<?php if (!empty($recaptcha_theme) && $recaptcha_theme == "custom") : ?>
 					<div id="recaptcha_image" class="recaptcha_image"></div>
@@ -92,6 +100,7 @@
 				}); 
 			});
 			</script>
+			*/ ?>
 		<?php endif; ?>
     <?php endif; ?>
     
