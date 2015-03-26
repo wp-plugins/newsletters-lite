@@ -83,7 +83,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						?>
 						
 						<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
-							<?php wp_editor(stripslashes($_POST['content']), 'content', array('tabindex' => "2", 'tinymce' => $tinymce)); ?>
+							<?php wp_editor(stripslashes($_POST['content']), 'content', array('tabindex' => "2", 'tinymce' => $tinymce, 'drag_drop_upload' => true)); ?>
 						<?php else : ?>
 							<?php the_editor(stripslashes($_POST['content']), 'content', 'title', true, 2); ?>
 						<?php endif; ?>
@@ -211,35 +211,6 @@ function deletecontentarea(number, history_id) {
 }
 
 function addcontentarea() {	
-	/*var contentarea_html = '';
-	contentarea_html += '<div class="postbox" id="contentareabox' + contentarea + '">';
-	contentarea_html += '<div class="handlediv" title="Click to toggle"><br></div>';
-	contentarea_html += '<h3 class="hndle"><span><?php echo __('Content Area', $this -> plugin_name); ?> ' + contentarea + '</span></h3>';
-	contentarea_html += '<div class="inside">';
-	contentarea_html += '<textarea id="contentarea' + contentarea + '" name="contentarea[' + contentarea + ']"></textarea>';
-	contentarea_html += '<table id="post-status-info" cellpadding="0" cellspacing="0">';
-	contentarea_html += '<tbody>';
-	contentarea_html += '<tr>';
-	contentarea_html += '<td id="wp-word-count">';
-	contentarea_html += '<span id="word-count"><code>[newsletters_content id="' + contentarea + '"]</code></span>';
-	contentarea_html += '</td>';
-	contentarea_html += '<td class="autosave-info">';
-	contentarea_html += '<span id="autosave" style="display:none;"></span>';
-	contentarea_html += '</td>';
-	contentarea_html += '</tr>';
-	contentarea_html += '</tbody>';
-	contentarea_html += '</table>';
-	contentarea_html += '<p><a href="" onclick="if (confirm(\'<?php echo __('Are you sure you want to remove this content area?', $this -> plugin_name); ?>\')) { deletecontentarea(' + contentarea + ', \'\'); } return false;" class="button button-secondary"><?php _e('Delete', $this -> plugin_name); ?></a></p>';
-	contentarea_html += '</div>';
-	contentarea_html += '</div>';
-	
-	jQuery('#contentareas').append(contentarea_html);
-	wpml_scroll('#contentareabox' + contentarea);
-	
-	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
-		tinyMCE.execCommand("mceAddEditor", false, 'contentarea' + contentarea);
-	}*/
-	
 	jQuery('#contentarea_loading').show();
 	jQuery.post(wpmlajaxurl + '?action=newsletters_load_new_editor', {contentarea:contentarea}, function(response) {
 		jQuery('#contentareas').append(response);

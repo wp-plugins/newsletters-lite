@@ -241,6 +241,39 @@
 							?>
 							<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=view&amp;id=<?php echo $email -> id; ?>"><?php echo sprintf("%s&#37; / %s&#37; / %s&#37; / %s", number_format($tracking, 2, '.', ''), number_format($eunsubscribeperc, 2, '.', ''), number_format($ebouncedperc, 2, '.', ''), $clicks); ?></a>
 							<?php echo $Html -> help(sprintf(__('%s opened %s, %s unsubscribes %s, %s bounces %s and %s clicks out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . number_format($ebouncedperc, 2, '.', '') . '&#37;)', '<strong>' . $clicks . '</strong>', '<strong>' . $etotal . '</strong>')); ?>
+							
+							<?php
+							
+							$data = array(
+								array(
+									'value'		=>	 number_format($tracking, 0, '.', ''),
+									'color'		=>	"#46BFBD",
+									'highlight'	=>	"#5AD3D1",
+									'label'		=>	"Read",
+								),
+								array(
+									'value'		=>	number_format((100 - $tracking), 0, '.', ''),
+									'color'		=>	"#949FB1",
+									'highlight'	=>	"#A8B3C5",
+									'label'		=>	"Unread",
+								),
+								array(
+									'value'		=>	number_format($ebouncedperc, 0, '.', ''),
+									'color'		=>	"#F7464A",
+									'highlight'	=>	"#FF5A5E",
+									'label'		=>	"Bounced",
+								),
+								array(
+									'value'		=>	number_format($eunsubscribeperc, 0, '.', ''),
+									'color'		=>	"#FDB45C",
+									'highlight'	=>	"#FFC870",
+									'label'		=>	"Unsubscribed",
+								)
+							);
+								
+							?>
+							
+							<?php $Html -> pie_chart('email-chart-' . $email -> id, array('width' => 100), $data, $options); ?>
 						</td>
 						<td>
 							<?php if ($email -> scheduled == "Y") : ?>

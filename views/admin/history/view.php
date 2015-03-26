@@ -97,10 +97,12 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 			<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 				<th><?php _e('Tracking', $this -> plugin_name); ?></th>
 				<td>
-					<?php global $wpdb; $Db -> model = $Email -> model; ?>
-					<?php $etotal = $Db -> count(array('history_id' => $history -> id)); ?>
-					<?php $eread = $Db -> count(array('read' => "Y", 'history_id' => $history -> id)); ?>
 					<?php 
+						
+					global $wpdb; $Db -> model = $Email -> model;
+					$etotal = $Db -> count(array('history_id' => $history -> id));
+					$eread = $Db -> count(array('read' => "Y", 'history_id' => $history -> id));
+					$tracking = (($eread/$etotal) * 100);
 					
 					$query = "SELECT SUM(`count`) FROM `" . $wpdb -> prefix . $Bounce -> table . "` WHERE `history_id` = '" . $history -> id . "'";
 					
@@ -112,9 +114,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 						$this -> set_cache($query_hash, $ebounced);
 					}
 					
-					?>
-					<?php $ebouncedperc = (!empty($etotal)) ? number_format((($ebounced/$etotal) * 100), 2, '.', '') : 0; ?>
-					<?php 
+					$ebouncedperc = (!empty($etotal)) ? number_format((($ebounced/$etotal) * 100), 2, '.', '') : 0;
 					
 					$query = "SELECT COUNT(`id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `history_id` = '" . $history -> id . "'";
 					
@@ -134,7 +134,7 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					
 					echo sprintf(__('%s opened %s, %s%s unsubscribes%s %s, %s bounces %s and %s%s clicks%s out of %s emails sent out', $this -> plugin_name), 
 					'<strong>' . $eread . '</strong>', 
-					'(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', 
+					'(' . ((!empty($etotal)) ? number_format($tracking, 2, '.', '') : 0) . '&#37;)', 
 					'<a href="' . admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=unsubscribes&history_id=' . $history -> id) . '">',
 					'<strong>' . $eunsubscribed . '</strong>', 
 					'</a>',
@@ -145,6 +145,35 @@ $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'histor
 					'<strong>' . $clicks . '</strong>', 
 					'</a>', 
 					'<strong>' . $etotal . '</strong>'); 
+					
+					$data = array(
+						array(
+							'value'		=>	 number_format($tracking, 0, '.', ''),
+							'color'		=>	"#46BFBD",
+							'highlight'	=>	"#5AD3D1",
+							'label'		=>	"Read",
+						),
+						array(
+							'value'		=>	number_format((100 - $tracking), 0, '.', ''),
+							'color'		=>	"#949FB1",
+							'highlight'	=>	"#A8B3C5",
+							'label'		=>	"Unread",
+						),
+						array(
+							'value'		=>	number_format($ebouncedperc, 0, '.', ''),
+							'color'		=>	"#F7464A",
+							'highlight'	=>	"#FF5A5E",
+							'label'		=>	"Bounced",
+						),
+						array(
+							'value'		=>	number_format($eunsubscribeperc, 0, '.', ''),
+							'color'		=>	"#FDB45C",
+							'highlight'	=>	"#FFC870",
+							'label'		=>	"Unsubscribed",
+						)
+					);
+						
+					$Html -> pie_chart('email-chart-' . $history -> id, array('width' => 150, 'height' => 150), $data, $options); 
 					
 					?>
 				</td>

@@ -33,7 +33,7 @@ if ($this -> language_do()) {
 					            	<?php 
 					
 									$settings = array(
-										'wpautop'			=>	false,
+										//'wpautop'			=>	false,
 										'media_buttons'		=>	true,
 										'textarea_name'		=>	'etmessage_latestposts[' . $language . ']',
 										'textarea_rows'		=>	10,
@@ -61,7 +61,7 @@ if ($this -> language_do()) {
 					<?php 
 					
 					$settings = array(
-						'wpautop'			=>	false,
+						//'wpautop'			=>	false,
 						'media_buttons'		=>	true,
 						'textarea_name'		=>	'etmessage_latestposts',
 						'textarea_rows'		=>	10,

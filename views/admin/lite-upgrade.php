@@ -37,8 +37,9 @@ $emails_percentage = (($emails / 1000) * 100);
 		<p><?php _e('You can click "Submit Serial" below to activate Tribulant Newsletters PRO.', $this -> plugin_name); ?><br/>
 		<?php _e('Alternatively, click "Buy PRO Now" to open the plugin page and buy a serial key to submit.', $this -> plugin_name); ?></p>
 		<p>
-			<a class="button button-secondary button-large" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> submitserial); ?>" onclick="jQuery.colorbox({href:ajaxurl + '?action=<?php echo $this -> pre; ?>serialkey'}); return false;"><?php _e('Submit Serial', $this -> plugin_name); ?></a>
-			<a class="button button-primary button-large" href="<?php echo $plugin_link; ?>" onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'90%', height:'90%', href:'<?php echo $plugin_link; ?>', fastIframe:false}); return false;"><?php _e('Buy PRO Now', $this -> plugin_name); ?></a>
+			<?php /*<a class="button button-secondary button-large" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> submitserial); ?>" onclick="jQuery.colorbox({href:ajaxurl + '?action=<?php echo $this -> pre; ?>serialkey'}); return false;"><?php _e('Submit Serial', $this -> plugin_name); ?></a>*/ ?>
+			<a class="button button-primary button-hero" href="<?php echo $plugin_link; ?>" onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'90%', height:'90%', href:'<?php echo $plugin_link; ?>', fastIframe:false}); return false;"><?php _e('Buy PRO Now', $this -> plugin_name); ?></a>
+			<p><?php _e('or', $this -> plugin_name); ?> <a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> submitserial); ?>" onclick="jQuery.colorbox({href:ajaxurl + '?action=<?php echo $this -> pre; ?>serialkey'}); return false;"><?php _e('submit a serial key', $this -> plugin_name); ?></a></p>
 		</p>
 	</div>
 		

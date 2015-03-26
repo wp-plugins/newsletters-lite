@@ -83,7 +83,8 @@ if (!class_exists('wpMail')) {
 		function tiny_mce_before_init($init_array = array()) {
 			global $wpdb, $Db, $post, $Template, $Mailinglist;
 		
-			$init_array['content_css'] .= "," . $this -> url() . '/css/editor-style.css';	
+			$init_array['content_css'] .= "," . $this -> render_url('css/editor-style.css', 'admin', false);
+			$init_array['content_css'] .= "," . $this -> render_url('css/editor-style-theme.css', 'admin', false);	
 
 			$snippets = array();
 			$templatesquery = "SELECT * FROM " . $wpdb -> prefix . $Template -> table . " ORDER BY title ASC";
@@ -887,7 +888,7 @@ if (!class_exists('wpMail')) {
 					case 'unsubscribe'		:
 						global $Html;
 					
-						$querystring = 'method=unsubscribe&' . $this -> pre . 'subscriber_id=' . $_GET[$this -> pre . 'subscriber_id'] . '&' . $this -> pre . 'subscriber_email=' . $_GET[$this -> pre . 'subscriber_email'] . '&' . $this -> pre . 'mailinglist_id=' . $_GET[$this -> pre . 'mailinglist_id'] . '&authkey=' . $_GET['authkey'];
+						$querystring = 'method=unsubscribe&' . $this -> pre . 'subscriber_id=' . $_GET[$this -> pre . 'subscriber_id'] . '&' . $this -> pre . 'mailinglist_id=' . $_GET[$this -> pre . 'mailinglist_id'] . '&authkey=' . $_GET['authkey'];
 						$url = $Html -> retainquery($querystring, $this -> get_managementpost(true));
 						$this -> redirect($url);
 						exit();
@@ -1231,7 +1232,7 @@ if (!class_exists('wpMail')) {
 						
 						<?php
 						break;
-					case 'bounce'			:					
+					case 'bounce'			:										
 						switch ($_GET['type']) {
 							case 'mandrill'			:
 								if (isset($_POST['mandrill_events'])) {																						
@@ -1239,10 +1240,10 @@ if (!class_exists('wpMail')) {
 									foreach ($events as $event) {
 										if ($event -> event === 'soft_bounce') {
 											$this -> log_error(sprintf(__('Mandrill bounce: %s', $this -> plugin_name), $event -> msg -> email));
-											$result = $this -> bounce($event -> msg -> email, "mandrill-bounce");										
+											$result = $this -> bounce($event -> msg -> email, "mandrill-bounce", $event -> msg -> bounce_description);										
 										} else {
 											$this -> log_error(sprintf(__('Mandrill hard bounce, rejection, or spam: %s', $this->plugin_name), $event -> msg -> email));
-											$result = $this -> bounce($event -> msg -> email, "mandrill-delete");
+											$result = $this -> bounce($event -> msg -> email, "mandrill-delete", $event -> msg -> bounce_description);
 										}
 									}
 								}
@@ -1273,7 +1274,7 @@ if (!class_exists('wpMail')) {
 												foreach ($json_message -> bounce -> bouncedRecipients as $recipient) {
 													if ($recipient -> action == "failed") {
 														$this -> log_error(sprintf(__('Amazon SNS bounce: %s', $this -> plugin_name), $recipient -> emailaddress));
-														$result = $this -> bounce($recipient -> emailAddress, "sns");
+														$result = $this -> bounce($recipient -> emailAddress, "sns", $json_message -> bounce -> bouncedRecipients[0] -> status . ' - ' . $json_message -> bounce -> bouncedRecipients[0] -> diagnosticCode);
 													}
 												}
 											}
@@ -1281,7 +1282,7 @@ if (!class_exists('wpMail')) {
 											if (!empty($json_message -> complaint -> complainedRecipients)) {
 												foreach ($json_message -> complaint -> complainedRecipients as $recipient) {
 													$this -> log_error(sprintf(__('Amazon SNS complaint: %s', $this -> plugin_name), $recipient -> emailaddress));
-													$result = $this -> bounce($recipient -> emailAddress, "sns");
+													$result = $this -> bounce($recipient -> emailAddress, "sns", $json_message -> bounce -> bouncedRecipients[0] -> status . ' - ' . $json_message -> bounce -> bouncedRecipients[0] -> diagnosticCode);
 												}
 											}
 										}
@@ -1291,7 +1292,7 @@ if (!class_exists('wpMail')) {
 							default				:
 								$this -> bounce($_GET['em']);
 								break;
-						}																		
+						}	
 						break;
 					case 'newsletter'		:
 						global $Db, $History, $Subscriber;

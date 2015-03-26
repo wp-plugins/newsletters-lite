@@ -495,6 +495,369 @@ if (!class_exists('wpMailPlugin')) {
 		    global $wpdb, $Html, $Subscriber, $Email, $Bounce, $Unsubscribe;
 		    
 		    $type = (empty($_GET['type'])) ? "days" : $_GET['type'];
+			$fromdate = (empty($_GET['from'])) ? date("Y-m-d", strtotime("-13 days")) : $_GET['from'];
+			$todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
+			
+			switch ($type) {
+				case 'years'			:
+					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`created`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$subscribers_array[date_i18n("Y", strtotime($record -> date))] = $record -> subscriberscount; 
+							
+							if (empty($y_max) || (!empty($y_max) && $record -> subscriberscount > $y_max)) {
+								$y_max = $record -> subscriberscount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`created`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $emails_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$emails_array[date_i18n("Y", strtotime($record -> date))] = $record -> emailscount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> emailscount > $y_right_max)) {
+								$y_right_max = $record -> emailscount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`modified`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $bounces_array = array();
+				    if (!empty($records)) {	    
+					    foreach ($records as $record) {
+						    $bounces_array[date_i18n("Y", strtotime($record -> date))] = $record -> bouncecount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> bouncecount > $y_right_max)) {
+								$y_right_max = $record -> bouncecount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(`id`) AS `unsubscribescount`, DATE(`modified`) AS `date` FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`modified`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $unsubscribes_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+						    $unsubscribes_array[date_i18n("Y", strtotime($record -> date))] = $record -> unsubscribescount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> unsubscribescount > $y_right_max)) {
+								$y_right_max = $record -> unsubscribescount;
+							}
+					    }
+				    }
+				    
+				    $dates_data = array();
+				    $subscribers_data = array();
+				    $emails_data = array();
+				    $bounces_data = array();
+				    $unsubscribes_data = array();
+				    
+				    $fromstamp = strtotime($fromdate);
+					$tostamp = strtotime($todate);
+					$yearsdiff = round(abs($tostamp - $fromstamp) / (60 * 60 * 24 * 365));
+				    
+				    $j = 0;
+				    for ($i = 0; $i <= $yearsdiff; $i++) {
+				    	$datestring = date_i18n("Y", strtotime("-" . $i . " years", $tostamp));
+					    $dates_data[$j] = date_i18n("Y", strtotime("-" . $i . " years", $tostamp));
+					    
+					    if (!empty($subscribers_array[$datestring])) {
+						    $subscribers_data[$j] = $subscribers_array[$datestring];
+					    } else {
+						    $subscribers_data[$j] = 0;
+					    }
+					    
+					    if (!empty($emails_array[$datestring])) {
+						    $emails_data[$j] = $emails_array[$datestring];
+					    } else {
+						    $emails_data[$j] = 0;
+					    }
+					    
+					    if (!empty($bounces_array[$datestring])) {
+						    $bounces_data[$j] = $bounces_array[$datestring];
+					    } else {
+						    $bounces_data[$j] = 0;
+					    }
+					    
+					    if (!empty($unsubscribes_array[$datestring])) {
+						    $unsubscribes_data[$j] = $unsubscribes_array[$datestring];
+					    } else {
+						    $unsubscribes_data[$j] = 0;
+					    }
+					    
+					    $j++;
+				    }
+				    
+				    $unsubscribes_data = array_reverse($unsubscribes_data);
+				    $subscribers_data = array_reverse($subscribers_data);
+				    $bounces_data = array_reverse($bounces_data);
+				    $emails_data = array_reverse($emails_data);
+				    $dates_data = array_reverse($dates_data);
+					break;
+				case 'months'			:
+					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`created`)";
+					$records = $wpdb -> get_results($query);
+					
+				    $subscribers_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$subscribers_array[date_i18n("mY", strtotime($record -> date))] = $record -> subscriberscount; 
+							
+							if (empty($y_max) || (!empty($y_max) && $record -> subscriberscount > $y_max)) {
+								$y_max = $record -> subscriberscount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`created`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $emails_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$emails_array[date_i18n("mY", strtotime($record -> date))] = $record -> emailscount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> emailscount > $y_right_max)) {
+								$y_right_max = $record -> emailscount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`modified`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $bounces_array = array();
+				    if (!empty($records)) {	    
+					    foreach ($records as $record) {
+						    $bounces_array[date_i18n("mY", strtotime($record -> date))] = $record -> bouncecount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> bouncecount > $y_right_max)) {
+								$y_right_max = $record -> bouncecount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(`id`) AS `unsubscribescount`, DATE(`modified`) AS `date` FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`modified`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $unsubscribes_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+						    $unsubscribes_array[date_i18n("mY", strtotime($record -> date))] = $record -> unsubscribescount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> unsubscribescount > $y_right_max)) {
+								$y_right_max = $record -> unsubscribescount;
+							}
+					    }
+				    }
+				    
+				    $dates_data = array();
+				    $subscribers_data = array();
+				    $emails_data = array();
+				    $bounces_data = array();
+				    $unsubscribes_data = array();
+				    
+				    $fromstamp = strtotime($fromdate);
+					$tostamp = strtotime($todate);
+					$monthsdiff = round(abs($tostamp - $fromstamp) / 2628000);
+				    
+				    $j = 0;
+				    for ($i = 0; $i <= $monthsdiff; $i++) {
+				    	$datestring = date_i18n("mY", strtotime("-" . $i . " months", $tostamp));
+					    $dates_data[$j] = date_i18n("F Y", strtotime("-" . $i . " months", $tostamp));
+					    
+					    if (!empty($subscribers_array[$datestring])) {
+						    $subscribers_data[$j] = $subscribers_array[$datestring];
+					    } else {
+						    $subscribers_data[$j] = 0;
+					    }
+					    
+					    if (!empty($emails_array[$datestring])) {
+						    $emails_data[$j] = $emails_array[$datestring];
+					    } else {
+						    $emails_data[$j] = 0;
+					    }
+					    
+					    if (!empty($bounces_array[$datestring])) {
+						    $bounces_data[$j] = $bounces_array[$datestring];
+					    } else {
+						    $bounces_data[$j] = 0;
+					    }
+					    
+					    if (!empty($unsubscribes_array[$datestring])) {
+						    $unsubscribes_data[$j] = $unsubscribes_array[$datestring];
+					    } else {
+						    $unsubscribes_data[$j] = 0;
+					    }
+					    
+					    $j++;
+				    }
+				    
+				    $unsubscribes_data = array_reverse($unsubscribes_data);
+				    $subscribers_data = array_reverse($subscribers_data);
+				    $bounces_data = array_reverse($bounces_data);
+				    $emails_data = array_reverse($emails_data);
+				    $dates_data = array_reverse($dates_data);
+					break;
+				case 'days'				:
+				default 				:				
+					$query = "SELECT COUNT(`id`) as `subscriberscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
+					$records = $wpdb -> get_results($query);
+					
+				    $subscribers_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$subscribers_array[date_i18n("m-d", strtotime($record -> date))] = $record -> subscriberscount; 
+							
+							if (empty($y_max) || (!empty($y_max) && $record -> subscriberscount > $y_max)) {
+								$y_max = $record -> subscriberscount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $emails_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$emails_array[date_i18n("m-d", strtotime($record -> date))] = $record -> emailscount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> emailscount > $y_right_max)) {
+								$y_right_max = $record -> emailscount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`modified`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $bounces_array = array();
+				    if (!empty($records)) {	    
+					    foreach ($records as $record) {
+						    $bounces_array[date_i18n("m-d", strtotime($record -> date))] = $record -> bouncecount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> bouncecount > $y_right_max)) {
+								$y_right_max = $record -> bouncecount;
+							}
+					    }
+				    }
+				    
+				    $query = "SELECT COUNT(`id`) AS `unsubscribescount`, DATE(`modified`) AS `date` FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`modified`)";
+				    $records = $wpdb -> get_results($query);
+				    
+				    $unsubscribes_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+						    $unsubscribes_array[date_i18n("m-d", strtotime($record -> date))] = $record -> unsubscribescount; 
+							
+							if (empty($y_right_max) || (!empty($y_right_max) && $record -> unsubscribescount > $y_right_max)) {
+								$y_right_max = $record -> unsubscribescount;
+							}
+					    }
+				    }
+				    
+				    $dates_data = array();
+				    $subscribers_data = array();
+				    $emails_data = array();
+				    $bounces_data = array();
+				    $unsubscribes_data = array();
+				    
+				    $fromstamp = strtotime($fromdate);
+					$tostamp = strtotime($todate);
+					$daysdiff = round(abs($tostamp - $fromstamp) / 86400);
+				    
+				    $j = 0;
+				    for ($i = 0; $i <= $daysdiff; $i++) {
+				    	$datestring = date_i18n("m-d", strtotime("-" . $i . " days", $tostamp));
+					    $dates_data[$j] = date_i18n("M j", strtotime("-" . $i . " days", $tostamp));
+					    
+					    if (!empty($subscribers_array[$datestring])) {
+						    $subscribers_data[$j] = $subscribers_array[$datestring];
+					    } else {
+						    $subscribers_data[$j] = 0;
+					    }
+					    
+					    if (!empty($emails_array[$datestring])) {
+						    $emails_data[$j] = $emails_array[$datestring];
+					    } else {
+						    $emails_data[$j] = 0;
+					    }
+					    
+					    if (!empty($bounces_array[$datestring])) {
+						    $bounces_data[$j] = $bounces_array[$datestring];
+					    } else {
+						    $bounces_data[$j] = 0;
+					    }
+					    
+					    if (!empty($unsubscribes_array[$datestring])) {
+						    $unsubscribes_data[$j] = $unsubscribes_array[$datestring];
+					    } else {
+						    $unsubscribes_data[$j] = 0;
+					    }
+					    
+					    $j++;
+				    }
+				    
+				    $unsubscribes_data = array_reverse($unsubscribes_data);
+				    $subscribers_data = array_reverse($subscribers_data);
+				    $bounces_data = array_reverse($bounces_data);
+				    $emails_data = array_reverse($emails_data);
+				    $dates_data = array_reverse($dates_data);
+			}
+			
+			$data = array();
+				    
+		    $data['labels'] = $dates_data;
+		    
+		    $data['datasets'] = array(
+			    array(
+					'label'					=>	__('Subscribers', $this -> plugin_name),
+		            'fillColor'				=>	"#46BFBD",
+		            'highlightFill'			=>	"#5AD3D1",
+		            'data'					=>	$subscribers_data,
+				),
+				array(
+					'label'					=>	__('Emails Sent', $this -> plugin_name),
+		            'fillColor'				=>	"#4D5360",
+		            'highlightFill'			=>	"#616774",
+		            'data'					=>	$emails_data,
+				),
+				array(
+					'label'					=>	__('Unsubscribes', $this -> plugin_name),
+		            'fillColor'				=>	"#FDB45C",
+		            'highlightFill'			=>	"#FFC870",
+		            'data'					=>	$unsubscribes_data,
+				),
+				array(
+					'label'					=>	__('Bounces', $this -> plugin_name),
+					'fillColor'				=>	"#F7464A",
+					'highlightFill'			=>	"#FF5A5E",
+					'data'					=>	$bounces_data,
+				),
+		    );
+		    
+		    echo json_encode($data);
+		    
+		    exit();
+		    die();
+	    }
+	    
+	    function ajax_welcomestats_bak() {
+	    	define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+		    global $wpdb, $Html, $Subscriber, $Email, $Bounce, $Unsubscribe;
+		    
+		    $type = (empty($_GET['type'])) ? "days" : $_GET['type'];
 			$fromdate = (empty($_GET['from'])) ? date("Y-m-d", strtotime("-31 days")) : $_GET['from'];
 			$todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 			
@@ -1520,7 +1883,7 @@ if (!class_exists('wpMailPlugin')) {
 					<?php 
 					
 					$settings = array(
-						'wpautop'			=>	false,
+						//'wpautop'			=>	false,
 						'media_buttons'		=>	true,
 						'textarea_name'		=>	'contentarea[' . $_POST['contentarea'] . ']',
 						'textarea_rows'		=>	10,
@@ -3275,6 +3638,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 			if (is_admin()) {	
 				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
+				wp_enqueue_script('chartjs', $this -> render_url('js/chartjs/Chart.js', 'admin', false), array('jquery'), false, false);
 					
 				if (preg_match("/(widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {									
 					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
@@ -6831,7 +7195,7 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function bounce($email = null, $type = 'cgi') {
+		function bounce($email = null, $type = 'cgi', $status = null) {
 			global $wpdb, $Bounce, $Email, $Db, $Subscriber, $SubscribersList;
 	
 	        $deleted_subscribers = 0;
@@ -7018,7 +7382,11 @@ if (!class_exists('wpMailPlugin')) {
                             $Db -> save_field('bouncecount', ($subscriber -> bouncecount + 1), array('id' => $subscriber -> id));
                         }
                         
-                        $bouncedata = array('email' => $subscriber -> email);
+                        $bouncedata = array(
+                        	'email' 		=> 	$subscriber -> email,
+                        	'status'		=>	$status,
+                        );
+                        
                         $Bounce -> save($bouncedata);
                         $subscriber -> bouncecount = ($subscriber -> bouncecount + 1);
                         $this -> admin_bounce_notification($subscriber);
@@ -7052,7 +7420,11 @@ if (!class_exists('wpMailPlugin')) {
                             $Db -> save_field('bouncecount', ($subscriber -> bouncecount + 1), array('id' => $subscriber -> id));
                         }
                         
-                        $bouncedata = array('email' => $subscriber -> email);
+                        $bouncedata = array(
+                        	'email' 			=> 	$subscriber -> email,
+                        	'status'			=>	$status,
+                        );
+                        
                         $Bounce -> save($bouncedata);
                         $subscriber -> bouncecount = ($subscriber -> bouncecount + 1);
                         $this -> admin_bounce_notification($subscriber);
@@ -7070,7 +7442,11 @@ if (!class_exists('wpMailPlugin')) {
                         $Db -> delete($subscriber -> id);
                         $deleted_subscribers++;
                         
-                        $bouncedata = array('email' => $subscriber -> email);
+                        $bouncedata = array(
+                        	'email' 			=> 	$subscriber -> email,
+                        	'status'			=>	$status,
+                        );
+                        
                         $Bounce -> save($bouncedata);
                         $subscriber -> bouncecount = ($subscriber -> bouncecount + 1);
                         $this -> admin_bounce_notification($subscriber);

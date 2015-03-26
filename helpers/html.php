@@ -21,6 +21,24 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	 
 	    return( $NewArray );
 	}
+	
+	function pie_chart($id = null, $attributes = array(), $data = array(), $options = array()) {
+		
+		$default_attributes = array(
+			'width'					=>	300,
+			'height'				=>	300,
+		);
+		
+		$attributes = wp_parse_args($attributes, $default_attributes);
+		
+		$default_options = array(
+			'tooltipTemplate'		=>	"<%if (label){%><%=label%>: <%}%><%=value%>%",
+		);
+		
+		$options = wp_parse_args($options, $default_options);
+		
+		$this -> render('charts' . DS . 'pie', array('id' => $id, 'attributes' => $attributes, 'data' => $data, 'options' => $options), true, 'admin');
+	}
 	 
 	/**
 	 * Convert the php date format string to a js date format

@@ -2,7 +2,7 @@
 <?php
 
 $type = (empty($_GET['type'])) ? 'days' : $_GET['type'];
-$fromdate = (empty($_GET['from'])) ? date("Y-m-d", strtotime("-31 days")) : $_GET['from'];
+$fromdate = (empty($_GET['from'])) ? date("Y-m-d", strtotime("-13 days")) : $_GET['from'];
 $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 
 ?>
@@ -29,16 +29,33 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 	</p>
 </div>
 
+<div id="chart-legend" class="newsletters-chart-legend"></div>
+
+<canvas id="canvas" style="width:100%; height:300px;"></canvas>
+
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	jQuery('#fromdate').datepicker({showButtonPanel:true, numberOfMonths:2, changeMonth:true, changeYear:true, defaultDate:"<?php echo $fromdate; ?>", dateFormat:"yy-mm-dd"});
 	jQuery('#todate').datepicker({showButtonPanel:true, numberOfMonths:2, changeMonth:true, changeYear:true, defaultDate:"<?php echo $todate; ?>", dateFormat:"yy-mm-dd"});
+	
+	var ajaxdata = {type:'<?php echo $type; ?>', from:'<?php echo $fromdate; ?>', to:'<?php echo $to; ?>'};
+	
+	jQuery.getJSON(newsletters_ajaxurl + '?action=wpmlwelcomestats', ajaxdata, function(json) {
+		var barChartData = json;
+		var ctx = document.getElementById("canvas").getContext("2d");
+		var barChart = new Chart(ctx).Bar(barChartData, {
+			barShowStroke: false,
+			legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul><br class=\"clear\" />"
+		});
+		var legend = barChart.generateLegend();
+		jQuery('#chart-legend').html(legend);
+	});
 });
 </script>
 
 <?php
 
-include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
-newsletters_open_flash_chart_object("100%", "300", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&type=' . $type . '&from=' . $fromdate . '&to=' . $todate, false, $this -> url());
+//include_once $this -> plugin_base() . DS . 'vendors' . DS . 'ofc' . DS . 'open_flash_chart_object.php';
+//newsletters_open_flash_chart_object("100%", "300", admin_url('admin-ajax.php') . '?action=wpmlwelcomestats&type=' . $type . '&from=' . $fromdate . '&to=' . $todate, false, $this -> url());
 
 ?>

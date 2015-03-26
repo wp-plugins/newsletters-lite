@@ -70,7 +70,7 @@ if ($this -> language_do()) {
 					            	<?php 
 					
 									$settings = array(
-										'wpautop'			=>	true,
+										//'wpautop'			=>	true,
 										'media_buttons'		=>	true,
 										'textarea_name'		=>	'etmessage_order[' . $language . ']',
 										'textarea_rows'		=>	10,
@@ -98,7 +98,7 @@ if ($this -> language_do()) {
 					<?php 
 					
 					$settings = array(
-						'wpautop'			=>	true,
+						//'wpautop'			=>	true,
 						'media_buttons'		=>	true,
 						'textarea_name'		=>	'etmessage_order',
 						'textarea_rows'		=>	10,

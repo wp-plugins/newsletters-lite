@@ -70,7 +70,7 @@ if ($this -> language_do()) {
 					            	<?php 
 					
 									$settings = array(
-										'wpautop'			=>	true,
+										//'wpautop'			=>	true,
 										'media_buttons'		=>	true,
 										'textarea_name'		=>	'etmessage_unsubscribe[' . $language . ']',
 										'textarea_rows'		=>	10,

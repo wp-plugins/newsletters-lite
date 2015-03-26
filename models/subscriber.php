@@ -977,11 +977,11 @@ class wpmlSubscriber extends wpMailPlugin {
 														
 						foreach ($mailinglists as $key => $list_id) {					
 							$mailinglist = $Mailinglist -> get($list_id);
+							$active = (!empty($mailinglist -> doubleopt) && $mailinglist -> doubleopt == "N") ? "Y" : "N";
 							$paid = ($mailinglist -> paid == "Y") ? 'Y' : 'N';
 							if (!empty($mailinglist -> paid) && $mailinglist -> paid == "Y") { $active = "N"; }
 							$sl_data = array('SubscribersList' => array('subscriber_id' => $this -> insertid, 'list_id' => $list_id, 'active' => $active, 'paid' => $paid));
-							$SubscribersList -> save($sl_data);
-							
+							$SubscribersList -> save($sl_data);							
 							$active = $oldactive;
 						}
 					}

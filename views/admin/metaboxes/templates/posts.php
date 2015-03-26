@@ -34,7 +34,7 @@ if ($this -> language_do()) {
 					            	<?php 
 					
 									$settings = array(
-										'wpautop'			=>	false,
+										//'wpautop'			=>	false,
 										'media_buttons'		=>	true,
 										'textarea_name'		=>	'etmessage_posts[' . $language . ']',
 										'textarea_rows'		=>	10,
@@ -62,7 +62,7 @@ if ($this -> language_do()) {
 					<?php 
 						
 					$settings = array(
-						'wpautop'			=>	false,
+						//'wpautop'			=>	false,
 						'media_buttons'		=>	true,
 						'textarea_name'		=>	'etmessage_posts',
 						'textarea_rows'		=>	10,
