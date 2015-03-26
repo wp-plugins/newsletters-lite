@@ -171,6 +171,20 @@ class wpmlTheme extends wpMailPlugin {
 					$this -> data -> content = trim(html_entity_decode(urldecode($remote['body'])));
 				}
 			}
+			
+			if (!empty($this -> data -> imgprependurl)) {
+				if (preg_match_all('/<img.*?>/', $this -> data -> content, $matches)) {
+					if (!empty($matches[0])) {
+						foreach ($matches[0] as $img) {
+					        if (preg_match('/src="(.*?)"/', $img, $m)) {
+						    	if (!empty($m)) {
+						    		$this -> data -> content = str_replace($m[0], 'src="' . rtrim($this -> data -> imgprependurl, '/') . '/' . $m[1] . '"', $this -> data -> content); 
+						    	}
+					        }
+					    }
+					}
+				}
+			}
 		}
 		
 		return $this -> errors;

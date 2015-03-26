@@ -69,6 +69,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	
 	function post_thumbnail($atts = array(), $content = null) {	
 		global $post;
+		
 		$output = "";
 		$thepost = (empty($atts['post_id'])) ? $post : get_post($atts['post_id']);
 		$atts['post_id'] = $thepost -> ID;
@@ -121,10 +122,22 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			'language'			=>	false,
 			'eftype'			=>	"excerpt",
 			'target'			=>	"_self",
+			'thumbnail_size'		=>	"thumbnail",
+			'thumbnail_align'		=>	"left",
+			'thumbnail_hspace'		=>	"15",
+			'thumbnail_class'		=>	"newsletters-thumbnail",
 		);
 			
 		$r = shortcode_atts($defaults, $atts);
 		extract($r);
+		
+		global $shortcode_thumbnail;
+		$shortcode_thumbnail = array(
+			'size'				=>	$thumbnail_size,
+			'align'				=>	$thumbnail_align,
+			'hspace'			=>	$thumbnail_hspace,
+			'class'				=>	$thumbnail_class,
+		);
 		
 		$arguments = array(
 			'post_id'			=>	$post_id,
@@ -171,9 +184,13 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			'post_type'				=>	"post",
 			'eftype'				=>	"excerpt",
 			'target'				=>	"_self",
+			'thumbnail_size'		=>	"thumbnail",
+			'thumbnail_align'		=>	"left",
+			'thumbnail_hspace'		=>	"15",
+			'thumbnail_class'		=>	"newsletters-thumbnail",
 		);
 		
-		$arguments = shortcode_atts($defaults, $atts);
+		$arguments = shortcode_atts($defaults, $atts);		
 		if (empty($arguments['category'])) { $arguments['category'] = false; }
 		
 		if (!empty($arguments['post_type'])) {
@@ -186,9 +203,16 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$wpml_eftype = $eftype;
 		$wpml_target = $target;
 		
-		$currentlanguage = $arguments['language'];
-		
+		$currentlanguage = $arguments['language'];		
 		extract($arguments);
+		
+		global $shortcode_thumbnail;
+		$shortcode_thumbnail = array(
+			'size'				=>	$thumbnail_size,
+			'align'				=>	$thumbnail_align,
+			'hspace'			=>	$thumbnail_hspace,
+			'class'				=>	$thumbnail_class,
+		);
 							   
 		if ($posts = get_posts($arguments)) {	
 			$shortcode_post_showdate = $showdate;
@@ -212,7 +236,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	}
 	
 	function shortcode_posts($atts = array(), $content = null, $tag = null) {
-		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_categories, $shortcode_category, $shortcode_categories_done, $shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate;
+		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_categories, $shortcode_category, $shortcode_categories_done, 
+		$shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate, $shortcode_thumbnail;
+		
 		$return = "";
 		
 		if (!empty($wpml_eftype) && $wpml_eftype == "full" && $tag == "post_excerpt") {
@@ -303,14 +329,26 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				}
 				break;
 			case 'post_thumbnail'			:
-			case 'newsletters_post_thumbnail'	:
-				$defaults = array('size' => "thumbnail");
+			case 'newsletters_post_thumbnail'	:			
+				if (!empty($atts) && is_array($atts)) {
+					$atts = array_merge($atts, $shortcode_thumbnail);
+				} else {
+					$atts = $shortcode_thumbnail;
+				}
+			
+				$defaults = array(
+					'size' 			=> 	"thumbnail",
+					'align'			=>	"left",
+					'hspace'		=>	"15",
+					'class'			=>	"newsletters_thumbnail",
+				);
+				
 				extract(shortcode_atts($defaults, $atts));
 				if (!empty($shortcode_post)) {
 					if (function_exists('has_post_thumbnail')) {
 						if (has_post_thumbnail($shortcode_post -> ID)) {							
 							$return .= '<a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '">';
-							$attr = apply_filters('newsletters_post_thumbnail_attr', array('style' => "margin-right:15px;", 'align' => "left", 'hspace' => "15", 'class' => "post_thumbnail"), $shortcode_post -> ID);
+							$attr = apply_filters('newsletters_post_thumbnail_attr', array('style' => "margin-right:15px;", 'align' => $align, 'hspace' => $hspace, 'class' => $class), $shortcode_post -> ID);
 							$return .= get_the_post_thumbnail($shortcode_post -> ID, $size, $attr);
 							$return .= '</a>';						
 							return $return;

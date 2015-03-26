@@ -361,7 +361,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	}
 	
 	function get_gravatar($email = null, $s = 50, $d = 'mm', $r = 'g', $img = true, $atts = array() ) {
-		$src = 'http://www.gravatar.com/avatar/';
+		/*$src = 'http://www.gravatar.com/avatar/';
 		$src .= md5( strtolower( trim( $email ) ) );
 		$src .= "?s=$s&d=$d&r=$r";
 		if ($img) {
@@ -373,7 +373,9 @@ class wpmlHtmlHelper extends wpMailPlugin {
 			$url .= ' />';
 			$url .= '</div>';
 		}
-		return $url;
+		return $url;*/
+		
+		return get_avatar($email, $s, null, false);
 	}
 	
 	function wordpress_usermeta_fields() {

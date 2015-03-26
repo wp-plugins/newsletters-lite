@@ -128,7 +128,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 												<?php
 												
 												$settings = array(
-													'wpautop'			=>	false,
+													//'wpautop'			=>	false,
 													'media_buttons'		=>	true,
 													'textarea_name'		=>	'contentarea[' . $contentarea -> number . ']',
 													'textarea_rows'		=>	10,

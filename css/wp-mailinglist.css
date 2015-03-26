@@ -383,7 +383,8 @@ table.mceLayout {
 	display: block;
 }
 
-.newsletters_circular {
+.newsletters_circular, 
+.newsletters img.avatar {
 	border-radius: 50%;
 	-moz-border-radius: 50%;
 	-webkit-border-radius: 50%;

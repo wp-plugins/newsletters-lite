@@ -110,6 +110,21 @@
         	</script>
         </div>
         
+        <?php if (empty($Theme -> data -> id)) : ?>
+        	<table class="form-table">
+	        	<tbody>
+		        	<tr>
+		        		<th><label for="Theme_imgprependurl"><?php _e('Image Prepend URL', $this -> plugin_name); ?></label>
+		        		<?php echo $Html -> help(__('If your template has relative image paths in the source, this image prepend URL setting is very useful to automatically add an absolute URL to the source attribute of all images. Eg. <code>src="images/myimage.jpg"</code> and you fill in a prepend URL of <code>http://domain.com/</code>, it will become <code>src="http://domain.com/images/myimage.jpg"</code>', $this -> plugin_name)); ?></th>
+		        		<td>
+		        			<input type="text" class="widefat" name="Theme[imgprependurl]" value="<?php echo esc_attr(stripslashes($Theme -> data -> imgprependurl)); ?>" id="Theme_imgprependurl" />
+		        			<span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Prepend the SRC attribute of IMG tags with a URL', $this -> plugin_name); ?></span>
+		        		</td>
+		        	</tr>
+	        	</tbody>
+        	</table>
+        <?php endif; ?>
+        
         <?php $theme_name = $Html -> field_value('Theme[name]'); ?>
         <?php if (!empty($theme_name)) : ?>
         	<?php if ($theme_name == "themailer") : ?>
