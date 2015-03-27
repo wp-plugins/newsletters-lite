@@ -66,41 +66,11 @@
 			
 			?>
 			
-			<div id="" class="" style="">
+			<div id="<?php echo $widget_id; ?>-recaptcha" class="newsletters_recaptcha_widget" style="">
 				<div class="g-recaptcha" data-sitekey="<?php echo $recaptcha_publickey; ?>" data-theme="<?php echo $recaptcha_theme; ?>" data-tabindex="<?php echo $Html -> tabindex($widget_id, true); ?>"></div>
 	            <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=<?php echo $recaptcha_language; ?>"></script>
 	            <input type="hidden" name="captcha_recaptcha" value="1" />
 			</div>
-			
-			<?php /*
-			<div id="<?php echo $widget_id; ?>-recaptcha" style="display:none;" class="recaptcha_widget">
-				<?php if (!empty($recaptcha_theme) && $recaptcha_theme == "custom") : ?>
-					<div id="recaptcha_image" class="recaptcha_image"></div>
-					<div id="recaptcha_links" class="recaptcha_links">
-						<a href="javascript:Recaptcha.reload()">reload</a> |
-						<a class="recaptcha_only_if_image" href="javascript:Recaptcha.switch_type('audio')">switch to audio</a>
-						<a class="recaptcha_only_if_audio" href="javascript:Recaptcha.switch_type('image')">switch to image</a> |
-						<a href="javascript:Recaptcha.showhelp()">help</a>
-					</div>
-					<div class="newsletters-fieldholder recaptcha_response">
-						<label for="recaptcha_response_field" class="wpmlcustomfield"><?php _e('Type the words', $this -> plugin_name); ?></label>
-						<input type="text" id="recaptcha_response_field" class="wpml widefat wpmltext recaptcha_response_field" name="recaptcha_response_field">
-					</div>					
-					<style type="text/css">
-					<?php echo $recaptcha_customcss; ?>
-					</style>
-				<?php endif; ?>
-			</div>
-			<script type="text/javascript">
-			jQuery(document).ready(function() { 
-				Recaptcha.create("<?php echo $recaptcha_publickey; ?>", "<?php echo $widget_id; ?>-recaptcha", {
-					theme:"<?php echo $recaptcha_theme; ?>",
-					tabindex:<?php echo $Html -> tabindex($widget_id); ?>,
-					lang:"<?php echo $recaptcha_language; ?>"
-				}); 
-			});
-			</script>
-			*/ ?>
 		<?php endif; ?>
     <?php endif; ?>
     

@@ -36,7 +36,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		$attributes = wp_parse_args($attributes, $default_attributes);
 		
 		$default_options = array(
-			'tooltipTemplate'		=>	"<%if (label){%><%=label%>: <%}%><%=value%>%",
+			'tooltipTemplate'		=>	"\<\% if (label){\%\>\<\%\=label%>: \<\%}\%\><\%\=value\%\>\%",
 		);
 		
 		$options = wp_parse_args($options, $default_options);

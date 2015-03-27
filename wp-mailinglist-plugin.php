@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.7';
+		var $version = '4.4.7.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -90,7 +90,7 @@ if (!class_exists('wpMailPlugin')) {
 		 * @param STRING. Base directory of the plugin
 		 *
 		 */
-		function register_plugin($name = null, $base = null) {
+		function register_plugin($name = null, $base = null) {			
 			$this -> api_key = $this -> get_option('api_key');
 			$this -> plugin_name = basename(dirname(__FILE__));			
 			$this -> plugin_base = rtrim(dirname($base), DS);
@@ -105,6 +105,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			global $wpdb;
 			$wpdb -> query("SET sql_mode = '';");
+			@ini_set('asp_tags', false);
 			//$wpdb -> query("SET innodb_lock_wait_timeout = 360;");
 			
 			$debugging = get_option('tridebugging');
@@ -6321,9 +6322,9 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.4.6.1") < 0) {
+				if (version_compare($cur_version, "4.4.7.1") < 0) {
 					$this -> update_options();
-					$version = '4.4.7';	
+					$version = '4.4.7.1';	
 				}
 			
 				//the current version is older.
