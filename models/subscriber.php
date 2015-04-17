@@ -628,13 +628,11 @@ class wpmlSubscriber extends wpMailPlugin {
 					$data['registered'] = "N";
 					$data['user_id'] = 0;
 				}
-						
+				
+				// Go head, try tosave the subscriber
 				if ($this -> save($data, false, false)) {					
 					$subscriber = $this -> get($this -> insertid, false);
 					$subscriberauth = $Auth -> gen_subscriberauth();
-					
-					//$Db -> model = $this -> model;
-					//$Db -> save_field('authkey', $subscriberauth, array('id' => $subscriber -> id));
 					$subscriberauth = $this -> gen_auth($subscriber -> id);
 					
 					if (!is_admin()) {
@@ -991,11 +989,10 @@ class wpmlSubscriber extends wpMailPlugin {
 					
 					/* Mailing list associations */
 					if (!empty($mailinglists)) {
-						$oldactive = $active;
-														
+						$oldactive = $active;														
 						foreach ($mailinglists as $key => $list_id) {					
 							$mailinglist = $Mailinglist -> get($list_id);
-							$active = (is_admin() || (!empty($mailinglist -> doubleopt) && $mailinglist -> doubleopt) == "N") ? "Y" : "N";
+							$active = (!empty($mailinglist -> doubleopt) && $mailinglist -> doubleopt == "N") ? "Y" : $oldactive;							
 							$paid = ($mailinglist -> paid == "Y") ? 'Y' : 'N';
 							if (!empty($mailinglist -> paid) && $mailinglist -> paid == "Y") { $active = "N"; }
 							$sl_data = array('SubscribersList' => array('subscriber_id' => $this -> insertid, 'list_id' => $list_id, 'active' => $active, 'paid' => $paid));

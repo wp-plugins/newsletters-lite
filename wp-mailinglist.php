@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.4.7.2
+Version: 4.5
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -423,6 +423,14 @@ if (!class_exists('wpMail')) {
 					$this -> render_error($message);
 				}
 				
+				// Show about notice?
+				$showmessage_about = $this -> get_option('showmessage_about');
+				if (!empty($showmessage_about) && (empty($_GET['page']) || $_GET['page'] != "newsletters-about")) {
+					$message = sprintf(__('Welcome to Tribulant Newsletters %s. See what is new %s', $this -> plugin_name), '<strong>' . $this -> version . '</strong>', '<a class="button button-primary" href="' . admin_url('index.php?page=newsletters-about') . '">' . __('About this Update', $this -> plugin_name) . '</a>');
+					$message .= ' <a class="button button-secondary" href="' . $Html -> retainquery('newsletters_method=hidemessage&message=about') . '">' . __('Hide', $this -> plugin_name) . '</a>';
+					$this -> render_message($message);
+				}
+				
 				global $queue_count, $queue_status;
 				
 				if (!empty($queue_count)) {
@@ -730,6 +738,9 @@ if (!class_exists('wpMail')) {
 					case 'hidemessage'					:
 						if (!empty($_GET['message'])) {
 							switch ($_GET['message']) {
+								case 'about'					:
+									$this -> delete_option('showmessage_about');
+									break;
 								case 'submitserial'				:
 									$this -> update_option('hidemessage_submitserial', true);
 									break;
@@ -2548,6 +2559,7 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function newsletters_about() {
+			//$this -> delete_option('showmessage_about');
 			$this -> render('about', false, true, 'admin');
 		}
 		
@@ -7388,6 +7400,7 @@ if (!class_exists('wpMail')) {
 		function activation_hook() {
 			$this -> ci_initialization();
 			$this -> add_option('activation_redirect', true);
+			$this -> update_option('showmessage_about', true);
 			//wp_redirect(admin_url('index.php') . "?page=newsletters-about");
 		}
 		

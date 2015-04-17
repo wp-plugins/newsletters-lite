@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.1.1
-Stable tag: 4.4.7.2
+Stable tag: 4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -147,6 +147,94 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5 =
+* ADD: Show newsletters details under Users section in WordPress per user
+* ADD: Show user roles when viewing sent & draft newsletters
+* ADD: New default template for system emails and "None"
+* ADD: Export failed records while sending/queuing with Ajax progress
+* ADD: Screen layout number of columns added in WordPress dashboard
+* ADD: Show if a child theme folder is present
+* ADD: Show logged in users if they are already subscribed
+* ADD: Unsubscribe comments upon unsubscribe from manage subscriptions
+* ADD: Show autoresponders linked to history/draft newsletter
+* ADD: Media files per newsletter
+* ADD: New colorbox theme/design
+* ADD: Unlink a post from a newsletter without deleting the post
+* ADD: New icons throughout the plugin
+* ADD: Choose between line/bar graphs in admin
+* ADD: Pause email queue
+* ADD: Prefill subscribe form with GET/POST variables
+* ADD: Expand CKEditor functionality
+* ADD: "Export All" button for emails of a history/draft email
+* ADD: Set theme per email template/system email in configuration
+* ADD: Duplicate newsletter theme/template
+* ADD: Send emails through the JSON API
+* ADD: Section to view bounced emails 
+* IMPROVE: Show recurring details on sent & draft newsletter view page
+* IMPROVE: Minutes and months intervals for recurring newsletters
+* IMPROVE: Change API examples to Github Gists
+* IMPROVE: Change serialized Ajax import/export/send/queue to JSON for performance
+* IMPROVE: Improve subscribers CSV export with fputcsv()
+* IMPROVE: Increase database field length for many languages
+* IMPROVE: Focus email field of "Test Email Settings" utility upon open
+* IMPROVE: More accurate live preview while creating newsletter
+* IMPROVE: Deprecated TinyMCE API call: <target>.onKeyDown.add(..)
+* IMPROVE: Improvements to the spam score report output
+* IMPROVE: TinyMCE editor improvements related to newsletters
+* IMPROVE: Deprecated TinyMCE API call onChange.add
+* IMPROVE: Subscriber exists improvements
+* IMPROVE: Datepicker custom field to go further than current year
+* IMPROVE: Add subscribe form all lists option to TinyMCE button/dialog
+* IMPROVE: New jQuery UI theme/design
+* IMPROVE: Autoresponder newsletter editor improvements
+* IMPROVE: Log clicks for view online, unsubscribe and other internal URLs
+* IMPROVE: Change get_user_meta() to get_user_option()
+* IMPROVE: Layout improvements to manage subscriptions custom fields
+* IMPROVE: Layout improvements for post/page newsletter subscribe forms
+* IMPROVE: Better select drop downs throughout the plugin
+* IMPROVE: Load proper metaboxes for content areas while creating newsletter
+* IMPROVE: Style ReCaptcha better, it is too wide
+* IMPROVE: Show total emails sent under Newsletters > History per newsletter 
+* IMPROVE: Apply wpautop() to newsletter content areas
+* IMPROVE: Always use WordPress date_format and date_i18n
+* IMPROVE: Improved history newsletter emails export format
+* IMPROVE: Performance on create newsletter page (Ajax calls)
+* IMPROVE: Custom fields options improvements
+* IMPROVE: More records with "Per Page" setting in admin
+* IMPROVE: Improve bounce accuracy
+* IMPROVE: New WordPress 4.1 paging for all sections 
+* FIX: Subscriber active/inactive status issues
+* FIX: User roles not saving upon saving draft of newsletter
+* FIX: Manage subscriptions multilingual setting not showing correctly
+* FIX: Textdomain typo in tinymce-dialog.php
+* FIX: WPML zh-hans issues with splitting
+* FIX: "None" newsletter theme/template doesn't stick on newsletter
+* FIX: Cache on some settings under Newsletters > Configuration
+* FIX: "Management Link Text" not responding to multilingual strings
+* FIX: "Reset Transient" on cron goes in infinite loop
+* FIX: No email saved, please try again
+* FIX: Recurring/scheduled newsletter should change from draft to sent if it was sent
+* FIX: Help tooltips not working/showing everywhere in the dashboard
+* FIX: Open/closed hand cursors for drag/drop not loading
+* FIX: TinyMCE button 'eftype' not applying to shortcode
+* FIX: Link/click tracking not applying on content areas
+* FIX: Charts/graphs year overlap issue
+* FIX: Dollar/percentage signs break and are stripped
+* FIX: Pie chart tooltips not showing
+* FIX: Inactive subscriptions with require activate turned off
+* FIX: Custom field title field length issue with long titles
+* FIX: Quotes (single/double) breaks certain links such as tracking
+* FIX: Single quote (') breaks custom field options
+* FIX: Import subscribers CSV from Excel with semi-colon (;) doesn't work
+* FIX: Single opt-in on a mailing list not working with double opt-in set in global setting
+* FIX: Unsubscribe link in "View in browser" doesn't work
+* FIX: Setting mailing lists on field "Duplicate entry '0' for key 'PRIMARY'"
+* FIX: Content areas not showing in TEXT version newsletter
+* FIX: 'eftype' parameter in post(s) shortcodes is ineffective
+* FIX: Sending preview loses some selections
+* FIX: Recurring newsletter only going to lists and not roles
+* FIX: Bounced emails count wrong on email tracking information 
 
 = 4.4.7.1 =
 * FIX: PHP asp_tags On causes parse errors with charts

@@ -9,7 +9,7 @@
 }
 
 td.column-newsletters, th.column-newsletters {
-	text-align: center;
+    text-align: center;
 }
 
 .newsletters_fielderror {
@@ -95,7 +95,7 @@ td.column-newsletters, th.column-newsletters {
     position: absolute;
     top: 0;
     right: 0;
-    background: #0074a2 url('../images/badge.png') no-repeat;
+    background: #0074a2;
     background-position: center 24px;
     -webkit-background-size: 85px 85px;
     background-size: 85px 85px;
@@ -104,10 +104,9 @@ td.column-newsletters, th.column-newsletters {
     text-align: center;
     font-weight: 600;
     margin: 5px 0 0;
-    padding-top: 120px;
-    height: 40px;
+    padding: 15px 0;
     display: inline-block;
-    width: 150px;
+	width: 150px;
     text-rendering: optimizeLegibility;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
     box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
@@ -335,19 +334,19 @@ ul#fieldoptions li {
 }
 
 ul#fieldoptions li.fieldoptions-sortable {
-	width: 60%;
-	display: block;
-	/* background: white; */
-	/* padding: 5px; */
-	margin: 0 0 10px 0;
+    width: 60%;
+    display: block;
+    /* background: white; */
+    /* padding: 5px; */
+    margin: 0 0 10px 0;
 }
 
 ul#fieldoptions li.ui-sortable-placeholder {
     background: #f8f8f8;
     width: 52%;
-	margin: 0 4% 10px 4%;
+    margin: 0 4% 10px 4%;
     border: 2px #ccc dotted;
-	border-radius: 3px;
+    border-radius: 3px;
     visibility: visible !important;
 }
 
@@ -391,7 +390,7 @@ ul#fieldoptions li span.fieldoptions-input {
     /* display: block; */
     /* width: 300px; */
     padding: 0 1%;
-    
+
 }
 
 /* WORDPRESS ADMIN BEGIN */
@@ -418,11 +417,11 @@ table.mceLayout {
 
 img.newsletters_gravatar {
     /*box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-                                    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-                                    -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-                                    border-radius: 3px;
-                                    border: none;
-                                    width: 45px;*/
+                                        -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+                                        -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+                                        border-radius: 3px;
+                                        border: none;
+                                        width: 45px;*/
 }
 
 table tbody tr.arow {
@@ -912,10 +911,10 @@ ul#wpmlsubmenu a.current {
 
 .fa:hover {
     /*-webkit-transform: rotateY(360deg);
-                	transform: rotateY(360deg);
-                	cursor: pointer;
-                	-webkit-transition: -webkit-transform 500ms ease;
-                	transition: transform 500ms ease;*/
+                    	transform: rotateY(360deg);
+                    	cursor: pointer;
+                    	-webkit-transition: -webkit-transform 500ms ease;
+                    	transition: transform 500ms ease;*/
 }
 
 .button .fa {
@@ -928,10 +927,10 @@ ul#wpmlsubmenu a.current {
 .newsletters-update-nag:before,
 #wpadminbar .newsletters-lite a:before {
     /*font-family: 'newsletters_dashicons' !important;
-                                content: '\f466';
-                                -webkit-font-smoothing: antialiased;
-                                -moz-osx-font-smoothing: grayscale;
-                                font-size: 20px;*/
+                                    content: '\f466';
+                                    -webkit-font-smoothing: antialiased;
+                                    -moz-osx-font-smoothing: grayscale;
+                                    font-size: 20px;*/
     font-family: 'FontAwesome' !important;
     content: "\f0e0";
     -webkit-font-smoothing: antialiased;
@@ -989,15 +988,15 @@ ul#wpmlsubmenu a.current {
 .wpmlhelp a:before,
 .newsletters_help a:before {
     /*font-family: 'newsletters_dashicons' !important;
-                                content: '\f223';
-                                font-weight: 400;
-                                font-size: 20px;
-                                vertical-align: top;
-                                text-decoration: none;
-                                line-height: 100%;
-                                height: auto;
-                                -webkit-font-smoothing: antialiased;
-                                -moz-osx-font-smoothing: grayscale;*/
+                                    content: '\f223';
+                                    font-weight: 400;
+                                    font-size: 20px;
+                                    vertical-align: top;
+                                    text-decoration: none;
+                                    line-height: 100%;
+                                    height: auto;
+                                    -webkit-font-smoothing: antialiased;
+                                    -moz-osx-font-smoothing: grayscale;*/
 }
 
 @font-face {
@@ -1254,10 +1253,3 @@ ul#wpmlsubmenu a.current {
 }
 
 /* WORDPRESS ADMIN END */
-
-
-
-
-
-
-
