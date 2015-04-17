@@ -2,7 +2,7 @@
 	<form action="?page=<?php echo $this -> sections -> links; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you want to apply this action to the selected links?', $this -> plugin_name); ?>')) { return false; }">
 		<div class="tablenav">
 			<div class="alignleft actions">
-				<a href="?page=<?php echo $this -> sections -> clicks; ?>" class="newsletters-icon-link button"> <?php _e('Clicks', $this -> plugin_name); ?></a>
+				<a href="?page=<?php echo $this -> sections -> clicks; ?>" class="button"><i class="fa fa-link"></i> <?php _e('Clicks', $this -> plugin_name); ?></a>
 			</div>
 			<div class="alignleft actions">
 				<select name="action">
@@ -98,6 +98,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'linksperpage']) && $_COOKIE[$this -> pre . 'linksperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'linksperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'linksperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'linksperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				

@@ -11,11 +11,11 @@ $emailscount = $Db -> count();
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Scheduled Tasks', $this -> plugin_name); ?> <?php echo $Html -> link(__('Refresh', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks, array('class' => "add-new-h2")); ?></h2>   
 	
-	<?php $this -> render('settings-navigation', false, true, 'admin'); ?>
+	<?php $this -> render('settings-navigation', array('tableofcontents' => false), true, 'admin'); ?>
     
     <p>
 		<?php _e('These are scheduled tasks which are automatically run using the WordPress cron.', $this -> plugin_name); ?><br/>
-        <?php _e('The current server time is:', $this -> plugin_name); ?> <strong><?php echo date_i18n("Y-m-d H:i:s", time()); ?></strong>
+        <?php _e('The current server time is:', $this -> plugin_name); ?> <strong><?php echo $Html -> gen_date("Y-m-d H:i:s", time()); ?></strong>
     </p>
     
     <table class="widefat">
@@ -55,6 +55,12 @@ $emailscount = $Db -> count();
             <tr class="alternate">
             	<th>
 					<a class="row-title" href="?page=<?php echo $this -> sections -> settings; ?>#bouncediv"><?php _e('POP3 Bounce Check', $this -> plugin_name); ?></a>
+					<?php
+						
+					$pop3_status = $this -> get_pop3_status();
+						
+					?>
+					<small>(<?php echo $pop3_status; ?>)</small>
                     <div class="row-actions">
                     	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=runschedule&amp;hook=pophook', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
                         <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=reschedule&amp;hook=pophook', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
@@ -69,25 +75,6 @@ $emailscount = $Db -> count();
                     <?php endif; ?>
                 </td>
             </tr>
-            <?php /*
-            <!-- Latest Posts = "wpml_latestposts" -->
-            <tr>
-            	<th>
-					<a class="row-title" href="?page=<?php echo $this -> sections -> settings; ?>#latestposts"><?php _e('Latest Posts Subscription', $this -> plugin_name); ?></a>
-                    <div class="row-actions">
-                    	<span class="edit"><?php echo $Html -> link(__('Run Now', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=runschedule&amp;hook=latestposts', array('onclick' => "if (!confirm('" . __('Are you sure you want to execute this task right now? It may take a while to execute, please do not refresh or close this window.', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
-                        <span class="edit"><?php echo $Html -> link(__('Reschedule', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=reschedule&amp;hook=latestposts', array('onclick' => "if (!confirm('" . __('Are you sure you want to reset this schedule?', $this -> plugin_name) . "')) { return false; }")); ?> |</span>
-                        <span class="delete"><?php echo $Html -> link(__('Stop Schedule', $this -> plugin_name), '?page=' . $this -> sections -> settings_tasks . '&amp;method=clearschedule&amp;hook=latestposts', array('onclick' => "if (!confirm('" . __('Are you sure you wish to clear this scheduled task?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?></span>
-                    </div>
-                </th>
-                <td>
-                	<?php if ($this -> get_option('latestposts') == "Y") : ?>
-                		<?php echo $Html -> next_scheduled('latestposts'); ?>
-                    <?php else : ?>
-                    	<?php _e('Latest posts subscription is turned OFF.', $this -> plugin_name); ?>
-                    <?php endif; ?>
-                </td>
-            </tr>*/ ?>
             <!-- Autoresponder emails = "wpml_autoresponders" -->
             <tr class="alternate">
             	<th>

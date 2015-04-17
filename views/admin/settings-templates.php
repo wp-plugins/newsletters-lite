@@ -11,7 +11,6 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 
 <div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('System Emails Configuration', $this -> plugin_name); ?></h2>
-    <?php $this -> render('settings-navigation', false, true, 'admin'); ?>
     <p>
     	<?php _e('System emails are messages sent as notifications to users/admins on events.', $this -> plugin_name); ?><br/>
     	<?php _e('You can configure each email template individually according to your needs.', $this -> plugin_name); ?><br/>
@@ -19,6 +18,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
     	<?php _e('Each template is inserted where the <code>[wpmlcontent]</code> tag is in the default template chosen under Newsletters > Templates.', $this -> plugin_name); ?>
     </p>
 	<form action="?page=<?php echo $this -> sections -> settings_templates; ?>" method="post">
+		<?php $this -> render('settings-navigation', array('tableofcontents' => "tableofcontents-templates"), true, 'admin'); ?>
 		<?php wp_nonce_field($this -> sections -> settings); ?>
 		<div id="poststuff">
 			<div id="post-body" class="metabox-holder columns-2">

@@ -113,5 +113,21 @@ if ($this -> language_do()) {
 				<?php endif; ?>
 			</td>
 		</tr>
+		<tr>
+			<th><label for="ettemplate_bounce"><?php _e('Email Template', $this -> plugin_name); ?></label></th>
+			<td>
+				<?php $ettemplate_bounce = __($this -> get_option('ettemplate_bounce')); ?>
+				<?php if ($themes = $Theme -> select()) : ?>
+					<select name="ettemplate_bounce" id="ettemplate_bounce">
+						<option value=""><?php _e('- None -', $this -> plugin_name); ?></option>
+						<?php foreach ($themes as $theme_id => $theme_title) : ?>
+							<option <?php echo (!empty($ettemplate_bounce) && $ettemplate_bounce == $theme_id) ? 'selected="selected"' : ''; ?> value="<?php echo $theme_id; ?>"><?php _e($theme_title); ?></option>
+						<?php endforeach; ?>
+					</select>
+				<?php else : ?>
+					<p class="newsletters_error"><?php _e('No templates are available', $this -> plugin_name); ?></p>
+				<?php endif; ?>
+			</td>
+		</tr>
 	</tbody>
 </table>

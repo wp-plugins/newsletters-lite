@@ -4,9 +4,12 @@
 
 $preview_src = admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'history_iframe&id=' . $history -> id . '&rand=' . rand(1,999);
 
+$user_chart = $this -> get_user_option(false, 'chart');
+$chart = (empty($user_chart)) ? "bar" : $user_chart; 
+
 $type = (empty($_GET['type'])) ? 'days' : $_GET['type'];
-$fromdate = (empty($_GET['from'])) ? date("Y-m-d", strtotime("-13 days")) : $_GET['from'];
-$todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
+$fromdate = (empty($_GET['from'])) ? $Html -> gen_date("Y-m-d", strtotime("-13 days")) : $_GET['from'];
+$todate = (empty($_GET['to'])) ? $Html -> gen_date("Y-m-d", time()) : $_GET['to'];
 
 ?>
 
@@ -17,29 +20,49 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 	
 	<div class="tablenav">
 		<div class="alignleft actions">
-			<a href="?page=<?php echo $this -> sections -> send; ?>&amp;method=history&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Send this history email again or edit the draft', $this -> plugin_name); ?>" class="button button-primary"><?php _e('Send/Edit', $this -> plugin_name); ?></a>
-			<a onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo $preview_src; ?>'}); return false;" href="#" class="button"><?php _e('Preview', $this -> plugin_name); ?></a>
-			<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=delete&amp;id=<?php echo $history -> id; ?>" title="<?php _e('Remove this history email permanently', $this -> plugin_name); ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this history email?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Delete', $this -> plugin_name); ?></a>
-			<?php echo $Html -> link(__('Duplicate', $this -> plugin_name), '?page=' . $this -> sections -> history . '&amp;method=duplicate&amp;id=' . $history -> id, array('class' => "button")); ?>
+			<a href="?page=<?php echo $this -> sections -> send; ?>&amp;method=history&amp;id=<?php echo $history -> id; ?>" class="button button-primary"><i class="fa fa-paper-plane"></i> <?php _e('Send/Edit', $this -> plugin_name); ?></a>
+			<a onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo $preview_src; ?>'}); return false;" href="#" class="button"><i class="fa fa-eye"></i> <?php _e('Preview', $this -> plugin_name); ?></a>
+			<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=delete&amp;id=<?php echo $history -> id; ?>" class="button button-highlighted" onclick="if (!confirm('<?php _e('Are you sure you wish to remove this history email?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-trash"></i> <?php _e('Delete', $this -> plugin_name); ?></a>
+			<?php /*echo $Html -> link(__('Duplicate', $this -> plugin_name), '?page=' . $this -> sections -> history . '&amp;method=duplicate&amp;id=' . $history -> id, array('class' => "button"));*/ ?>
+			<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&amp;method=duplicate&amp;id=' . $history -> id); ?>" class="button"><i class="fa fa-clipboard"></i> <?php _e('Duplicate', $this -> plugin_name); ?></a>
 		</div>
 	</div>
 	
 	<div class="postbox" style="padding:10px;">
+		<p>
+			<a href="<?php echo $Html -> retainquery('newsletters_method=set_user_option&option=chart&value=bar'); ?>" class="button <?php echo (empty($chart) || $chart == "bar") ? 'active' : ''; ?>"><i class="fa fa-bar-chart"></i></a>
+			<a href="<?php echo $Html -> retainquery('newsletters_method=set_user_option&option=chart&value=line'); ?>" class="button <?php echo (!empty($chart) && $chart == "line") ? 'active' : ''; ?>"><i class="fa fa-line-chart"></i></a>
+			<?php echo $Html -> help(__('Switch between bar and line charts.', $this -> plugin_name)); ?>
+		</p>
+		
 		<div id="chart-legend" class="newsletters-chart-legend"></div>
 		<canvas id="canvas" style="width:100%; height:300px;"></canvas>
 		
 		<script type="text/javascript">
 		jQuery(document).ready(function() {	
-			var ajaxdata = {type:'<?php echo $type; ?>', from:'<?php echo $fromdate; ?>', to:'<?php echo $to; ?>', history_id:'<?php echo $history -> id; ?>'};
+			var ajaxdata = {type:'<?php echo $type; ?>', chart:'<?php echo $chart; ?>', from:'<?php echo $fromdate; ?>', to:'<?php echo $to; ?>', history_id:'<?php echo $history -> id; ?>'};
 			
 			jQuery.getJSON(newsletters_ajaxurl + '?action=wpmlwelcomestats', ajaxdata, function(json) {
 				var barChartData = json;
 				var ctx = document.getElementById("canvas").getContext("2d");
-				var barChart = new Chart(ctx).Bar(barChartData, {
-					barShowStroke: false,
-					multiTooltipTemplate: "\<\%= datasetLabel \%\>: \<\%= value \%\>",
-					legendTemplate: "<ul class=\"\<\%=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:\<\%=datasets[i].fillColor\%\>\"></span>\<\%if(datasets[i].label){\%\>\<\%=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
-				});
+				
+				<?php if (empty($chart) || $chart == "bar") : ?>
+					var barChart = new Chart(ctx).Bar(barChartData, {
+						barShowStroke: false,
+						responsive: true,
+						multiTooltipTemplate: "\<\%\= datasetLabel \%\>: \<\%\= value \%\>",
+						legendTemplate: "<ul class=\"\<\%\=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:<\%\=datasets[i].fillColor\%\>\"></span>\<\% if(datasets[i].label){ \%\><\%\=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
+					});
+				<?php else : ?>
+					var barChart = new Chart(ctx).Line(barChartData, {
+						responsive: true,
+						bezierCurve: false,
+						datasetFill: false,
+						multiTooltipTemplate: "\<\%\= datasetLabel \%\>: \<\%\= value \%\>",
+						legendTemplate: "<ul class=\"\<\%\=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:<\%\=datasets[i].fillColor\%\>\"></span>\<\% if(datasets[i].label){ \%\><\%\=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
+					});
+				<?php endif; ?>
+				
 				var legend = barChart.generateLegend();
 				jQuery('#chart-legend').html(legend);
 			});
@@ -76,6 +99,35 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 									<?php $m++; ?>
 								<?php endforeach; ?>
 							<?php endif; ?>
+						<?php else : ?>
+							<?php _e('None', $this -> plugin_name); ?>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+					<th><?php _e('Roles', $this -> plugin_name); ?></th>
+					<td>
+						<?php if (!empty($history -> roles)) : ?>
+							<?php 
+								
+							global $wp_roles;
+							$roles = maybe_unserialize($history -> roles); 
+							$role_names = $wp_roles -> get_names();
+							$roles_output = array();
+							
+							if (!empty($roles) && is_array($roles)) {
+								foreach ($roles as $role) {
+									$roles_output[] = '<a href="' . admin_url('users.php?role=' . $role) . '">' . __($role_names[$role]) . '</a>';
+								}
+								
+								$roles_output = implode(", ", $roles_output);
+							}
+							
+							echo $roles_output;
+							
+							?>
+						<?php else : ?>
+							<?php _e('None', $this -> plugin_name); ?>
 						<?php endif; ?>
 					</td>
 				</tr>
@@ -85,8 +137,8 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 	                	<?php $Db -> model = $Theme -> model; ?>
 	                    <?php if (!empty($history -> theme_id) && $theme = $Db -> find(array('id' => $history -> theme_id))) : ?>
 	                    	<a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" title="<?php _e('Template Preview:', $this -> plugin_name); ?> <?php echo $theme -> title; ?>"><?php echo $theme -> title; ?></a>
-	                    	<a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_preview"></a>
-	                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), __($theme -> title)); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a>
+	                    	<a href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', title:'<?php echo __($theme -> title); ?>', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;" class=""><i class="fa fa-eye fa-fw"></i></a>
+	                    	<a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), __($theme -> title)); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class=""><i class="fa fa-pencil fa-fw"></i></a>
 	                    <?php else : ?>
 	                    	<?php _e('None', $this -> plugin_name); ?>
 	                    <?php endif; ?>
@@ -99,6 +151,8 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 		            	<?php echo $Html -> help(__('If a post/page was published from this newsletter, it will be linked/associated and shown here.', $this -> plugin_name)); ?></th>
 		            	<td>
 			            	<a href="<?php echo get_permalink($history -> post_id); ?>" target="_blank"><?php echo __($post -> post_title); ?></a>
+			            	<a class="" href="<?php echo get_delete_post_link($post -> ID); ?>" onclick="if (!confirm('<?php _e('Are you sure you want to delete this post?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-trash"></i></a>
+			            	<a class="" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=unlinkpost&id=' . $_POST['ishistory']); ?>" onclick="if (!confirm('<?php _e('Are you sure you want to unlink this post from this newsletter?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-chain-broken"></i></a>
 		            	</td>
 	            	</tr>
 	            <?php endif; ?>
@@ -113,6 +167,20 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 	            		<?php endif; ?>
 	            	</td>
 	            </tr>
+				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+		            <th><?php _e('Recurring', $this -> plugin_name); ?></th>
+		            <td>
+			            <?php if (!empty($history -> recurring) && $history -> recurring == "Y") : ?>
+                    		<?php _e('Yes', $this -> plugin_name); ?>
+                    		<?php $helpstring = sprintf(__('Send every %s %s', $this -> plugin_name), $history -> recurringvalue, $history -> recurringinterval); ?>
+                    		<?php if (!empty($history -> recurringlimit)) : ?><?php $helpstring .= sprintf(__(' and repeat %s times', $this -> plugin_name), $history -> recurringlimit); ?><?php endif; ?>
+                    		<?php $helpstring .= sprintf(__(' starting %s and has been sent %s times already'), $history -> recurringdate, $history -> recurringsent); ?>
+                    		(<?php echo $helpstring; ?>)
+                    	<?php else : ?>
+                    		<?php _e('No', $this -> plugin_name); ?>
+                    	<?php endif; ?>
+		            </td>
+	            </tr>
 	            <?php $Db -> model = $Queue -> model; ?>
 	            <?php if ($queue_count = $Db -> count(array('history_id' => $history -> id))) : ?>
 	            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
@@ -120,6 +188,20 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 	            		<td>
 	            			<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> queue . '&filter=1&history_id=' . $history -> id); ?>"><?php echo sprintf(__('%s emails in the queue', $this -> plugin_name), $queue_count); ?></a>
 	            		</td>
+	            	</tr>
+	            <?php endif; ?>
+	            <?php $Db -> model = $Autoresponder -> model; ?>
+	            <?php if ($autoresponders = $Db -> find_all(array('history_id' => $history -> id))) : ?>
+	            	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+		            	<th><?php _e('Autoresponders', $this -> plugin_name); ?>
+		            	<?php echo $Html -> help(__('Autoresponders linked to this newsletter', $this -> plugin_name)); ?></th>
+		            	<td>
+			            	<ul>
+				            	<?php foreach ($autoresponders as $autoresponder) : ?>
+				            		<li><a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> autoresponders . '&amp;method=save&amp;id=' . $autoresponder -> id); ?>"><?php _e($autoresponder -> title); ?></a></li>
+				            	<?php endforeach; ?>
+			            	</ul>
+		            	</td>
 	            	</tr>
 	            <?php endif; ?>
 				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
@@ -160,14 +242,16 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 						?>
 						<?php 
 						
-						echo sprintf(__('%s opened %s, %s%s unsubscribes%s %s, %s bounces %s and %s%s clicks%s out of %s emails sent out', $this -> plugin_name), 
+						echo sprintf(__('%s read %s, %s%s unsubscribes%s %s, %s%s bounces%s %s and %s%s clicks%s out of %s emails sent out', $this -> plugin_name), 
 						'<strong>' . $eread . '</strong>', 
 						'(' . ((!empty($etotal)) ? number_format($tracking, 2, '.', '') : 0) . '&#37;)', 
 						'<a href="' . admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=unsubscribes&history_id=' . $history -> id) . '">',
 						'<strong>' . $eunsubscribed . '</strong>', 
 						'</a>',
 						'(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', 
+						'<a href="' . admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=bounces&history_id=' . $history -> id) . '">',
 						'<strong>' . (empty($ebounced) ? 0 : $ebounced) . '</strong>', 
+						'</a>',
 						'(' . $ebouncedperc . '&#37;)', 
 						'<a href="?page=' . $this -> sections -> clicks . '&amp;history_id=' . $history -> id . '">', 
 						'<strong>' . $clicks . '</strong>', 
@@ -214,7 +298,7 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 								<?php foreach ($history -> attachments as $attachment) : ?>
 	                            	<li class="<?php echo $this -> pre; ?>attachment">
 	                                	<?php echo $Html -> attachment_link($attachment, false); ?>
-	                                    <a class="button button-primary newsletters_attachment_remove" href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"></a>
+	                                    <a class="button button-primary" href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-trash"></i></a>
 	                                </li>
 	                            <?php endforeach; ?>
 	                        </ul>
@@ -223,11 +307,11 @@ $todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
 	            <?php endif; ?>
 				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 					<th><?php _e('Created', $this -> plugin_name); ?></th>
-					<td><?php echo $history -> created; ?></td>
+					<td><abbr title="<?php echo $history -> created; ?>"><?php echo $Html -> gen_date(false, strtotime($history -> created)); ?></abbr></td>
 				</tr>
 				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 					<th><?php _e('Modified', $this -> plugin_name); ?></th>
-					<td><?php echo $history -> modified; ?></td>
+					<td><abbr title="<?php echo $history -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($history -> modified)); ?></abbr></td>
 				</tr>
 			</tbody>
 		</table>

@@ -192,7 +192,7 @@ include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
 									<?php echo __($validation_rules[$field -> validation]['title']); ?>
 								<?php endif; ?>
 							</td>
-							<td><label for="checklist<?php echo $field -> id; ?>"><abbr title="<?php echo $field -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($field -> modified)); ?></abbr></label></td>
+							<td><label for="checklist<?php echo $field -> id; ?>"><abbr title="<?php echo $field -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($field -> modified)); ?></abbr></label></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -208,6 +208,9 @@ include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'fieldsperpage']) && $_COOKIE[$this -> pre . 'fieldsperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'fieldsperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'fieldsperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'fieldsperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -220,8 +223,8 @@ include $this -> plugin_base() . DS . 'includes' . DS . 'variables.php';
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>fieldssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>fields" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>fieldssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>fields" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>

@@ -292,7 +292,7 @@ global $wpdb, $Mailinglist, $Template;
                                     	<?php $select = wp_dropdown_categories(array('show_option_none' => __('- Select Category -', $this -> plugin_name), 'echo' => 0, 'name' => "posts_single_category", 'id' => "posts_category_menu", 'hide_empty' => 0, 'show_count' => 1)); ?>
                                         <?php $select = preg_replace("#<select([^>]*)>#", '<select$1 onchange="posts_changeCategory();" style="width:210px;">', $select); ?>
                                         <?php echo $select; ?>
-                                        <span id="posts_multiple_message" style="display:none;"><span class="newsletters_loading"></span></span>
+                                        <span id="posts_multiple_message" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
                                     </td>
                                 </tr>
                                 <?php if ($post_types = $this -> get_custom_post_types()) : ?>
@@ -458,7 +458,7 @@ global $wpdb, $Mailinglist, $Template;
                                 </td>
                             </tr>
                             <tr>
-                            	<td nowrap="nowrap" valign="top"><label for="history_lists"><?php _e('Mailing List(s):', "wp-mailingliist"); ?></label></td>
+                            	<td nowrap="nowrap" valign="top"><label for="history_lists"><?php _e('Mailing List(s):', $this -> plugin_name); ?></label></td>
                                 <td>
                                 	<select name="history_lists" id="history_lists" multiple="multiple">
                                     	<option value=""><?php _e('- All Mailing Lists -', $this -> plugin_name); ?></option>

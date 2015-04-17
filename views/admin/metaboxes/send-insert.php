@@ -95,7 +95,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 					</p>
 				</div>
 				
-				<span id="postsloading" style="display:none;"><span class="newsletters_loading"></span></span>
+				<span id="postsloading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 				
 				<div id="postsdiv" style="display:none;">
 					<p>
@@ -338,7 +338,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	if (jQuery.isFunction(jQuery.fn.cookie)) {
+	if (jQuery.isFunction(jQuery.cookie)) {
 		var inserttabscookieid = jQuery.cookie('inserttabscookie') || 0;
 	}
 		
@@ -346,7 +346,7 @@ jQuery(document).ready(function() {
 		jQuery('#inserttabs').tabs({
 			active:inserttabscookieid,
 			activate: function(event, ui) {
-				if (jQuery.isFunction(jQuery.fn.cookie)) {
+				if (jQuery.isFunction(jQuery.cookie)) {
 					jQuery.cookie("inserttabscookie", ui.newTab.index(), {expires:365, path:'/'});
 				}
 			}

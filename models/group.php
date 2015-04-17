@@ -8,7 +8,7 @@ class wpmlGroup extends wpMailPlugin {
 	
 	var $fields = array(
 		'id'				=>	"INT(11) NOT NULL AUTO_INCREMENT",
-		'title'				=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'title'				=>	"VARCHAR(255) NOT NULL DEFAULT ''",
 		'created'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'modified'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'key'				=>	"PRIMARY KEY (`id`)",
@@ -16,7 +16,7 @@ class wpmlGroup extends wpMailPlugin {
 	
 	var $tv_fields = array(
 		'id'				=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
-		'title'				=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'title'				=>	array("VARCHAR(255)", "NOT NULL DEFAULT ''"),
 		'created'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'modified'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'key'				=>	"PRIMARY KEY (`id`)",

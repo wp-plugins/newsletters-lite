@@ -230,13 +230,13 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 		<tr>
 			<th>&nbsp;</th>
 			<td>
-				<a id="testsettings" class="button button-primary" onclick="testsettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>" title="<?php _e('Test your email settings', $this -> plugin_name); ?>"><?php _e('Test Email Settings &raquo;', $this -> plugin_name); ?></a>
+				<a id="testsettings" class="button button-primary" onclick="testsettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>" title="<?php _e('Test your email settings', $this -> plugin_name); ?>"><?php _e('Test Email Settings', $this -> plugin_name); ?> <i class="fa fa-arrow-right"></i></a>
 				
 				<span id="dkim_wizard_div" style="display:<?php echo ($this -> get_option('dkim') == "Y") ? 'inline-block' : 'none'; ?>;">
-					<a id="dkimwizard" href="" onclick="dkimwizard({domain:jQuery('#dkim_domain').val(), selector:jQuery('#dkim_selector').val()}); return false;" class="button button-primary"><?php _e('Run DKIM Wizard &raquo;', $this -> plugin_name); ?></a>
+					<a id="dkimwizard" href="" onclick="dkimwizard({domain:jQuery('#dkim_domain').val(), selector:jQuery('#dkim_selector').val()}); return false;" class="button button-primary"><?php _e('Run DKIM Wizard', $this -> plugin_name); ?> <i class="fa fa-arrow-right"></i></a>
 				</span>
 				
-				<span id="testsettingsloading" style="display:none;"><span class="newsletters_loading"></span></span>
+				<span id="testsettingsloading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 			</td>
 		</tr>
 	</tbody>

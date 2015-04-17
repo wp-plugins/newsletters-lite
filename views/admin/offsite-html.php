@@ -1,4 +1,4 @@
-<div class="<?php echo $this -> pre; ?> widget_newsletters">
+<div class="newsletters <?php echo $this -> pre; ?> widget_newsletters">
 	<form action="<?php echo home_url('?' . $this -> pre . 'method=offsite&list=' . $options['list']); ?>" method="post">
 		<input type="hidden" name="list_id[]" value="<?php echo $options['list']; ?>" />
 		<?php if (!empty($fields)) : ?>

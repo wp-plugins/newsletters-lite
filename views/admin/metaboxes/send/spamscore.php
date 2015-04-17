@@ -1,18 +1,24 @@
 <div id="spamscore_result">
-	<p><?php _e('Click "Check Now" to test', $this -> plugin_name); ?></p>
+	<?php if (!empty($_POST['spamscore'])) : ?>
+		<iframe width="100%" style="width:100%;" frameborder="0" scrolling="no" class="autoHeight widefat" src="<?php echo admin_url('admin-ajax.php'); ?>?action=newsletters_gauge&value=<?php echo $_POST['spamscore']; ?>"></iframe>
+	<?php else : ?>
+		<p style="text-align:center;"><?php _e('Click "Check Now" to test', $this -> plugin_name); ?></p>
+	<?php endif; ?>
 </div>
 
 <p style="text-align:center;"><a class="button button-secondary button-small" id="spamscorerunnerbutton" href="" onclick="spamscorerunner(); return false;"><?php _e('Check Now', $this -> plugin_name); ?></a>
-<span id="spamscorerunnerloading" style="display:none;"><span class="newsletters_loading"></span></span></p>
+<span id="spamscorerunnerloading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span></p>
 
-<script type="text/javascript" src="<?php echo $this -> render_url('js/justgage.js', 'admin', false); ?>"></script>
-<script type="text/javascript" src="<?php echo $this -> render_url('js/raphael.js', 'admin', false); ?>"></script>
+<?php /*<script type="text/javascript" src="<?php echo $this -> render_url('js/justgage.js', 'admin', false); ?>"></script>
+<script type="text/javascript" src="<?php echo $this -> render_url('js/raphael.js', 'admin', false); ?>"></script>*/ ?>
 
 <script type="text/javascript">
 var spamscorerequest = false;
 
-<?php if (!empty($_POST['ishistory'])) : ?>
-var history_id = "<?php echo $_POST['ishistory']; ?>";
+<?php $history_id = (empty($_POST['ishistory'])) ? $_GET['id'] : $_POST['ishistory']; ?>
+
+<?php if (!empty($history_id)) : ?>
+var history_id = "<?php echo $history_id; ?>";
 <?php else : ?>
 var history_id = false;
 <?php endif; ?>
@@ -45,15 +51,18 @@ function spamscorerunner() {
 		complete: function(response) {
 			jQuery('#spamscorerunnerloading').hide();
 			jQuery('#spamscorerunnerbutton').removeAttr('disabled');
-		}
+		},
+		cache: true
 	});
 }
 
 jQuery(document).ready(function() {
-	if (history_id != false) {
-		spamscorerunner();
-	}
-
-	setTimeout(spamscorerunner, 60000);
+	setTimeout(function() {
+		if (history_id != false) {
+			spamscorerunner();
+		}
+	
+		setInterval(spamscorerunner, 60000);
+	}, 3000);
 });
 </script>

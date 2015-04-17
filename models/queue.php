@@ -195,7 +195,7 @@ class wpmlQueue extends wpMailPlugin {
 		
 		if (empty($senddate) || strtotime($senddate) < time()) {
 			$this -> set_timezone();
-			$senddate = date_i18n("Y-m-d H:i:s", time());
+			$senddate = $Html -> gen_date("Y-m-d H:i:s", time());
 		}
 		
 		if (empty($subscriber) && empty($user)) { $this -> errors[] = __('No subscriber specified', $this -> plugin_name); }		

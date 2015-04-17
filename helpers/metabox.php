@@ -137,6 +137,13 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'send-otheractions', false, true, 'admin');
 	}
 	
+	function send_contentarea($post = null, $metabox = null) {
+		
+		if (!empty($metabox['args']['contentarea'])) {
+			$this -> render('metaboxes' . DS . 'send' . DS . 'contentarea', array('contentarea' => $metabox['args']['contentarea']), true, 'admin');
+		}
+	}
+	
 	function send_multimime() {
 		$this -> render('metaboxes' . DS . 'send-multimime', false, true, 'admin');
 	}

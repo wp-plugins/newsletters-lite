@@ -256,7 +256,7 @@
 			<?php $this -> render('error', array('errors' => $exporterrors), true, 'admin'); ?>
 							
 			<?php if (!empty($exportfile)) : ?>
-				<div class="updated fade"><p><?php _e('Subscribers have been exported.', $this -> plugin_name); ?> <a href="<?php echo home_url(); ?>/?<?php echo $this -> pre; ?>method=exportdownload&file=<?php echo urlencode($exportfile); ?>" title="<?php _e('Download the subscribers CSV document to your computer', $this -> plugin_name); ?>"><?php _e('Download CSV', $this -> plugin_name); ?></a></p></div>
+				<div class="updated fade"><p><i class="fa fa-check"></i> <?php _e('Subscribers have been exported.', $this -> plugin_name); ?> <a href="<?php echo home_url(); ?>/?<?php echo $this -> pre; ?>method=exportdownload&file=<?php echo urlencode($exportfile); ?>" title="<?php _e('Download the subscribers CSV document to your computer', $this -> plugin_name); ?>"><?php _e('Download CSV', $this -> plugin_name); ?></a></p></div>
 			<?php endif; ?>		
 			<form action="?page=<?php echo $this -> sections -> importexport; ?>&amp;method=export#export" method="post" enctype="multipart/form-data" id="export-form">
 				<input type="hidden" name="export_filetype" value="csv" />
@@ -299,8 +299,8 @@
 		                <tr>
 		                	<th><label for="export_delimiter"><?php _e('Delimiter', $this -> plugin_name); ?></label></th>
 		                	<td>
-		                		<input type="text" class="widefat" style="width:45px;" name="export_delimiter" value="<?php echo (!empty($_POST['export_delimiter'])) ? esc_attr(stripslashes($_POST['export_delimiter'])) : ','; ?>" id="export_delimiter" />
-		                		<span class="howto"><?php _e('Choose the delimiter to delimit columns with. The default is comma (,)', $this -> plugin_name); ?></span>
+		                		<input type="text" class="widefat" style="width:45px;" name="export_delimiter" value="<?php echo (!empty($_POST['export_delimiter'])) ? esc_attr(stripslashes($_POST['export_delimiter'])) : ';'; ?>" id="export_delimiter" />
+		                		<span class="howto"><?php _e('Choose the delimiter to delimit columns with. The default is semi-colon (;)', $this -> plugin_name); ?></span>
 		                	</td>
 		                </tr>
 		                <tr>

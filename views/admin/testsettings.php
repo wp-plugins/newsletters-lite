@@ -36,12 +36,16 @@
 	        <p>
 	        	<input class="button-secondary" onclick="jQuery.colorbox.close();" type="button" name="close" value="<?php _e('Close', $this -> plugin_name); ?>" />
 	            <input id="testsettingsbutton" class="button-primary" type="submit" name="submit" value="<?php _e('Send Test Email', $this -> plugin_name); ?>" />
-	            <span style="display:none;" id="wpml_testsettings_loading"><span class="newsletters_loading"></span></span>
+	            <span style="display:none;" id="wpml_testsettings_loading"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 	        </p>
 	    </form>
 	    
-	    <script type="text/javascript">    
-		function wpml_testsettings(form) {
+	    <script type="text/javascript">   
+		jQuery(document).ready(function() {
+			setTimeout(function() { jQuery('#testemail').focus(); }, 500);
+		});
+		     
+		function wpml_testsettings(form) {			
 			var formvalues = jQuery('#testsettingsform').serialize();
 			jQuery('#wpml_testsettings_loading').show();
 			jQuery('#testsettingsbutton').attr('disabled', "disabled");

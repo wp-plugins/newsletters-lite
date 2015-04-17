@@ -46,6 +46,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('admin_menu');
 			$this -> add_action('admin_menu', 'add_dashboard', 10, 1);
 			$this -> add_action('admin_head');
+			$this -> add_action('admin_head-index.php', 'dashboard_columns');
 			$this -> add_action('widgets_init', 'widget_register', 10, 1);
 			$this -> add_action('wp_head', 'wp_head', 15, 1);
 			$this -> add_action('wp_footer');
@@ -56,10 +57,14 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('delete_post', 'delete_post', 10, 1);
 			$this -> add_action('trashed_post', 'delete_post', 10, 1);
 			$this -> add_action('init', 'init', 11, 1);
+			$this -> add_action('init', 'custom_post_types', 10, 1);
 			$this -> add_action('wp_login', 'end_session', 10, 1);
 			$this -> add_action('wp_logout', 'end_session', 10, 1);
 			$this -> add_action('init', 'init_textdomain', 10, 1);
 			$this -> add_action('plugins_loaded', "plugins_loaded", 2, 1);
+			
+			$this -> add_filter('manage_users_columns');			 
+			$this -> add_action('manage_users_custom_column', 'manage_users_custom_column', 10, 3);
 			
 			/* Schedules */
 			$this -> add_action('newsletters_ratereviewhook', 'ratereview_hook', 10, 1);
@@ -159,6 +164,9 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_delete_option', array($this, 'ajax_delete_option'));
+				add_action('wp_ajax_newsletters_pause_queue', array($this, 'ajax_pause_queue'));
+				add_action('wp_ajax_newsletters_autocomplete_histories', array($this, 'ajax_autocomplete_histories'));
 				add_action('wp_ajax_newsletters_load_new_editor', array($this, 'ajax_load_new_editor'));
 				
 				add_action('wp_ajax_newsletters_latestposts_save', array($this, 'ajax_latestposts_save'));

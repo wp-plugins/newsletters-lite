@@ -45,7 +45,7 @@
 									</div>
 								</td>
 								<td>
-									<abbr title="<?php echo $p -> created; ?>"><?php echo date("Y-m-d", strtotime($p -> created)); ?></abbr>
+									<abbr title="<?php echo $p -> created; ?>"><?php echo $Html -> gen_date(false, strtotime($p -> created)); ?></abbr>
 								</td>
 							</tr>
 						<?php } ?>

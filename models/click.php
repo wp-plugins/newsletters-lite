@@ -8,6 +8,7 @@ if (!class_exists('wpmlClick')) {
 		var $tv_fields = array(
 			'id'					=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
 			'link_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+			'referer'				=>	array("VARCHAR(255)", "NOT NULL DEFAULT ''"),
 			'history_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 			'user_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 			'subscriber_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
@@ -39,6 +40,27 @@ if (!class_exists('wpmlClick')) {
 			return;
 		}
 		
+		function referer_name($referer = null) {
+			$referer_name = __('Unknown', $this -> plugin_name);
+			
+			switch ($referer) {
+				case 'unsubscribe'				:
+					$referer_name = __('Unsubscription', $this -> plugin_name);
+					break;
+				case 'online'					:
+					$referer_name = __('View Online', $this -> plugin_name);
+					break;
+				case 'manage'					:
+					$referer_name = __('Management', $this -> plugin_name);
+					break;
+				default 						:
+					$referer_name = __('Unknown', $this -> plugin_name);
+					break;
+			}
+			
+			return $referer_name;
+		}
+		
 		function defaults() {
 			global $Html;
 			
@@ -59,7 +81,7 @@ if (!class_exists('wpmlClick')) {
 			extract($r, EXTR_SKIP);
 			
 			if (!empty($data)) {
-				if (empty($link_id)) { $this -> errors['link_id'] = __('Please specify a link', $this -> plugin_name); }
+				if (empty($link_id) && empty($referer)) { $this -> errors['link_id'] = __('Please specify a link', $this -> plugin_name); }
 			} else {
 				$this -> errors[] = __('No data was provided', $this -> plugin_name);
 			}

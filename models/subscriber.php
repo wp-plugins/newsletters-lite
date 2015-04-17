@@ -63,7 +63,7 @@ class wpmlSubscriber extends wpMailPlugin {
 	var $name = 'wpmlSubscriber';
 	
 	function wpmlSubscriber($data = array()) {
-		global $Db;
+		global $Db, $Field;
 	
 		$this -> table = $this -> pre . $this -> controller;
 	
@@ -103,6 +103,23 @@ class wpmlSubscriber extends wpMailPlugin {
 						if (!in_array($key, $this -> table_fields)) {
 							$val = maybe_unserialize($val);					
 							$_POST[$key] = $val;
+							
+							/*$Db -> model = $Field -> model;
+							if ($field = $Db -> find(array('slug' => $key))) {
+								if (!empty($field -> type) && ($field -> type == "radio" || $field -> type == "checkbox" || $field -> type == "select")) {
+									$_POST[$key] = array();
+									$this -> initialize_classes();
+									if ($newfieldoptions = $this -> SubscribersOption -> find_all(array('subscriber_id' => $this -> id, 'field_id' => $field -> id))) {										
+										if (count($newfieldoptions) > 1) {
+											foreach ($newfieldoptions as $newfieldoption) {
+												$_POST[$key][] = $newfieldoption -> option_id;
+											}
+										} else {
+											$_POST[$key] = $newfieldoptions[0] -> option_id;
+										}
+									}
+								}
+							}*/
 						}
 					}
 				}
@@ -565,9 +582,9 @@ class wpmlSubscriber extends wpMailPlugin {
 						$this -> render('error', array('errors' => array('email' => __($this -> get_option('subscriberexistsmessage')))), true, 'default');					
 						
 						if ($this -> get_option('subscriberexistsredirect') == "management") {
-							$redirecturl = get_permalink($this -> get_option('managementpost'));
+							$redirecturl = $Html -> retainquery('email=' . $data['email'], $this -> get_managementpost(true));
 						} elseif ($this -> get_option('subscriberexistsredirect') == "custom") {
-							$redirecturl = $this -> get_option('subscriberexistsredirecturl');	
+							$redirecturl = $Html -> retainquery('email=' . $data['email'], $this -> get_option('subscriberexistsredirecturl'));	
 						} else {
 							//do nothing...	
 						}
@@ -693,12 +710,11 @@ class wpmlSubscriber extends wpMailPlugin {
 				if ($email != $subscriber -> email) {
 					$id = $curr_id;
 					$this -> id = $curr_id;
-					$this -> data[$this -> model] -> id = $curr_id;			
+					$this -> data[$this -> model] -> id = $curr_id;	
 					
 					$cur_lists = $this -> mailinglists($curr_id);
 					$sel_lists = $mailinglists;
 					$new_lists = array_merge($cur_lists, $sel_lists);
-							
 					$this -> data[$this -> model] -> mailinglists = $new_lists;
 					
 					if (empty($justsubscribe)) {
@@ -979,7 +995,7 @@ class wpmlSubscriber extends wpMailPlugin {
 														
 						foreach ($mailinglists as $key => $list_id) {					
 							$mailinglist = $Mailinglist -> get($list_id);
-							$active = (!empty($mailinglist -> doubleopt) && $mailinglist -> doubleopt == "N") ? "Y" : "N";
+							$active = (is_admin() || (!empty($mailinglist -> doubleopt) && $mailinglist -> doubleopt) == "N") ? "Y" : "N";
 							$paid = ($mailinglist -> paid == "Y") ? 'Y' : 'N';
 							if (!empty($mailinglist -> paid) && $mailinglist -> paid == "Y") { $active = "N"; }
 							$sl_data = array('SubscribersList' => array('subscriber_id' => $this -> insertid, 'list_id' => $list_id, 'active' => $active, 'paid' => $paid));

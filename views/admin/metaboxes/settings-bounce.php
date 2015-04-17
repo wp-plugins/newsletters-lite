@@ -124,8 +124,8 @@
             <tr>
             	<th>&nbsp;</th>
             	<td>
-            		<a id="testbouncesettings" class="button-primary" onclick="testbouncesettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>"><?php _e('Test POP3 Settings &raquo;', $this -> plugin_name); ?></a>
-            		<span id="testbouncesettingsloading" style="display:none;"><span class="newsletters_loading"></span></span>
+            		<a id="testbouncesettings" class="button-primary" onclick="testbouncesettings(); return false;" href="?page=<?php echo $this -> sections -> settings; ?>"><?php _e('Test POP3 Settings', $this -> plugin_name); ?> <i class="fa fa-arrow-right"></i></a>
+            		<span id="testbouncesettingsloading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
             	</td>
             </tr>
         </tbody>

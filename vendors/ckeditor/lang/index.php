@@ -1,1 +1,0 @@
-<?php /* Silence, so that search engines don't index/crawl this folder and it's contents */ ?>

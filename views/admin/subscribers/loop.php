@@ -8,14 +8,11 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 	<form action="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=mass" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected subscribers?', $this -> plugin_name); ?>')) { return false; };" method="post" id="subscribersform" name="subscribersform">
 		<div class="tablenav">
 			<div class="alignleft">
-                <?php if ($this -> get_option('bouncemethod') == "pop") : ?>
-                    <a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-bounced" class="button" onclick="if (!confirm('<?php _e('Are you sure you wish to check your POP3 mailbox for bounced emails?', $this -> plugin_name); ?>')) { return false; }"><?php _e('Check for Bounces', $this -> plugin_name); ?></a>
-                <?php endif; ?>
                 <?php if (!empty($paidsubscriptions) && $paidsubscriptions == "Y") : ?>
                 	<a href="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=check-expired" class="button"><?php _e('Check Expired', $this -> plugin_name); ?></a>
                 <?php endif; ?>
                 <a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=unsubscribes'); ?>"><?php _e('Unsubscribes', $this -> plugin_name); ?></a>
-                <?php /*<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=bounces'); ?>"><?php _e('Bounces', $this -> plugin_name); ?></a>*/ ?>
+				<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> subscribers . '&method=bounces'); ?>"><?php _e('Bounces', $this -> plugin_name); ?></a>
 				<select class="widefat" style="width:auto;" name="action" onchange="action_change(this.value);">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
@@ -275,7 +272,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 			                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
 			                                    <?php endif; ?>
 			                                <?php else : ?>
-			                                	<?php echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$column -> slug})); ?>
+			                                	<?php echo $Html -> gen_date(false, strtotime($subscriber -> {$column -> slug})); ?>
 			                                <?php endif; ?>
 		                                <?php elseif ($column -> type == "pre_gender") : ?>
 		                                	<?php echo (!empty($subscriber -> {$column -> slug}) && $subscriber -> {$column -> slug} == "male") ? __('Male', $this -> plugin_name) : __('Female', $this -> plugin_name); ?>
@@ -288,7 +285,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		                            </td>
 		                        <?php endforeach; ?>
 		                    <?php endif; ?>
-							<td><label for="checklist<?php echo $subscriber -> id; ?>"><abbr title="<?php echo $subscriber -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($subscriber -> modified)); ?></abbr></label></td>
+							<td><label for="checklist<?php echo $subscriber -> id; ?>"><abbr title="<?php echo $subscriber -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($subscriber -> modified)); ?></abbr></label></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php else : ?>
@@ -308,6 +305,9 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 							<option <?php echo (isset($_COOKIE[$this -> pre . 'subscribersperpage']) && $_COOKIE[$this -> pre . 'subscribersperpage'] == $s) ? 'selected="selected"' : ''; ?> value="<?php echo $s; ?>"><?php echo $s; ?> <?php _e('subscribers', $this -> plugin_name); ?></option>
 							<?php $s += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'subscribersperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'subscribersperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'subscribersperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 			</div>
@@ -323,8 +323,8 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		}
 		
 		function change_sorting(field, dir) {
-			document.cookie = "<?php echo $this -> pre; ?>subscriberssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-			document.cookie = "<?php echo $this -> pre; ?>subscribers" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+			document.cookie = "<?php echo $this -> pre; ?>subscriberssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+			document.cookie = "<?php echo $this -> pre; ?>subscribers" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 			window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 		}
 		

@@ -19,9 +19,10 @@ class wpmlHistory extends wpMailPlugin {
 		'id'				=> 	"INT(11) NOT NULL AUTO_INCREMENT",
 		'from'				=>	"VARCHAR(150) NOT NULL DEFAULT ''",
 		'fromname'			=> 	"VARCHAR(150) NOT NULL DEFAULT ''",
-		'subject'			=>	"VARCHAR(150) NOT NULL DEFAULT ''",
+		'subject'			=>	"VARCHAR(255) NOT NULL DEFAULT ''",
 		'message'			=>	"LONGTEXT NOT NULL",
 		'text'				=>	"LONGTEXT NOT NULL",
+		'spamscore'			=>	"VARCHAR(20) NOT NULL DEFAULT ''",
 		'mailinglists'		=>	"TEXT NOT NULL",
 		'groups'			=>	"TEXT NOT NULL",
 		'roles'				=>	"TEXT NOT NULL",
@@ -34,6 +35,7 @@ class wpmlHistory extends wpMailPlugin {
 		'daterangeto'		=>	"VARCHAR(50) NOT NULL DEFAULT ''",
 		'sent'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'post_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
+		'p_id'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'user_id'			=>	"INT(11) NOT NULL DEFAULT '0'",
 		'senddate'			=>	"DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00'",
 		'recurring'			=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
@@ -52,9 +54,10 @@ class wpmlHistory extends wpMailPlugin {
 		'id'				=> 	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
 		'from'				=>	array("VARCHAR(150)", "NOT NULL DEFAULT ''"),
 		'fromname'			=>	array("VARCHAR(150)", "NOT NULL DEFAULT ''"),
-		'subject'			=>	array("VARCHAR(150)", "NOT NULL DEFAULT ''"),
+		'subject'			=>	array("VARCHAR(255)", "NOT NULL DEFAULT ''"),
 		'message'			=>	array("LONGTEXT", "NOT NULL"),
 		'text'				=>	array("LONGTEXT", "NOT NULL"),
+		'spamscore'			=>	array("VARCHAR(20)", "NOT NULL DEFAULT ''"),
 		'mailinglists'		=>	array("TEXT", "NOT NULL"),
 		'groups'			=>	array("TEXT", "NOT NULL"),
 		'roles'				=>	array("TEXT", "NOT NULL"),
@@ -67,6 +70,7 @@ class wpmlHistory extends wpMailPlugin {
 		'daterangeto'		=>	array("VARCHAR(50)", "NOT NULL DEFAULT ''"),
 		'sent'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'post_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
+		'p_id'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'user_id'			=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'senddate'			=>	array("DATETIME", "NOT NULL DEFAULT '0000-00-00 00:00:00'"),
 		'recurring'			=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
@@ -133,7 +137,9 @@ class wpmlHistory extends wpMailPlugin {
 	}
 	
 	function queue_recurring( ) {
-		global $wpdb, $Field, $Db, $Mailinglist, $Queue, $Subscriber, $SubscribersList;
+		global $wpdb, $Field, $Db, $Mailinglist, $Queue, $Subscriber, $Unsubscribe, $Bounce, $SubscribersList;
+		
+		$recurring_queued = 0;
 		
 		$query = "SELECT * FROM " . $wpdb -> prefix . $this -> table . " WHERE `recurring` = 'Y' 
 		AND (`recurringlimit` = '' OR `recurringlimit` = '0' OR `recurringlimit` > `recurringsent`) 
@@ -153,18 +159,20 @@ class wpmlHistory extends wpMailPlugin {
 			foreach ($histories as $history) {
 				$this -> remove_server_limits();
 				$mailinglists = maybe_unserialize($history -> mailinglists);
+				$roles = maybe_unserialize($history -> roles);
 				$fieldsconditions = maybe_unserialize($history -> conditions);
 				$subscriberids = array();
 				$subscriberemails = array();
 				
-				if (!empty($mailinglists)) {
-					$mailinglistscondition = "(";
+				if (!empty($mailinglists) || !empty($roles)) {
 					$m = 1;
-					
-					foreach ($mailinglists as $mailinglist_id) {
-						$mailinglistscondition .= "list_id = '" . $mailinglist_id . "'";
-						if ($m < count($mailinglists)) { $mailinglistscondition .= " OR "; }
-						$m++;	
+					if (!empty($mailinglists)) {			
+						$mailinglistscondition = "(";		
+						foreach ($mailinglists as $mailinglist_id) {
+							$mailinglistscondition .= "list_id = '" . $mailinglist_id . "'";
+							if ($m < count($mailinglists)) { $mailinglistscondition .= " OR "; }
+							$m++;	
+						}
 					}
 					
 					/* Fields Conditions */
@@ -222,67 +230,120 @@ class wpmlHistory extends wpMailPlugin {
 					. $wpdb -> prefix . $Subscriber -> table . ".email FROM " 
 					. $wpdb -> prefix . $Subscriber -> table . " LEFT JOIN "
 					. $wpdb -> prefix . $SubscribersList -> table . " ON "
-					. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id WHERE "
-					. $mailinglistscondition . ") AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y'"
+					. $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id";
+					
+					if (!empty($mailinglistscondition)) {
+						$query .= " WHERE " . $mailinglistscondition . ")";
+					}
+					
+					$query .= " AND " . $wpdb -> prefix . $SubscribersList -> table . ".active = 'Y'"
 					. str_replace(" AND ()", "", $fieldsquery);
 					
 					$sentmailscount = 0;
 					$q_queries = array();
 					
-					$query_hash = md5($query);
-					if ($ob_subscribers = $this -> get_cache($query_hash)) {
-						$subscribers = $ob_subscribers;
-					} else {
-						$subscribers = $wpdb -> get_results($query);
-						$this -> set_cache($query_hash, $subscribers);
-					}
+					$datasets = array();
+					$q_queries = array();
+					$d = 0;
 					
-					if (!empty($subscribers)) {				
-						$datasets = array();
-						$q_queries = array();
-						$d = 0;
+					// Send to user roles?
+					if (!empty($roles)) {
+						$users = array();
+						$exclude_users_query = "SELECT GROUP_CONCAT(`user_id`) FROM `" . $wpdb -> prefix . $Unsubscribe -> table . "` WHERE `user_id` != '0'";
+						$exclude_users = $wpdb -> get_var($exclude_users_query);
 						
-						foreach ($subscribers as $subscriber) {
-							$this -> remove_server_limits();											
-							$subscriber -> mailinglist_id = $mailinglists[0];										
-							$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $mailinglists);
-							
-							$q_queries[] = $Queue -> save(
-								$subscriber,
-								false,
-								$history -> subject, 
-								$history -> message, 
-								$history -> attachments, 
-								$history -> post_id, 
-								$history -> id, 
-								true, 
-								$history -> theme_id, 
-								$history -> senddate
+						foreach ($roles as $role_key) {
+							$users_arguments = array(
+								'blog_id'				=>	$GLOBALS['blog_id'],
+								'role'					=>	$role_key,
+								'exclude'				=>	$exclude_users,
+								'fields'				=>	array('ID', 'user_email', 'user_login'),
 							);
 							
-							$d++;
+							$role_users = get_users($users_arguments);
+							$users = array_merge($users, $role_users);
 						}
 						
-						if (!empty($q_queries)) {												
-							foreach ($q_queries as $q_query) {
+						if (!empty($users)) {
+							foreach ($users as $user) {
 								$this -> remove_server_limits();
-								if (!empty($q_query)) {
-									$wpdb -> query($q_query);
-								}
+								
+								$q_queries[] = $Queue -> save(
+									false,
+									$user, 
+									$history -> subject, 
+									$history -> message, 
+									$history -> attachments, 
+									$history -> post_id, 
+									$history -> id, 
+									true, 
+									$history -> theme_id, 
+									$history -> senddate
+								);
+								
+								$d++;
 							}
 						}
-						
-						$recurringdate = date_i18n("Y-m-d H:i:s", strtotime($history -> recurringdate . " +" . $history -> recurringvalue . " " . $history -> recurringinterval));
-						$recurringsent = ($history -> recurringsent + 1);
-						
-						$Db -> model = $this -> model;
-						$Db -> save_field('recurringdate', $recurringdate, array('id' => $history -> id));
-						$Db -> model = $this -> model;
-						$Db -> save_field('recurringsent', $recurringsent, array('id' => $history -> id));
 					}
+
+					if (!empty($mailinglists)) {
+						$query_hash = md5($query);
+						if ($ob_subscribers = $this -> get_cache($query_hash)) {
+							$subscribers = $ob_subscribers;
+						} else {
+							$subscribers = $wpdb -> get_results($query);
+							$this -> set_cache($query_hash, $subscribers);
+						}
+											
+						if (!empty($subscribers)) {						
+							foreach ($subscribers as $subscriber) {
+								$this -> remove_server_limits();											
+								$subscriber -> mailinglist_id = $mailinglists[0];										
+								$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $mailinglists);
+								
+								$q_queries[] = $Queue -> save(
+									$subscriber,
+									false,
+									$history -> subject, 
+									$history -> message, 
+									$history -> attachments, 
+									$history -> post_id, 
+									$history -> id, 
+									true, 
+									$history -> theme_id, 
+									$history -> senddate
+								);
+								
+								$d++;
+							}
+						}
+					}
+					
+					if (!empty($q_queries)) {												
+						foreach ($q_queries as $q_query) {
+							$this -> remove_server_limits();
+							if (!empty($q_query)) {
+								$wpdb -> query($q_query);
+								$recurring_queued++;
+							}
+						}
+					}
+					
+					$recurringdate = date_i18n("Y-m-d H:i:s", strtotime($history -> recurringdate . " +" . $history -> recurringvalue . " " . $history -> recurringinterval));
+					$recurringsent = ($history -> recurringsent + 1);
+					$sent = ($history -> sent + 1);
+					
+					$Db -> model = $this -> model;
+					$Db -> save_field('recurringdate', $recurringdate, array('id' => $history -> id));
+					$Db -> model = $this -> model;
+					$Db -> save_field('recurringsent', $recurringsent, array('id' => $history -> id));
+					$Db -> model = $this -> model;
+					$Db -> save_field('sent', $sent, array('id' => $history -> id));
 				}
 			}
 		}
+		
+		echo sprintf(__('%s recurring emails queued', $this -> plugin_name), $recurring_queued);
 		
 		return true;
 	}
@@ -434,6 +495,10 @@ class wpmlHistory extends wpMailPlugin {
 						
 						$Db -> model = $this -> model;
 						$Db -> save_field('scheduled', "N", array('id' => $history -> id));
+						
+						$sent = ($history -> sent + 1);
+						$Db -> model = $this -> model;
+						$Db -> save_field('sent', $sent, array('id' => $history -> id));
 					}
 				}
 			}
@@ -475,7 +540,7 @@ class wpmlHistory extends wpMailPlugin {
 	 *
 	 */
 	function save($data = array(), $validate = true) {
-		global $wpdb, $Html, $Db, $HistoriesList;
+		global $wpdb, $Html, $Db, $HistoriesList, $user_ID;
 		
 		$errors = false;
 		
@@ -512,6 +577,8 @@ class wpmlHistory extends wpMailPlugin {
 				$c = 1;
 				unset($this -> table_fields['key']);
 				unset($this -> table_fields['created']);
+				unset($this -> table_fields['spamscore']);
+				unset($this -> table_fields['p_id']);
 				
 				foreach (array_keys($this -> table_fields) as $field) {				
 					switch ($field) {
@@ -545,6 +612,8 @@ class wpmlHistory extends wpMailPlugin {
 				
 				unset($this -> table_fields['key']);
 				unset($this -> table_fields['id']);
+				unset($this -> table_fields['spamscore']);
+				unset($this -> table_fields['p_id']);
 				
 				foreach (array_keys($this -> table_fields) as $field) {				
 					switch ($field) {
@@ -577,6 +646,7 @@ class wpmlHistory extends wpMailPlugin {
 			if ($wpdb -> query($query)) {
 				//the query was successful
 				$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;
+				$history_id = $this -> insertid;
 				
 				/* attachments */
 				if (!empty($newattachments)) {
@@ -586,6 +656,27 @@ class wpmlHistory extends wpMailPlugin {
 						$newattachment['history_id'] = $this -> insertid;						
 						$Db -> model = $HistoriesAttachment -> model;
 						$Db -> save($newattachment, true);
+					}
+				}
+				
+				/* Custom post type */
+				if ($history = $this -> get($history_id, false)) {
+					$post_data = array(
+						'ID'							=>	((empty($history -> p_id)) ? false : $history -> p_id),
+						'post_content'					=>	$history -> message,
+						'post_title'					=>	$history -> subject,
+						'post_status'					=>	"publish",
+						'post_type'						=>	"newsletter",
+						'post_author'					=>	$user_ID,
+					);
+					
+					if ($p_id = wp_insert_post($post_data, false)) {
+						//set the history_id on the post
+						update_post_meta($p_id, 'newsletters_history_id', $history_id);
+						
+						//custom post has been inserted/updated
+						$Db -> model = $this -> model;
+						$Db -> save_field('p_id', $p_id, array('id' => $history_id));
 					}
 				}
 				
@@ -774,12 +865,12 @@ class wpmlHistory extends wpMailPlugin {
 		return false;
 	}
 	
-	function select() {
+	function select($limit = false) {
 		global $Db;
 		$historyselect = array();
 		$Db -> model = $this -> model;
 		
-		if ($histories = $Db -> find_all(false, false, array('modified', "DESC"))) {
+		if ($histories = $Db -> find_all(false, false, array('modified', "DESC"), $limit)) {
 			foreach ($histories as $history) {
 				$historyselect[$history -> id] = $history -> id . ' - ' . __($history -> subject) . ' (' . date_i18n("Y-m-d", strtotime($history -> modified)) . ')';
 			}

@@ -18,7 +18,7 @@
 	} else {
 		?>
 
-		<div class="error"><p><?php _e('Your version of the Newsletter plugin is up to date.', $this -> plugin_name); ?></p></div>
+		<div class="updated"><p><i class="fa fa-check"></i> <?php _e('Your version of the Newsletter plugin is up to date.', $this -> plugin_name); ?></p></div>
 		
 		<?php if ($raw_response = get_transient($this -> pre . 'update_info')) : ?>
 			<?php if (!empty($raw_response['headers']['date'])) : ?>

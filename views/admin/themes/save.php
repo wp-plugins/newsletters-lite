@@ -96,12 +96,14 @@
         	<textarea name="Theme[paste]" class="widefat" contenteditable="true" id="Theme_paste" rows="10" cols="100%"><?php echo esc_attr(stripslashes($Theme -> data -> paste)); ?></textarea>
         	
         	<script type="text/javascript">
-        	jQuery(document).ready(function() {
+        	jQuery(document).ready(function() {	        	
             	jQuery('textarea#Theme_paste').ckeditor({
                 	fullPage: true,
 					allowedContent: true,
-					height: 500,
-					entities: false
+					//height: 500,
+					entities: false,
+					extraPlugins: 'image2,autogrow,codesnippet,tableresize',
+					autoGrow_onStartup: true
             	});
             	
             	//CKEDITOR.disableAutoInline = true;

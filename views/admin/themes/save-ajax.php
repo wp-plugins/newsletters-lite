@@ -209,7 +209,7 @@
         
         <p class="submit">
         	<input class="button-primary" type="submit" name="save" value="<?php _e('Save Template', $this -> plugin_name); ?>" />
-        	<span id="newsletters_themeedit_loader" style="display:none;"><span class="newsletters_loading"></span></span>
+        	<span id="newsletters_themeedit_loader" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
         </p>
     </form>
 </div>

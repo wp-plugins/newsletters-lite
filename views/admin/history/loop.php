@@ -4,12 +4,13 @@
 			<div class="alignleft actions">
 				<?php $rssfeed = $this -> get_option('rssfeed'); ?>
 				<?php if (!empty($rssfeed) && $rssfeed == "Y" && apply_filters($this -> pre . '_admin_history_rsslink', true)) : ?>
-					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="newsletters-icon-rss button"> <?php _e('RSS', $this -> plugin_name); ?></a>
+					<a href="<?php echo home_url(); ?>/?feed=newsletters" title="<?php _e('RSS feed for all newsletter history', $this -> plugin_name); ?>" class="button"><i class="fa fa-rss"></i> <?php _e('RSS', $this -> plugin_name); ?></a>
 				<?php endif; ?>
 				<?php if (apply_filters($this -> pre . '_admin_history_exportlink', true)) : ?>
-                	<a onclick="jQuery('#newsletters-history-action').val('export'); jQuery('#newsletters-history-form').removeAttr('onsubmit').submit(); return false;" href="" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
+                	<a onclick="jQuery('#newsletters-history-action').val('export'); jQuery('#newsletters-history-form').removeAttr('onsubmit').submit(); return false;" href="" class="button"><i class="fa fa-download"></i> <?php _e('Export', $this -> plugin_name); ?></a>
 				<?php endif; ?>
-				<a href="<?php echo $this -> url; ?>&amp;method=clear" title="<?php _e('Clear all email history', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to clear the email history?', $this -> plugin_name); ?>')) { return false; }" class="button newsletters_delete_link"> <?php _e('Clear', $this -> plugin_name); ?></a>
+				<a href="<?php echo $this -> url; ?>&amp;method=clear" title="<?php _e('Clear all email history', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to clear the email history?', $this -> plugin_name); ?>')) { return false; }" class="button"><i class="fa fa-trash"></i> <?php _e('Clear', $this -> plugin_name); ?></a>
+				<?php /*<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> emails); ?>" class="button"><i class="fa fa-history"></i> <?php _e('All Emails', $this -> plugin_name); ?></a>*/ ?>
 			</div>
 			<div class="alignleft actions">
 				<select name="action" id="newsletters-history-action">
@@ -60,7 +61,7 @@
 						</a>
 					</th>
 					<?php $colspan++; ?>
-					<th class="column-stats" nowrap="nowrap"><?php _e('Open / Unsub / Bounce / Clicks', $this -> plugin_name); ?></th>
+					<th class="column-stats" nowrap="nowrap"><?php _e('Tracking', $this -> plugin_name); ?></th>
 					<?php $colspan++; ?>
 					<th class="column-sent <?php echo ($orderby == "sent") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=sent&order=' . (($orderby == "sent") ? $otherorder : "asc")); ?>">
@@ -125,7 +126,7 @@
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
-					<th class="column-stats" nowrap="nowrap"><?php _e('Open / Unsub / Bounce / Clicks', $this -> plugin_name); ?></th>
+					<th class="column-stats" nowrap="nowrap"><?php _e('Tracking', $this -> plugin_name); ?></th>
 					<th class="column-sent <?php echo ($orderby == "sent") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=sent&order=' . (($orderby == "sent") ? $otherorder : "asc")); ?>">
 							<span><?php _e('Status', $this -> plugin_name); ?></span>
@@ -204,11 +205,12 @@
 	                        	<?php _e('None', $this -> plugin_name); ?>
 	                        <?php endif; ?>
 	                    </td>
-						<td nowrap="nowrap">
-							<?php $Db -> model = $Email -> model; ?>
-							<?php $etotal = $Db -> count(array('history_id' => $email -> id)); ?>
-							<?php $eread = $Db -> count(array('history_id' => $email -> id, 'read' => "Y")); ?>
+						<td>
 							<?php 
+								
+							$Db -> model = $Email -> model;
+							$etotal = $Db -> count(array('history_id' => $email -> id));
+							$eread = $Db -> count(array('history_id' => $email -> id, 'read' => "Y"));	
 							
 							global $wpdb;
 							$tracking = (!empty($etotal)) ? ($eread/$etotal) * 100 : 0;
@@ -239,8 +241,8 @@
 							$clicks = $this -> Click -> count(array('history_id' => $email -> id));
 							
 							?>
-							<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=view&amp;id=<?php echo $email -> id; ?>"><?php echo sprintf("%s&#37; / %s&#37; / %s&#37; / %s", number_format($tracking, 2, '.', ''), number_format($eunsubscribeperc, 2, '.', ''), number_format($ebouncedperc, 2, '.', ''), $clicks); ?></a>
-							<?php echo $Html -> help(sprintf(__('%s opened %s, %s unsubscribes %s, %s bounces %s and %s clicks out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . number_format($ebouncedperc, 2, '.', '') . '&#37;)', '<strong>' . $clicks . '</strong>', '<strong>' . $etotal . '</strong>')); ?>
+							<a href="?page=<?php echo $this -> sections -> history; ?>&amp;method=view&amp;id=<?php echo $email -> id; ?>"><?php echo sprintf("%s / %s / %s / %s", '<span style="color:#46BFBD;">' . number_format($tracking, 2, '.', '') . '&#37;</span>', '<span style="color:#FDB45C;">' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;</span>', '<span style="color:#F7464A;">' . number_format($ebouncedperc, 2, '.', '') . '&#37;</span>', $clicks); ?></a>
+							<?php echo $Html -> help(sprintf(__('%s read %s, %s unsubscribes %s, %s bounces %s and %s clicks out of %s emails sent out', $this -> plugin_name), '<strong>' . $eread . '</strong>', '(' . ((!empty($etotal)) ? number_format((($eread/$etotal) * 100), 2, '.', '') : 0) . '&#37;)', '<strong>' . $eunsubscribed . '</strong>', '(' . number_format($eunsubscribeperc, 2, '.', '') . '&#37;)', '<strong>' . $ebounced . '</strong>', '(' . number_format($ebouncedperc, 2, '.', '') . '&#37;)', '<strong>' . $clicks . '</strong>', '<strong>' . $etotal . '</strong>')); ?>
 							
 							<?php
 							
@@ -278,12 +280,12 @@
 						<td>
 							<?php if ($email -> scheduled == "Y") : ?>
 								<span class="wpmlpending"><?php _e('Scheduled', $this -> plugin_name); ?></span>
-								<small>(<abbr title="<?php echo $email -> senddate; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> senddate)); ?></abbr>)</small>
+								<small>(<abbr title="<?php echo $email -> senddate; ?>"><?php echo $Html -> gen_date(false, strtotime($email -> senddate)); ?></abbr>)</small>
 							<?php elseif ($email -> sent <= 0) : ?>
 								<span class="wpmlerror"><?php _e('Draft', $this -> plugin_name); ?></span>
 							<?php else : ?>
 								<span class="wpmlsuccess"><?php _e('Sent', $this -> plugin_name); ?></span>
-								<small>(<?php echo sprintf(__('%s times', $this -> plugin_name), $email -> sent); ?>)</small>
+								<small>(<?php echo sprintf(__('%s times and %s emails', $this -> plugin_name), $email -> sent, $etotal); ?>)</small>
 							<?php endif; ?>
 	                    </td>
 	                    <td>
@@ -318,7 +320,7 @@
 	                        <?php endif; ?>
 	                    </td>
 	                    <?php endif; ?>
-						<td><label for="checklist<?php echo $email -> id; ?>"><abbr title="<?php echo $email -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> modified)); ?></abbr></label></td>
+						<td><label for="checklist<?php echo $email -> id; ?>"><abbr title="<?php echo $email -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($email -> modified)); ?></abbr></label></td>
 	                    <td>
 	                    	<?php if (!empty($email -> attachments)) : ?>
 	                        	<ul style="padding:0; margin:0;">
@@ -345,6 +347,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'historiesperpage']) && $_COOKIE[$this -> pre . 'historiesperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'historiesperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'historiesperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'historiesperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -357,8 +362,8 @@
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>historysorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>history" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>historysorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>history" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>

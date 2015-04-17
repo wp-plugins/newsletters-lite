@@ -2,11 +2,11 @@
 	<form action="?page=<?php echo $this -> sections -> templates; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected snippets?', $this -> plugin_name); ?>')) { return false; }" id="templatesform" name="templatesform">
 		<div class="tablenav">
 			<div class="alignleft actions">
-				<select name="action" class="alignleft widefat" style="width:auto;">
+				<select name="action" class="widefat" style="width:auto;">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete', $this -> plugin_name); ?></option>
 				</select>
-				<input type="submit" class="button-secondary action alignleft" name="execute" value="<?php _e('Apply', $this -> plugin_name); ?>" />
+				<input type="submit" class="button-secondary action" name="execute" value="<?php _e('Apply', $this -> plugin_name); ?>" />
 			</div>
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
@@ -105,7 +105,7 @@
 							<td>
 								<code>[newsletters_snippet id="<?php echo $template -> id; ?>"]</code>
 							</td>
-							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $template -> modified; ?></label></td>
+							<td><label for="checklist<?php echo $template -> id; ?>"><?php echo $Html -> gen_date(false, strtotime($template -> modified)); ?></label></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -121,6 +121,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'templatesperpage']) && $_COOKIE[$this -> pre . 'templatesperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'templatesperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'templatesperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'templatesperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -131,8 +134,8 @@
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>templatessorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>templates" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>templatessorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>templates" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>

@@ -1,4 +1,4 @@
-<div class="<?php echo $this -> pre; ?>unsubscribe <?php echo $this -> pre; ?>">
+<div class="newsletters <?php echo $this -> pre; ?>unsubscribe <?php echo $this -> pre; ?>">
 	<?php global $wpdb, $Mailinglist; ?>	
 	<?php $this -> render('error', array('errors' => $errors), true, 'default'); ?>
 	

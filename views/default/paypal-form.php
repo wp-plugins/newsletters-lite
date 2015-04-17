@@ -7,7 +7,7 @@
 		<?php foreach ($checkoutdata as $ckey => $cval) : ?>
 			<input type="hidden" name="<?php echo $ckey; ?>" value="<?php echo $cval; ?>" />
 		<?php endforeach; ?>
-		<input type="submit" class="<?php echo $this -> pre; ?>button paybutton" name="checkout" value="<?php _e('Pay Now', $this -> plugin_name); ?>" />
+		<input type="submit" class="<?php echo $this -> pre; ?>button ui-button-success paybutton" name="checkout" value="<?php _e('Pay Now', $this -> plugin_name); ?>" />
 	</form>
 	
 	<?php if ($autosubmit) : ?>

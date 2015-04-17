@@ -1,9 +1,14 @@
-<?php $src = (!empty($_POST['ishistory'])) ? admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'history_iframe&id=' . $_POST['ishistory'] : false; ?>
+<?php 
+
+$history_id = (empty($_POST['ishistory'])) ? $_GET['id'] : $_POST['ishistory'];	
+$src = (!empty($history_id)) ? admin_url('admin-ajax.php') . '?action=' . $this -> pre . 'history_iframe&id=' . $history_id : false; 
+
+?>
 
 <p>
 	<a href="<?php echo $src; ?>" target="_blank" class="button button-secondary"><?php _e('Open in New Window', $this -> plugin_name); ?></a>
 	<a href="" id="previewrunnerbutton" onclick="previewrunner(); return false;" class="button button-primary"><?php _e('Update Preview', $this -> plugin_name); ?></a>
-	<span id="previewrunnerloading" style="display:none;"><span class="newsletters_loading"></span></span>
+	<span id="previewrunnerloading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 </p>
 
 <iframe width="100%" height="300" frameborder="0" scrolling="auto" class="autoHeight widefat" style="width:100%; margin:15px 0 0 0; border:1px #CCCCCC solid;" src="<?php echo $src; ?>" id="previewiframe">
@@ -13,14 +18,17 @@
 <script type="text/javascript">
 var previewrequest = false;
 
-<?php if (!empty($_POST['ishistory'])) : ?>
-var history_id = "<?php echo $_POST['ishistory']; ?>";
+<?php if (!empty($history_id)) : ?>
+var history_id = "<?php echo $history_id; ?>";
+<?php else : ?>
+var history_id = false;
 <?php endif; ?>
 
 function previewrunner() {	
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 	var formvalues = jQuery('form#post').serialize();
-	var content = jQuery("iframe#content_ifr").contents().find("body#tinymce").html();
+	//var content = jQuery("iframe#content_ifr").contents().find("body#tinymce").html();
+	var content = tinyMCE.editors.content.getContent();
 	
 	if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
 		tinyMCE.triggerSave();
@@ -30,18 +38,23 @@ function previewrunner() {
 	jQuery('#previewrunnerbutton').attr('disabled', "disabled");
 	jQuery('#previewrunnerloading').show();
 	
+	jQuery.ajaxSetup({cache:false});
+	
 	previewrequest = jQuery.ajax({
 		data: formvalues,
 		dataType: 'xml',
-		url: wpmlajaxurl + '?action=wpmlpreviewrunner',
+		url: wpmlajaxurl + '?action=wpmlpreviewrunner&random=' + (new Date()).getTime(),
+		cache: false,
 		type: "POST",
-		success: function(response) {
+		success: function(response) {			
 			history_id = jQuery("history_id", response).text();
+			p_id = jQuery("p_id", response).text();
 			previewcontent = jQuery("previewcontent", response).text();
 			newsletter_url = jQuery("newsletter_url", response).text();
 			
 			if (history_id != "") { 
 				jQuery('#ishistory').val(history_id); 
+				jQuery('#p_id').val(p_id);
 				jQuery('#edit-slug-box').show();
 				jQuery('#sample-permalink').html(newsletter_url);
 				jQuery('#view-post-btn a').attr('href', newsletter_url);
@@ -72,6 +85,13 @@ function previewrunner() {
 }
 
 jQuery(document).ready(function() {
-	setTimeout(previewrunner, 60000);
+	//setTimeout(previewrunner, 60000);
+	setTimeout(function() {
+		if (history_id != false) {
+			previewrunner();
+		}
+		
+		setInterval(previewrunner, 60000);
+	}, 3000);
 });
 </script>

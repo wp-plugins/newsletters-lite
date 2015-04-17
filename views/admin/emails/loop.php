@@ -52,9 +52,9 @@
 		    <div class="tablenav">
 				<?php if ($_GET['page'] == $this -> sections -> history) : ?>
 			    	<div class="alignleft actions">
-			    		<?php $exportlink = ($_GET['page'] == $this -> sections -> history) ? '?page=' . $this-> sections -> history . '&amp;method=exportsent&amp;history_id=' . $history -> id : '?page='; ?>
-			        	<a onclick="jQuery('#newsletters-emails-action').val('export'); jQuery('#newsletters-emails-form').removeAttr('onsubmit').submit(); return false;" href="" class="newsletters-icon-download button"> <?php _e('Export', $this -> plugin_name); ?></a>
-			        	<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history); ?>" class="newsletters-icon-download button"> <?php _e('Export All', $this -> plugin_name); ?></a>
+			    		<?php $exportlink = ($_GET['page'] == $this -> sections -> history) ? '?page=' . $this -> sections -> history . '&amp;method=exportsent&amp;history_id=' . $history -> id : '?page='; ?>
+			        	<a onclick="jQuery('#newsletters-emails-action').val('export'); jQuery('#newsletters-emails-form').removeAttr('onsubmit').submit(); return false;" href="" class="button"><i class="fa fa-download"></i> <?php _e('Export', $this -> plugin_name); ?></a>
+			        	<a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&amp;method=emails-mass&amp;action=exportall&amp;emails=all&amp;history_id=' . $history -> id); ?>" class="button"><i class="fa fa-download"></i> <?php _e('Export All', $this -> plugin_name); ?></a>
 			        </div>
 			        <div class="alignleft actions">
 				        <select name="action" id="newsletters-emails-action" onchange="emails_change_action(this.value);">
@@ -146,7 +146,7 @@
 					</th>
 	                <th class="column-read <?php echo ($orderby == "read") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=read&order=' . (($orderby == "read") ? $otherorder : "asc")); ?>#emailssent">
-							<span><?php _e('Opened', $this -> plugin_name); ?></span>
+							<span><?php _e('Read', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -204,7 +204,7 @@
 					</th>
 	                <th class="column-read <?php echo ($orderby == "read") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=read&order=' . (($orderby == "read") ? $otherorder : "asc")); ?>#emailssent">
-							<span><?php _e('Opened', $this -> plugin_name); ?></span>
+							<span><?php _e('Read', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -275,6 +275,7 @@
 		                    		<?php
 										
 									$mailinglists = maybe_unserialize($email -> mailinglists);
+									$mailinglists = $Subscriber -> mailinglists($email -> subscriber_id, $mailinglists);
 									if (is_array($mailinglists)) {
 										$m = 1;
 										foreach ($mailinglists as $list_id) {								
@@ -318,7 +319,7 @@
 		                    	<?php echo (!empty($email -> bounced) && $email -> bounced == "Y") ? '<span class="' . $this -> pre . 'error">' . __('Yes', $this -> plugin_name) . '</span>' : '<span class="newsletters_success">' . __('No', $this -> plugin_name) . '</span>'; ?>
 		                    </td>
 		                    <td>
-		                    	<abbr title="<?php echo $email -> created; ?>"><?php echo date_i18n("Y-m-d", strtotime($email -> created)); ?></abbr>
+		                    	<abbr title="<?php echo $email -> created; ?>"><?php echo $Html -> gen_date(false, strtotime($email -> created)); ?></abbr>
 		                    </td>
 		                </tr>
 		            <?php endforeach; ?>
@@ -336,6 +337,9 @@
 							<option <?php echo (isset($_COOKIE[$this -> pre . 'emailsperpage']) && $_COOKIE[$this -> pre . 'emailsperpage'] == $s) ? 'selected="selected"' : ''; ?> value="<?php echo $s; ?>"><?php echo $s; ?> <?php _e('emails', $this -> plugin_name); ?></option>
 							<?php $s += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'emailsperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'emailsperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'emailsperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 			</div>

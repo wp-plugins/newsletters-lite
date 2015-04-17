@@ -21,7 +21,7 @@ class wpmlField extends wpMailPlugin {
 
 	var $table_fields = array(
 		'id'			=>	"INT(11) NOT NULL AUTO_INCREMENT",
-		'title'			=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'title'			=>	"VARCHAR(255) NOT NULL DEFAULT ''",
 		'caption'		=>	"TEXT NOT NULL",
 		'watermark'		=>	"TEXT NOT NULL",
 		'slug'			=>	"VARCHAR(100) NOT NULL DEFAULT ''",
@@ -45,7 +45,7 @@ class wpmlField extends wpMailPlugin {
 	
 	var $tv_fields = array(
 		'id'			=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
-		'title'			=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'title'			=>	array("VARCHAR(255)", "NOT NULL DEFAULT ''"),
 		'caption'		=>	array("TEXT", "NOT NULL"),
 		'watermark'		=>	array("TEXT", "NOT NULL"),
 		'slug'			=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
@@ -71,7 +71,7 @@ class wpmlField extends wpMailPlugin {
 
 	function wpmlField($data = array()) {
 		global $wpdb, $Db, $FieldsList;
-		
+		$this -> sections = (object) $this -> sections;
 		$this -> table = $this -> pre . $this -> controller;	
 	
 		if (!empty($data)) {
@@ -79,11 +79,27 @@ class wpmlField extends wpMailPlugin {
 				//$this -> {$key} = stripslashes_deep($val);
 				
 				switch ($key) {
+					case 'fieldoptions'		:
+						$this -> initialize_classes();
+						$this -> newfieldoptions = false;
+						if ($fieldoptions = $this -> Option -> find_all(array('field_id' => $this -> id), false, array('order', "ASC"))) {
+							if (is_admin() && $_GET['page'] == $this -> sections -> fields) {
+								$this -> newfieldoptions = $fieldoptions;
+							} else {
+								foreach ($fieldoptions as $fieldoption) {
+									$this -> newfieldoptions[$fieldoption -> id] = $fieldoption -> value;
+								}
+							}
+						}
+						
+						$this -> {$key} = $val;
+						break;
 					case 'regex'			:
 						$this -> {$key} = $val;
 						break;
 					default 				:
-						$this -> {$key} = stripslashes_deep($val);
+						//$this -> {$key} = stripslashes_deep($val);
+						$this -> {$key} = $val;
 						break;
 				}
 			}
@@ -351,7 +367,14 @@ class wpmlField extends wpMailPlugin {
 		
 		$this -> data[$this -> model] = (object) $data[$this -> model];
 		
-		if ($this -> language_do()) {		
+		if ($this -> language_do()) {
+			$this -> data[$this -> model] -> title = $this -> language_join($this -> data[$this -> model] -> title, false, true);
+			$this -> data[$this -> model] -> caption = $this -> language_join($this -> data[$this -> model] -> caption, false, true);
+			$this -> data[$this -> model] -> watermark = $this -> language_join($this -> data[$this -> model] -> watermark, false, true);
+			$this -> data[$this -> model] -> errormessage = $this -> language_join($this -> data[$this -> model] -> errormessage, false, true);
+		}
+		
+		/*if ($this -> language_do()) {		
 			if (true) {
 				$this -> data[$this -> model] -> title = $this -> language_join($this -> data[$this -> model] -> title, false, true);
 				$this -> data[$this -> model] -> caption = $this -> language_join($this -> data[$this -> model] -> caption, false, true);
@@ -382,6 +405,44 @@ class wpmlField extends wpMailPlugin {
 					$this -> data[$this -> model] -> fieldoptions = $newfieldoptions;
 					$fieldoptions = $newfieldoptions;
 				}
+			}
+		}*/
+		
+		if (!empty($this -> data[$this -> model] -> fieldoptions)) {
+			$fieldoptions_data = $this -> data[$this -> model] -> fieldoptions;
+			$el = $this -> language_getlanguages();
+			$language_default = $this -> language_default();
+			
+			if ($this -> language_do()) {
+				$fieldoptions = array();
+				$newfieldoptions = array();
+				
+				//for ($n = 0; $n < count($fieldoptions_data[$language_default]); $n++) {
+				foreach ($el as $language) {
+					/*if (!empty($fieldoptions_data[$language][$n])) {							
+						$newfieldoptions[$n][$language] = stripslashes($fieldoptions_data[$language][$n]);
+					}*/
+					
+					foreach ($fieldoptions_data[$language] as $fieldoptions_id => $fieldoptions_value) {
+						if (!empty($fieldoptions_value)) {
+							$fieldoptions[$fieldoptions_id][$language] = stripslashes($fieldoptions_value['value']);	
+							
+							$newfieldoptions[$fieldoptions_id]['id'] = $fieldoptions_value['id'];
+							$newfieldoptions[$fieldoptions_id]['value'] = $fieldoptions[$fieldoptions_id];
+						}
+					}
+				}	
+				//}
+				
+				foreach ($fieldoptions as $key => $fieldoption) {
+					$fieldoptions[$key] = $this -> language_join($fieldoption);
+					$newfieldoptions[$key]['value'] = $this -> language_join($newfieldoptions[$key]['value']);
+				}
+				
+				$this -> data[$this -> model] -> newfieldoptions = $newfieldoptions;
+				//$fieldoptions = $newfieldoptions;
+			} else {
+				
 			}
 		}
 		
@@ -424,8 +485,8 @@ class wpmlField extends wpMailPlugin {
 					if ($type == "select" || $type == "radio" || $type == "checkbox") {
 						if (empty($fieldoptions)) {
 							$this -> errors['fieldoptions'] = __('Please fill in some options', $this -> plugin_name);
-						} else {
-							$fieldoptions = explode("\r\n", $fieldoptions);
+						} else {							
+							/*$fieldoptions = explode("\r\n", $fieldoptions);
 							$newoptions = array();
 							
 							if (!empty($fieldoptions)) {
@@ -435,19 +496,20 @@ class wpmlField extends wpMailPlugin {
 									$option = trim($option);
 									
 									if (!empty($option)) {
-										$newoptions[$n] = $option;
+										$newoptions[$n] = stripslashes($option);
 										$n++;
 									}
 								}
 							}
 							
 							if (!empty($newoptions)) {
-								$fieldoptions = serialize($newoptions);
+								$fieldoptions = maybe_serialize($newoptions);
 							} else {
 								$fieldoptions = '';
 								$this -> errors['fieldoptions'] = __('Please fill in some options', $this -> plugin_name);
-							}
+							}*/
 							
+							$fieldoptions = maybe_serialize($fieldoptions);							
 							$this -> data[$this -> model] -> fieldoptions = $fieldoptions;
 						}
 					} elseif ($type == "file") {
@@ -495,7 +557,7 @@ class wpmlField extends wpMailPlugin {
 				}
 			
 				if (!empty($id)) {
-					$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET `title` = '" . $title . "', `slug` = '" . $slug . "', `display` = '" . $display . "', `required` = '" . $required . "', `errormessage` = '" . $errormessage . "', `validation` = '" . $validation . "', `regex` = '" . $regex . "', `type` = '" . $type . "', `hidden_type` = '" . $hidden_type . "', `hidden_value` = '" . $hidden_value . "', `filetypes` = '" . $filetypes . "', `filesizelimit` = '" . $filesizelimit . "', `fieldoptions` = '" . $fieldoptions . "', `modified` = '" . $modified . "', `caption` = '" . $caption . "', `watermark` = '" . $watermark . "' WHERE `id` = '" . $id . "' LIMIT 1;";
+					$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET `title` = '" . $title . "', `slug` = '" . $slug . "', `display` = '" . $display . "', `required` = '" . $required . "', `errormessage` = '" . $errormessage . "', `validation` = '" . $validation . "', `regex` = '" . $regex . "', `type` = '" . $type . "', `hidden_type` = '" . $hidden_type . "', `hidden_value` = '" . $hidden_value . "', `filetypes` = '" . $filetypes . "', `filesizelimit` = '" . $filesizelimit . "', `fieldoptions` = '" . esc_sql($fieldoptions) . "', `modified` = '" . $modified . "', `caption` = '" . $caption . "', `watermark` = '" . $watermark . "' WHERE `id` = '" . $id . "' LIMIT 1;";
 					$field_old = $this -> get($id);
 				} else {
 					$query1 = "INSERT INTO `" . $wpdb -> prefix . "" . $this -> table . "` (";
@@ -510,7 +572,7 @@ class wpmlField extends wpMailPlugin {
 					foreach (array_keys($this -> table_fields) as $field) {
 						if (!empty(${$field}) && ${$field} != "0") {
 							$query1 .= "`" . $field . "`";
-							$query2 .= "'" . ${$field} . "'";
+							$query2 .= "'" . esc_sql(${$field}) . "'";
 							
 							if ($c < count($this -> table_fields)) {
 								$query1 .= ", ";
@@ -528,8 +590,9 @@ class wpmlField extends wpMailPlugin {
 					$query = $query1 . $query2 . ");";
 				}
 
-				if ($wpdb -> query($query)) {
+				if ($wpdb -> query($query)) {					
 					$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;
+					$field_id = $this -> insertid;
 
 					if (!empty($id)) {
 						$FieldsList -> delete_all(array('field_id' => $this -> insertid));
@@ -537,6 +600,32 @@ class wpmlField extends wpMailPlugin {
 					} else {
 						$this -> insert_id = $data['id'] = $wpdb -> insert_id;						
 						$this -> add_field($Subscriber -> table, $slug);
+					}
+					
+					// Field options
+					if (!empty($newfieldoptions)) {
+						$this -> initialize_classes();
+						
+						$o = 1;
+						foreach ($newfieldoptions as $newfieldoption) {
+							if (!empty($newfieldoption['value'])) {
+								$newfieldoption_data = array(
+									'order'						=>	$o,
+									'value'						=>	$newfieldoption['value'],
+									'field_id'					=>	$field_id,
+								);
+								
+								if (!empty($newfieldoption['id'])) {
+									$newfieldoption_data['id'] = $newfieldoption['id'];
+								}
+								
+								$Db -> model = $this -> Option -> model;
+								$this -> Option -> save($newfieldoption_data);								
+								$this -> Option -> errors = false;
+								
+								$o++;
+							}
+						}
 					}
 					
 					if ($display == "always") {

@@ -27,7 +27,7 @@
 				},
 				update: function(event, ui) {
 					jQuery.post(wpmlajaxurl + "?action=newsletters_order_fields", jQuery('ul#fields').sortable('serialize'), function(response) {
-						jQuery('#message').html('<p>' + response + '</p>').fadeIn();
+						jQuery('#message').html('<p><i class="fa fa-check"></i> ' + response + '</p>').fadeIn();
 					});
 				}
 			});

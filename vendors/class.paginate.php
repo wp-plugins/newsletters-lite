@@ -212,6 +212,9 @@ class wpmlpaginate extends wpMailPlugin {
 				if (preg_match("/(NOT IN)/si", $val)) {
 					$query .= " " . $key . " " . $val . "";
 					$countquery .= " " . $key . " " . $val . "";
+				} elseif (preg_match("/(IN \()/si", $val)) {
+					$query .= " " . $key . " " . $val . "";
+					$countquery .= " " . $key . " " . $val;
 				} elseif (preg_match("/LE (.*)/si", $val, $vmatches)) {
 					$query .= " " . $key . " >= '" . $vmatches[1] . "'";
 					$countquery .= " " . $key . " >= '" . $vmatches[1] . "'";
@@ -296,7 +299,7 @@ class wpmlpaginate extends wpMailPlugin {
 			$this -> pagination .= '<span class="displaying-num">' . sprintf(__('%s items', $this -> plugin_name), $this -> per_page) . '</span>';
 			$this -> pagination .= '<span class="pagination-links">';
 			//$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
-			$this -> pagination .= '<a href="?page=' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after) . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
+			$this -> pagination .= '<a href="' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after) . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
 			//$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
 			$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after) . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
 			$this -> pagination .= '<span class="paging-input">';

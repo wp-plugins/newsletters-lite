@@ -31,12 +31,19 @@ class wpmlBounce extends wpMailPlugin {
 	var $indexes = array('email', 'history_id');
 	
 	function wpmlBounce($data = array()) {
-		global $wpdb, $Db;
+		global $wpdb, $Db, $History;
 		$this -> table = $this -> pre . $this -> controller;
 		
 		if (!empty($data)) {
 			foreach ($data as $dkey => $dval) {				
 				$this -> {$dkey} = stripslashes_deep($dval);
+				
+				switch ($dkey) {
+					case 'history_id'			:
+						$Db -> model = $History -> model;
+						$this -> history = $Db -> find(array('id' => $dval));
+						break;
+				}
 			}
 		}
 		

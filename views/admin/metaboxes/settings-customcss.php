@@ -15,6 +15,14 @@
                 <?php endif; ?>
             </td>
         </tr>
+        <?php if ($this -> has_child_theme_folder()) : ?>
+	        <tr>
+	        	<th><?php _e('Child Theme Folder', $this -> plugin_name); ?></th>
+	        	<td>
+	        		<?php echo sprintf(__('Yes, there is a %s folder inside your theme folder %s', $this -> plugin_name), '<code>newsletters</code>', '<code>' . basename(get_stylesheet_directory()) . '</code>'); ?>
+	        	</td>
+	        </tr>
+	    <?php endif; ?>
         <tr>
         	<th><label for="theme_usestyle_Y"><?php _e('Use Theme Style File?', $this -> plugin_name); ?></label></th>
             <td>

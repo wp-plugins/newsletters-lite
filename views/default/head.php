@@ -11,9 +11,15 @@ var wpmlScroll = "<?php echo ($embed['scroll'] == "Y") ? 'Y' : 'N'; ?>";
 	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>?';
 <?php endif; ?>
 
-jQuery(document).ready(function() { 
+jQuery.noConflict();
+
+jQuery(document).ready(function() {
+	if (jQuery.isFunction(jQuery.fn.select2)) {
+		jQuery('.newsletters select').select2();
+	}
+	 
 	if (jQuery.isFunction(jQuery.fn.button)) {
-		jQuery('.<?php echo $this -> pre; ?>button').button(); 
+		jQuery('.<?php echo $this -> pre; ?>button, .newsletters_button').button(); 
 	}
 });
 </script>

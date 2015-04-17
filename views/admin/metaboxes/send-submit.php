@@ -27,7 +27,8 @@
 				<input type="hidden" id="fromname" name="fromname" value="<?php echo (!empty($_POST['fromname'])) ? $_POST['fromname'] : ''; ?>" />
 			
 				<span id="sendfrom">
-					<span id="sendfrom-image"></span><?php _e('Send from', $this -> plugin_name); ?>
+					<?php /*<span id="sendfrom-image"></span>*/ ?>
+					<i class="fa fa-user fa-fw pull-left"></i> <?php _e('Send from', $this -> plugin_name); ?>
 					<span id="sendfrom-edit"><a id="sendfrom-edit-link" href="" onclick="jQuery('#sendfromdiv').show('slow'); jQuery('#smtpfromname').focus(); jQuery(this).hide(); return false;"><?php _e('Edit', $this -> plugin_name); ?></a></span>
 					<?php echo $Html -> help(__('Change the From Name and From Address that this email is being sent from as it will appear in the email/webmail clients of the recipients.', $this -> plugin_name)); ?>
 				</span>
@@ -84,7 +85,8 @@
 					<input type="hidden" name="sendrecurring" id="sendrecurringfield" value="<?php echo (!empty($_POST['sendrecurring']) && $_POST['sendrecurring'] == "Y") ? 'Y' : ''; ?>" />
 				
 					<span id="sendrecurring">
-						<span id="sendrecurring-image"></span>
+						<?php /*<span id="sendrecurring-image"></span>*/ ?>
+						<i class="fa fa-retweet fa-fw pull-left"></i>
 						<?php if (!empty($_POST['sendrecurring']) && $_POST['sendrecurring'] == "Y") : ?>
 							<span id="sendrecurring-value">
 								<?php echo sprintf(__('Send every %s %s', $this -> plugin_name), $_POST['sendrecurringvalue'], $_POST['sendrecurringinterval'], $_POST['sendrecurringlimit']); ?>
@@ -102,16 +104,18 @@
 							<?php _e('Every', $this -> plugin_name); ?>
 							<input type="text" name="sendrecurringvalue" value="<?php echo esc_attr(stripslashes($_POST['sendrecurringvalue'])); ?>" id="sendrecurringvalue" class="widefat" style="width:45px;" /> 
 							<select name="sendrecurringinterval" id="sendrecurringinterval">
-								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "hours") ? 'selected="selected"' : ''; ?> value="hours">Hours</option>
-								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "days") ? 'selected="selected"' : ''; ?> value="days">Days</option>
-								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "weeks") ? 'selected="selected"' : ''; ?> value="weeks">Weeks</option>
-								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "years") ? 'selected="selected"' : ''; ?> value="years">Years</option>
+								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "minutes") ? 'selected="selected"' : ''; ?> value="minutes"><?php _e('Minutes', $this -> plugin_name); ?></option>
+								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "hours") ? 'selected="selected"' : ''; ?> value="hours"><?php _e('Hours', $this -> plugin_name); ?></option>
+								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "days") ? 'selected="selected"' : ''; ?> value="days"><?php _e('Days', $this -> plugin_name); ?></option>
+								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "weeks") ? 'selected="selected"' : ''; ?> value="weeks"><?php _e('Weeks', $this -> plugin_name); ?></option>
+								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "months") ? 'selected="selected"' : ''; ?> value="months"><?php _e('Months', $this -> plugin_name); ?></option>
+								<option <?php echo (!empty($_POST['sendrecurringinterval']) && $_POST['sendrecurringinterval'] == "years") ? 'selected="selected"' : ''; ?> value="years"><?php _e('Years', $this -> plugin_name); ?></option>
 							</select>
 							<?php echo $Html -> help(__('Choose the interval at which this newsletter should be sent again. All data of the newsletter such as the list(s), content, template, etc. will be reused as configured.', $this -> plugin_name)); ?>
 						</div>
 						<div class="form-field">
 							<?php _e('Starting', $this -> plugin_name); ?>
-							<?php $sendrecurringdate = (empty($_POST['sendrecurringdate'])) ? date_i18n("Y-m-d H:i:s", time()) : $_POST['sendrecurringdate']; ?>
+							<?php $sendrecurringdate = (empty($_POST['sendrecurringdate'])) ? $Html -> gen_date("Y-m-d H:i:s", time()) : $_POST['sendrecurringdate']; ?>
 							<input type="text" name="sendrecurringdate" value="<?php echo $sendrecurringdate; ?>" id="sendrecurringdate" class="widefat" style="width:140px;" />
 							<?php echo $Html -> help(__('Specify a starting date and time for the first recurring instance to run. In the format YYYY-MM-DD HH:MM:SS', $this -> plugin_name)); ?>
 						</div>
@@ -163,18 +167,25 @@
 				
     		<div class="misc-pub-section curtime misc-pub-section-last">
     			<?php if ($this -> get_option('sendingprogress') == "Y") : ?>
-            		<span id="timestamp"><?php _e('Send immediately', $this -> plugin_name); ?></span>
+            		<i class="fa fa-clock-o fa-fw"></i> <span id="timestamp"><?php _e('Send immediately', $this -> plugin_name); ?></span>
             	<?php else : ?>
-            		<span id="timestamp"><?php _e('Queue immediately', $this -> plugin_name); ?></span>
+            		<i class="fa fa-clock-o fa-fw"></i> <span id="timestamp"><?php _e('Queue immediately', $this -> plugin_name); ?></span>
             	<?php endif; ?>
+            	
+            	<style type="text/css">
+	            #timestamp:before {
+		            content: "" !important;
+	            }
+	            </style>
+            	
             	<a href="" onclick="jQuery('#timestampdiv').show('slow'); jQuery(this).hide(); return false;" class="edit-timestamp hide-if-no-js" style="display:inline;"><?php _e('Edit', $this -> plugin_name); ?></a>
             	
             	<?php echo $Html -> help(__('You can choose to send this newsletter immediately or you can click the "Edit" link to change the date/time to a future date/time at which it will be sent.', $this -> plugin_name)); ?>
             	
 				<div id="timestampdiv" class="hide-if-js" style="display:none;">
-					<p class="howto"><?php echo sprintf(__('Current time is %s', $this -> plugin_name), '<strong>' . date_i18n("Y-m-d H:i:s", time()) . '</strong>'); ?></p>
+					<p class="howto"><?php echo sprintf(__('Current time is %s', $this -> plugin_name), '<strong>' . $Html -> gen_date("Y-m-d H:i:s", time()) . '</strong>'); ?></p>
 					<?php touch_time(0, 0, 0, 0); ?>
-					<?php $senddate = (empty($_POST['senddate']) || strtotime($_POST['senddate']) <= time()) ? date_i18n("Y-m-d H:i:s", time()) : $_POST['senddate']; ?>
+					<?php $senddate = (empty($_POST['senddate']) || strtotime($_POST['senddate']) <= time()) ? $Html -> gen_date("Y-m-d H:i:s", time()) : $_POST['senddate']; ?>
 					<input type="hidden" name="sendtype" id="sendtype" value="<?php echo ($this -> get_option('sendingprogress') == "Y") ? 'send' : 'queue'; ?>" />
 					<input type="hidden" name="senddate" id="senddate" value="<?php echo $senddate; ?>" />
 					<input type="hidden" name="scheduled" id="scheduled" value="N" />
@@ -192,11 +203,11 @@
 					
 					<?php if (!empty($senddate) && strtotime($senddate) > time()) : ?>
 						jQuery('#scheduled').val("Y");
-						jQuery('#aa').val('<?php echo date_i18n("Y", strtotime($senddate)); ?>');
-						jQuery('#mm').val('<?php echo date_i18n("m", strtotime($senddate)); ?>');
-						jQuery('#jj').val('<?php echo date_i18n("d", strtotime($senddate)); ?>');
-						jQuery('#hh').val('<?php echo date_i18n("H", strtotime($senddate)); ?>');
-						jQuery('#mn').val('<?php echo date_i18n("i", strtotime($senddate)); ?>');
+						jQuery('#aa').val('<?php echo $Html -> gen_date("Y", strtotime($senddate)); ?>');
+						jQuery('#mm').val('<?php echo $Html -> gen_date("m", strtotime($senddate)); ?>');
+						jQuery('#jj').val('<?php echo $Html -> gen_date("d", strtotime($senddate)); ?>');
+						jQuery('#hh').val('<?php echo $Html -> gen_date("H", strtotime($senddate)); ?>');
+						jQuery('#mn').val('<?php echo $Html -> gen_date("i", strtotime($senddate)); ?>');
 						update_timestamp();
 					<?php endif; ?>
 				});

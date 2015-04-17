@@ -24,6 +24,22 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	
 	function bar_chart($id = null, $attributes = array(), $data = array(), $options = array()) {
 		
+		$default_attributes = array(
+			'width'					=>	"100%",
+			'height'				=>	"300px",
+		);
+		
+		$attributes = wp_parse_args($attributes, $default_attributes);
+		
+		$default_options = array(
+			'barShowStroke'			=>	false,
+			'multiTooltipTemplate'	=>	"\<\%\= datasetLabel \%\>: \<\%\= value \%\>",
+			'legendTemplate'		=>	"<ul class=\"\<\%\=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:<\%\=datasets[i].fillColor\%\>\"></span>\<\% if(datasets[i].label){ \%\><\%\=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
+		);
+		
+		$options = wp_parse_args($options, $default_options);
+		
+		$this -> render('charts' . DS . 'bar', array('id' => $id, 'attributes' => $attributes, 'data' => $data, 'options' => $options), true, 'admin');
 	}
 	
 	function pie_chart($id = null, $attributes = array(), $data = array(), $options = array()) {
@@ -36,10 +52,16 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		$attributes = wp_parse_args($attributes, $default_attributes);
 		
 		$default_options = array(
-			'tooltipTemplate'		=>	"\<\% if (label){\%\>\<\%\=label%>: \<\%}\%\><\%\=value\%\>\%",
+			'tooltipTemplate'		=>	"<%if (label){%><%=label%>: <%}%><%=value%>%",
 		);
 		
 		$options = wp_parse_args($options, $default_options);
+		
+		if (!empty($attributes['width']) && $attributes['width'] < 150) {
+			foreach ($data as $dkey => $dval) {
+				$data[$dkey]['label'] = substr($dval['label'], 0, 1);
+			}
+		}
 		
 		$this -> render('charts' . DS . 'pie', array('id' => $id, 'attributes' => $attributes, 'data' => $data, 'options' => $options), true, 'admin');
 	}
@@ -159,7 +181,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		
 			?>
 			
-			<span class="wpmlhelp"><a href="" onclick="return false;" title="<?php echo esc_attr(stripslashes($help)); ?>"></a></span>
+			<span class="wpmlhelp"><a href="" onclick="return false;" title="<?php echo esc_attr(stripslashes($help)); ?>"><i class="fa fa-question-circle fa-fw"></i></a></span>
 			
 			<?php
 			
@@ -466,9 +488,9 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	
 		if (!empty($attachmentfile)) {			
 			if ($icononly == false) {
-				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '">' . $this -> truncate(basename($attachmentfile), $truncate) . '</a>';
+				return '<a class="button" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '"><i class="fa fa-paperclip"></i> ' . $this -> truncate(basename($attachmentfile), $truncate) . '</a>';
 			} else {
-				return '<a class="button newsletters_attachment_link" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '"></a>';
+				return '<a class="button" style="text-decoration:none;" target="_blank" href="' . $this -> uploads_url() . '/' . $attachmentfile . '" title="' . basename($attachmentfile) . '"><i class="fa fa-paperclip"></i></a>';
 			}
 		}
 		
@@ -485,6 +507,9 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					break;
 				case 'submitserial'		:
 					$name = __('Submit Serial', $this -> plugin_name);
+					break;
+				case 'forms'			:
+					$name = __('Subscribe Forms', $this -> plugin_name);
 					break;
 				case 'send'				:
 					$name = __('Create Newsletter', $this -> plugin_name);
@@ -524,6 +549,9 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					break;
 				case 'history'			:
 					$name = __('Sent &amp; Draft Emails', $this -> plugin_name);
+					break;
+				case 'emails'			:
+					$name = __('All Emails', $this -> plugin_name);
 					break;
 				case 'links'			:
 					$name = __('Links', $this -> plugin_name);
@@ -720,7 +748,10 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	}
 	
 	function gen_date($format = "Y-m-d H:i:s", $time = false) {
-		if (empty($format)) { $format = "Y-m-d H:i:s"; } 
+		if (empty($format)) {
+			$format = get_option('date_format'); 
+		} 
+		
 		$this -> set_timezone();
 		$newtime = (empty($time)) ? time() : $time;
 		return date_i18n($format, $newtime);
@@ -756,8 +787,8 @@ class wpmlHtmlHelper extends wpMailPlugin {
 					$value = ${$mn[1]} -> data -> {$mn[2]};
 				}
 				
-				if ($this -> language_do() && $language) {
-					if ($mn[2] == "fieldoptions") {
+				if ($this -> language_do() && !empty($language)) {					
+					if ($mn[2] == "fieldoptions") {												
 						$alloptions = maybe_unserialize($value);
 						$optionarray = array();
 						
@@ -783,13 +814,26 @@ class wpmlHtmlHelper extends wpMailPlugin {
         return $value;
 	}
 	
+	function has_field_error($name = null) {
+		if (!empty($name)) {
+			if ($mn = $this -> strip_mn($name)) {
+				global ${$mn[1]};
+				if (!empty(${$mn[1]} -> errors[$mn[2]])) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	function field_error($name = null) {
 		if (!empty($name)) {		
 			if ($mn = $this -> strip_mn($name)) {
 				global ${$mn[1]};
 				if (!empty(${$mn[1]} -> errors[$mn[2]])) {
 					ob_start();
-					echo '<div class="' . $this -> pre . 'error">' . ${$mn[1]} -> errors[$mn[2]] . '</div>';
+					echo '<div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> ' . ${$mn[1]} -> errors[$mn[2]] . '</p></div>';
 					return ob_get_clean();
 				}
 			}

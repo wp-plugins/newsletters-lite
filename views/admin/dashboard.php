@@ -1,11 +1,21 @@
 <div class="newsletters-dashboard-widget">
+	<?php
+		
+	$user_chart = $this -> get_user_option(false, 'chart');
+	$chart = (empty($user_chart)) ? "bar" : $user_chart;
+	
+	$from = $Html -> gen_date("Y-m-d", strtotime("-6 days"));
+	$to = $Html -> gen_date("Y-m-d", time());
+	
+	?>
+	
+	<p>
+		<a href="<?php echo $Html -> retainquery('newsletters_method=set_user_option&option=chart&value=bar'); ?>" class="button <?php echo (empty($chart) || $chart == "bar") ? 'active' : ''; ?>"><i class="fa fa-bar-chart"></i></a>
+		<a href="<?php echo $Html -> retainquery('newsletters_method=set_user_option&option=chart&value=line'); ?>" class="button <?php echo (!empty($chart) && $chart == "line") ? 'active' : ''; ?>"><i class="fa fa-line-chart"></i></a>
+		<?php echo $Html -> help(__('Switch between bar and line charts.', $this -> plugin_name)); ?>
+	</p>
+	
 	<div>
-		<?php
-		
-		$from = date("Y-m-d", strtotime("-6 days"));
-		$to = date("Y-m-d", time());
-		
-		?>
 		<div id="chart-legend" class="newsletters-chart-legend"></div>
 		<canvas id="canvas" style="width:100%; height:200px;"></canvas>
 	</div>
@@ -13,16 +23,29 @@
 	
 	<script type="text/javascript">
 	jQuery(document).ready(function() {
-		var ajaxdata = {from:'<?php echo $from; ?>', to:'<?php echo $to; ?>'};
+		var ajaxdata = {chart:'<?php echo $chart; ?>', from:'<?php echo $from; ?>', to:'<?php echo $to; ?>'};
 		
 		jQuery.getJSON(newsletters_ajaxurl + '?action=wpmlwelcomestats', ajaxdata, function(json) {
 			var barChartData = json;
 			var ctx = document.getElementById("canvas").getContext("2d");
-			var barChart = new Chart(ctx).Bar(barChartData, {
-				barShowStroke: false,
-				multiTooltipTemplate: "\<\%\= datasetLabel \%\>: \<\%\= value \%\>",
-				legendTemplate: "<ul class=\"\<\%=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:\<\%=datasets[i].fillColor\%\>\"></span>\<\%if(datasets[i].label){\%\>\<\%=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
-			});
+			
+			<?php if (empty($chart) || $chart == "bar") : ?>
+				var barChart = new Chart(ctx).Bar(barChartData, {
+					responsive: true,
+					barShowStroke: false,
+					multiTooltipTemplate: "\<\%\= datasetLabel \%\>: \<\%\= value \%\>",
+					legendTemplate: "<ul class=\"\<\%\=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:<\%\=datasets[i].fillColor\%\>\"></span>\<\% if(datasets[i].label){ \%\><\%\=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
+				});
+			<?php else : ?>
+				var barChart = new Chart(ctx).Line(barChartData, {
+					responsive: true,
+					bezierCurve: false,
+					datasetFill: false,
+					multiTooltipTemplate: "\<\%\= datasetLabel \%\>: \<\%\= value \%\>",
+					legendTemplate: "<ul class=\"\<\%\=name.toLowerCase()\%\>-legend\">\<\% for (var i=0; i<datasets.length; i++){\%\><li><span style=\"background-color:<\%\=datasets[i].fillColor\%\>\"></span>\<\% if(datasets[i].label){ \%\><\%\=datasets[i].label\%\>\<\%}\%\></li>\<\%}\%\></ul><br class=\"clear\" />"
+				});
+			<?php endif; ?>
+			
 			var legend = barChart.generateLegend();
 			jQuery('#chart-legend').html(legend);
 		})
@@ -36,24 +59,9 @@
 	
 	?>
 	
-	<div class="newsletters-dashboard-widget-column">
+	<div class="newsletters-dashboard-widget-column">		
 		<h4><?php _e('Recent Newsletters', $this -> plugin_name); ?></h4>
 		<?php if (!empty($histories)) : ?>
-			<?php /*<table>
-				<tbody>
-					<?php foreach ($histories as $history) : ?>
-						<tr>
-							<td class="first b b-ad">
-								<?php echo __($history -> subject); ?>
-							</td>
-							<td class="t ad" style="text-align:right; width:100px;">
-								<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $history -> id); ?>"><?php _e('View', $this -> plugin_name); ?></a>
-								<a class="button button-small" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> send . '&amp;method=history&amp;id=' . $history -> id); ?>"><?php _e('Edit', $this -> plugin_name); ?></a>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>*/ ?>
 			<ul>
 				<?php foreach ($histories as $history) : ?>
 					<li>
@@ -122,52 +130,6 @@
 		<h4><?php _e('Overview', $this -> plugin_name); ?></h4>
 		<?php $Html -> pie_chart('overview-chart', array('width' => 200), $data, $options); ?>
 	</div>
-	
-	<?php /*
-	<div class="table table_discussion">
-		<p class="sub"><?php _e('Overview', $this -> plugin_name); ?></p> 
-		<table> 
-			<tbody>
-				<tr class="first">
-					<td class="b b-comments">
-						<a href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><span class="total-count"><?php echo $total; ?></span></a>
-					</td>
-					<td class="last t comments">
-						<a href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><?php _e('Subscribers', $this -> plugin_name); ?></a>
-					</td>
-				</tr>
-				<tr>
-					<td class="b b_approved">
-						<a href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><span class="approved-count"><?php echo $active; ?></span></a>
-					</td>
-					<td class="last t">
-						<a class="approved" href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><?php _e('Subscriptions', $this -> plugin_name); ?></a>
-					</td>
-				</tr>
-				<tr>
-					<td class="b b-waiting">
-						<a href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><span class="pending-count"><?php echo $unsubscribes; ?></span></a>
-					</td>
-					<td class="last t">
-						<a class="waiting" href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>&method=unsubscribes"><?php _e('Unsubscribes', $this -> plugin_name); ?></a>
-					</td>
-				</tr>
-				<tr>
-					<td class="b b-spam">
-						<a href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><span class="spam-count"><?php echo $bounces; ?></span></a>
-					</td>
-					<td class="last t">
-						<a class="spam" href="admin.php?page=<?php echo $this -> sections -> subscribers; ?>"><?php _e('Bounces', $this -> plugin_name); ?></a>
-					</td>
-				</tr> 
-			</tbody>
-		</table>
-		
-		<p>
-			<a class="button" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> welcome); ?>"><?php _e('See full overview', $this -> plugin_name); ?></a>
-		</p>
-	</div>
-	*/ ?>
 	
 	<br class="clear" />
 </div>

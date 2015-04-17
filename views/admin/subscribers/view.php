@@ -98,7 +98,7 @@
 											<?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
 										<?php endif; ?>
 									<?php else : ?>
-										<?php echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug})); ?>
+										<?php echo $Html -> gen_date(false, strtotime($subscriber -> {$field -> slug})); ?>
 									<?php endif; ?>
                                 <?php elseif ($field -> type == "pre_gender") : ?>
                                 	<?php echo $Html -> gender($subscriber -> {$field -> slug}); ?>

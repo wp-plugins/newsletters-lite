@@ -176,7 +176,7 @@
 								<?php endif; ?>
 							</td>
 							<td>
-								<abbr title="<?php echo $unsubscribe -> created; ?>"><?php echo date_i18n("Y-m-d", strtotime($unsubscribe -> created)); ?></abbr>
+								<abbr title="<?php echo $unsubscribe -> created; ?>"><?php echo $Html -> gen_date(false, strtotime($unsubscribe -> created)); ?></abbr>
 							</td>
 						</tr>
 					<?php endforeach; ?>
@@ -198,6 +198,9 @@
 							<option <?php echo (isset($_COOKIE[$this -> pre . 'unsubscribesperpage']) && $_COOKIE[$this -> pre . 'unsubscribesperpage'] == $s) ? 'selected="selected"' : ''; ?> value="<?php echo $s; ?>"><?php echo $s; ?> <?php _e('unsubscribes', $this -> plugin_name); ?></option>
 							<?php $s += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'unsubscribesperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'unsubscribesperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'unsubscribesperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 			</div>

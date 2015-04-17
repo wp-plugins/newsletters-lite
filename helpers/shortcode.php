@@ -133,6 +133,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$r = shortcode_atts($defaults, $atts);
 		extract($r);
 		
+		global $wpml_eftype;
+		$wpml_eftype = $eftype;
+		
 		global $shortcode_thumbnail;
 		$shortcode_thumbnail = array(
 			'size'				=>	$thumbnail_size,
@@ -201,12 +204,12 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			}
 		}
 		
+		$currentlanguage = $arguments['language'];		
+		extract($arguments);
+		
 		global $wpml_eftype, $wpml_target;
 		$wpml_eftype = $eftype;
 		$wpml_target = $target;
-		
-		$currentlanguage = $arguments['language'];		
-		extract($arguments);
 		
 		global $shortcode_thumbnail;
 		$shortcode_thumbnail = array(
@@ -323,7 +326,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				break;
 			case 'post_date'				:
 			case 'newsletters_post_date'	:			
-				$defaults = array('format' => "F jS, Y");
+				$defaults = array('format' => get_option('date_format'));
 				extract(shortcode_atts($defaults, $atts));
 			
 				if (!empty($shortcode_post)) {
@@ -449,7 +452,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				$style = ' style="color:' . ${'newsletters_acolor'} . ';"';
 			}
 			
-			$more = ' <a class="newsletters_readmore" target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a>';
+			$more = ' <p><a class="newsletters_readmore newsletters_button" target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '"' . $style . '>' . __($excerpt_more) . '</a></p>';
 		}
 			
 		return $more;
@@ -589,7 +592,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$action = $Html -> retainquery($this -> pre . 'method=optin', $action) . '#' . $widget_id;
 		
 		$output = "";
-		$output .= '<div id="' . $widget_id . '" class="' . $this -> pre . ' widget_newsletters">';
+		$output .= '<div id="' . $widget_id . '" class="newsletters ' . $this -> pre . ' widget_newsletters">';
 		$output .= '<div id="' . $widget_id . '-wrapper">';
 		
 		if (!empty($_GET['success'])) {

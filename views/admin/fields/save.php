@@ -343,10 +343,129 @@ $regex = $Html -> field_value('Field[regex]');
 		<div id="typediv" style="display:<?php echo ($Html -> field_value('Field[type]') == "checkbox" || $Html -> field_value('Field[type]') == "radio" || $Html -> field_value('Field[type]') == "select") ? 'block' : 'none'; ?>;">
 			<table class="form-table">
 				<tbody>
-					<tr class="form-field" style="display:block;">
+					<tr>
 						<th><label for="Field.fieldoptions"><?php _e('Field Options', $this -> plugin_name); ?></label></th>
-						<td>
-							<?php if ($this -> language_do()) : ?>							
+						<td>			
+							<?php
+								
+							$fieldoptions = $Html -> field_value('Field[newfieldoptions]');
+								
+							?>
+							
+							<ul id="fieldoptions">
+								<li id="fieldoptions-sample" class="fieldoptions-sortable" style="display:none;">
+									<span class="fieldoptions-handle"><i class="fa fa-sort fa-fw fa-border"></i></span>
+									<span class="fieldoptions-input">
+										<?php if ($this -> language_do()) : ?>
+											<div id="tabs_fieldoptions_sample">
+												<ul>
+													<?php foreach ($el as $language) : ?>
+														<li><a href="#tabs_fieldoptions_sample_<?php echo $language; ?>"><?php echo $this -> language_flag($language); ?></a></li>
+													<?php endforeach; ?>
+												</ul>
+												<?php foreach ($el as $language) : ?>
+													<div id="tabs_fieldoptions_sample_<?php echo $language; ?>">
+														<input class="widefat fieldoption-input-text" type="text" name="Field[fieldoptions][<?php echo $language; ?>][][value]" value="" id="" />
+													</div>
+												<?php endforeach; ?>
+											</div>
+											
+											<script type="text/javascript">
+											jQuery(document).ready(function() {
+												jQuery('#tabs_fieldoptions_sample').tabs();
+											});
+											</script>
+										<?php else : ?>
+											
+										<?php endif; ?>
+									</span>
+									<span class="fieldoptions-remove"><a href="" data-id="" onclick="newsletters_fieldoptions_remove(this); return false;" class="button"><i class="fa fa-trash"></i></a></span>
+									<br class="clear" />
+								</li>
+								<?php $f = 0; ?>
+								<?php foreach ($fieldoptions as $fieldoption) : ?>
+									<li class="fieldoptions-sortable">
+										<span class="fieldoptions-handle"><i class="fa fa-sort fa-fw fa-border"></i></span>
+										<span class="fieldoptions-input">
+											<?php if ($this -> language_do()) : ?>
+												<div id="tabs_fieldoptions_<?php echo $fieldoption -> id; ?>">
+													<ul>
+														<?php foreach ($el as $language) : ?>
+															<li><a href="#tabs_fieldoptions_<?php echo $fieldoption -> id; ?>_<?php echo $language; ?>"><?php echo $this -> language_flag($language); ?></a></li>
+														<?php endforeach; ?>
+													</ul>
+													<?php foreach ($el as $language) : ?>
+														<div id="tabs_fieldoptions_<?php echo $fieldoption -> id; ?>_<?php echo $language; ?>">
+															<input type="hidden" name="Field[fieldoptions][<?php echo $language; ?>][<?php echo $f; ?>][id]" value="<?php echo esc_attr(stripslashes($fieldoption -> id)); ?>" />
+															<input class="widefat" type="text" name="Field[fieldoptions][<?php echo $language; ?>][<?php echo $f; ?>][value]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $fieldoption -> value))); ?>" id="" />
+														</div>
+													<?php endforeach; ?>
+												</div>
+												
+												<script>
+												jQuery(document).ready(function() {
+													jQuery('#tabs_fieldoptions_<?php echo $fieldoption -> id; ?>').tabs();
+												});
+												</script>
+											<?php else : ?>
+												<input class="widefat" type="text" name="Field[fieldoptions][<?php echo $f; ?>][value]" value="<?php echo esc_attr(stripslashes(__($fieldoption -> value))); ?>" id="" />
+											<?php endif; ?>
+										</span>
+										<span class="fieldoptions-remove"><a data-id="<?php echo esc_attr(stripslashes($fieldoption -> id)); ?>" href="" onclick="newsletters_fieldoptions_remove(this); return false;" class="button"><i class="fa fa-trash"></i></a></span>
+										<br class="clear" />
+									</li>
+									<?php $f++; ?>
+								<?php endforeach; ?>
+							</ul>
+							
+							<p class="submit">
+								<a href="" class="button" onclick="newsletters_fieldoptions_add(); return false;"><i class="fa fa-plus"></i> <?php _e('Add Option', $this -> plugin_name); ?></a>
+							</p>
+							
+							<script type="text/javascript">
+							jQuery(document).ready(function() {
+								jQuery('#fieldoptions').sortable({
+									handle: '.fieldoptions-handle',
+									//containment: '#fieldoptions',
+									axis: 'y'
+								});
+							});
+							
+							var newsletters_fieldoptions_add = function() {
+								var li = jQuery('li#fieldoptions-sample').clone().removeAttr('style').removeAttr('id');
+								jQuery(li).find('div#tabs_fieldoptions_sample').tabs();
+								jQuery('ul#fieldoptions').append(li);
+								
+								jQuery(li).closest('.fieldoption-input-text').focus().focus();
+								return li;
+							}
+							
+							var newsletters_fieldoptions_remove = function(element) {
+								if (confirm('<?php _e('Are you sure you want to delete this option?', $this -> plugin_name); ?>')) {
+									var id = jQuery(element).data('id');
+									
+									if (id != "") {
+										jQuery.ajax({
+											type: "POST",
+											data: {id:id},
+											url: newsletters_ajaxurl + "?action=newsletters_delete_option",
+										}).done(function(response) {
+											jQuery(element).closest('li').remove();
+										}).fail(function() {
+											alert('<?php _e('Failed, please try again', $this -> plugin_name); ?>');
+										});
+									} else {
+										jQuery(element).closest('li').remove();
+									}
+										
+									return true;
+								}
+								
+								return false;
+							}
+							</script>
+																		
+							<?php /*<?php if ($this -> language_do()) : ?>							
 								<div id="tabs_fieldoptions">
 									<ul>
 										<?php $tabs_fieldoptions = 1; ?>
@@ -376,7 +495,7 @@ $regex = $Html -> field_value('Field[regex]');
 	                            <?php if ($Html -> field_value('Field[id]') != "") : ?>
 	                            	<div class="howto"><?php _e('Removing options or changing the order will affect existing subscribers. Rather just add options below the current ones.', $this -> plugin_name); ?></div>
 	                            <?php endif; ?>
-	                        <?php endif; ?>
+	                        <?php endif; ?>*/ ?>
 						</td>
 					</tr>
 				</tbody>

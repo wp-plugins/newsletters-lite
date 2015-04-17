@@ -1,12 +1,10 @@
 <div class="wrap newsletters <?php echo $this -> pre; ?> <?php echo $this -> sections -> queue; ?>">
-	<h2><?php _e('Email Queue', $this -> plugin_name); ?> <a href="?page=<?php echo $this -> sections -> queue; ?>" class="add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a></h2>
+	<h2>
+		<?php _e('Email Queue', $this -> plugin_name); ?> 
+		<a href="?page=<?php echo $this -> sections -> queue; ?>" class="add-new-h2"><?php _e('Refresh', $this -> plugin_name); ?></a>
+		<a class="add-new-h2" href="?page=<?php echo $this -> sections -> settings; ?>#schedulingdiv"><?php _e('Configure Scheduling', $this -> plugin_name); ?></a>
+	</h2>
 	<h3><?php _e('Schedule Details', $this -> plugin_name); ?></h3>
-	
-	<div class="tablenav">
-		<div class="alignleft action">
-			<a class="button button-secondary" href="?page=<?php echo $this -> sections -> settings; ?>#schedulingdiv"><?php _e('Configure Email Scheduling', $this -> plugin_name); ?></a>
-		</div>
-	</div>
 	
 	<div class="postbox" style="padding:10px;">
 		<table class="widefat queuetable">

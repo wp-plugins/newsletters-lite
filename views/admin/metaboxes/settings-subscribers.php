@@ -1,3 +1,11 @@
+<!-- Subscription Behaviour -->
+
+<?php
+	
+$currentusersubscribed = $this -> get_option('currentusersubscribed');	
+	
+?>
+
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -33,6 +41,13 @@
 			<td>
 				<input type="text" class="widefat" id="<?php echo $this -> pre; ?>generalredirect" name="generalredirect" value="<?php echo esc_attr(stripslashes($this -> get_option('generalredirect'))); ?>" />
 				<span class="howto"><?php _e('Redirect upon unsubscription, activation, etc...', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<th><label for="currentusersubscribed"><?php _e('Notification to Subscribed Users', $this -> plugin_name); ?></label></th>
+			<td>
+				<label><input <?php echo (!empty($currentusersubscribed)) ? 'checked="checked"' : ''; ?> type="checkbox" name="currentusersubscribed" value="1" id="currentusersubscribed" /> <?php _e('Yes, show users if they are already subscribed', $this -> plugin_name); ?></label>
+				<span class="howto"><?php _e('Shows a notice above the subscribe form if a logged in user is already subscribed.', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
         <tr>

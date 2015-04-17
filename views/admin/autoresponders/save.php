@@ -109,56 +109,51 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
         </div>
         
         <div id="newsletterdiv_new" style="display:<?php echo (!empty($Autoresponder -> data -> newsletter) && $Autoresponder -> data -> newsletter == "new") ? 'block' : 'none'; ?>;">
-        	<table class="form-table">
-            	<tbody>
-                	<tr>
-                    	<th><label for="Autoresponder_nnewsletter_subject"><?php _e('Newsletter Subject', $this -> plugin_name); ?></label>
-                    	<?php echo $Html -> help(__('Fill in the email subject of the new email which will be sent for this autoresponder. This is the subject which will show up in the email/webmail client of your subscribers.', $this -> plugin_name)); ?></th>
-                        <td>
-                        	<div id="titlediv">
-                        		<div id="titlewrap">
-                        			<input class="widefat" type="text" id="title" name="Autoresponder[nnewsletter][subject]" value="<?php echo esc_attr(stripslashes($Autoresponder -> data -> nnewsletter['subject'])); ?>" id="" />
-                        		</div>
-                        	</div>
-                            <?php echo $Html -> field_error('Autoresponder[nnewsletter_subject]'); ?>
-                        	<span class="howto"><?php _e('Subject of the newsletter.', $this -> plugin_name); ?></span>
-                        </td>
-                    </tr>
-                	<tr>
-                    	<th><label for=""><?php _e('Newsletter Content', $this -> plugin_name); ?></label>
-                    	<?php echo $Html -> help(__('The message/content of the newsletter which will be sent to the subscribers. It is used in conjunction with the template chosen below and this message/content is placed into the template where the [wpmlcontent] shortcode was specified.', $this -> plugin_name)); ?></th>
-                        <td>
-                        	<div id="poststuff">
-                                <div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section">                                    
-                                    <!-- The Editor -->
-									<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
-										<?php wp_editor(stripslashes($Autoresponder -> data -> nnewsletter['content']), 'content', array('tabindex' => 2)); ?>
-									<?php else : ?>
-										<?php the_editor(stripslashes($Autoresponder -> data -> nnewsletter['content']), 'content', 'title', true, 2); ?>
-									<?php endif; ?>
-                                    
-                                    <table id="post-status-info" cellpadding="0" cellspacing="0">
-                                        <tbody>
-                                            <tr>
-                                                <td id="wp-word-count">
-                                                    <?php _e('Word Count', $this -> plugin_name); ?>:
-                                                    <span id="word-count">0</span>
-                                                </td>
-                                                <td class="autosave-info">
-                                                    <span id="autosave" style="display:none;"></span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    
-                                    <?php echo $Html -> field_error('Autoresponder[nnewsletter_content]'); ?>
-                                </div> 
-                            </div> 
-                        	<span class="howto"><?php _e('Content of the newsletter.', $this -> plugin_name); ?></span>
-                            <?php $this -> render('setvariables', false, true, 'admin'); ?>
-                        </td>
-                    </tr>
-                    <tr>
+	        <div id="post-body-content">
+				<div id="titlediv">
+            		<div id="titlewrap">
+            			<input class="widefat" type="text" id="title" name="Autoresponder[nnewsletter][subject]" value="<?php echo esc_attr(stripslashes($Autoresponder -> data -> nnewsletter['subject'])); ?>" id="Autoresponder_nnewsletter_subject" />
+            		</div>
+            	</div>
+                <?php echo $Html -> field_error('Autoresponder[nnewsletter_subject]'); ?>
+            	<span class="howto"><?php _e('Subject of the newsletter.', $this -> plugin_name); ?></span>
+				
+				<div id="poststuff">
+                    <div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section">                                    
+                        <!-- The Editor -->
+						<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
+							<?php wp_editor(stripslashes($Autoresponder -> data -> nnewsletter['content']), 'content', array('tabindex' => 2)); ?>
+						<?php else : ?>
+							<?php the_editor(stripslashes($Autoresponder -> data -> nnewsletter['content']), 'content', 'title', true, 2); ?>
+						<?php endif; ?>
+                        
+                        <table id="post-status-info" cellpadding="0" cellspacing="0">
+                            <tbody>
+                                <tr>
+                                    <td id="wp-word-count">
+                                        <?php _e('Word Count', $this -> plugin_name); ?>:
+                                        <span id="word-count">0</span>
+                                    </td>
+                                    <td class="autosave-info">
+                                        <span id="autosave" style="display:none;"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <?php echo $Html -> field_error('Autoresponder[nnewsletter_content]'); ?>
+                    </div> 
+                </div> 
+            	<span class="howto"><?php _e('Content of the newsletter.', $this -> plugin_name); ?></span>
+                <?php /*<?php $this -> render('setvariables', false, true, 'admin'); ?>*/ ?>
+                <p>
+	                <a class="button button-secondary button-large" href="" onclick="jQuery.colorbox({title:'<?php _e('Shortcodes/Variables', $this -> plugin_name); ?>', maxHeight:'80%', maxWidth:'80%', href:'<?php echo admin_url('admin-ajax.php'); ?>?action=<?php echo $this -> pre; ?>setvariables'}); return false;"> <?php _e('Shortcodes/Variables', $this -> plugin_name); ?></a>
+                </p>
+			</div>
+            
+            <table class="form-table">
+	            <tbody>
+		            <tr>
                     	<th><label for="Autoresponder_nnewsletter_theme_id_0"><?php _e('Newsletter Template', $this -> plugin_name); ?></label>
                     	<?php echo $Html -> help(__('Choose the template to use for the email that will be sent to the subscribers for this autoresponder. The content above will be put into this template where the [wpmlcontent] shortcode was specified.', $this -> plugin_name)); ?></th>
                         <td>
@@ -176,7 +171,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                             <span class="howto"><?php _e('Choose the template to use for this new newsletter.', $this -> plugin_name); ?></span>
                         </td>
                     </tr>
-                </tbody>
+	            </tbody>
             </table>
         </div>
         
@@ -187,7 +182,6 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                 	<?php echo $Html -> help(__('The send delay is measured in days. How many days after the subscriber has subscribed do you want this autoresponder message to send to the subscriber? You can specify 0 (zero) to have the autoresponder send to the subscriber immediately upon activation.', $this -> plugin_name)); ?></th>
                     <td>
                     	<?php echo $Form -> text('Autoresponder[delay]', array('width' => "45px")); ?>
-                    	<?php /*<?php _e('days after subscribing.', $this -> plugin_name); ?>*/ ?>
                     	<?php $delayintervals = array('minutes' => __('Minutes', $this -> plugin_name), 'hours' => __('Hours', $this -> plugin_name), 'days' => __('Days', $this -> plugin_name), 'weeks' => __('Weeks', $this -> plugin_name), 'years' => __('Years', $this -> plugin_name)); ?>
                     	<?php echo $Form -> select('Autoresponder[delayinterval]', $delayintervals); ?>
                     	<?php _e('after subscribing and confirming', $this -> plugin_name); ?>
@@ -218,6 +212,6 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	jQuery('[name="Autoresponder[title]"]').Watermark('<?php echo addslashes(__('Enter autoresponder title here', $this -> plugin_name)); ?>');
-	jQuery('#Autoresponder_nnewsletter_subject').Watermark('<?php echo addslashes(__('Enter email subject here', $this -> plugin_name)); ?>');
+	jQuery('[name="Autoresponder[nnewsletter][subject]"]').Watermark('<?php echo addslashes(__('Enter email subject here', $this -> plugin_name)); ?>');
 });
 </script>

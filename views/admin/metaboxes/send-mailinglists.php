@@ -250,7 +250,7 @@ jQuery(document).ready(function() {
 		update_subscribers();
 	<?php endif; ?>	
 	
-	if (jQuery.isFunction(jQuery.fn.cookie)) {
+	if (jQuery.isFunction(jQuery.cookie)) {
 		var mailingliststabscookieid = jQuery.cookie('mailingliststabscookie') || 0;
 	}
 		
@@ -258,7 +258,7 @@ jQuery(document).ready(function() {
 		jQuery('#mailingliststabs').tabs({
 			active:mailingliststabscookieid,
 			activate: function(event, ui) {
-				if (jQuery.isFunction(jQuery.fn.cookie)) {
+				if (jQuery.isFunction(jQuery.cookie)) {
 					jQuery.cookie("mailingliststabscookie", ui.newTab.index(), {expires:365, path:'/'});
 				}
 			}
@@ -324,7 +324,7 @@ function update_subscribers() {
 		data['condquery'] = condqueryarray;
 	}
 	
-	jQuery("#subscriberscount").html('<p><span class="newsletters_loading"></span> <?php echo addslashes(__('loading subscriber count...', $this -> plugin_name)); ?></p>');
+	jQuery("#subscriberscount").html('<p><i class="fa fa-refresh fa-spin fa-fw"></i> <?php echo addslashes(__('loading subscriber count...', $this -> plugin_name)); ?></p>');
 		
 	srequest = jQuery.post(ajaxurl, data, function(response) {
 		if (response == "0") {

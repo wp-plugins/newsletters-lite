@@ -5,7 +5,8 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.4.7.1';
+		var $version = '4.4.7.2';
+		var $dbversion = '1.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -31,6 +32,7 @@ if (!class_exists('wpMailPlugin')) {
 			'templates_save'			=>	"newsletters-templates-save",
 			'queue'						=>	"newsletters-queue",
 			'history'					=>	"newsletters-history",
+			'emails'					=>	"newsletters-emails",
 			'links'						=>	"newsletters-links",
 			'clicks'					=>	"newsletters-links-clicks",
 			'orders'					=>	"newsletters-orders",
@@ -77,7 +79,7 @@ if (!class_exists('wpMailPlugin')) {
 			'wpmlGroup',
 		);
 		
-		var $models = array('Link', 'Click', 'Content', 'Latestpostssubscription');
+		var $models = array('Link', 'Click', 'Option', 'SubscribersOption', 'Content', 'Latestpostssubscription');
 		
 		var $helpers = array('Checkinit', 'Db', 'Html', 'Form', 'Metabox', 'Shortcode', 'Auth');	
 		var $tables = array();
@@ -286,7 +288,7 @@ if (!class_exists('wpMailPlugin')) {
 	        $version_info = $update -> get_version_info();
 	        
 	        if (!empty($version_info) && $version_info['is_valid_key'] == "0") {
-		        echo '<tr class="plugin-update-tr">';
+		        echo '<tr id="newsletters-plugin-update-tr" class="plugin-update-tr">';
 		        echo '<td colspan="3" class="plugin-update">';
 		        echo '<div class="update-message">';
 
@@ -299,6 +301,17 @@ if (!class_exists('wpMailPlugin')) {
 		        echo '</div>';
 		        echo '</td>';
 		        echo '</tr>';
+		        
+		        ?>
+		        
+		        <script type="text/javascript">
+			    jQuery(document).ready(function() {
+				    var row = jQuery('#newsletters-plugin-update-tr').closest('tr').prev();
+				    jQuery(row).addClass('update');
+			    });
+			    </script>
+		        
+		        <?php
 	        }
 	    }
 	    
@@ -495,9 +508,10 @@ if (!class_exists('wpMailPlugin')) {
 			define('SHORTINIT', true);
 		    global $wpdb, $Html, $Subscriber, $Email, $Bounce, $Unsubscribe, $wpmlClick;
 		    
+		    $chart = (empty($_GET['chart'])) ? "bar" : $_GET['chart'];
 		    $type = (empty($_GET['type'])) ? "days" : $_GET['type'];
-			$fromdate = (empty($_GET['from'])) ? date("Y-m-d", strtotime("-13 days")) : $_GET['from'];
-			$todate = (empty($_GET['to'])) ? date("Y-m-d", time()) : $_GET['to'];
+			$fromdate = (empty($_GET['from'])) ? date_i18n("Y-m-d", strtotime("-13 days")) : $_GET['from'];
+			$todate = (empty($_GET['to'])) ? date_i18n("Y-m-d", time()) : $_GET['to'];
 			$history_id = (empty($_GET['history_id'])) ? false : $_GET['history_id'];
 			
 			$history_condition = (!empty($history_id)) ? " `history_id` = '" . $history_id . "' AND" : false;
@@ -517,6 +531,22 @@ if (!class_exists('wpMailPlugin')) {
 					    }
 				    }
 				    
+				    // Clicks
+				    $query = "SELECT COUNT(`id`) as `clickscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $this -> Click -> table . "` WHERE" . $history_condition . " CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
+					$records = $wpdb -> get_results($query);
+					
+				    $clicks_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$clicks_array[date_i18n("Y", strtotime($record -> date))] = $record -> clickscount; 
+							
+							if (empty($y_max) || (!empty($y_max) && $record -> clickscount > $y_max)) {
+								$y_max = $record -> clickscount;
+							}
+					    }
+				    }
+				    
+				    // Emails Sent
 				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE" . $history_condition . " CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY YEAR(`created`)";
 				    $records = $wpdb -> get_results($query);
 				    
@@ -568,11 +598,17 @@ if (!class_exists('wpMailPlugin')) {
 				    $fromstamp = strtotime($fromdate);
 					$tostamp = strtotime($todate);
 					$yearsdiff = round(abs($tostamp - $fromstamp) / (60 * 60 * 24 * 365));
+					
+					$d = new DateTime($todate);
+					$d -> modify("next year");
 				    
 				    $j = 0;
 				    for ($i = 0; $i <= $yearsdiff; $i++) {
-				    	$datestring = date_i18n("Y", strtotime("-" . $i . " years", $tostamp));
-					    $dates_data[$j] = date_i18n("Y", strtotime("-" . $i . " years", $tostamp));
+					    $d -> modify("previous year");
+				    	//$datestring = date_i18n("Y", strtotime("-" . $i . " years", $tostamp));
+					    //$dates_data[$j] = date_i18n("Y", strtotime("-" . $i . " years", $tostamp));
+					    $datestring = $d -> format("Y");
+					    $dates_data[$j] = $d -> format("Y");
 					    
 					    if (empty($history_id)) {
 						    if (!empty($subscribers_array[$datestring])) {
@@ -581,6 +617,12 @@ if (!class_exists('wpMailPlugin')) {
 							    $subscribers_data[$j] = 0;
 						    }
 						}
+						
+						if (!empty($clicks_array[$datestring])) {
+						    $clicks_data[$j] = $clicks_array[$datestring];
+					    } else {
+						    $clicks_data[$j] = 0;
+					    }
 					    
 					    if (!empty($emails_array[$datestring])) {
 						    $emails_data[$j] = $emails_array[$datestring];
@@ -606,6 +648,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $unsubscribes_data = array_reverse($unsubscribes_data);
 				    $subscribers_data = array_reverse($subscribers_data);
 				    $bounces_data = array_reverse($bounces_data);
+				    $clicks_data = array_reverse($clicks_data);
 				    $emails_data = array_reverse($emails_data);
 				    $dates_data = array_reverse($dates_data);
 					break;
@@ -624,6 +667,22 @@ if (!class_exists('wpMailPlugin')) {
 					    }
 				    }
 				    
+				    // Clicks
+				    $query = "SELECT COUNT(`id`) as `clickscount`, DATE(`created`) as `date` FROM `" . $wpdb -> prefix . $this -> Click -> table . "` WHERE" . $history_condition . " CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY DATE(`created`)";
+					$records = $wpdb -> get_results($query);
+					
+				    $clicks_array = array();
+				    if (!empty($records)) {
+					    foreach ($records as $record) {
+							$clicks_array[date_i18n("mY", strtotime($record -> date))] = $record -> clickscount; 
+							
+							if (empty($y_max) || (!empty($y_max) && $record -> clickscount > $y_max)) {
+								$y_max = $record -> clickscount;
+							}
+					    }
+				    }
+				    
+				    // Emails Sent
 				    $query = "SELECT COUNT(id) as `emailscount`, DATE(created) as `date` FROM " . $wpdb -> prefix . $Email -> table . " WHERE" . $history_condition . " CAST(`created` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`created`)";
 				    $records = $wpdb -> get_results($query);
 				    
@@ -638,6 +697,7 @@ if (!class_exists('wpMailPlugin')) {
 					    }
 				    }
 				    
+				    // Bounces
 				    $query = "SELECT COUNT(id) as `bounces`, SUM(count) as `bouncecount`, DATE(modified) as `date` FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE" . $history_condition . " CAST(`modified` AS DATE) BETWEEN '" . $fromdate . "' AND '" . $todate . "' GROUP BY MONTH(`modified`)";
 				    $records = $wpdb -> get_results($query);
 				    
@@ -675,11 +735,18 @@ if (!class_exists('wpMailPlugin')) {
 				    $fromstamp = strtotime($fromdate);
 					$tostamp = strtotime($todate);
 					$monthsdiff = round(abs($tostamp - $fromstamp) / 2628000);
+					
+					$d = new DateTime($todate);
+					//$d -> modify("next month");
 				    
 				    $j = 0;
 				    for ($i = 0; $i <= $monthsdiff; $i++) {
-				    	$datestring = date_i18n("mY", strtotime("-" . $i . " months", $tostamp));
-					    $dates_data[$j] = date_i18n("F Y", strtotime("-" . $i . " months", $tostamp));
+						$d -> modify("previous month");
+					    
+				    	//$datestring = date_i18n("mY", strtotime("-" . $i . " month", $tostamp), false);
+					    //$dates_data[$j] = date_i18n("F Y", strtotime("-" . $i . " month", $tostamp), false);
+					    $datestring = $d -> format("mY");
+					    $dates_data[$j] = $d -> format("F Y");
 					    
 					    if (empty($history_id)) {
 						    if (!empty($subscribers_array[$datestring])) {
@@ -688,6 +755,12 @@ if (!class_exists('wpMailPlugin')) {
 							    $subscribers_data[$j] = 0;
 						    }
 						}
+						
+						if (!empty($clicks_array[$datestring])) {
+						    $clicks_data[$j] = $clicks_array[$datestring];
+					    } else {
+						    $clicks_data[$j] = 0;
+					    }
 					    
 					    if (!empty($emails_array[$datestring])) {
 						    $emails_data[$j] = $emails_array[$datestring];
@@ -713,6 +786,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $unsubscribes_data = array_reverse($unsubscribes_data);
 				    $subscribers_data = array_reverse($subscribers_data);
 				    $bounces_data = array_reverse($bounces_data);
+				    $clicks_data = array_reverse($clicks_data);
 				    $emails_data = array_reverse($emails_data);
 				    $dates_data = array_reverse($dates_data);
 					break;
@@ -726,7 +800,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $subscribers_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
-							$subscribers_array[date_i18n("m-d", strtotime($record -> date))] = $record -> subscriberscount; 
+							$subscribers_array[date_i18n("dmY", strtotime($record -> date))] = $record -> subscriberscount; 
 							
 							if (empty($y_max) || (!empty($y_max) && $record -> subscriberscount > $y_max)) {
 								$y_max = $record -> subscriberscount;
@@ -741,7 +815,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $clicks_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
-							$clicks_array[date_i18n("m-d", strtotime($record -> date))] = $record -> clickscount; 
+							$clicks_array[date_i18n("dmY", strtotime($record -> date))] = $record -> clickscount; 
 							
 							if (empty($y_max) || (!empty($y_max) && $record -> clickscount > $y_max)) {
 								$y_max = $record -> clickscount;
@@ -756,7 +830,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $emails_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
-							$emails_array[date_i18n("m-d", strtotime($record -> date))] = $record -> emailscount; 
+							$emails_array[date_i18n("dmY", strtotime($record -> date))] = $record -> emailscount; 
 							
 							if (empty($y_right_max) || (!empty($y_right_max) && $record -> emailscount > $y_right_max)) {
 								$y_right_max = $record -> emailscount;
@@ -771,7 +845,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $bounces_array = array();
 				    if (!empty($records)) {	    
 					    foreach ($records as $record) {
-						    $bounces_array[date_i18n("m-d", strtotime($record -> date))] = $record -> bouncecount; 
+						    $bounces_array[date_i18n("dmY", strtotime($record -> date))] = $record -> bouncecount; 
 							
 							if (empty($y_right_max) || (!empty($y_right_max) && $record -> bouncecount > $y_right_max)) {
 								$y_right_max = $record -> bouncecount;
@@ -786,7 +860,7 @@ if (!class_exists('wpMailPlugin')) {
 				    $unsubscribes_array = array();
 				    if (!empty($records)) {
 					    foreach ($records as $record) {
-						    $unsubscribes_array[date_i18n("m-d", strtotime($record -> date))] = $record -> unsubscribescount; 
+						    $unsubscribes_array[date_i18n("dmY", strtotime($record -> date))] = $record -> unsubscribescount; 
 							
 							if (empty($y_right_max) || (!empty($y_right_max) && $record -> unsubscribescount > $y_right_max)) {
 								$y_right_max = $record -> unsubscribescount;
@@ -804,11 +878,17 @@ if (!class_exists('wpMailPlugin')) {
 				    $fromstamp = strtotime($fromdate);
 					$tostamp = strtotime($todate);
 					$daysdiff = round(abs($tostamp - $fromstamp) / 86400);
+					
+					$d = new DateTime($todate);
+					$d -> modify("next day");
 				    
 				    $j = 0;
 				    for ($i = 0; $i <= $daysdiff; $i++) {
-				    	$datestring = date_i18n("m-d", strtotime("-" . $i . " days", $tostamp));
-					    $dates_data[$j] = date_i18n("M j", strtotime("-" . $i . " days", $tostamp));
+				    	//$datestring = date_i18n("m-d", strtotime("-" . $i . " days", $tostamp));
+					    //$dates_data[$j] = date_i18n("M j", strtotime("-" . $i . " days", $tostamp));
+					    $d -> modify("previous day");
+					    $datestring = $d -> format("dmY");
+					    $dates_data[$j] = $d -> format("M j");
 					    
 					    if (empty($history_id)) {
 						    if (!empty($subscribers_array[$datestring])) {
@@ -857,11 +937,28 @@ if (!class_exists('wpMailPlugin')) {
 		    $data['labels'] = $dates_data;
 		    $data['datasets'] = array();
 		    
+		    $data['datasets'][] = array(
+				'label'					=>	__('Emails Sent', $this -> plugin_name),
+	            'fillColor'				=>	"#4D5360",
+	            'highlightFill'			=>	"#616774",
+	            'strokeColor'			=>	"#4D5360",
+	            'pointColor'			=>	"#4D5360",
+	            'pointStrokeColor'		=>	"#4D5360",
+	            'pointHighlightFill'	=>	"#616774",
+	            'pointHighlightStroke'	=>	"#616774",
+	            'data'					=>	$emails_data,
+			);
+		    
 		    if (empty($history_id)) {
 			    $data['datasets'][] = array(
 					'label'					=>	__('Subscribers', $this -> plugin_name),
 		            'fillColor'				=>	"#46BFBD",
 		            'highlightFill'			=>	"#5AD3D1",
+		            'strokeColor'			=>	"#46BFBD",
+		            'pointColor'			=>	"#46BFBD",
+		            'pointStrokeColor'		=>	"#46BFBD",
+		            'pointHighlightFill'	=>	"#5AD3D1",
+		            'pointHighlightStroke'	=>	"#5AD3D1",
 		            'data'					=>	$subscribers_data,
 				);
 			}
@@ -870,20 +967,23 @@ if (!class_exists('wpMailPlugin')) {
 				'label'					=>	__('Clicks', $this -> plugin_name),
 	            'fillColor'				=>	"#949FB1",
 	            'highlightFill'			=>	"#A8B3C5",
+	            'strokeColor'			=>	"#949FB1",
+	            'pointColor'			=>	"#949FB1",
+	            'pointStrokeColor'		=>	"#949FB1",
+	            'pointHighlightFill'	=>	"#A8B3C5",
+	            'pointHighlightStroke'	=>	"#A8B3C5",
 	            'data'					=>	$clicks_data,
-			);
-			
-			$data['datasets'][] = array(
-				'label'					=>	__('Emails Sent', $this -> plugin_name),
-	            'fillColor'				=>	"#4D5360",
-	            'highlightFill'			=>	"#616774",
-	            'data'					=>	$emails_data,
 			);
 			
 			$data['datasets'][] = array(
 				'label'					=>	__('Unsubscribes', $this -> plugin_name),
 	            'fillColor'				=>	"#FDB45C",
 	            'highlightFill'			=>	"#FFC870",
+	            'strokeColor'			=>	"#FDB45C",
+	            'pointColor'			=>	"#FDB45C",
+	            'pointStrokeColor'		=>	"#FDB45C",
+	            'pointHighlightFill'	=>	"#FFC870",
+	            'pointHighlightStroke'	=>	"#FFC870",
 	            'data'					=>	$unsubscribes_data,
 			);
 			
@@ -891,6 +991,11 @@ if (!class_exists('wpMailPlugin')) {
 				'label'					=>	__('Bounces', $this -> plugin_name),
 				'fillColor'				=>	"#F7464A",
 				'highlightFill'			=>	"#FF5A5E",
+				'strokeColor'			=>	"#F7464A",
+	            'pointColor'			=>	"#F7464A",
+	            'pointStrokeColor'		=>	"#F7464A",
+	            'pointHighlightFill'	=>	"#FF5A5E",
+	            'pointHighlightStroke'	=>	"#FF5A5E",
 				'data'					=>	$bounces_data,
 			);
 		    
@@ -909,18 +1014,59 @@ if (!class_exists('wpMailPlugin')) {
 			die();
 		}
 		
+		function ajax_delete_option() {
+			
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			$success = false;
+			
+			if (!empty($_REQUEST['id'])) {
+				if ($this -> Option -> delete($_REQUEST['id'])) {
+					$success = true;
+				}
+			}
+			
+			echo $success;
+			
+			exit();
+			die();
+		}
+		
+		function ajax_pause_queue() {
+			
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			$success = false;
+			
+			if (!empty($_POST['status'])) {
+				$status = $_POST['status'];
+				
+				if ($this -> update_option('queue_status', $status)) {
+					$success = true;
+					$this -> delete_option('hidemessage_queue_status');
+				}
+			}
+			
+			echo $success;
+			
+			exit();
+			die();
+		}
+		
 		function ajax_executemail() {
 			define('DOING_AJAX', true);
 			define('SHORTINIT', true);
 			global $wpdb, $Db, $Subscriber, $History, $HistoriesAttachment;
-			$subscriber = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
+			//$subscriber = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
+			$subscriber = $subscriber_request = (object) stripslashes_deep($_REQUEST['subscriber']);
 			
 			if (!empty($_REQUEST)) {
 				$historyquery = "SELECT id, message, subject FROM " . $wpdb -> prefix . $History -> table . " WHERE id = '" . $_REQUEST['history_id'] . "' LIMIT 1";
 				$history = $wpdb -> get_row($historyquery);
 			
 				if (!empty($history)) {
-					$subscriber_request = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));								
 					$subscriber = $Subscriber -> get($subscriber_request -> id, false);
 					$subscriber -> mailinglist_id = $subscriber_request -> mailinglist_id;
 					$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $subscriber_request -> mailinglists);
@@ -969,15 +1115,14 @@ if (!class_exists('wpMailPlugin')) {
 			define('DOING_AJAX', true);
 			define('SHORTINIT', true);
 			global $wpdb, $Db, $Subscriber, $Queue, $History, $HistoriesAttachment;
-			$subscriber = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
+			//$subscriber = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
+			$subscriber = $subscriber_request = (object) stripslashes_deep($_REQUEST['subscriber']);
 			
 			if (!empty($_REQUEST)) {
 				$historyquery = "SELECT id, message, subject FROM " . $wpdb -> prefix . $History -> table . " WHERE id = '" . $_REQUEST['history_id'] . "' LIMIT 1";
 				$history = $wpdb -> get_row($historyquery);
 			
-				if (!empty($history)) {
-					$subscriber_request = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
-					
+				if (!empty($history)) {					
 					if (!empty($subscriber_request -> user_id)) {
 						$subscriber = false;
 						$user = $this -> userdata($subscriber_request -> user_id);
@@ -1037,14 +1182,32 @@ if (!class_exists('wpMailPlugin')) {
 			$exportfilename = $_REQUEST['exportfile'];
 			$exportfilepath = $Html -> uploads_path() . '/' . $this -> plugin_name . '/export/';
 			$exportfilefull = $exportfilepath . $exportfilename;
-			
-			if ($fh = fopen($exportfilefull, "a")) {
-				$subscriberrequest = @unserialize(stripslashes($_REQUEST['subscriber']));
-				$row = '"' . implode('","', $subscriberrequest) . '"' . "\r\n";
-				fwrite($fh, $row, 1024);
+				
+			if ($fp = fopen($exportfilefull, "a")) {				
+				$delimiter = (empty($_REQUEST['delimiter'])) ? ";" : $_REQUEST['delimiter'];
+				$headings = $_REQUEST['headings'];
+				$subscriber = stripslashes_deep($_REQUEST['subscriber']);
+				
+				$headings_keys = array();
+				foreach ($headings as $hkey => $hval) {
+					$headings_keys[$hkey] = '';
+				}
+				
+				$subscriber = array_merge($headings_keys, $subscriber);
+				
+				if (!empty($subscriber)) {
+					fputcsv($fp, $subscriber, $delimiter, '"');
+				}
+				
+				fclose($fp);
+				
+				//$subscriberrequest = @unserialize(stripslashes($_REQUEST['subscriber']));
+				//$row = '"' . implode('","', $subscriberrequest) . '"' . "\r\n";
+				//fwrite($fh, $row, 1024);
 			}
 			
-			echo $subscriberrequest['email'];
+			//echo $subscriberrequest['email'];
+			echo $subscriber['email'];
 			
 			exit();
 			die();
@@ -1056,7 +1219,8 @@ if (!class_exists('wpMailPlugin')) {
 			global $wpdb, $Db, $Queue, $Subscriber, $SubscribersList, $Unsubscribe, $Bounce;
 		
 			if (!empty($_REQUEST['subscriber'])) {
-				$subscriber = maybe_unserialize(stripslashes($_REQUEST['subscriber']));				
+				//$subscriber = maybe_unserialize(stripslashes($_REQUEST['subscriber']));				
+				$subscriber = stripslashes_deep($_REQUEST['subscriber']);
 				$subscriber['justsubscribe'] = true;
 				$email = $subscriber['email'];
 				$confirmation_subject = stripslashes($_REQUEST['confirmation_subject']);
@@ -1268,6 +1432,14 @@ if (!class_exists('wpMailPlugin')) {
 			
 			<script type="text/javascript">
 			jQuery(document).ready(function() {
+				if (jQuery.isFunction(jQuery.fn.select2)) {
+					jQuery('.newsletters select').select2();
+				}
+					
+				if (jQuery.isFunction(jQuery.fn.button)) {	
+					jQuery('.widget_newsletters .button').button();
+				}
+				
 				jQuery('#<?php echo $widget_id; ?>-form .newsletters-list-checkbox').on('click', function() { newsletters_refreshfields('<?php echo $widget_id; ?>'); });
 				jQuery('#<?php echo $widget_id; ?>-form .newsletters-list-select').on('change', function() { newsletters_refreshfields('<?php echo $widget_id; ?>'); });
 			});
@@ -1350,6 +1522,71 @@ if (!class_exists('wpMailPlugin')) {
 					$this -> render('dkim' . DS . 'step1', array('domain' => $_POST['domain'], 'selector' => $_POST['selector'], 'public' => $keys['publickey'], 'private' => $keys['privatekey']), true, 'admin');
 					break;
 			}
+			
+			exit();
+			die();
+		}
+		
+		function get_pop3_status() {
+			$pop3_status = false;
+			
+			require_once($this -> plugin_base() . DS . 'vendors' . DS . 'class.pop3_new.php');
+			$pop_host = $this -> get_option('bouncepop_host');
+			$pop_port = $this -> get_option('bouncepop_port');
+			$pop_user = $this -> get_option('bouncepop_user');
+			$pop_pass = $this -> get_option('bouncepop_pass');
+	        $pop3 = new POP3();
+	        
+	        if ($pop3 -> connect($pop_host, $pop_port)) {
+	        	if ($pop3 -> user($pop_user)) {
+	        		$count = $pop3 -> pass($pop_pass);
+	        		
+	        		if ($count === false) {
+						$pop3_status = $pop3 -> ERROR;
+	        		} elseif ($count === 0) {
+		        		$pop3_status = __('There are no emails in the mailbox', $this -> plugin_name);
+	        		} elseif ($count > 0) {
+		        		$pop3_status = sprintf(__('There are %s emails in the mailbox', $this -> plugin_name), $count);
+	        		}
+	        	} else {
+		        	$pop3_status = $pop3 -> ERROR;
+	        	}
+	        } else {
+		        $pop3_status = $pop3 -> ERROR;
+	        }
+	        
+	        return $pop3_status;
+		}
+		
+		function ajax_autocomplete_histories() {
+			
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			global $Db, $History;
+			
+			$Db -> model = $History -> model;
+			
+			$conditions = array();
+			if (!empty($_REQUEST['q'])) {
+				$conditions['subject'] = "LIKE '%" . $_REQUEST['q'] . "%'";
+			}
+			
+			if ($histories = $Db -> find_all($conditions)) {
+				if (!empty($histories)) {
+					$t = 0;
+				
+					foreach ($histories as $history) {
+						$titles[$t]['id'] = $history -> id;
+						$titles[$t]['text'] = __($history -> subject);
+						$t++;
+					}
+					
+					$json = json_encode($titles);
+				}
+			}
+			
+			echo $json;
 			
 			exit();
 			die();
@@ -1459,7 +1696,7 @@ if (!class_exists('wpMailPlugin')) {
 			die();
 		}
 		
-		function ajax_addcontentarea() {		
+		function ajax_addcontentarea() {				
 			?>
 			
 			<div class="postbox">
@@ -1488,7 +1725,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function ajax_previewrunner() {
-	    	global $wpdb, $Db, $Html, $History;
+	    	global $wpdb, $Db, $Html, $History, $wpmlContent;
 	    	define('DOING_AJAX', true);
 	    	define('SHORTINIT', true);
 	    	
@@ -1533,6 +1770,9 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if ($History -> save($history_data, false)) {
 				$history_id = $History -> insertid;
+				
+				$Db -> model = $History -> model;
+				$p_id = $Db -> field('p_id', array('id' => $history_id));
 			
 				if (!empty($_POST['contentarea'])) {
 					foreach ($_POST['contentarea'] as $number => $content) {
@@ -1541,7 +1781,7 @@ if (!class_exists('wpMailPlugin')) {
 							'history_id'		=>	$history_id,
 							'content'			=>	$content,
 						);
-					
+						
 						$this -> Content -> save($content_data, true);
 					}	
 				}
@@ -1558,6 +1798,7 @@ if (!class_exists('wpMailPlugin')) {
 	    	
 	    	<result>
 				<history_id><?php echo $history_id; ?></history_id>
+				<p_id><?php echo $p_id; ?></p_id>
 				<previewcontent><![CDATA[<?php echo $preview; ?>]]></previewcontent>
 				<newsletter_url><![CDATA[<?php echo $Html -> retainquery($this -> pre . 'method=newsletter&id=' . $history_id, home_url()); ?>]]></newsletter_url>
 			</result>
@@ -1572,7 +1813,7 @@ if (!class_exists('wpMailPlugin')) {
 		    define('DOING_AJAX', true);
 	    	define('SHORTINIT', true);
 		    
-	    	global $Html, $Subscriber, $newsletters_presend, $newsletters_emailraw;
+	    	global $Db, $History, $Html, $Subscriber, $newsletters_presend, $newsletters_emailraw;
 	    	$newsletters_presend = true;
 	    	$subscriber_id = $Subscriber -> admin_subscriber_id();
 	    	$subscriber = $Subscriber -> get($subscriber_id, false);
@@ -1581,6 +1822,12 @@ if (!class_exists('wpMailPlugin')) {
 			$message = $this -> render_email('send', array('message' => $_POST['content'], 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id), false, true, true, $_POST['theme_id']);
 			$this -> execute_mail($subscriber, false, $subject, $message, $history -> attachments, $history_id, false, false);
 			$spamscore = $this -> spam_score($newsletters_emailraw, "long");
+			
+			// Save the 'spamscore'
+			if (!empty($spamscore -> score)) {
+				$Db -> model = $History -> model;
+				$Db -> save_field('spamscore', $spamscore -> score, array('id' => $history_id));
+			}
 			
 			$output = "";
 			ob_start();
@@ -1595,17 +1842,17 @@ if (!class_exists('wpMailPlugin')) {
 						<h2><?php _e('Spam Score Report', $this -> plugin_name); ?></h2>
 						<p><a href="" onclick="jQuery.colorbox.close(); return false;" class="button button-primary"><?php _e('Close Report', $this -> plugin_name); ?></a></p>
 						<h3><?php _e('Report', $this -> plugin_name); ?></h3>
-						<p><?php echo nl2br($spamscore -> report); ?></p>
+						<p><pre><?php echo ($spamscore -> report); ?></pre></p>
 						<h3><?php _e('RAW Email', $this -> plugin_name); ?></h3>
-						<p><?php echo nl2br($newsletters_emailraw); ?></p>
+						<p><pre><?php echo htmlspecialchars($newsletters_emailraw); ?></pre></p>
 						<p><a href="" onclick="jQuery.colorbox.close(); return false;" class="button button-primary"><?php _e('Close Report', $this -> plugin_name); ?></a></p>
 					</div>
 				</div>
 			</div>
 			
 			<?php		
+				
 			$output = ob_get_clean();
-			
 			
 			header("Content-Type: text/xml; charset=UTF-8");
 	    	
@@ -1656,7 +1903,7 @@ if (!class_exists('wpMailPlugin')) {
 					  var g = new JustGage({
 					    id: "gauge", 
 					    value: <?php echo $value; ?>, 
-					    min: 1,
+					    min: 0,
 					    max: 10,
 					    title: "<?php echo ($value >= 5) ? __('This is spam!', $this -> plugin_name) : __('This is safe!', $this -> plugin_name); ?>",
 					    label: "<?php _e('Spam Score', $this -> plugin_name); ?>",
@@ -1830,6 +2077,8 @@ if (!class_exists('wpMailPlugin')) {
 							$this -> delete_all_cache('all');
 							$Db -> model = $Subscriber -> model;
 							$subscriber = $Subscriber -> find(array('id' => $subscriber -> id), false, false, true, true, false);
+						} else {
+							$_POST[$this -> pre . 'errors'] = $errors;
 						}
 					} else {
 						$errors[] = __('No data was posted.', $this -> plugin_name);	
@@ -2147,7 +2396,7 @@ if (!class_exists('wpMailPlugin')) {
 							if ($_POST['activate'] == "N") {
 								if ($Db -> delete_all(array('subscriber_id' => $_POST['subscriber_id'], 'list_id' => $_POST['mailinglist_id']))) {								
 									$Db -> model = $Unsubscribe -> model;
-									$unsubscribe_data = array('email' => $subscriber -> email, 'mailinglist_id' => $_POST['mailinglist_id']);
+									$unsubscribe_data = array('email' => $subscriber -> email, 'mailinglist_id' => $_POST['mailinglist_id'], 'comments' => $_POST['comments']);
 									$Db -> save($unsubscribe_data, true);
 								
 									$Db -> model = $Autoresponderemail -> model;
@@ -2345,6 +2594,7 @@ if (!class_exists('wpMailPlugin')) {
 						))),
 						'no_shipping'						=>	1,
 						'no_note'							=>	1,
+						'bn'								=>	"TribulantSoftware_SP",
 					);
 					
 					if ($this -> get_option('paypalsubscriptions') == "Y" && $mailinglist -> interval != "once") {
@@ -2383,7 +2633,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			switch ($method) {
 				case 'paidsubscriptionsuccess'	:
-					$message = __('Thank you for your payment!<br/><br/>Please allow a moment for the subscription to be activated.', $this -> plugin_name);
+					$message = __('Thank you for your payment! Please allow a moment for the subscription to be activated.', $this -> plugin_name);
 					$this -> redirect($this -> get_managementpost(true), "success", $message);
 					break;
 				case 'resubscribe'			:				
@@ -2484,6 +2734,20 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					} else {
 						$errors[] = __('No subscriber ID was specified, please try again.', $this -> plugin_name);
+					}
+					
+					$clicktrack = $this -> get_option('clicktrack');
+					if (!empty($clicktrack) && $clicktrack == "Y") {
+						$click_data = array(
+							//'link_id'			=>	$link -> id,
+							'referer'			=>	"unsubscribe",
+							'history_id'		=>	$_GET[$this -> pre . 'history_id'],
+							'user_id'			=>	$_GET[$this -> pre . 'user_id'],
+							'subscriber_id'		=>	$_GET[$this -> pre . 'subscriber_id'],
+							'device'			=>	$this -> get_device()
+						);
+						
+						$this -> Click -> save($click_data, true);
 					}
 					
 					if (!empty($data['confirm']) || $this -> get_option('unsubscribeconfirmation') == "N") {					
@@ -2681,6 +2945,32 @@ if (!class_exists('wpMailPlugin')) {
 			return;
 		}
 		
+		function manage_users_columns($columns = array()) {
+		    $columns['newsletters'] = __('Newsletters', $this -> plugin_name);
+		    return $columns;
+		}
+			
+		function manage_users_custom_column($value = null, $column_name = null, $user_id = null) {				
+			switch ($column_name) {
+				case 'newsletters'				:
+					global $Db, $Email;
+					
+					$newsletters = 0;
+					
+					if (!empty($user_id)) {
+						$Db -> model = $Email -> model;
+						if ($emails_count = $Db -> count(array('user_id' => $user_id))) {
+							$newsletters = $emails_count;
+						}
+					}
+					
+					return $newsletters;
+					break;
+			}
+				
+		    return $value;
+		}
+		
 		function language_ready() {
 			//the language plugin
 			$language_plugin = "LangSwitch/langswitch.php";
@@ -2754,7 +3044,10 @@ if (!class_exists('wpMailPlugin')) {
 			if(!$show_available){
 				// check if content is available in default language, if not return first language found. (prevent empty result)
 				if($lang != $this -> language_default()) {
-					$str = $this -> language_use($this -> language_default(), $text, $show_available);
+					//if (!is_admin()) {
+						$str = $this -> language_use($this -> language_default(), $text, $show_available);
+					//}
+					
 					if ($q_config['show_displayed_language_prefix'])
 						$str = "(". $this -> language_name($this -> language_default()) .") " . $str;
 					return $str;
@@ -2983,6 +3276,10 @@ if (!class_exists('wpMailPlugin')) {
 			$text = "";
 			$languages = $this -> language_getlanguages();
 			
+			foreach ($languages as $language) {
+				$tagTypeMap[$language] = true;
+			}
+			
 			foreach($languages as $language) {
 				if (!empty($texts[$language])) {
 					$texts[$language] = preg_split($split_regex, $texts[$language]);
@@ -3017,7 +3314,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if (!empty($text)) {	
 				//init vars
-				$split_regex = "#(<!--[^-]*-->|\[:[a-z]{2}\])#ism";
+				$split_regex = "#(<!--[^-]*-->|\[:[a-z-]{2,10}\])#ism";
 				$current_language = "";
 				$result = array();
 				
@@ -3028,18 +3325,19 @@ if (!class_exists('wpMailPlugin')) {
 				
 				// split text at all xml comments
 				$blocks = preg_split($split_regex, $text, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+				
 				foreach($blocks as $block) {
 					# detect language tags
-					if(preg_match("#^<!--:([a-z]{2})-->$#ism", $block, $matches)) {
+					if(preg_match("#^<!--:([a-z-]{2,10})-->$#ism", $block, $matches)) {
 						if($this -> language_isenabled($matches[1])) {
 							$current_language = $matches[1];
 							$languageMap[$current_language] = false;
 						} else {
 							$current_language = "invalid";
-						}
+						}						
 						continue;
 					// detect quicktags
-					} elseif($quicktags && preg_match("#^\[:([a-z]{2})\]$#ism", $block, $matches)) {
+					} elseif($quicktags && preg_match("#^\[:([a-z-]{2,10})\]$#ism", $block, $matches)) {
 						if($this -> language_isenabled($matches[1])) {
 							$current_language = $matches[1];
 							$languageMap[$current_language] = true;
@@ -3234,23 +3532,27 @@ if (!class_exists('wpMailPlugin')) {
 			//enqueue jQuery JS Library
 			if (apply_filters('newsletters_enqueuescript_jquery', true)) { wp_enqueue_script('jquery'); }
 			if (apply_filters('newsletters_enqueuescript_jqueryuicore', true)) { wp_enqueue_script('jquery-ui-core'); }
-			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }
+			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }			
+			wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, false, false);
 	
 			if (is_admin()) {	
 				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
 				wp_enqueue_script('chartjs', $this -> render_url('js/chartjs/Chart.js', 'admin', false), array('jquery'), false, false);
 					
-				if (preg_match("/(widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {									
+				if (preg_match("/(index\.php|widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {									
 					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 				}
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
 					
 					//if (in_array($_GET['page'], (array) $this -> sections)) {
-						wp_enqueue_media();
+						if ($_GET['page'] != $this -> sections -> send) {
+							wp_enqueue_media();
+						}
 						
 						// CKEditor
-						wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
+						//wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
+						wp_enqueue_script('ckeditor', '//cdn.ckeditor.com/4.4.7/full-all/ckeditor.js', array('jquery'), '4.4.7', false);
 						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
 					
 						wp_enqueue_script('iris', admin_url('js/iris.min.js'), array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1);
@@ -3259,6 +3561,7 @@ if (!class_exists('wpMailPlugin')) {
 				    
 				    wp_enqueue_script('jquery-ui-watermark', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.watermark.js', array('jquery'), false, true);
 				    wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
+				    wp_enqueue_script('jquery-ui-button', false, array('jquery'), false, true);
 				}
 			
 				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {					
@@ -3283,12 +3586,6 @@ if (!class_exists('wpMailPlugin')) {
 					// Uploadify
 					if (!empty($_GET['page']) && !empty($_GET['method']) && $_GET['page'] == $this -> sections -> subscribers && $_GET['method'] == "save") {
 						wp_enqueue_script('uploadify', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.uploadify.js', array('jquery'), '1.0', false);
-					}
-					
-					//Syntax Highlighter
-					if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> settings_api) {
-						wp_enqueue_script('syntaxhighlighter', "http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js", array('jquery'), false, false);
-						wp_enqueue_script('syntaxhighlignter-php', "http://alexgorbatchev.com/pub/sh/current/scripts/shBrushPhp.js", array('jquery'), false, false);
 					}
 					
 					if ($_GET['page'] == $this -> sections -> welcome ||
@@ -3359,8 +3656,10 @@ if (!class_exists('wpMailPlugin')) {
 			    wp_localize_script('datepicker-i18n', 'objectL10n', $aryArgs);
 				
 			/* Front-End Scripts */
-			} else {									
-				if (wpml_is_management()) {								
+			} else {													
+				if (wpml_is_management()) {		
+					wp_enqueue_script('jquery-ui-dialog', false, array('jquery'), false, true);
+																
 					if ($this -> get_option('loadscript_jqueryuitabs') == "Y") {
 						if (apply_filters('newsletters_enqueuescript_jqueryuitabs', true)) { wp_enqueue_script('jquery-ui-tabs', false, array('jquery'), false, true); }
 						if (apply_filters('newsletters_enqueuescript_jquerycookie', true)) { wp_enqueue_script('jquery-cookie', $this -> render_url('js/jquery.cookie.js', 'admin', false), array('jquery')); }
@@ -3396,13 +3695,6 @@ if (!class_exists('wpMailPlugin')) {
 				if (apply_filters('newsletters_enqueuescript_jqueryuiwatermark', true)) { if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'admin', false), array('jquery'), false, true); } }
 				if (apply_filters('newsletters_enqueuescript_jqueryuploadify', true)) { if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'admin', false), array('jquery'), false, true); } }
 				if (apply_filters('newsletters_enqueuescript_' . $this -> plugin_name, true)) { wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true); }
-				
-				/*if (apply_filters('newsletters_enqueuescript_recaptcha', true)) { 
-					$captcha_type = $this -> get_option('captcha_type');
-					if (!empty($captcha_type) && $captcha_type == "recaptcha") {
-						wp_enqueue_script('recaptcha', "http://www.google.com/recaptcha/api/js/recaptcha_ajax.js");
-					}
-				}*/
 			}
 			
 			return true;
@@ -3434,7 +3726,7 @@ if (!class_exists('wpMailPlugin')) {
 					wp_enqueue_style('syntaxhighlighter-theme', "http://alexgorbatchev.com/pub/sh/current/styles/shThemeEmacs.css", false, false, "all");
 				}
 			} else {
-				$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
+				$uisrc = $this -> render_url('css/jquery-ui.css', 'default', false);
 				wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
 				
 				if ($this -> get_option('theme_usestyle') == "Y") {
@@ -3443,7 +3735,10 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			}
 			
-			if ($load) {
+			wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', false, false, "all");
+			wp_enqueue_style('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css', false, false, "all");
+			
+			if ($load) {				
 				if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
 				wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
 			}
@@ -3637,7 +3932,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function autoresponder_scheduling() {
-			wp_clear_scheduled_hook($this -> pre . '_autoresponders');			
+			//wp_clear_scheduled_hook($this -> pre . '_autoresponders');			
 			$schedules = wp_get_schedules();
 			$interval = $this -> get_option('autoresponderscheduling');
 			$new_timestamp = time() + $schedules[$interval]['interval'];
@@ -3936,6 +4231,54 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
+		function add_user_option($user_id = null, $option = null, $value = null) {
+			$user_id = (empty($user_id)) ? get_current_user_id() : $user_id;
+			
+			if (!empty($user_id) && !empty($option)) {
+				if (add_user_meta($user_id, 'newsletters_' . $option, $value, false)) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		function update_user_option($user_id = null, $option = null, $value = null) {
+			$user_id = (empty($user_id)) ? get_current_user_id() : $user_id;
+			
+			if (!empty($user_id) && !empty($option)) {
+				if (update_user_meta($user_id, 'newsletters_' . $option, $value)) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		function get_user_option($user_id = null, $option = null, $single = true) {
+			$user_id = (empty($user_id)) ? get_current_user_id() : $user_id;
+			
+			if (!empty($user_id) && !empty($option)) {
+				if ($value = get_user_meta($user_id, 'newsletters_' . $option, $single)) {
+					return $value;
+				}
+			}
+			
+			return false;
+		}
+		
+		function delete_user_option($user_id = null, $option = null) {
+			$user_id = (empty($user_id)) ? get_current_user_id() : $user_id;
+			
+			if (!empty($user_id) && !empty($option)) {
+				if (delete_user_meta($user_id, 'newsletters_' . $option)) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
 		function userdata($user_id = null) {
 			if (!empty($user_id)) {
 				if ($user = get_userdata($user_id)) {
@@ -3983,12 +4326,19 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function render_field($field_id = null, $fieldset = true, $optinid = null, $showcaption = true, $watermark = true, $instance = null, $offsite = false) {
+		function render_field($field_id = null, $fieldset = true, $optinid = null, $showcaption = true, $watermark = true, $instance = null, $offsite = false, $errors = array()) {
 			global $Field, $Html, $wpmltabindex, $Mailinglist, $Subscriber;
 		
 			if (!empty($field_id)) {
-				if ($field = $Field -> get($field_id)) {				
-					echo '<div class="newsletters-fieldholder ' . $field -> slug . '">';
+				if ($field = $Field -> get($field_id)) {	
+					$_POST[$field -> slug] = (empty($_POST[$field -> slug]) && !empty($_GET[$field -> slug])) ? $_GET[$field -> slug] : $_POST[$field -> slug];
+					
+					$list = (empty($instance['list'])) ? __($_POST['list_id'][0]) : __($instance['list']);
+					if ($this -> language_do()) {
+						$list = $this -> language_use($instance['lang'], $list, false);
+					}
+								
+					echo '<div class="newsletters-fieldholder ' . (($field -> type == "hidden" || ($field -> type == "special" && $field -> slug == "list" && !empty($list) && (is_numeric($list) || $list == "all"))) ? 'newsletters-fieldholder-hidden' : 'newsletters-fieldholder-visible') . ' ' . $field -> slug . '">';
 				
 					if ($fieldset == true && $field -> type != "special" && $field -> type != "hidden") {
 						if ($field -> type == "file") {
@@ -3998,7 +4348,8 @@ if (!class_exists('wpMailPlugin')) {
 						}
 							
 						_e($field -> title);
-						if ($field -> required == "Y") { echo ' <span class="' . $this -> pre . 'required">&#42;</span>'; };
+						//if ($field -> required == "Y") { echo ' <span class="' . $this -> pre . 'required">&#42;</span>'; };
+						if ($field -> required == "Y") { echo ' <i class="fa fa-asterisk newsletters_required"></i>'; };
 						echo '</label>';
 					}
 				
@@ -4035,7 +4386,7 @@ if (!class_exists('wpMailPlugin')) {
 							if (!is_admin() || defined('DOING_AJAX') || (!empty($_GET['method']) && $_GET['method'] == "offsitewizard")) {
 								echo '<input type="hidden" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
 							} else {
-								echo '<input type="text" class="widefat" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
+								echo '<input type="text" class="" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($hidden_value)) . '" />';
 							}
 							break;
 						case 'text'				:
@@ -4043,7 +4394,7 @@ if (!class_exists('wpMailPlugin')) {
 								$_POST['email'] = $_GET['email'];
 							}
 						
-							echo '<input class="' . $this -> pre . ' widefat ' . $this -> pre . 'text' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' type="text" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($_POST[$field -> slug])) . '" />';
+							echo '<input class="' . $this -> pre . ' ' . $this -> pre . 'text' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' type="text" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($_POST[$field -> slug])) . '" />';
 							
 							if (!empty($field -> watermark) && $watermark == true && empty($offsite)) {
 								?>
@@ -4064,11 +4415,6 @@ if (!class_exists('wpMailPlugin')) {
 								default 				:																
 									if (preg_match("/[0-9]/si", $optinid, $matches)) {
 										$number = $matches[0];
-										
-										$list = (empty($instance['list'])) ? __($_POST['list_id'][0]) : __($instance['list']);
-										if ($this -> language_do()) {
-											$list = $this -> language_use($instance['lang'], $list, false);
-										}
 										
 										if (!empty($list)) {
 											if (is_numeric($list)) {
@@ -4093,7 +4439,7 @@ if (!class_exists('wpMailPlugin')) {
 												} elseif ($list == "all") {
 													echo '<input type="hidden" name="list_id[]" value="all" />';
 												} else {
-													echo '<select class="' . ((!empty($Subscriber -> errors['list_id'])) ? ' wpmlfielderror ' : '') . $this -> pre . ' autowidth widefat ' . $this -> pre . 'select newsletters-list-select" id="' . $optinid . $field -> slug . '-list-select" name="list_id[]">';
+													echo '<select class="' . ((!empty($Subscriber -> errors['list_id'])) ? ' wpmlfielderror ' : '') . $this -> pre . ' autowidth ' . $this -> pre . 'select newsletters-list-select" id="' . $optinid . $field -> slug . '-list-select" name="list_id[]">';
 													echo '<option value="">' . __('- Select -', $this -> plugin_name) . '</option>';
 													
 													foreach ($lists as $list_id => $list_title) {
@@ -4113,41 +4459,62 @@ if (!class_exists('wpMailPlugin')) {
 							}
 							break;
 						case 'textarea'			:
-							echo '<textarea class="' . $this -> pre . ' widefat ' . $this -> pre . 'textarea' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' rows="3" name="' . $field -> slug . '">' . strip_tags($_POST[$field -> slug]) . '</textarea>';
+							echo '<textarea class="' . $this -> pre . ' ' . $this -> pre . 'textarea' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' rows="4" name="' . $field -> slug . '">' . strip_tags($_POST[$field -> slug]) . '</textarea>';
 							break;
-						case 'select'			:
-							echo '<select class="' . $this -> pre . ' widefat ' . $this -> pre . 'select' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" style="width:auto;" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' name="' . $field -> slug . '">';
+						case 'select'			:						
+							echo '<select class="' . $this -> pre . ' ' . $this -> pre . 'select' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" style="width:auto;" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' name="' . $field -> slug . '">';
 							echo '<option value="">' . __('- Select -', $this -> plugin_name) . '</option>';
 							
-							$options = unserialize($field -> fieldoptions);
+							/*$options = unserialize($field -> fieldoptions);
 							if (!empty($options)) {
 								foreach ($options as $name => $value) {
-									$select = (!empty($_POST[$field -> slug]) && $_POST[$field -> slug] == $name) ? 'selected="selected"' : '';
+									$select = (!empty($_POST[$field -> slug]) && ($_POST[$field -> slug] == $name || $_POST[$field -> slug] == __($value))) ? 'selected="selected"' : '';
 									echo '<option ' . $select . ' value="' . $name . '">' . __($value) . '</option>';
+								}
+							}*/
+							
+							if (!empty($field -> newfieldoptions)) {
+								foreach ($field -> newfieldoptions as $option_id => $option_value) {
+									$select = (!empty($_POST[$field -> slug]) && ($_POST[$field -> slug] == $option_id || $_POST[$field -> slug] == __($option_value))) ? 'selected="selected"' : '';
+									echo '<option ' . $select . ' value="' . $option_id . '">' . __($option_value) . '</option>';
 								}
 							}
 							
 							echo '</select>';
 							break;
 						case 'radio'			:
-							$options = unserialize($field -> fieldoptions);
+							/*$options = unserialize($field -> fieldoptions);
 							if (!empty($options)) {
 								$r = 1;
 								
-								foreach ($options as $name => $value) {
-									$checked = ($_POST[$field -> slug] == $name) ? 'checked="checked"' : '';
+								foreach ($options as $name => $value) {																		
+									$checked = ($_POST[$field -> slug] == $name || $_POST[$field -> slug] == __($value)) ? 'checked="checked"' : '';
 									echo '<label class="wpmlradiolabel ' . $this -> pre . '"><input class="' . $this -> pre . 'radio' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" ' . $Html -> tabindex($optinid) . ' type="radio" ' . $checked . ' name="' . $field -> slug . '" value="' . $name . '" /> ' . __($value) . '</label>';
 									
 									$r++;
 								}
+							}*/
+							
+							if (!empty($field -> newfieldoptions)) {
+								foreach ($field -> newfieldoptions as $option_id => $option_value) {
+									$checked = ($_POST[$field -> slug] == $option_id || $_POST[$field -> slug] == __($value)) ? 'checked="checked"' : '';
+									echo '<label class="wpmlradiolabel ' . $this -> pre . '"><input class="' . $this -> pre . 'radio' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" ' . $Html -> tabindex($optinid) . ' type="radio" ' . $checked . ' name="' . $field -> slug . '" value="' . $option_id . '" /> ' . __($option_value) . '</label>';
+								}
 							}
 							break;
 						case 'checkbox'			:
-							$options = unserialize($field -> fieldoptions);
+							/*$options = unserialize($field -> fieldoptions);
 							if (!empty($options)) {
 								foreach ($options as $name => $value) {
-									$checked = (!empty($_POST[$field -> slug]) && is_array($_POST[$field -> slug]) && @in_array($name, $_POST[$field -> slug])) ? 'checked="checked"' : '';
+									$checked = (!empty($_POST[$field -> slug]) && (is_array($_POST[$field -> slug]) && @in_array($name, $_POST[$field -> slug]))) ? 'checked="checked"' : '';
 									echo '<label class="wpmlcheckboxlabel ' . $this -> pre . '"><input class="' . $this -> pre . 'checkbox' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" ' . $Html -> tabindex($optinid) . ' type="checkbox" ' . $checked . ' name="' . $field -> slug . '[]" value="' . $name . '" /> ' . __($value) . '</label>';
+								}
+							}*/
+							
+							if (!empty($field -> newfieldoptions)) {
+								foreach ($field -> newfieldoptions as $option_id => $option_value) {
+									$checked = (!empty($_POST[$field -> slug]) && (is_array($_POST[$field -> slug]) && in_array($option_id, $_POST[$field -> slug]))) ? 'checked="checked"' : '';
+									echo '<label class="wpmlcheckboxlabel ' . $this -> pre . '"><input class="' . $this -> pre . 'checkbox' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" ' . $Html -> tabindex($optinid) . ' type="checkbox" ' . $checked . ' name="' . $field -> slug . '[]" value="' . $option_id . '" /> ' . __($option_value) . '</label>';
 								}
 							}
 							break;
@@ -4189,11 +4556,9 @@ if (!class_exists('wpMailPlugin')) {
 											<?php if (!is_admin()) : ?>jQuery('.<?php echo $this -> pre; ?>button').button('option', "disabled", true);<?php endif; ?>
 										},*/
 										'onUploadError' 	: 	function(file, errorCode, errorMsg, errorString) {
-											console.log('The file ' + file.name + ' could not be uploaded: ' + errorString);
+											
 										},
 										'onUploadSuccess' 	: 	function(file, data, response) {
-											console.log('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
-											console.log('Updating field #<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>');
 											jQuery('#<?php echo $this -> pre . '-' . $optinid . '' . $field -> slug; ?>').val(data);
 										}/*,
 										'onUploadComplete'	:	function(file) {
@@ -4212,7 +4577,7 @@ if (!class_exists('wpMailPlugin')) {
 							if ($countries = $wpmlCountry -> select()) {						
 								?>
 								
-								<select class="<?php echo $this -> pre; ?>country <?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>precountry<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" id="<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> name="<?php echo $field -> slug; ?>">
+								<select class="<?php echo $this -> pre; ?>country <?php echo $this -> pre; ?> <?php echo $this -> pre; ?>precountry<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" id="<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> name="<?php echo $field -> slug; ?>">
 									<option value=""><?php _e('- Select Country -', $this -> plugin_name); ?></option>
 									<?php foreach ($countries as $id => $value) : ?>
 										<option <?php echo (!empty($_POST[$field -> slug]) && $_POST[$field -> slug] == $id) ? 'selected="selected"' : ''; ?> value="<?php echo $id; ?>"><?php echo $value; ?></option>
@@ -4245,7 +4610,7 @@ if (!class_exists('wpMailPlugin')) {
 							
 							?>
 							
-							<input type="text" class="<?php echo $this -> pre; ?>predate <?php echo $this -> pre; ?>text <?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" value="<?php echo $currentDate; ?>" name="<?php echo $field -> slug; ?>" id="<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>" />
+							<input type="text" class="<?php echo $this -> pre; ?>predate <?php echo $this -> pre; ?>text <?php echo $this -> pre; ?> <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" value="<?php echo $currentDate; ?>" name="<?php echo $field -> slug; ?>" id="<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>" />
 							
 							<?php if (empty($offsite)) : ?>
 								<script type="text/javascript">
@@ -4253,13 +4618,13 @@ if (!class_exists('wpMailPlugin')) {
 									jQuery('#<?php echo $this -> pre; ?>-<?php echo $optinid . $field -> slug; ?>').datepicker({
 										changeMonth: true,
 										changeYear: true,
-										yearRange: "<?php echo date_i18n("Y", strtotime("-100 years")); ?>:<?php echo date_i18n("Y"); ?>",
+										yearRange: "<?php echo date_i18n("Y", strtotime("-100 years")); ?>:<?php echo date_i18n("Y", strtotime("+100 years")); ?>",
 										showOn: "both",
 										buttonImage: "<?php echo plugins_url(); ?>/<?php echo $this -> plugin_name; ?>/views/default/img/calendar.gif",
-										buttonImageOnly: true,
+										buttonImageOnly: false,
 										dateFormat: "<?php echo $Html -> dateformat_PHP_to_jQueryUI(get_option('date_format')); ?>",
 										defaultDate: <?php echo $defaultDate; ?>
-									});
+									}).next().button();
 								});
 								</script>
 							<?php endif; ?>
@@ -4270,7 +4635,7 @@ if (!class_exists('wpMailPlugin')) {
 								$value = $_POST[$field -> slug]['y'] . '-' . 
 							}	
 						
-							echo '<input class="' . $this -> pre . ' widefat ' . $this -> pre . 'text' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' type="text" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($_POST[$field -> slug])) . '" />';
+							echo '<input class="' . $this -> pre . ' ' . $this -> pre . 'text' . ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : '') . '" id="' . $this -> pre . '-' . $optinid . '' . $field -> slug . '" ' . $Html -> tabindex($optinid) . ' type="text" name="' . $field -> slug . '" value="' . esc_attr(stripslashes($_POST[$field -> slug])) . '" />';
 						
 							?>
 							
@@ -4285,7 +4650,7 @@ if (!class_exists('wpMailPlugin')) {
 							/*												
 							?>
 						
-							<select class="<?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" id="<?php echo $this -> pre; ?>-<?php echo $optinid; ?><?php echo $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[y]">
+							<select class="<?php echo $this -> pre; ?> <?php echo $this -> pre; ?>predate<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" id="<?php echo $this -> pre; ?>-<?php echo $optinid; ?><?php echo $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[y]">
 								<option value=""><?php _e('YYYY', $this -> plugin_name); ?></option>
 								<?php for ($y = 00; $y <= 99; $y++) : ?>
 								<?php $sel = ($_POST[$field -> slug][0] == '19' . $y || $_POST[$field -> slug]['y'] == '19' . $y) ? 'selected="selected"' : ''; ?>
@@ -4298,7 +4663,7 @@ if (!class_exists('wpMailPlugin')) {
 								<?php endfor; ?>
 							</select>
 							
-							<select class="<?php echo $this -> pre; ?> widefat<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[m]">
+							<select class="<?php echo $this -> pre; ?><?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[m]">
 								<option value=""><?php _e('MM', $this -> plugin_name); ?></option>
 								<?php for ($m = 1; $m <= 12; $m++) : ?>
 								<?php $sel = ($_POST[$field -> slug][1] == $m || $_POST[$field -> slug]['m'] == $m) ? 'selected="selected"' : ''; ?>
@@ -4307,7 +4672,7 @@ if (!class_exists('wpMailPlugin')) {
 								<?php endfor; ?>
 							</select>
 							
-							<select class="<?php echo $this -> pre; ?> widefat<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[d]">
+							<select class="<?php echo $this -> pre; ?><?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" <?php echo $Html -> tabindex($optinid); ?> class="autowidth" name="<?php echo $field -> slug; ?>[d]">
 								<option value=""><?php _e('DD', $this -> plugin_name); ?></option>
 								<?php for ($d = 1; $d <= 31; $d++) : ?>
 								<?php $sel = ($_POST[$field -> slug][2] == $d || $_POST[$field -> slug]['d'] == $d) ? 'selected="selected"' : ''; ?>
@@ -4324,7 +4689,7 @@ if (!class_exists('wpMailPlugin')) {
 						case 'pre_gender'		:
 							?>
 							
-							<select class="<?php echo $this -> pre; ?> widefat <?php echo $this -> pre; ?>pregender<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" id="<?php echo $this -> pre; ?>-<?php echo $optinid; ?><?php echo $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> name="<?php echo $field -> slug; ?>">
+							<select class="<?php echo $this -> pre; ?> <?php echo $this -> pre; ?>pregender<?php echo ((!empty($_POST[$this -> pre . 'errors'][$field -> slug])) ? ' ' . $this -> pre . 'fielderror' : ''); ?>" style="width:auto;" id="<?php echo $this -> pre; ?>-<?php echo $optinid; ?><?php echo $field -> slug; ?>" <?php echo $Html -> tabindex($optinid); ?> name="<?php echo $field -> slug; ?>">
 								<option value=""><?php _e('- Select Gender -', $this -> plugin_name); ?></option>
 								<option <?php echo (!empty($_POST[$field -> slug]) && $_POST[$field -> slug] == "male") ? 'selected="selected"' : ''; ?> value="male"><?php _e('Male', $this -> plugin_name); ?></option>
 								<option <?php echo (!empty($_POST[$field -> slug]) && $_POST[$field -> slug] == "female") ? 'selected="selected"' : ''; ?> value="female"><?php _e('Female', $this -> plugin_name); ?></option>
@@ -4334,8 +4699,24 @@ if (!class_exists('wpMailPlugin')) {
 							break;
 					}
 					
+					$docaption = false;
 					if (!empty($field -> caption) && $showcaption == true && $field -> type != "special" && $field -> type != "hidden") {
 						echo '<span class="' . $this -> pre . 'customfieldcaption">' . __(stripslashes($field -> caption)) . '</span>';
+						$docaption = true;
+					}
+					
+					if (!empty($errors[$field -> slug])) {
+						?>
+						
+						<?php if (empty($docaption)) : ?>
+							<br class="newsletters_clear" />
+						<?php endif; ?>
+						
+						<div id="newsletters-<?php echo $optinid; ?>-<?php echo $field -> slug; ?>-error" class="newsletters-field-error ui-state-error ui-corner-all">
+							<p><i class="fa fa-exclamation-triangle"></i> <?php echo stripslashes($errors[$field -> slug]); ?></p>
+						</div>
+						
+						<?php
 					}
 					
 					echo '</div>' . "\r\n";
@@ -4546,7 +4927,8 @@ if (!class_exists('wpMailPlugin')) {
 					
 				$url = $Html -> retainquery($querystring, $this -> get_managementpost(true));
 				
-				if ((!empty($urlonly) && $urlonly == true) || empty($subscriber -> format) || $subscriber -> format == "html") {
+				//if ((!empty($urlonly) && $urlonly == true) || empty($subscriber -> format) || $subscriber -> format == "html") {
+				if (empty($urlonly) || $urlonly == false) {
 					$unsubscribelink = '<a href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
 				} else {
 					$unsubscribelink = $url;
@@ -4558,11 +4940,11 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function gen_manage_link($subscriber = array(), $theme_id = null) {
+		function gen_manage_link($subscriber = array(), $theme_id = null, $history_id = null) {
 			global $Db, $Subscriber, $Html, $Auth;
 		
 			if (!empty($subscriber)) {
-				$linktext = $this -> get_option('managelinktext');
+				$linktext = __($this -> get_option('managelinktext'));
 				
 				if (empty($subscriber -> cookieauth)) {
 					$subscriberauth = $Auth -> gen_subscriberauth();
@@ -4572,7 +4954,7 @@ if (!class_exists('wpMailPlugin')) {
 					$subscriberauth = $subscriber -> cookieauth;
 				}
 				
-				$url = $Html -> retainquery('method=loginauth&subscriberauth=' . $subscriberauth, $this -> get_managementpost(true));
+				$url = $Html -> retainquery('method=loginauth&email=' . $subscriber -> email . '&subscriberauth=' . $subscriberauth, $this -> get_managementpost(true));
 				
 				if (!empty($theme_id)) {
 					global $wpdb, $Theme;
@@ -4803,8 +5185,8 @@ if (!class_exists('wpMailPlugin')) {
 				$subject = $message;
 			}
 			
-			if (!empty($message)) {
-				if (!empty($subscriber)) {			
+			if (!empty($message)) {				
+				if (!empty($subscriber)) {								
 					$Db -> model = $Mailinglist -> model;
 					$mailinglist_name = $Db -> field('title', array('id' => $subscriber -> mailinglist_id));
 					
@@ -4872,13 +5254,14 @@ if (!class_exists('wpMailPlugin')) {
 						get_bloginfo('name'), 
 						home_url(), 
 						$this -> gen_activation_link($subscriber, $theme_id), 
-						$this -> gen_manage_link($subscriber, $theme_id), 
+						$this -> gen_manage_link($subscriber, $theme_id, $history_id), 
 						$this -> gen_online_link($subscriber, false, $history_id, false, $theme_id, true),
 						$this -> gen_online_link($subscriber, false, $history_id, false, $theme_id, false),
 						$this -> gen_online_link($subscriber, false, $history_id, true, $theme_id, false), 
 						$this -> gen_tracking_link($eunique), 
 						$this -> gen_mailinglist_names($subscriber),
-						stripslashes(str_replace("$", "&#36;", $subject)),
+						//stripslashes(str_replace("$", "&#36;", $subject)),
+						(preg_replace('/\$(\d)/', '\\\$$1', stripslashes($subject))),
 						$history_id,
 						$this -> gen_unsubscribe_comments(),
 						$subscriber -> bouncecount,
@@ -5079,7 +5462,7 @@ if (!class_exists('wpMailPlugin')) {
 									if ($this -> get_option('requireactivate') == "Y" || $mailinglist -> paid == "Y") {									
 										$subject = $this -> et_subject('confirm');
 										$fullbody = $this -> et_message('confirm', $subscriber);
-										$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+										$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('confirm'), false, $fullbody);
 										$this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false);
 									}
 								} else {
@@ -5101,7 +5484,7 @@ if (!class_exists('wpMailPlugin')) {
 						if (!empty($subscriber -> mailinglists)) {		
 							$subject = $this -> et_subject('confirm');
 							$fullbody = $this -> et_message('confirm', $subscriber);
-							$message = $this -> render_email(false, array('subscriber' => $subscriber), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+							$message = $this -> render_email(false, array('subscriber' => $subscriber), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('confirm'), false, $fullbody);
 							$this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false);
 						}
 					}
@@ -5126,34 +5509,18 @@ if (!class_exists('wpMailPlugin')) {
 									$to = (object) array('email' => $email);
 									$subject = $this -> et_subject('subscribe', $subscriber);
 									$fullbody = $this -> et_message('subscribe', $subscriber);					
-									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('subscribe'), false, $fullbody);
 									$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 								}
 							}
 						}
 					}
-					
-					/*if (!empty($subscriber -> mailinglist_id)) {
-						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
-						
-						$query_hash = md5($adminemailquery);
-						if ($ob_email = $this -> get_cache($query_hash)) {
-							$email = $ob_email;
-						} else {
-							$email = $wpdb -> get_var($adminemailquery);
-							$this -> set_cache($query_hash, $email);
-						}
-						
-						if (!empty($email)) {
-							$adminemail = $email;
-						}
-					}*/
 				
 					$adminemail = $this -> get_option('adminemail');
 					$to = (object) array('email' => $adminemail);
 					$subject = $this -> et_subject('subscribe', $subscriber);
 					$fullbody = $this -> et_message('subscribe', $subscriber);					
-					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('subscribe'), false, $fullbody);					
 					$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 					
 					return true;
@@ -5171,7 +5538,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($unsubscribe_usernotification)) {
 					$subject = $this -> et_subject('unsubscribeuser', $subscriber);
 					$fullbody = $this -> et_message('unsubscribeuser', $subscriber);
-					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglists' => $mailinglists), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglists' => $mailinglists), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('unsubscribeuser'), false, $fullbody);
 					
 					if ($this -> execute_mail($subscriber, false, $subject, $message, false, false, false, false)) {
 						return true;
@@ -5195,28 +5562,12 @@ if (!class_exists('wpMailPlugin')) {
 									$to = (object) array('email' => $email);
 									$subject = $this -> et_subject('subscribe', $subscriber);
 									$fullbody = $this -> et_message('subscribe', $subscriber);					
-									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+									$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('subscribe'), false, $fullbody);
 									$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 								}
 							}
 						}
 					}
-					
-					/*if (!empty($subscriber -> mailinglist_id)) {
-						$adminemailquery = "SELECT `adminemail` FROM `" . $wpdb -> prefix . $Mailinglist -> table . "` WHERE `id` = '" . $subscriber -> mailinglist_id . "'";					
-
-						$query_hash = md5($adminemailquery);
-						if ($ob_email = $this -> get_cache($query_hash)) {
-							$email = $ob_email;
-						} else {
-							$email = $wpdb -> get_var($adminemailquery);
-							$this -> set_cache($query_hash, $email);
-						}
-						
-						if (!empty($email)) {
-							$adminemail = $email;
-						}
-					}*/
 					
 					$adminemail = $this -> get_option('adminemail');
 					
@@ -5231,7 +5582,7 @@ if (!class_exists('wpMailPlugin')) {
 					$to -> email = $adminemail;
 					$subject = $this -> et_subject('unsubscribe', $subscriber);
 					$fullbody = $this -> et_message('unsubscribe', $subscriber);
-					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('unsubscribe'), false, $fullbody);
 					
 					if ($this -> execute_mail($to, false, $subject, $message, false, false, false, false)) {
 						return true;
@@ -5248,7 +5599,7 @@ if (!class_exists('wpMailPlugin')) {
 					$to -> email = $this -> get_option('adminemail');
 					$subject = $this -> et_subject('bounce', $subscriber);
 					$fullbody = $this -> et_message('bounce', $subscriber);
-					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> default_theme_id('system'), false, $fullbody);
+					$message = $this -> render_email(false, array('subscriber' => $subscriber, 'mailinglist' => $mailinglist), false, $this -> htmltf($subscriber -> format), true, $this -> et_template('bounce'), false, $fullbody);
 					$this -> execute_mail($to, false, $subject, $message, false, false, false, false);
 					
 					return true;
@@ -5397,6 +5748,7 @@ if (!class_exists('wpMailPlugin')) {
 					curl_setopt($ch, CURLOPT_POST, true);
 					curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);	
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 					curl_setopt($ch, CURLOPT_HEADER, false);
 					$result = curl_exec($ch);
 					curl_close($ch);					
@@ -5445,7 +5797,10 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if (empty($error)) {
-				$Db -> model = $Email -> model;			
+				$Db -> model = $Email -> model;		
+				
+				$message = str_replace("[wpmlsubject]", $subject, $message);
+				
 				$subject = $this -> process_set_variables($subscriber, $user, stripslashes($subject), $history_id, $eunique, true);			
 				$message = $this -> process_set_variables($subscriber, $user, stripslashes($message), $history_id, $eunique);
 				$message = apply_filters('newsletters_execute_mail_message', $message);
@@ -5661,13 +6016,17 @@ if (!class_exists('wpMailPlugin')) {
 		 * @param ARRAY/STRING
 		 * @return BOOLEAN
 		 */
-		function debug($var = array(), $output = true) {
+		function debug($var = array(), $output = true, $specialchars = false) {
 			if ($output == false) { ob_start(); }
 			$debugging = get_option('tridebugging');
 			$this -> debugging = (empty($debugging)) ? $this -> debugging : true;
 	
 			if ($this -> debugging == true) {
-				echo '<pre>' . print_r($var, true) . '</pre>';
+				if (!empty($specialchars) && $specialchars == true) {
+					echo '<pre>' . print_r(htmlspecialchars($var), true) . '</pre>';
+				} else {
+					echo '<pre>' . print_r($var, true) . '</pre>';
+				}
 			}
 			
 			if ($output == false) {
@@ -5702,13 +6061,17 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function get_managementpost($permalink = false, $autocreate = false) {		
+		function get_managementpost($permalink = false, $autocreate = false, $language = null) {		
 			global $wpdb, $wp_rewrite, $newsletters_managementpost_error;
 			$user_id = get_current_user_id();
 			require_once(ABSPATH . WPINC . DS . 'rewrite.php');
 			if (!is_object($wp_rewrite)) { $wp_rewrite = new WP_Rewrite(); }
 			
-			$managementpost = __(get_option($this -> pre . 'managementpost'));
+			if (empty($language)) {
+				$managementpost = __(get_option($this -> pre . 'managementpost'));
+			} else {
+				$managementpost = $this -> language_use($language, $this -> get_option('managementpost'));
+			}
 			$query = "SELECT `ID` FROM `" . $wpdb -> posts . "` WHERE `ID` = '" . $managementpost . "' AND `post_status` = 'publish'";
 			
 			$query_hash = md5($query);
@@ -6076,11 +6439,21 @@ if (!class_exists('wpMailPlugin')) {
 		
 		function updating_plugin() {
 			if (!is_admin()) return;
+			
+			$dbversion = $this -> get_option('dbversion');
+			if (empty($dbversion)) {
+				$this -> add_option('dbversion', '1.0');
+			}
 		
 			if (!$this -> get_option('version')) {
 				$this -> add_option('version', $this -> version);
 				$this -> update_options();
 				return;
+			}
+			
+			$cur_dbversion = $this -> get_option('dbversion');
+			if (version_compare($cur_dbversion, $this -> dbversion) < 0) {
+				$this -> update_option('showmessage_dbupdate', true);
 			}
 	
 			$cur_version = $this -> get_option('version');
@@ -6322,9 +6695,11 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.4.7.1") < 0) {
+				if (version_compare($cur_version, "4.4.7.2") < 0) {
+					
 					$this -> update_options();
-					$version = '4.4.7.1';	
+					
+					$version = '4.4.7.2';	
 				}
 			
 				//the current version is older.
@@ -6593,6 +6968,8 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$Field -> check_default_fields();
 			
+			flush_rewrite_rules();
+			
 			return $wpml_add_option_count;
 		}
 		
@@ -6641,7 +7018,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			if ($role = get_role('administrator')) {		
 				if (!empty($this -> sections)) {			
-					foreach ($this -> sections as $section_key => $section_menu) {												
+					foreach ($this -> sections as $section_key => $section_menu) {																		
 						if (empty($role -> capabilities['newsletters_' . $section_key])) {
 							$role -> add_cap('newsletters_' . $section_key);
 							
@@ -6862,7 +7239,7 @@ if (!class_exists('wpMailPlugin')) {
 	        		return false;
 	                break;
 	            case 'pop'					:
-	            	require_once($this -> plugin_base() . DS . 'vendors' . DS . 'class.bounce.php');
+	            	require_once($this -> plugin_base() . DS . 'vendors' . DS . 'bounce' . DS . 'bounce_driver.class.php');
 	            	$bouncehandler = new BounceHandler();
 	            
 					require_once($this -> plugin_base() . DS . 'vendors' . DS . 'class.pop3_new.php');
@@ -6899,6 +7276,12 @@ if (!class_exists('wpMailPlugin')) {
 				                        if ($the_facts[0]['action'] == "failed") {
 					                        $email = trim($the_facts[0]['recipient']);
 					                        $status = trim($the_facts[0]['status']);
+					                        
+					                        include($this -> plugin_base() . DS . 'vendors' . DS . 'bounce' . DS . 'bounce_responses.php');
+											$status_message = $bouncehandler -> fetch_status_messages(trim($the_facts[0]['status']));
+											if (!empty($status_message)) {
+												$status .= ' - ' . $status_message[0][0] . ', ' . $status_message[1][0];
+											}
 					                        
 					                 		$Db -> model = $Subscriber -> model;	                                
 			                                if ($subscriber = $Db -> find(array('email' => $email))) {	 
@@ -7151,6 +7534,17 @@ if (!class_exists('wpMailPlugin')) {
 			return $subject;
 		}
 		
+		function et_template($type = null, $subscriber = null, $language = null) {
+			
+			$theme_id = $this -> default_theme_id('system');
+			
+			if (!empty($type)) {
+				$theme_id = __($this -> get_option('ettemplate_' . $type));
+			}
+			
+			return $theme_id;
+		}
+		
 		function et_message($type = null, $subscriber = null, $language = null) {
 			$message = false;
 			
@@ -7295,6 +7689,17 @@ if (!class_exists('wpMailPlugin')) {
 			}
 		}
 		
+		function has_child_theme_folder() {
+			$theme_path = get_stylesheet_directory();
+			$full_path = $theme_path . DS . 'newsletters';
+			
+			if (file_exists($full_path)) {
+				return true;
+			}
+			
+			return false;
+		}
+		
 		function render_url($file = null, $folder = 'admin', $extension = null) {	
 			$this -> plugin_name = basename(dirname(__FILE__));
 		
@@ -7315,7 +7720,7 @@ if (!class_exists('wpMailPlugin')) {
 					$folderurl = plugins_url() . '/' . $this -> plugin_name . '/';
 				}
 				
-				$url = $folderurl . $file;
+				$url = $folderurl . $file;				
 				return $url;
 			}
 			
@@ -7392,15 +7797,6 @@ if (!class_exists('wpMailPlugin')) {
 		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {						
 			global $newsletters_history_id;
 			$this -> plugin_name = basename(dirname(__FILE__));
-			
-			/*$render_hash = md5($file . $params['subject'] . $params['history_id'] . $output . $html . $renderht . $theme_id . $shortlinks . $fullbody);
-			if ($ob_output = $this -> get_cache($render_hash, 'value')) {
-				if (empty($output) || $output == false) {
-					return $ob_output;
-				} else {
-					echo $ob_output;
-				}
-			}*/
 		
 			if (!empty($file) || !empty($fullbody)) {
 				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
@@ -7480,7 +7876,8 @@ if (!class_exists('wpMailPlugin')) {
 				
 				//pass the $body through the shortcodes
 				$body = do_shortcode($body);
-				$body = str_replace("$", "&#36;", $body);
+				//$body = str_replace("$", "&#36;", $body);
+				$body = preg_replace('/\$(\d)/', '\\\$$1', $body);
 				
 				$themeintextversion = $this -> get_option('themeintextversion');
 				if (empty($themeintextversion)) {
@@ -7488,27 +7885,27 @@ if (!class_exists('wpMailPlugin')) {
 					$wpml_textmessage = $body;
 				}
 				
-				if (empty($output) || $output == false) {					
+				if (empty($output) || $output == false) {										
 					if ($html == true) {
 						global $Db, $Theme;
-						$Db -> model = $Theme -> model;
-						
+						$Db -> model = $Theme -> model;						
 						if (!empty($theme_id) && $theme = $Db -> find(array('id' => $theme_id))) {
-							$theme_content = "";
+							$theme_content = "";							
 							ob_start();					
 							echo do_shortcode(stripslashes($theme -> content));
 							$theme_content = ob_get_clean();
 							$theme_content = apply_filters('newsletters_theme_before_wpmlcontent_replace', $theme_content);
 							
-							$body = '<div class="newsletters_content">' . apply_filters($this -> pre . '_wpmlcontent_before_replace', $body) . '</div>';
+							$body = '<div class="newsletters_content">' . apply_filters($this -> pre . '_wpmlcontent_before_replace', $body) . '</div>';							
 							$new_body = preg_replace("/\[wpmlcontent\]/si", $body, $theme_content);
 							
 							$pattern = "/\[(\[?)(newsletters_content)(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*+(?:\[(?!\/\2\])[^\[]*+)*+)\[\/\2\])?)(\]?)/s";
 							$new_body = preg_replace_callback($pattern, array($this, 'newsletters_content'), $new_body);
-							$new_body = htmlspecialchars_decode($new_body);
+							$new_body = htmlspecialchars_decode($new_body, ENT_NOQUOTES);
 							$new_body = apply_filters($this -> pre . '_wpmlcontent_after_replace', $new_body);
 							$body = $new_body;
 						} else {
+							// No theme, load default
 							$body = do_shortcode($head) . $body . do_shortcode($foot);
 						}
 					}
@@ -7518,8 +7915,7 @@ if (!class_exists('wpMailPlugin')) {
 						$wpml_textmessage = $body;
 					}
 					
-					//** Bit.ly and Click tracking
-					
+					//** Bit.ly and Click tracking					
 					$pattern = '/<a[^>]*?href=[\'"](.*?)[\'"][^>]*?>(.*?)<\/a>/si';				
 					if (preg_match_all($pattern, $body, $regs)) {				
 						$body = apply_filters('newsletters_emailbody_links', $body, $history_id, $regs);
@@ -7555,8 +7951,7 @@ if (!class_exists('wpMailPlugin')) {
 							}
 						}	
 					}
-					
-					//$this -> set_cache($render_hash, $body, 'value');				
+								
 					return $body;
 				} else {				
 					return true;
@@ -7567,15 +7962,13 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function newsletters_content($matches = null) {
-			$output = "";
-		
+			$output = "";		
 			if (!empty($matches)) {
-				$atts = shortcode_parse_atts($matches['3']);
-				
-				if (!empty($this -> history_id) && !empty($atts['id'])) {
-					if (is_object($this -> Content)) {
-						if ($contentarea = $this -> Content -> find(array('number' => $atts['id'], 'history_id' => $this -> history_id))) {
-							$output = stripslashes($contentarea -> content);
+				$atts = shortcode_parse_atts($matches['3']);				
+				if (!empty($this -> history_id) && !empty($atts['id'])) {					
+					if (is_object($this -> Content)) {						
+						if ($contentarea = $this -> Content -> find(array('number' => $atts['id'], 'history_id' => $this -> history_id))) {							
+							$output = wpautop(do_shortcode(stripslashes($contentarea -> content)));
 						}
 					}
 				}

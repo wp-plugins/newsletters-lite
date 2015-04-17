@@ -62,6 +62,10 @@ class wpmlFormHelper extends wpMailPlugin {
 		$r = wp_parse_args($options, $defaults);
 		extract($r, EXTR_SKIP);
 		
+		if ($Html -> has_field_error($name)) {
+			$class .= ' newsletters_fielderror';
+		}
+		
 		ob_start();
 		
 		?><input autocomplete="<?php echo $autocomplete; ?>" <?php echo (empty($tabindex)) ? '' : 'tabindex="' . esc_attr(stripslashes($tabindex)) . '"'; ?> class="<?php echo $class; ?>" style="width:<?php echo $width; ?>;" id="<?php echo $id; ?>" type="text" name="<?php echo $name; ?>" value="<?php echo esc_attr(stripslashes($Html -> field_value($name))); ?>" /><?php

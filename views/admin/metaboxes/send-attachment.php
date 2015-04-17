@@ -24,7 +24,7 @@
                                 <?php foreach ($_POST['attachments'] as $attachment) : ?>
                                 	<li class="<?php echo $this -> pre; ?>attachment">
                                     	<?php echo $Html -> attachment_link($attachment, false); ?>
-                                        <a class="button button-primary newsletters_attachment_remove" href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"></a>
+                                        <a class="button button-primary" href="?page=<?php echo $this -> sections -> history; ?>&amp;method=removeattachment&amp;id=<?php echo $attachment['id']; ?>" onclick="if (!confirm('<?php _e('Are you sure you want to remove this attachment?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-trash"></i></a>
                                     </li>    
                                 <?php endforeach; ?>
                            </ul>

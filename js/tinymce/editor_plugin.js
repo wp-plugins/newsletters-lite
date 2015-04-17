@@ -52,7 +52,7 @@
 				}, {
 					text: "Subscribe Form",
 					onclick: function() {
-						var mailinglists = [{text:'MULTI - Select Drop Down', value:'select'}, {text:'MULTI - Checkboxes List', value:'checkboxes'}];
+						var mailinglists = [{text:'MULTI - All (No Choice)', value:'all'}, {text:'MULTI - Select Drop Down', value:'select'}, {text:'MULTI - Checkboxes List', value:'checkboxes'}];
 						var index;
 						for (index = 0; index < tinymce.settings.newsletters_mailinglists_list.length; index++) {
 							mailinglists.push(tinymce.settings.newsletters_mailinglists_list[index]);
@@ -67,7 +67,7 @@
 								values: mailinglists,
 								tooltip: 'Either multiple (select drop down or checkboxes list) or a specific mailing list.',
 								onSelect: function() {
-									if (this.value() == "select" || this.value() == "checkboxes") {
+									if (this.value() == "select" || this.value() == "checkboxes" || this.value() == "all") {
 										subscribeinclude_element.show();
 									} else {
 										subscribeinclude_element.hide();
@@ -334,6 +334,7 @@
 									newsletters_posts += ' showdate="N"';
 								}
 								
+								newsletters_posts += ' eftype="' + e.data.newsletters_posts_eftype + '"';
 								newsletters_posts += ' orderby="' + e.data.newsletters_posts_orderby + '"';
 								newsletters_posts += ' order="' + e.data.newsletters_posts_order + '"';
 								newsletters_posts += ' category="' + e.data.newsletters_posts_category + '"';

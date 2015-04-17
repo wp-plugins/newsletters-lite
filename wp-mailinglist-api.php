@@ -5,6 +5,8 @@ class wpMailAPI extends wpMail {
 	var $api_methods = array(
 		'subscriber_add',
 		'subscriber_delete',
+		'send_email',
+		'queue_email',
 	);
 	
 	var $api_method;
@@ -49,6 +51,26 @@ class wpMailAPI extends wpMail {
 								$error = __('Subscriber could not be deleted', $this -> plugin_name);
 								$this -> api_error($error);
 							}
+							break;
+						case 'send_email'				:
+							if (!empty($data -> api_data -> email)) {
+								$Db -> model = $Subscriber -> model;
+								if ($subscriber = $Db -> find(array('email' => $data -> api_data -> email))) {
+									if ($this -> execute_mail($subscriber, false, $data -> api_data -> subject, $data -> api_data -> message)) {
+										$this -> api_success(__('Email has been sent', $this -> plugin_name));
+									} else {
+										global $mailerrors;
+										$this -> api_error(implode("; ", $mailerrors));
+									}
+								} else {
+									$this -> api_error(sprintf(__('Subscriber not found by email, first add with %s', $this -> plugin_name), '<code>subscriber_add</code>'));
+								}
+							} else {
+								$this -> api_error(__('No email was specified', $this -> plugin_name));
+							}
+							break;
+						case 'queue_email'				:
+							
 							break;
 					}
 				} else {

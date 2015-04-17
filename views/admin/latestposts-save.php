@@ -217,11 +217,11 @@
 		            		<?php
 		            		
 		            		$startdate = $latestpostssubscription -> startdate;
-		            		if (empty($startdate)) { $startdate = date_i18n("Y-m-d H:i:s", time()); }
+		            		if (empty($startdate)) { $startdate = $Html -> gen_date("Y-m-d H:i:s", time()); }
 		            		
 		            		?>
 		            	
-		            		<input type="text" name="startdate" value="<?php echo esc_attr(stripslashes(date("Y-m-d H:i:s", strtotime($startdate)))); ?>" id="startdate" /> <strong><?php _e('Current Date/Time:', $this -> plugin_name); ?> <?php echo date_i18n("Y-m-d H:i:s", time()); ?></strong>
+		            		<input type="text" name="startdate" value="<?php echo esc_attr(stripslashes(date("Y-m-d H:i:s", strtotime($startdate)))); ?>" id="startdate" /> <strong><?php _e('Current Date/Time:', $this -> plugin_name); ?> <?php echo $Html -> gen_date("Y-m-d H:i:s", time()); ?></strong>
 		            		<span class="howto"><small><?php _e('(format: YYYY-MM-DD HH:MM:SS)', $this -> plugin_name); ?></small> <?php _e('Choose the day to start sending these posts for the first time with the settings configured.', $this -> plugin_name); ?></span>
 		            	</td>
 		            </tr>
@@ -258,7 +258,7 @@
 	                    	<div class="scroll-list">
 	                        	<label><input type="radio" name="theme_id" value="0" id="theme_id_0" /> <?php _e('NONE', $this -> plugin_name); ?></label><br/>
 	                        	<?php foreach ($themes as $theme) : ?>
-	                            	<label><input <?php echo ((!empty($theme) && $theme -> id == $latestpostssubscription -> theme_id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="theme_id" value="<?php echo $theme -> id; ?>" id="theme_id_<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> <a class="newsletters_dashicons newsletters_theme_preview" href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;"></a> <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class="newsletters_dashicons newsletters_theme_edit"></a><br/>
+	                            	<label><input <?php echo ((!empty($theme) && $theme -> id == $latestpostssubscription -> theme_id) || $theme -> id == $default_theme_id) ? 'checked="checked"' : ''; ?> type="radio" name="theme_id" value="<?php echo $theme -> id; ?>" id="theme_id_<?php echo $theme -> id; ?>" /> <?php echo $theme -> title; ?></label> <a class="" href="" onclick="jQuery.colorbox({iframe:true, width:'80%', height:'80%', href:'<?php echo home_url(); ?>/?wpmlmethod=themepreview&amp;id=<?php echo $theme -> id; ?>'}); return false;"><i class="fa fa-eye fa-fw"></i></a> <a href="" onclick="jQuery.colorbox({title:'<?php echo sprintf(__('Edit Template: %s', $this -> plugin_name), $theme -> title); ?>', href:wpmlajaxurl + '?action=newsletters_themeedit&amp;id=<?php echo $theme -> id; ?>'}); return false;" class=""><i class="fa fa-pencil fa-fw"></i></a><br/>
 	                            <?php endforeach; ?>
 	                        </div>
 	                    <?php else : ?>
@@ -273,7 +273,7 @@
 		<p class="submit">
 			<input type="button" onclick="jQuery.colorbox.close();" class="button button-secondary" name="cancel" value="<?php _e('Cancel', $this -> plugin_name); ?>" />
 			<input type="submit" id="latestposts_save_button" class="button button-primary" name="save" value="<?php _e('Save Settings', $this -> plugin_name); ?>" />
-			<span style="display:none;" id="latestposts_loading"><span class="newsletters_loading"></span></span>
+			<span style="display:none;" id="latestposts_loading"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 		</p>
 	</form>
 </div>

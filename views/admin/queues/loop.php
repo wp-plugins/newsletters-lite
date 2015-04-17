@@ -1,8 +1,19 @@
+<!-- Email Queue Loop -->
+<?php
+	
+$queue_status = $this -> get_option('queue_status');
+	
+?>
 
 	<form action="?page=<?php echo $this -> sections -> queue; ?>&amp;method=mass" method="post" onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action?', $this -> plugin_name); ?>')) { return false; }">
 		<div class="tablenav">
 			<div class="alignleft actions">
-				<a href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=clear" title="<?php _e('Clear the email queue', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to purge the email queue?', $this -> plugin_name); ?>')) { return false; }" class="button"><?php _e('Clear Queue', $this -> plugin_name); ?></a>
+				<?php if (empty($queue_status) || $queue_status == "unpause") : ?>
+					<a id="newsletters_pause_queue_button" href="" onclick="newsletters_pause_queue('pause'); return false;" class="button"><i class="fa fa-pause"></i> <?php _e('Pause', $this -> plugin_name); ?></a>
+				<?php else : ?>
+					<a id="newsletters_pause_queue_button" href="" onclick="newsletters_pause_queue('unpause'); return false;" class="button"><i class="fa fa-play"></i> <?php _e('Unpause', $this -> plugin_name); ?></a>
+				<?php endif; ?>
+				<a href="?page=<?php echo $this -> sections -> queue; ?>&amp;method=clear" title="<?php _e('Clear the email queue', $this -> plugin_name); ?>" onclick="if (!confirm('<?php _e('Are you sure you wish to purge the email queue?', $this -> plugin_name); ?>')) { return false; }" class="button"><i class="fa fa-trash"></i> <?php _e('Clear Queue', $this -> plugin_name); ?></a>
 			</div>
 			<div class="alignleft actions">
 				<select name="action" class="widefat" style="width:auto;">
@@ -14,6 +25,36 @@
 			</div>
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
+		
+		<script type="text/javascript">
+		function newsletters_pause_queue(status) {
+			jQuery.ajax({
+				url: newsletters_ajaxurl + '?action=newsletters_pause_queue',
+				data: {status:status},
+				cache: false,
+				type: "POST",
+				success: function(response) {					
+					if (response == false) {
+						alert('<?php _e('Queue could not be paused, please try again', $this -> plugin_name); ?>');
+					} else {
+						if (status == "unpause") {
+							var pause_queue_html = '<i class="fa fa-pause"></i> <?php echo __('Pause', $this -> plugin_name); ?>';
+							var pause_queue_action = 'pause';
+						} else {
+							var pause_queue_html = '<i class="fa fa-play"></i> <?php echo __('Unpause', $this -> plugin_name); ?>';
+							var pause_queue_action = 'unpause';
+						}
+						
+						jQuery('#newsletters_pause_queue_button').html(pause_queue_html).attr('onclick', "newsletters_pause_queue('" + pause_queue_action + "'); return false;");		
+					}
+				}
+			});
+		}
+			
+		jQuery(document).ready(function() {
+			
+		});
+		</script>
 		
 		<?php
 		
@@ -206,7 +247,7 @@
 		                    <td>
 		                    	<?php echo $queue -> senddate; ?>
 		                    </td>
-							<td><label for="checklist<?php echo $queue -> id; ?>"><abbr title="<?php echo $queue -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($queue -> modified)); ?></abbr></label></td>
+							<td><label for="checklist<?php echo $queue -> id; ?>"><abbr title="<?php echo $queue -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($queue -> modified)); ?></abbr></label></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -222,6 +263,9 @@
 							<option <?php echo (isset($_COOKIE[$this -> pre . 'queuesperpage']) && $_COOKIE[$this -> pre . 'queuesperpage'] == $s) ? 'selected="selected"' : ''; ?> value="<?php echo $s; ?>"><?php echo $s; ?> <?php _e('emails', $this -> plugin_name); ?></option>
 							<?php $s += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'queuesperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'queuesperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'queuesperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 			</div>
@@ -237,8 +281,8 @@
 		}
 		
 		function change_sorting(field, dir) {
-			document.cookie = "<?php echo $this -> pre; ?>queuessorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-			document.cookie = "<?php echo $this -> pre; ?>queues" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+			document.cookie = "<?php echo $this -> pre; ?>queuessorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+			document.cookie = "<?php echo $this -> pre; ?>queues" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 			window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 		}
 		</script>

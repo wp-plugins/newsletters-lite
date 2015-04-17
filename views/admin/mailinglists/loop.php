@@ -2,7 +2,7 @@
 	<form onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected mailing lists?', $this -> plugin_name); ?>')) { return false; }" action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=mass" method="post">
 		<div class="tablenav">
 			<div class="alignleft">
-				<select name="action" class="alignleft" style="width:auto;" onchange="change_action(this.value); return false;">
+				<select name="action" style="width:auto;" onchange="change_action(this.value); return false;">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete Selected', $this -> plugin_name); ?></option>
 					<option value="merge"><?php _e('Merge', $this -> plugin_name); ?></option>
@@ -240,6 +240,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'listsperpage']) && $_COOKIE[$this -> pre . 'listsperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'listsperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'listsperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'listsperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -252,8 +255,8 @@
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>listssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>lists" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>listssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>lists" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>

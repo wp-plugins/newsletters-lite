@@ -17,7 +17,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
             		<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$managementpost = $this -> language_split($this -> get_option('managementpost'));
+					$managementpost = $this -> language_split($this -> get_managementpost(false));
 					
 					?>
 					<div id="managementposttabs">
@@ -32,7 +32,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="managementposttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="managementpost[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($managementpost[$language])); ?>" id="managementpost_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="managementpost[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> get_managementpost(false, false, $language))); ?>" id="managementpost_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -46,7 +46,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
 					});
 					</script>
             	<?php else : ?>
-            		<input type="text" name="managementpost" value="<?php echo esc_attr(stripslashes($this -> get_option('managementpost'))); ?>" id="managementpost" class="widefat" style="width:65px;" />
+            		<input type="text" name="managementpost" value="<?php echo esc_attr(stripslashes($this -> get_managementpost(false))); ?>" id="managementpost" class="widefat" style="width:65px;" />
             	<?php endif; ?>
             	<span class="howto"><?php echo sprintf(__('ID of the WordPress post with the %s shortcode in it.', $this -> plugin_name), '<code>[' . $this -> pre . 'management]</code>'); ?></span>
             </td>

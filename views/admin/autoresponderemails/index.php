@@ -35,9 +35,9 @@
             <script type="text/javascript">
 			function changefilter(field, value) {				
 				if (value != "") {
-					document.cookie = "<?php echo $this -> pre; ?>autoresponderemailsfilter_" + field + "=" + value + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>autoresponderemailsfilter_" + field + "=" + value + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 				} else {
-					document.cookie = "<?php echo $this -> pre; ?>autoresponderemailsfilter_" + field + "=" + value + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("-30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>autoresponderemailsfilter_" + field + "=" + value + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("-30 days")); ?> UTC; path=/";
 				}
 			}
 						

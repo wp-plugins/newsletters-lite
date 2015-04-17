@@ -10,7 +10,7 @@ class wpmlMailinglist extends wpMailPlugin {
 	
 	var $fields = array(
 		'id'				=>	"INT(11) NOT NULL AUTO_INCREMENT",
-		'title'				=>	"VARCHAR(100) NOT NULL DEFAULT ''",
+		'title'				=>	"VARCHAR(255) NOT NULL DEFAULT ''",
 		'privatelist'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'paid'				=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
 		'price'				=>	"FLOAT NOT NULL DEFAULT '0.00'",
@@ -29,7 +29,7 @@ class wpmlMailinglist extends wpMailPlugin {
 	
 	var $tv_fields = array(
 		'id'				=>	array("INT(11)", "NOT NULL AUTO_INCREMENT"),
-		'title'				=>	array("VARCHAR(100)", "NOT NULL DEFAULT ''"),
+		'title'				=>	array("VARCHAR(255)", "NOT NULL DEFAULT ''"),
 		'privatelist'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'paid'				=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
 		'price'				=>	array("FLOAT", "NOT NULL DEFAULT '0.00'"),

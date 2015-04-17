@@ -24,7 +24,7 @@ class wpmlDbHelper extends wpMailPlugin {
 	}
 
 	
-	function save($data = array(), $validate = true) {
+	function save($data = array(), $validate = true) {		
 		if (!empty($this -> model)) {
 			global $wpdb, ${$this -> model};
 			
@@ -132,7 +132,7 @@ class wpmlDbHelper extends wpMailPlugin {
 								}
 								
 								if (${$oldmodel} -> data -> applyexisting == "Y" && ${$oldmodel} -> data -> status == "active") {
-									$senddate = date_i18n("Y-m-d H:i:s", strtotime("+ " . ${$oldmodel} -> data -> delay . " " . ${$oldmodel} -> data -> delayinterval));
+									$senddate = $Html -> gen_date("Y-m-d H:i:s", strtotime("+ " . ${$oldmodel} -> data -> delay . " " . ${$oldmodel} -> data -> delayinterval));
 									
 									$query1 = "SELECT DISTINCT " 
 									. $wpdb -> prefix . $SubscribersList -> table . ".subscriber_id as sid, "
@@ -566,6 +566,8 @@ class wpmlDbHelper extends wpMailPlugin {
 						if (!empty($cmatches[1]) || $cmatches[1] == "0") {
 							$query .= " `" . $ckey . "` < " . $cmatches[1] . "";	
 						}
+					} elseif (preg_match("/(LIKE)/", $cval, $cmatches)) {
+						$query .= " `" . $ckey . "` " . $cval;
 					} else {				
 						$query .= " " . $ckey . " = " . $cval . "";
 					}

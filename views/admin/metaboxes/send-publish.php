@@ -13,7 +13,8 @@
 				<th><label for=""><?php _e('Existing Post', $this -> plugin_name); ?></label></th>
 				<td>
 					<a href="<?php echo get_permalink($post -> ID); ?>" target="_blank"><?php echo __($post -> post_title); ?></a>
-					<a class="newsletters-icon-delete-regular" href="<?php echo get_delete_post_link($post -> ID); ?>" onclick="if (!confirm('<?php _e('Are you sure you want to delete this post?', $this -> plugin_name); ?>')) { return false; }"></a>
+					<a class="" href="<?php echo get_delete_post_link($post -> ID); ?>" onclick="if (!confirm('<?php _e('Are you sure you want to delete this post?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-trash"></i></a>
+					<a class="" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=unlinkpost&id=' . $_POST['ishistory']); ?>" onclick="if (!confirm('<?php _e('Are you sure you want to unlink this post from this newsletter?', $this -> plugin_name); ?>')) { return false; }"><i class="fa fa-chain-broken"></i></a>
 				</td>
 			</tr>
 		<?php endif; ?>

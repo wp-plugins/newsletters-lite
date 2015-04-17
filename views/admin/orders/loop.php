@@ -135,7 +135,7 @@
 							<?php endif; ?>
 							<td><label for="checklist<?php echo $order -> id; ?>"><strong><?php echo $Html -> currency(); ?><?php echo number_format($order -> amount, 2, '.', ''); ?></strong></label></td>
 							<td><label for="checklist<?php echo $order -> id; ?>"><?php echo (!empty($order -> pmethod) && $order -> pmethod == "2co") ? '2CheckOut' : 'PayPal'; ?></label></td>
-							<td><label for="checklist<?php echo $order -> id; ?>"><abbr title="<?php echo $order -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($order -> modified)); ?></abbr></label></td>
+							<td><label for="checklist<?php echo $order -> id; ?>"><abbr title="<?php echo $order -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($order -> modified)); ?></abbr></label></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -151,6 +151,9 @@
 							<option <?php echo (isset($_COOKIE[$this -> pre . 'ordersperpage']) && $_COOKIE[$this -> pre . 'ordersperpage'] == $s) ? 'selected="selected"' : ''; ?> value="<?php echo $s; ?>"><?php echo $s; ?> <?php _e('orders', $this -> plugin_name); ?></option>
 							<?php $s += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'ordersperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'ordersperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'ordersperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 			</div>
@@ -166,8 +169,8 @@
 		}
 		
 		function change_sorting(field, dir) {
-			document.cookie = "<?php echo $this -> pre; ?>orderssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-			document.cookie = "<?php echo $this -> pre; ?>orders" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+			document.cookie = "<?php echo $this -> pre; ?>orderssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+			document.cookie = "<?php echo $this -> pre; ?>orders" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 			window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 		}
 		</script>

@@ -130,21 +130,7 @@ class wpmlTheme extends wpMailPlugin {
 		}
 		
 		if (empty($this -> errors)) {
-			if (!empty($this -> data -> inlinestyles) && $this -> data -> inlinestyles == "Y") {
-				/*$url = "http://inlinestyler.torchboxapps.com/styler/convert/";
-				$postfields = "returnraw=1&source=" . urlencode($this -> data -> content);
-			
-				if (function_exists('curl_init') && $ch = curl_init($url)) {
-					curl_setopt($ch, CURLOPT_URL, $url);
-					curl_setopt($ch, CURLOPT_POST, true);
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);	
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					curl_setopt($ch, CURLOPT_HEADER, false);
-					$result = curl_exec($ch);
-					$this -> data -> content = trim(html_entity_decode(urldecode($result)));
-					curl_close($ch);
-				}*/
-				
+			if (!empty($this -> data -> inlinestyles) && $this -> data -> inlinestyles == "Y") {				
 				$url = "http://premailer.dialect.ca/api/0.1/documents";
 				
 				$postfields = array(

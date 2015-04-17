@@ -1,4 +1,4 @@
-<div class="<?php echo $this -> pre; ?> widget_newsletters">
+<div class="newsletters <?php echo $this -> pre; ?> widget_newsletters">
 	<form action="<?php echo home_url(); ?>/?<?php echo $this -> pre; ?>method=offsite&title=<?php echo urlencode($options['title']); ?>&list=<?php echo $options['list']; ?>" onsubmit="wpmloffsite(this);" method="post">
 		<input type="hidden" name="list_id[]" value="<?php echo $options['list']; ?>" />
 	

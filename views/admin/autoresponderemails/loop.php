@@ -140,7 +140,7 @@
 	                    	<th class="check-column"><input type="checkbox" name="autoresponderemailslist[]" value="<?php echo $aemail -> id; ?>" id="checklist<?php echo $aemail -> id; ?>" /></th>
 	                        <td><label for="checklist<?php echo $aemail -> id; ?>"><?php echo $aemail -> id; ?></label></td>
 	                        <td>
-	                        	<?php $difference = $Html -> time_difference($aemail -> senddate, date_i18n("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
+	                        	<?php $difference = $Html -> time_difference($aemail -> senddate, $Html -> gen_date("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
 	                            <?php if ($difference >= 0) { $daysstring = __('This autoresponder email is due in ' . $difference . ' ' . $aemail -> autoresponder -> delayinterval . ' only.', $this -> plugin_name); } else { $daysstring = ""; }; ?>
 	                        	<strong><?php echo $Html -> link($aemail -> subscriber -> email, '?page=' . $this -> sections -> subscribers . '&amp;method=view&amp;id=' . $aemail -> subscriber_id, array('class' => "row-title")); ?></strong>
 	                        	<?php if (!empty($aemail -> active)) : ?>(<span class="<?php echo $this -> pre; ?><?php echo ($aemail -> active == "Y") ? 'success' : 'error'; ?>"><?php echo ($aemail -> active == "Y") ? __('active', $this -> plugin_name) : __('inactive', $this -> plugin_name); ?></span>)<?php endif; ?>
@@ -161,11 +161,11 @@
 	                            <?php endif; ?>
 	                        </td>
 	                        <td>
-	                        	<abbr title="<?php echo $aemail -> created; ?>"><?php echo date_i18n("Y-m-d", strtotime($aemail -> created)); ?></abbr>
+	                        	<abbr title="<?php echo $aemail -> created; ?>"><?php echo $Html -> gen_date(false, strtotime($aemail -> created)); ?></abbr>
 	                        </td>
 	                        <td>
-	                        	<abbr title="<?php echo $aemail -> senddate; ?>"><?php echo date_i18n("Y-m-d", strtotime($aemail -> senddate)); ?></abbr>
-	                            <?php $difference = $Html -> time_difference($aemail -> senddate, date_i18n("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
+	                        	<abbr title="<?php echo $aemail -> senddate; ?>"><?php echo $Html -> gen_date(false, strtotime($aemail -> senddate)); ?></abbr>
+	                            <?php $difference = $Html -> time_difference($aemail -> senddate, $Html -> gen_date("Y-m-d H:i:s"), $aemail -> autoresponder -> delayinterval); ?>
 	                            <?php if ($difference >= 0) : ?>(<?php echo $difference; ?> <?php echo $aemail -> autoresponder -> delayinterval; ?>+)<?php endif; ?>
 	                        </td>
 	                    </tr>
@@ -184,6 +184,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'autoresponderemailsperpage']) && $_COOKIE[$this -> pre . 'autoresponderemailsperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'autoresponderemailsperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'autoresponderemailsperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'autoresponderemailsperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -196,8 +199,8 @@
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>autoresponderemailssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>autoresponderemails" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>autoresponderemailssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>autoresponderemails" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>

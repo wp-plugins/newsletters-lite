@@ -2,11 +2,11 @@
 	<form onsubmit="if (!confirm('<?php _e('Are you sure you wish to execute this action on the selected groups?', $this -> plugin_name); ?>')) { return false; }" action="?page=<?php echo $this -> sections -> groups; ?>&amp;method=mass" method="post">
 		<div class="tablenav">
 			<div class="alignleft actions">
-				<select name="action" class="alignleft widefat" style="width:auto;">
+				<select name="action" class="widefat" style="width:auto;">
 					<option value=""><?php _e('- Bulk Actions -', $this -> plugin_name); ?></option>
 					<option value="delete"><?php _e('Delete Selected', $this -> plugin_name); ?></option>
 				</select>
-				<input type="submit" class="button-secondary alignleft" name="execute" value="<?php _e('Apply', $this -> plugin_name); ?>" />
+				<input type="submit" class="button-secondary" name="execute" value="<?php _e('Apply', $this -> plugin_name); ?>" />
 			</div>
 			<?php $this -> render_admin('pagination', array('paginate' => $paginate)); ?>
 		</div>
@@ -92,7 +92,7 @@
 		                    <td>
 		                    	<?php echo $Html -> link($Mailinglist -> count(array('group_id' => $group -> id)), '?page=' . $this -> sections -> groups . '&amp;method=view&amp;id=' . $group -> id . '#mailinglists'); ?>
 		                    </td>
-							<td><abbr title="<?php echo date_i18n("Y-m-d H:i:s", strtotime($group -> modified)); ?>"><?php echo date_i18n("Y-m-d", strtotime($group -> modified)); ?></abbr></td>
+							<td><abbr title="<?php echo $Html -> gen_date("Y-m-d H:i:s", strtotime($group -> modified)); ?>"><?php echo $Html -> gen_date(false, strtotime($group -> modified)); ?></abbr></td>
 						</tr>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -108,6 +108,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'groupsperpage']) && $_COOKIE[$this -> pre . 'groupsperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'groupsperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'groupsperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'groupsperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -120,8 +123,8 @@
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>listssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>lists" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>listssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>lists" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>

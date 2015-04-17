@@ -127,7 +127,9 @@ if (!class_exists('newsletters_lite')) {
 		}
 		
 		function lite_prevtime($time, $interval, $value) {
-			$time = (empty($time)) ? date("Y-m-d H:i:s", time()) : $time;
+			global $Html;
+			
+			$time = (empty($time)) ? $Html -> gen_date("Y-m-d H:i:s", time()) : $time;
 			$time = strtotime($time);
 		
 			switch ($interval) {
@@ -138,38 +140,38 @@ if (!class_exists('newsletters_lite')) {
 					$newtime = ($offset >= $seconds) ? ($prev + $seconds) : ($prev - 3600 + $seconds);
 					break;
 				case 'daily'			:
-					if (date("H", $time) < $value) { $time = strtotime("-1 days", $time); }
-					$y = date("Y", $time);
-					$m = date("m", $time);
-					$d = date("d", $time);
-					$h = date("H", strtotime($value . ':00'));
+					if ($Html -> gen_date("H", $time) < $value) { $time = strtotime("-1 days", $time); }
+					$y = $Html -> gen_date("Y", $time);
+					$m = $Html -> gen_date("m", $time);
+					$d = $Html -> gen_date("d", $time);
+					$h = $Html -> gen_date("H", strtotime($value . ':00'));
 					$newtime = strtotime($y . '-' . $m . '-' . $d . ' ' . $h . ':00');
 					break;
 				case 'weekly'			:
-					$diff = $value - date("w"); 
+					$diff = $value - $Html -> gen_date("w"); 
 					$timestamp = strtotime("+" . $diff . " days");
 					$timestamp = strtotime("-7 days", $timestamp);
-					$y = date("Y", $timestamp);
-					$m = date("m", $timestamp);
-					$d = date("d", $timestamp);
+					$y = $Html -> gen_date("Y", $timestamp);
+					$m = $Html -> gen_date("m", $timestamp);
+					$d = $Html -> gen_date("d", $timestamp);
 					$newtime = strtotime($y . '-' . $m . '-' . $d . ' 00:00:00');
 					break;
 				case 'monthly'			:
-					$diff = $value - date("d"); 
+					$diff = $value - $Html -> gen_date("d"); 
 					$timestamp = strtotime("+" . $diff . " days");
-					if (date("d", $time) < $value) { $timestamp = strtotime("-1 months", $timestamp); }
-					$y = date("Y", $timestamp);
-					$m = date("m", $timestamp);
-					$d = date("d", $timestamp);
+					if ($Html -> gen_date("d", $time) < $value) { $timestamp = strtotime("-1 months", $timestamp); }
+					$y = $Html -> gen_date("Y", $timestamp);
+					$m = $Html -> gen_date("m", $timestamp);
+					$d = $Html -> gen_date("d", $timestamp);
 					$newtime = strtotime($y . '-' . $m . '-' . $d . ' 00:00:00');
 					break;
 				case 'yearly'			:
-					$diff = $value - date("m"); 
+					$diff = $value - $Html -> gen_date("m"); 
 					$timestamp = strtotime("+" . $diff . " months");
-					if (date("m", $time) < $value) { $timestamp = strtotime("-1 years", $timestamp); }
-					$y = date("Y", $timestamp);
-					$m = date("m", $timestamp);
-					$d = date("d", $timestamp);
+					if ($Html -> gen_date("m", $time) < $value) { $timestamp = strtotime("-1 years", $timestamp); }
+					$y = $Html -> gen_date("Y", $timestamp);
+					$m = $Html -> gen_date("m", $timestamp);
+					$d = $Html -> gen_date("d", $timestamp);
 					$newtime = strtotime($y . '-' . $m . '-01 00:00:00');
 					break;
 			}									
@@ -178,10 +180,10 @@ if (!class_exists('newsletters_lite')) {
 		}
 		
 		function lite_current_emails_all($sendlimit = null, $sendlimitinterval = null, $sendlimitstart = null) {
-			global $History, $Email, $wpdb;
+			global $History, $Email, $wpdb, $Html;
 			$emailscount = false;
 			
-			$prevtime = date("Y-m-d H:i:s", $this -> lite_prevtime(false, $sendlimitinterval, $sendlimitstart));
+			$prevtime = $Html -> gen_date("Y-m-d H:i:s", $this -> lite_prevtime(false, $sendlimitinterval, $sendlimitstart));
 			$email_table = $wpdb -> prefix . $Email -> table;
 			$history_table = $wpdb -> prefix . $History -> table;
 			

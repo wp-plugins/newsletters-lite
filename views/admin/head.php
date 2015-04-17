@@ -4,8 +4,19 @@ var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 var newsletters_ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 var wpmlUrl = '<?php echo $this -> url(); ?>';
 
-<?php if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) : ?>
-	jQuery(document).ready(function() {
+<?php if (true || !empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) : ?>
+	jQuery.noConflict();
+	$ = jQuery.noConflict();
+
+	jQuery(document).ready(function() {		
+		if (jQuery.isFunction(jQuery.fn.select2)) {
+			jQuery('.newsletters select, .newsletters_select2').select2({});
+			
+			jQuery('.newsletters select[name="perpage"]').select2({
+				tags: true
+			});
+		}
+		
 		if (jQuery.isFunction(jQuery.fn.tooltip)) {
 			jQuery(".wpmlhelp a").tooltip({
 				tooltipClass: 'newsletters-ui-tooltip',

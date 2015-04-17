@@ -30,7 +30,7 @@
 					</th>
 					<th class="column-link_id <?php echo ($orderby == "link_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=link_id&order=' . (($orderby == "link_id") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Link', $this -> plugin_name); ?></span>
+							<span><?php _e('Link/Referer', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -59,7 +59,7 @@
 					</th>
 					<th class="column-link_id <?php echo ($orderby == "link_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=link_id&order=' . (($orderby == "link_id") ? $otherorder : "asc")); ?>">
-							<span><?php _e('Link', $this -> plugin_name); ?></span>
+							<span><?php _e('Link/Referer', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -115,6 +115,8 @@
 								<?php if (!empty($click -> link_id)) : ?>
 									<?php $link = $this -> Link -> find(array('id' => $click -> link_id)); ?>
 									<?php echo $Html -> link($link -> link, $link -> link, array('target' => "_blank")); ?>
+								<?php elseif (!empty($click -> referer)) : ?>
+									<?php echo $this -> Click -> referer_name($click -> referer); ?>
 								<?php else : ?>
 									<?php _e('None', $this -> plugin_name); ?>
 								<?php endif; ?>
@@ -150,6 +152,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'clicksperpage']) && $_COOKIE[$this -> pre . 'clicksperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'clicksperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'clicksperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'clicksperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				

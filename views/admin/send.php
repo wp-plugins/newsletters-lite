@@ -6,8 +6,12 @@ var contentarea = 1;
 
 global $ID, $post, $post_ID, $wp_meta_boxes, $errors;
 
-$ID = $this -> get_option('imagespost');
-$post_ID = $this -> get_option('imagespost');
+$imagespost = $this -> get_option('imagespost');
+$p_id = (empty($_POST['p_id'])) ? $imagespost : $_POST['p_id'];
+$ID = $p_id;
+$post_ID = $p_id;
+
+wp_enqueue_media(array('post' => $p_id));
 
 wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false);
 wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
@@ -24,6 +28,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 		<?php wp_nonce_field($this -> sections -> send); ?>
 		<input type="hidden" name="group" value="all" />
 		<input type="hidden" id="ishistory" name="ishistory" value="<?php echo $_POST['ishistory']; ?>" />
+		<input type="hidden" id="p_id" name="p_id" value="<?php echo $_POST['p_id']; ?>" />
 		<input type="hidden" name="inctemplate" value="<?php echo $_POST['inctemplate']; ?>" />
 		<input type="hidden" name="recurringsent" value="<?php echo esc_attr(stripslashes($_POST['sendrecurringsent'])); ?>" />
 		<input type="hidden" name="post_id" value="<?php echo esc_attr(stripslashes($_POST['post_id'])); ?>" />
@@ -58,12 +63,18 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						ob_start();
 						
 						echo "function (ed) {
-							ed.onChange.add(function (ed, l) {
+							/*ed.onChange.add(function (ed, l) {
 								jQuery('#previewiframe').contents().find('html div.newsletters_content').html(l.content);
+							});*/
+							
+							ed.on('change', function(e) {
+								jQuery('#previewiframe').contents().find('html div.newsletters_content').html(ed.getContent());
 							});
 						
-							ed.onKeyDown.add(function (ed, evt) {
-				            	var content = jQuery('iframe#content_ifr').contents().find('body#tinymce').html();
+							//ed.onKeyDown.add(function (ed, evt) {
+							ed.on('keydown', function(e) {
+				            	//var content = jQuery('iframe#content_ifr').contents().find('body#tinymce').html();
+				            	var content = ed.getContent();
 				            	jQuery('#previewiframe').contents().find('html div.newsletters_content').html(content);
 				            	
 								var val = jQuery.trim(content),  
@@ -82,7 +93,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						?>
 						
 						<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
-							<?php wp_editor(stripslashes($_POST['content']), 'content', array('tabindex' => "2", 'tinymce' => $tinymce, 'drag_drop_upload' => true)); ?>
+							<?php wp_editor(stripslashes($_POST['content']), 'content', array('tabindex' => "2", 'tinymce' => $tinymce)); ?>
 						<?php else : ?>
 							<?php the_editor(stripslashes($_POST['content']), 'content', 'title', true, 2); ?>
 						<?php endif; ?>
@@ -108,68 +119,11 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						<?php endif; ?>
 						
 						<p>
-							<a href="" onclick="addcontentarea(); return false;" class="button button-secondary"><?php _e('Add Content Area', $this -> plugin_name); ?></a>
-							<span id="contentarea_loading" style="display:none;"><span class="newsletters_loading"></span></span>
+							<a href="" onclick="addcontentarea(); return false;" id="addcontentarea_button" class="button button-secondary"><?php _e('Add Content Area', $this -> plugin_name); ?></a>
+							<span id="contentarea_loading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 						</p>
 						<div id="contentareas">
-							<?php
-
-							if (!empty($_POST['ishistory'])) {
-								$history_id = $_POST['ishistory'];
-								if ($contentareas = $this -> Content -> find_all(array('history_id' => $history_id), false, array('number', "ASC"))) {
-									foreach ($contentareas as $contentarea) {
-										?>
-										
-										<div class="postbox" id="contentareabox<?php echo $contentarea -> number; ?>">
-											<div class="handlediv" title="Click to toggle"><br></div>
-											<h3 class="hndle"><span><?php echo sprintf(__('Content Area %s', $this -> plugin_name), $contentarea -> number); ?></span></h3>
-											<div class="inside">
-												<?php
-												
-												$settings = array(
-													//'wpautop'			=>	false,
-													'media_buttons'		=>	true,
-													'textarea_name'		=>	'contentarea[' . $contentarea -> number . ']',
-													'textarea_rows'		=>	10,
-													'quicktags'			=>	true,
-													'entities'			=>	"",
-													'entity_encoding'	=>	"raw",
-												);
-												
-												wp_editor(stripslashes($contentarea -> content), 'contentarea' . $contentarea -> number, $settings); 
-												
-												?>
-												<table id="post-status-info" cellpadding="0" cellspacing="0">
-													<tbody>
-														<tr>
-															<td id="wp-word-count">
-																<span id="word-count">
-																	<?php echo sprintf(__('Use shortcode %s to display this content', $this -> plugin_name), '<code>[newsletters_content id="' . $contentarea -> number . '"]</code>'); ?>
-																	<br/><?php echo sprintf(__('And use %s to conditionally display if it is available.', $this -> plugin_name), '<code>[newsletters_if newsletters_content id="' . $contentarea -> number . '"]...[/newsletters_if]</code>'); ?>
-																</span>
-															</td>
-															<td class="autosave-info">
-																<span id="autosave" style="display:none;"></span>
-															</td>
-														</tr>
-													</tbody>
-												</table>
-												
-												<p>
-													<a href="" onclick="if (confirm('<?php echo __('Are you sure you want to remove this content area?', $this -> plugin_name); ?>')) { deletecontentarea('<?php echo $contentarea -> number; ?>', '<?php echo $contentarea -> history_id; ?>'); } return false;" class="button button-secondary"><?php _e('Delete', $this -> plugin_name); ?></a>
-												</p>
-											</div>
-										</div>
-										<script type="text/javascript">
-										contentarea++;
-										</script>
-										
-										<?php
-									}
-								}
-							}
-							
-							?>
+							<!-- Content Areas Go Here -->
 						</div>
 					</div>
 				</div>
@@ -188,9 +142,9 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	jQuery('#title').Watermark('<?php echo addslashes(__('Enter email subject here', $this -> plugin_name)); ?>');
-	jQuery('#daterangefrom').Watermark('eg. <?php echo date_i18n("Y-m-d", strtotime("-1 month")); ?>');
-	jQuery('#daterangeto').Watermark('eg. <?php echo date_i18n("Y-m-d", time()); ?>');
+	jQuery('#title').Watermark('<?php echo addslashes(__('Enter email subject here', $this -> plugin_name)); ?>').focus();
+	jQuery('#daterangefrom').Watermark('eg. <?php echo $Html -> gen_date("Y-m-d", strtotime("-1 month")); ?>');
+	jQuery('#daterangeto').Watermark('eg. <?php echo $Html -> gen_date("Y-m-d", time()); ?>');
 });
 
 var warnMessage = "<?php echo addslashes(__('You have unsaved changes on this page! All unsaved changes will be lost and it cannot be undone.', $this -> plugin_name)); ?>";
@@ -200,6 +154,7 @@ function deletecontentarea(number, history_id) {
 		var data = {number:number, history_id:history_id};
 		jQuery.post(wpmlajaxurl + '?action=newsletters_deletecontentarea', data, function(response) {
 			//all good, the request was successful
+			
 		});
 	} else {
 		tinyMCE.execCommand("mceRemoveEditor", false, 'contentarea' + number);
@@ -210,9 +165,11 @@ function deletecontentarea(number, history_id) {
 }
 
 function addcontentarea() {	
+	jQuery('#addcontentarea_button').disabled = true;
 	jQuery('#contentarea_loading').show();
 	jQuery.post(wpmlajaxurl + '?action=newsletters_load_new_editor', {contentarea:contentarea}, function(response) {
 		jQuery('#contentareas').append(response);
+		jQuery('#addcontentarea_button').disabled = false;
 		
 		if (typeof(tinyMCE) == "object" && typeof(tinyMCE.execCommand) == "function") {
 			jQuery('#contentarea_loading').hide();
@@ -225,17 +182,82 @@ function addcontentarea() {
 }
 
 jQuery(document).ready(function() {
+	var media = wp.media;
+
+	if ( media ) {
+
+		media.view.MediaFrame.Select.prototype.initialize = function() {
+
+			media.view.MediaFrame.prototype.initialize.apply( this, arguments );
+
+			_.defaults( this.options, {
+				selection: [],
+				library: { 
+							uploadedTo: media.view.settings.post.id, 
+							orderby: 'menuOrder', 
+							order: 'ASC' 
+				},
+				multiple: false,
+				state: 'library'
+			});
+
+			this.createSelection();
+			this.createStates();
+			this.bindHandlers();
+		};
+		
+		media.controller.FeaturedImage.prototype.initialize = function() {
+
+			var library, comparator;
+
+			if ( ! this.get('library') ) {
+				this.set( 'library', media.query( { 
+												type: 'image', 
+												uploadedTo: media.view.settings.post.id, 
+												orderby: 'menuOrder', 
+												order: 'ASC' 
+											} ) );
+			}
+
+			media.controller.Library.prototype.initialize.apply( this, arguments );
+
+			library    = this.get('library');
+			comparator = library.comparator;
+
+			library.comparator = function( a, b ) {
+				var aInQuery = !! this.mirroring.get( a.cid ),
+					bInQuery = !! this.mirroring.get( b.cid );
+
+				if ( ! aInQuery && bInQuery ) {
+					return -1;
+				} else if ( aInQuery && ! bInQuery ) {
+					return 1;
+				} else {
+					return comparator.apply( this, arguments );
+				}
+			};
+
+			library.observe( this.get('selection') );
+		};
+		
+	}
+	
+	_wpMediaViewsL10n.insertIntoPost = "<?php _e('Insert into Newsletter', $this -> plugin_name); ?>";
+	_wpMediaViewsL10n.uploadedToThisPost = "<?php _e('Uploaded to this Newsletter', $this -> plugin_name); ?>";
+	
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 
     jQuery('input:not(:button,:submit),textarea,select').change(function() {
-    	<?php $createpreview = $this -> get_option('createpreview'); ?>
-    	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
-    		previewrunner();
-    	<?php endif; ?>
-    	<?php $createspamscore = $this -> get_option('createspamscore'); ?>
-    	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>
-    		//spamscorerunner();
-    	<?php endif; ?>
+	    setTimeout(function() {
+	    	<?php $createpreview = $this -> get_option('createpreview'); ?>
+	    	<?php if (!empty($createpreview) && $createpreview == "Y") : ?>
+	    		previewrunner();
+	    	<?php endif; ?>
+	    	<?php $createspamscore = $this -> get_option('createspamscore'); ?>
+	    	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>
+	    		//spamscorerunner();
+	    	<?php endif; ?>
+	    }, 5000);
     
         window.onbeforeunload = function () {
             if (warnMessage != null) return warnMessage;

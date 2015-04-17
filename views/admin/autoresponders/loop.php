@@ -200,7 +200,7 @@
 	                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Active', $this -> plugin_name); ?></span>
 	                            <?php endif; ?>
 	                        </td>
-	                        <td><abbr title="<?php echo $autoresponder -> modified; ?>"><?php echo date_i18n("Y-m-d", strtotime($autoresponder -> modified)); ?></abbr></td>
+	                        <td><abbr title="<?php echo $autoresponder -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($autoresponder -> modified)); ?></abbr></td>
 	                    </tr>
 	                <?php endforeach; ?>
 	            <?php endif; ?>
@@ -217,6 +217,9 @@
 							<option <?php echo (!empty($_COOKIE[$this -> pre . 'autorespondersperpage']) && $_COOKIE[$this -> pre . 'autorespondersperpage'] == $p) ? 'selected="selected"' : ''; ?> value="<?php echo $p; ?>"><?php echo $p; ?> <?php _e('per page', $this -> plugin_name); ?></option>
 							<?php $p += 5; ?>
 						<?php endwhile; ?>
+						<?php if (isset($_COOKIE[$this -> pre . 'autorespondersperpage'])) : ?>
+							<option selected="selected" value="<?php echo $_COOKIE[$this -> pre . 'autorespondersperpage']; ?>"><?php echo $_COOKIE[$this -> pre . 'autorespondersperpage']; ?></option>
+						<?php endif; ?>
 					</select>
 				<?php endif; ?>
 				
@@ -229,8 +232,8 @@
 				}
 				
 				function change_sorting(field, dir) {
-					document.cookie = "<?php echo $this -> pre; ?>autoresponderssorting=" + field + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
-					document.cookie = "<?php echo $this -> pre; ?>autoresponders" + field + "dir=" + dir + "; expires=<?php echo date_i18n($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>autoresponderssorting=" + field + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
+					document.cookie = "<?php echo $this -> pre; ?>autoresponders" + field + "dir=" + dir + "; expires=<?php echo $Html -> gen_date($this -> get_option('cookieformat'), strtotime("+30 days")); ?> UTC; path=/";
 					window.location = "<?php echo preg_replace("/\&?" . $this -> pre . "page\=(.*)?/si", "", $_SERVER['REQUEST_URI']); ?>";
 				}
 				</script>
