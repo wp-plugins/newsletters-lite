@@ -789,7 +789,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			
 			$Db -> model = $Field -> model;
 			$fieldsconditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
-			$fields = $Db -> find_all($$fieldsconditions);
+			$fields = $Db -> find_all($fieldsconditions);
 				
 			if (!empty($id)) {
 				$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET";

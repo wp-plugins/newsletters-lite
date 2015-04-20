@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.1';
+		var $version = '4.5.1.1';
 		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -6703,11 +6703,11 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.1") < 0) {
+				if (version_compare($cur_version, "4.5.1.1") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
-					$version = '4.5.1';	
+					$version = '4.5.1.1';	
 				}
 			
 				//the current version is older.
