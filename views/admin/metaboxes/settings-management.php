@@ -17,7 +17,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
             		<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$managementpost = $this -> language_split($this -> get_managementpost(false));
+					$managementpost = $this -> get_managementpost(false);
 					
 					?>
 					<div id="managementposttabs">
@@ -58,7 +58,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
 					<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$managelinktext = $this -> language_split($this -> get_option('managelinktext'));
+					$managelinktext = $this -> get_option('managelinktext');
 					
 					?>
 					<div id="managelinktexttabs">
@@ -73,7 +73,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="managelinktexttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="managelinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($managelinktext[$language])); ?>" id="managelinktext_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="managelinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $managelinktext))); ?>" id="managelinktext_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -99,7 +99,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
             		<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$managementloginsubject = $this -> language_split($this -> get_option('managementloginsubject'));
+					$managementloginsubject = $this -> get_option('managementloginsubject');
 					
 					?>
 					<div id="managementloginsubjecttabs">
@@ -114,7 +114,7 @@ $managementshowsubscriptions = $this -> get_option('managementshowsubscriptions'
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="managementloginsubjecttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="managementloginsubject[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($managementloginsubject[$language])); ?>" id="managementloginsubject_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="managementloginsubject[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $managementloginsubject))); ?>" id="managementloginsubject_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>

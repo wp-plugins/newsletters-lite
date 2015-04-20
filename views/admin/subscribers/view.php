@@ -73,15 +73,14 @@
 						<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 							<th><?php echo __($field -> title); ?></th>
 							<td>
+								<?php $newfieldoptions = $field -> newfieldoptions; ?>
 								<?php if ($field -> type == "radio" || $field -> type == "select") : ?>
-									<?php $fieldoptions = unserialize($field -> fieldoptions); ?>
-									<?php echo __($fieldoptions[$subscriber -> {$field -> slug}]); ?>
+									<?php echo __($newfieldoptions[$subscriber -> {$field -> slug}]); ?>
 								<?php elseif ($field -> type == "checkbox") : ?>
 									<?php $supoptions = unserialize($subscriber -> {$field -> slug}); ?>
-									<?php $fieldoptions = unserialize($field -> fieldoptions); ?>
 									<?php if (!empty($supoptions) && is_array($supoptions)) : ?>
 										<?php foreach ($supoptions as $supopt) : ?>
-											&raquo;&nbsp;<?php echo __($fieldoptions[$supopt]); ?><br/>
+											&raquo;&nbsp;<?php echo __($newfieldoptions[$supopt]); ?><br/>
 										<?php endforeach; ?>
 									<?php else : ?>
 										<?php _e('none', $this -> plugin_name); ?>

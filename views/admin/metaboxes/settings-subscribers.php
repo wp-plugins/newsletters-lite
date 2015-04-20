@@ -85,7 +85,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
             		<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$subscriberexistsmessage = $this -> language_split($this -> get_option('subscriberexistsmessage'));
+					$subscriberexistsmessage = $this -> get_option('subscriberexistsmessage');
 					
 					?>
 					<div id="subscriberexistsmessagetabs">
@@ -100,7 +100,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="subscriberexistsmessagetab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="subscriberexistsmessage[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($subscriberexistsmessage[$language])); ?>" id="subscriberexistsmessage_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="subscriberexistsmessage[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $subscriberexistsmessage))); ?>" id="subscriberexistsmessage_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -131,7 +131,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 					<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$onlinelinktext = $this -> language_split($this -> get_option('onlinelinktext'));
+					$onlinelinktext = $this -> get_option('onlinelinktext');
 					
 					?>
 					<div id="onlinelinktexttabs">
@@ -146,7 +146,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="onlinelinktexttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="onlinelinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($onlinelinktext[$language])); ?>" id="onlinelinktext_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="onlinelinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $onlinelinktext))); ?>" id="onlinelinktext_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -172,7 +172,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 					<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$printlinktext = $this -> language_split($this -> get_option('printlinktext'));
+					$printlinktext = $this -> get_option('printlinktext');
 					
 					?>
 					<div id="printlinktexttabs">
@@ -187,7 +187,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="printlinktexttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="printlinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($printlinktext[$language])); ?>" id="printlinktext_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="printlinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $printlinktext))); ?>" id="printlinktext_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -244,7 +244,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 						<?php 
 					
 						$el = $this -> language_getlanguages(); 
-						$activationlinktext = $this -> language_split($this -> get_option('activationlinktext'));
+						$activationlinktext = $this -> get_option('activationlinktext');
 						
 						?>
 						<div id="activationlinktexttabs">
@@ -259,7 +259,7 @@ $currentusersubscribed = $this -> get_option('currentusersubscribed');
 				            <?php $tabnumber = 1; ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="activationlinktexttab<?php echo $tabnumber; ?>">
-				            		<input type="text" name="activationlinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($activationlinktext[$language])); ?>" id="activationlinktext_<?php echo $language; ?>" class="widefat" />
+				            		<input type="text" name="activationlinktext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $activationlinktext))); ?>" id="activationlinktext_<?php echo $language; ?>" class="widefat" />
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>

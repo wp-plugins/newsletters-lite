@@ -786,6 +786,10 @@ class wpmlSubscriber extends wpMailPlugin {
 				$data['registered'] = $registered = "Y";
 				$data['user_id'] = $user_id = $userid;
 			}
+			
+			$Db -> model = $Field -> model;
+			$fieldsconditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
+			$fields = $Db -> find_all($$fieldsconditions);
 				
 			if (!empty($id)) {
 				$query = "UPDATE `" . $wpdb -> prefix . "" . $this -> table . "` SET";
@@ -796,7 +800,7 @@ class wpmlSubscriber extends wpMailPlugin {
 						
 				/* Custom Fields */	
 				$usedfields = array();
-				$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
+				/*$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
 				
 				$query_hash = md5($fieldsquery);
 				if ($ob_fields = $this -> get_cache($query_hash)) {
@@ -804,15 +808,16 @@ class wpmlSubscriber extends wpMailPlugin {
 				} else {
 					$fields = $wpdb -> get_results($fieldsquery);
 					$this -> set_cache($query_hash, $fields);
-				}
+				}*/
 				
 				if (!empty($fields)) {				
 					foreach ($fields as $field) {
 						if ((empty($usedfields)) || (!empty($usedfields) && !in_array($field -> slug, $usedfields))) {						
-							if (!empty($data[$field -> slug])) {							
+							//if (!empty($data[$field -> slug])) {															
 								if (!empty($field -> type) && ($field -> type == "radio" || $field -> type == "select")) {
-									$fieldoptions = maybe_unserialize($field -> fieldoptions);
-									$fieldoptions = array_map('__', $fieldoptions);
+									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
+									$fieldoptions = $field -> newfieldoptions;
+									//$fieldoptions = array_map('__', $fieldoptions);
 									
 									if (array_key_exists($data[$field -> slug], $fieldoptions)) {
 										//do nothing, it is okay?
@@ -822,11 +827,13 @@ class wpmlSubscriber extends wpMailPlugin {
 									
 									}
 								} elseif ($field -> type == "checkbox") {
-									$fieldoptions = maybe_unserialize($field -> fieldoptions);
-									$fieldoptions = array_map('__', $fieldoptions);
+									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
+									$fieldoptions = newfieldoptions;
+									//$fieldoptions = array_map('__', $fieldoptions);
+									$data[$field -> slug] = maybe_serialize($data[$field -> slug]);
 									
 									if (!empty($data[$field -> slug])) {
-										$array = $data[$field -> slug];
+										/*$array = $data[$field -> slug];
 										
 										$newarray = array();
 										foreach ($array as $akey => $aval) {										
@@ -839,7 +846,7 @@ class wpmlSubscriber extends wpMailPlugin {
 											}
 										}
 										
-										$data[$field -> slug] = maybe_serialize($newarray);
+										$data[$field -> slug] = maybe_serialize($newarray);*/
 									}
 								} elseif ($field -> type == "pre_gender") {
 									if (!empty($data[$field -> slug])) {
@@ -859,7 +866,7 @@ class wpmlSubscriber extends wpMailPlugin {
 								}
 							
 								$query .= " `" . $field -> slug . "` = '" . (esc_sql($data[$field -> slug])) . "', ";
-							}
+							//}
 						
 							$usedfields[] = $field -> slug;
 						}
@@ -891,7 +898,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				
 				/* Custom Fields */
 				$usedfields = array();				
-				$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
+				/*$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
 				
 				$query_hash = md5($fieldsquery);
 				if ($ob_fields = $this -> get_cache($query_hash)) {
@@ -899,15 +906,16 @@ class wpmlSubscriber extends wpMailPlugin {
 				} else {
 					$fields = $wpdb -> get_results($fieldsquery);
 					$this -> set_cache($query_hash, $fields);
-				}
+				}*/
 				
 				if (!empty($fields)) {
 					foreach ($fields as $field) {
 						if (empty($usedfields) || (!empty($usedfields) && !in_array($field -> slug, $usedfields))) {
-							if (!empty($data[$field -> slug])) {								
+							//if (!empty($data[$field -> slug])) {								
 								if (!empty($field -> type) && ($field -> type == "radio" || $field -> type == "select")) {
-									$fieldoptions = maybe_unserialize($field -> fieldoptions);
-									$fieldoptions = array_map('__', $fieldoptions);
+									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
+									//$fieldoptions = array_map('__', $fieldoptions);
+									$fieldoptions = $field -> newfieldoptions;
 									
 									if (array_key_exists($data[$field -> slug], $fieldoptions)) {
 										//do nothing, it is okay?
@@ -917,10 +925,12 @@ class wpmlSubscriber extends wpMailPlugin {
 										
 									}
 								} elseif ($field -> type == "checkbox") {
-									$fieldoptions = maybe_unserialize($field -> fieldoptions);
-									$fieldoptions = array_map('__', $fieldoptions);
+									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
+									//$fieldoptions = array_map('__', $fieldoptions);
+									$fieldoptions = $field -> newfieldoptions;
+									$data[$field -> slug] = maybe_serialize($data[$field -> slug]);
 									
-									if (!empty($data[$field -> slug])) {
+									/*if (!empty($data[$field -> slug])) {
 										$array = $data[$field -> slug];
 										
 										$newarray = array();
@@ -935,7 +945,7 @@ class wpmlSubscriber extends wpMailPlugin {
 										}
 										
 										$data[$field -> slug] = maybe_serialize($newarray);
-									}
+									}*/
 								} elseif ($field -> type == "pre_gender") {
 									if (!empty($data[$field -> slug])) {
 										$data[$field -> slug] = strtolower($data[$field -> slug]);
@@ -955,7 +965,7 @@ class wpmlSubscriber extends wpMailPlugin {
 								
 								$query1 .= "`" . $field -> slug . "`, ";
 								$query2 .= "'" . esc_sql($data[$field -> slug]) . "', ";
-							}
+							//}
 						
 							$usedfields[] = $field -> slug;
 						}

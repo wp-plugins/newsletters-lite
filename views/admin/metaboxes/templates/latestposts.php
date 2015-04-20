@@ -27,7 +27,7 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etmessage_latestposts')); ?>
+				            <?php $texts = $this -> get_option('etmessage_latestposts'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetablatestposts<?php echo $tabnumber; ?>">
 					            	<?php 
@@ -40,10 +40,9 @@ if ($this -> language_do()) {
 										'quicktags'			=>	true,
 									);
 									
-									wp_editor(stripslashes($texts[$language]), 'etmessage_latestposts_' . $language, $settings); 
+									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_latestposts_' . $language, $settings); 
 									
 									?>
-				            		<?php /*<textarea name="etmessage_latestposts[<?php echo $language; ?>]" id="etmessage_latestposts_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>

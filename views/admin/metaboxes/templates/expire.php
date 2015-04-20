@@ -27,10 +27,10 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etsubject_expire')); ?>
+				            <?php $texts = $this -> get_option('etsubject_expire'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabexpire<?php echo $tabnumber; ?>">
-				            		<input type="text" name="etsubject_expire[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($texts[$language])); ?>" id="etsubject_expire_<?php echo $language; ?>" class="widefat" />
+				            		<input type="text" name="etsubject_expire[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $texts))); ?>" id="etsubject_expire_<?php echo $language; ?>" class="widefat" />
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -64,7 +64,7 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etmessage_expire')); ?>
+				            <?php $texts = $this -> get_option('etmessage_expire'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabexpiremessage<?php echo $tabnumber; ?>">
 					            	<?php 
@@ -77,10 +77,9 @@ if ($this -> language_do()) {
 										'quicktags'			=>	true,
 									);
 									
-									wp_editor(stripslashes($texts[$language]), 'etmessage_expire_' . $language, $settings); 
+									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_expire_' . $language, $settings); 
 									
 									?>
-				            		<?php /*<textarea name="etmessage_expire[<?php echo $language; ?>]" id="etmessage_expire_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>

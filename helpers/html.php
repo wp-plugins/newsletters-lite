@@ -801,11 +801,13 @@ class wpmlHtmlHelper extends wpMailPlugin {
 						
 						return trim(@implode("\r\n", $optionarray));
 					} else {
-						if ($texts = $this -> language_split($value)) {
+						/*if ($texts = $this -> language_split($value)) {
 							if (!empty($texts[$language])) {
 								return $texts[$language];
 							}
-						}
+						}*/
+						
+						return $this -> language_use($language, $value);
 					}
 				}
 			}

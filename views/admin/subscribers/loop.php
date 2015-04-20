@@ -246,42 +246,41 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		                    <?php if (!empty($columns)) : ?>
 		                    	<?php foreach ($columns as $column) : ?>
 		                        	<td>
-		                        	<?php if (!empty($subscriber -> {$column -> slug})) : ?>
-										<?php if ($column -> type == "radio" || $column -> type == "select") : ?>
-		                                    <?php $fieldoptions = unserialize($column -> fieldoptions); ?>
-		                                    <?php echo __($fieldoptions[$subscriber -> {$column -> slug}]); ?>
-		                                <?php elseif ($column -> type == "checkbox") : ?>
-		                                    <?php $supoptions = unserialize($subscriber -> {$column -> slug}); ?>
-		                                    <?php $fieldoptions = unserialize($column -> fieldoptions); ?>
-		                                    <?php if (!empty($supoptions) && is_array($supoptions)) : ?>
-		                                        <?php foreach ($supoptions as $supopt) : ?>
-		                                            &raquo;&nbsp;<?php echo __($fieldoptions[$supopt]); ?><br/>
-		                                        <?php endforeach; ?>
-		                                    <?php else : ?>
-		                                        <?php _e('none', $this -> plugin_name); ?>
-		                                    <?php endif; ?>
-		                                <?php elseif ($column -> type == "file") : ?>
-		                                	<?php echo $Html -> file_custom_field($subscriber -> {$column -> slug}); ?>
-		                                <?php elseif ($column -> type == "pre_country") : ?>
-		                                    <?php $Db -> model = $wpmlCountry -> model; ?>
-		                                    <?php echo $Db -> field('value', array('id' => $subscriber -> {$column -> slug})); ?>
-		                                <?php elseif ($column -> type == "pre_date") : ?>
-		                                	<?php if (is_serialized($subscriber -> {$column -> slug})) : ?>
-			                                    <?php $date = @unserialize($subscriber -> {$column -> slug}); ?>
-			                                    <?php if (!empty($date) && is_array($date)) : ?>
-			                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+			                        	<?php $newfieldoptions = $column -> newfieldoptions; ?>
+			                        	<?php if (!empty($subscriber -> {$column -> slug})) : ?>
+											<?php if ($column -> type == "radio" || $column -> type == "select") : ?>
+			                                    <?php echo __($newfieldoptions[$subscriber -> {$column -> slug}]); ?>
+			                                <?php elseif ($column -> type == "checkbox") : ?>
+			                                    <?php $supoptions = maybe_unserialize($subscriber -> {$column -> slug}); ?>
+			                                    <?php if (!empty($supoptions) && is_array($supoptions)) : ?>
+			                                        <?php foreach ($supoptions as $supopt) : ?>
+			                                            &raquo;&nbsp;<?php echo __($newfieldoptions[$supopt]); ?><br/>
+			                                        <?php endforeach; ?>
+			                                    <?php else : ?>
+			                                        <?php _e('none', $this -> plugin_name); ?>
 			                                    <?php endif; ?>
+			                                <?php elseif ($column -> type == "file") : ?>
+			                                	<?php echo $Html -> file_custom_field($subscriber -> {$column -> slug}); ?>
+			                                <?php elseif ($column -> type == "pre_country") : ?>
+			                                    <?php $Db -> model = $wpmlCountry -> model; ?>
+			                                    <?php echo $Db -> field('value', array('id' => $subscriber -> {$column -> slug})); ?>
+			                                <?php elseif ($column -> type == "pre_date") : ?>
+			                                	<?php if (is_serialized($subscriber -> {$column -> slug})) : ?>
+				                                    <?php $date = maybe_unserialize($subscriber -> {$column -> slug}); ?>
+				                                    <?php if (!empty($date) && is_array($date)) : ?>
+				                                        <?php echo $date['y']; ?>-<?php echo $date['m']; ?>-<?php echo $date['d']; ?>
+				                                    <?php endif; ?>
+				                                <?php else : ?>
+				                                	<?php echo $Html -> gen_date(false, strtotime($subscriber -> {$column -> slug})); ?>
+				                                <?php endif; ?>
+			                                <?php elseif ($column -> type == "pre_gender") : ?>
+			                                	<?php echo (!empty($subscriber -> {$column -> slug}) && $subscriber -> {$column -> slug} == "male") ? __('Male', $this -> plugin_name) : __('Female', $this -> plugin_name); ?>
 			                                <?php else : ?>
-			                                	<?php echo $Html -> gen_date(false, strtotime($subscriber -> {$column -> slug})); ?>
+			                                    <?php echo $subscriber -> {$column -> slug}; ?>
 			                                <?php endif; ?>
-		                                <?php elseif ($column -> type == "pre_gender") : ?>
-		                                	<?php echo (!empty($subscriber -> {$column -> slug}) && $subscriber -> {$column -> slug} == "male") ? __('Male', $this -> plugin_name) : __('Female', $this -> plugin_name); ?>
-		                                <?php else : ?>
-		                                    <?php echo $subscriber -> {$column -> slug}; ?>
-		                                <?php endif; ?>
-		                            <?php else : ?>
-		                            
-		                            <?php endif; ?>
+			                            <?php else : ?>
+			                            
+			                            <?php endif; ?>
 		                            </td>
 		                        <?php endforeach; ?>
 		                    <?php endif; ?>

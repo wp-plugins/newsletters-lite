@@ -451,11 +451,12 @@ select.wpml {
 /* Admin Bar */
 
 #wpadminbar .newsletters-lite a:before {
-    font-family: 'newsletters_dashicons' !important;
-    content: '\f466';
+    font-family: 'FontAwesome' !important;
+    content: "\f0e0";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 20px;
+    font-size: 16px;
+    top: 3px;
 }
 
 #wpadminbar .newsletters-lite {

@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5
+Version: 4.5.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -386,7 +386,7 @@ if (!class_exists('wpMail')) {
 					if (!empty($showmessage_ratereview) && empty($hidemessage_ratereview)) {
 						$rate_url = "https://wordpress.org/support/view/plugin-reviews/newsletters-lite?rate=5#postform";
 						$works_url = "http://wordpress.org/plugins/newsletters-lite/?compatibility[version]=" . get_bloginfo("version") . "&compatibility[topic_version]=" . $this -> version . "&compatibility[compatible]=1";
-						$message = sprintf(__('You have been using %s for %s days or more. Please consider %s it and say it %s on %s', $this -> plugin_name), '<a href="https://wordpress.org/plugins/newsletters-lite/" target="_blank">' . __('Tribulant Newsletters', $this -> plugin_name) . '</a>', $showmessage_ratereview, '<a href="' . $rate_url . '" target="_blank" class="button">' . __('Rating', $this -> plugin_name) . '</a>', '<a href="' . $works_url . '" target="_blank" class="button">' . __('Works', $this -> plugin_name) . '</a>', '<a href="http://wordpress.org/plugins/newsletters-lite/" target="_blank">WordPress.org</a>');
+						$message = sprintf(__('You have been using %s for %s days or more. Please consider %s it and say it %s on %s', $this -> plugin_name), '<a href="https://wordpress.org/plugins/newsletters-lite/" target="_blank">' . __('Tribulant Newsletters', $this -> plugin_name) . '</a>', $showmessage_ratereview, '<a href="' . $rate_url . '" target="_blank" class="button"><i class="fa fa-star"></i> ' . __('Rating', $this -> plugin_name) . '</a>', '<a href="' . $works_url . '" target="_blank" class="button"><i class="fa fa-thumbs-o-up"></i> ' . __('Works', $this -> plugin_name) . '</a>', '<a href="http://wordpress.org/plugins/newsletters-lite/" target="_blank">WordPress.org</a>');
 						$message .= ' <a style="text-decoration:none;" href="' . admin_url('admin.php?page=' . $this -> sections -> welcome . '&newsletters_method=hidemessage&message=ratereview') . '" class=""><i class="fa fa-times"></i></a>';
 						$this -> render_message($message);
 					}
@@ -418,7 +418,7 @@ if (!class_exists('wpMail')) {
 				// Database update required?
 				$showmessage_dbupdate = $this -> get_option('showmessage_dbupdate');
 				if (!empty($showmessage_dbupdate)) {
-					$message = sprintf(__('Newsletters requires a database update to continue, %s', $this -> plugin_name), '<a href="' . $Html -> retainquery('newsletters_method=dbupdate') . '">' . __('do it now', $this -> plugin_name) . '</a>');
+					$message = sprintf(__('Newsletters requires a database update to continue %s', $this -> plugin_name), '<a class="button" href="' . $Html -> retainquery('newsletters_method=dbupdate') . '">' . __('do it now', $this -> plugin_name) . '</a>');
 					$message .= $Html -> help(__('Depending on your current database, this may take some time. If it times out for any reason, please refresh.', $this -> plugin_name));
 					$this -> render_error($message);
 				}
@@ -426,8 +426,8 @@ if (!class_exists('wpMail')) {
 				// Show about notice?
 				$showmessage_about = $this -> get_option('showmessage_about');
 				if (!empty($showmessage_about) && (empty($_GET['page']) || $_GET['page'] != "newsletters-about")) {
-					$message = sprintf(__('Welcome to Tribulant Newsletters %s. See what is new %s', $this -> plugin_name), '<strong>' . $this -> version . '</strong>', '<a class="button button-primary" href="' . admin_url('index.php?page=newsletters-about') . '">' . __('About this Update', $this -> plugin_name) . '</a>');
-					$message .= ' <a class="button button-secondary" href="' . $Html -> retainquery('newsletters_method=hidemessage&message=about') . '">' . __('Hide', $this -> plugin_name) . '</a>';
+					$message = sprintf(__('Welcome to Tribulant Newsletters %s. See what is new %s', $this -> plugin_name), '<strong>' . $this -> version . '</strong>', '<a class="button button-primary" href="' . admin_url('index.php?page=newsletters-about') . '"><i class="fa fa-info-circle"></i> ' . __('About this Update', $this -> plugin_name) . '</a>');
+					$message .= ' <a class="button button-secondary" href="' . $Html -> retainquery('newsletters_method=hidemessage&message=about') . '"><i class="fa fa-times"></i> ' . __('Hide', $this -> plugin_name) . '</a>';
 					$this -> render_message($message);
 				}
 				
@@ -607,12 +607,12 @@ if (!class_exists('wpMail')) {
 													'field_id'				=>	$field -> id,
 												);
 												
-												$this -> Option -> save($option_data);
-												
+												$this -> Option -> save($option_data);												
 												$o++;
 											}
 											
-											/*$newfieldoptions = $this -> Option -> find_all(array('field_id' => $field -> id), false, array('order', "ASC"));
+											// Subscriber stuff
+											$newfieldoptions = $this -> Option -> find_all(array('field_id' => $field -> id), false, array('order', "ASC"));
 											$newfieldoptionsarray = array();
 											foreach ($newfieldoptions as $newfieldoption) {
 												$newfieldoptionsarray[$newfieldoption -> id] = $newfieldoption -> value;
@@ -651,11 +651,11 @@ if (!class_exists('wpMail')) {
 															$new_subscriber_fieldoptions = $option_id;
 														}
 														
-														//$Db -> model = $Subscriber -> model;
-														//$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
+														$Db -> model = $Subscriber -> model;
+														$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
 													}							
 												}
-											}*/
+											}
 										}
 									}
 								}
@@ -675,7 +675,7 @@ if (!class_exists('wpMail')) {
 							$wpdb -> query($query);
 						}
 						
-						$new_version = '1.1';
+						$new_version = '1.2';
 						$this -> update_option('dbversion', $new_version);
 						$this -> delete_option('showmessage_dbupdate');
 						$this -> render_message(__('Newsletters database update done', $this -> plugin_name));
@@ -1562,6 +1562,10 @@ if (!class_exists('wpMail')) {
 		
 		function wp_footer() {		
 			$this -> render('footer');
+			
+			if (wpml_is_management()) {
+				$this -> render('js' . DS . 'management', false, true, 'default');
+			}
 		}
 		
 		function delete_user($user_id = null) {	
@@ -2388,7 +2392,7 @@ if (!class_exists('wpMail')) {
 											'attachmentfile'	=>	false
 										);
 										
-										$History -> save($history_data, false);
+										$History -> save($history_data, false, false);
 										$history_id = $History -> insertid;										
 										$subscriberids = array();
 										$subscriberemails = array();
@@ -5103,7 +5107,7 @@ if (!class_exists('wpMail')) {
 						
 						break;		
 					case 'export'				:
-						global $wpdb, $Html, $Subscriber, $SubscribersList, $Field, $wpmlCountry;
+						global $wpdb, $Db, $Html, $Subscriber, $SubscribersList, $Field, $wpmlCountry;
 						$errors = false;
 						
 						if (empty($_POST['export_lists']) || !is_array($_POST['export_lists'])) { $errors[] = __('Please select export list(s)', $this -> plugin_name); }
@@ -5150,7 +5154,7 @@ if (!class_exists('wpMail')) {
 							if (!empty($subscribers)) {
 								$d = 0;
 								
-								$fieldsquery = "SELECT * FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
+								/*$fieldsquery = "SELECT * FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list' ORDER BY `order` ASC";
 								
 								$query_hash = md5($fieldsquery);
 								if ($ob_fields = $this -> get_cache($query_hash)) {
@@ -5158,7 +5162,11 @@ if (!class_exists('wpMail')) {
 								} else {
 									$fields = $wpdb -> get_results($fieldsquery);
 									$this -> set_cache($query_hash, $fields);
-								}
+								}*/
+								
+								$Db -> model = $Field -> model;
+								$fieldsconditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
+								$fields = $Db -> find_all($$fieldsconditions);
 								
 								$delimiter = (!empty($_POST['export_delimiter'])) ? $_POST['export_delimiter'] : ";";
 								
@@ -5188,10 +5196,11 @@ if (!class_exists('wpMail')) {
 									if (!empty($fields)) {
 										foreach ($fields as $field) {
 											if (!empty($field -> fieldoptions)) {
-												$fieldoptions_unserialize = unserialize($field -> fieldoptions);
+												/*$fieldoptions_unserialize = unserialize($field -> fieldoptions);
 												if (!empty($fieldoptions_unserialize) && is_array($fieldoptions_unserialize)) {
 													$fieldoptions = array_map('__', $fieldoptions_unserialize);	
-												}
+												}*/
+												$fieldoptions = $field -> newfieldoptions;
 											}
 											
 											switch ($_POST['export_purpose']) {
@@ -5199,14 +5208,14 @@ if (!class_exists('wpMail')) {
 													switch ($field -> type) {
 														case 'select'				:
 														case 'radio'				:
-															$datasets[$d][$field -> slug] = $fieldoptions[$subscriber -> {$field -> slug}];
+															$datasets[$d][$field -> slug] = __($fieldoptions[$subscriber -> {$field -> slug}]);
 															break;
 														case 'checkbox'				:
 															$checkboxes = array();
 															$supoptions = maybe_unserialize($subscriber -> {$field -> slug});
 															if (!empty($supoptions) && is_array($supoptions)) {
 																foreach ($supoptions as $subopt) {
-																	$checkboxes[] = $fieldoptions[$subopt];
+																	$checkboxes[] = __($fieldoptions[$subopt]);
 																}
 															}
 														
@@ -5224,9 +5233,9 @@ if (!class_exists('wpMail')) {
 															
 															if (is_serialized($subscriber -> {$field -> slug})) {
 																$date = maybe_unserialize($subscriber -> {$field -> slug});
-																echo $date['y'] . '-' . $date['m'] . '-' . $date['d'];
+																$datasets[$d][$field -> slug] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
 															} else {
-																echo date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug}));
+																$datasets[$d][$field -> slug] = date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug}));
 															}
 															break;
 														case 'pre_gender'			:
@@ -5242,7 +5251,7 @@ if (!class_exists('wpMail')) {
 													switch ($field -> type) {
 														case 'select'				:
 														case 'radio'				:
-															$datasets[$d][$field -> slug] = $fieldoptions[$subscriber -> {$field -> slug}];
+															$datasets[$d][$field -> slug] = __($fieldoptions[$subscriber -> {$field -> slug}]);
 															break;
 														default						:
 															$datasets[$d][$field -> slug] = $subscriber -> {$field -> slug};
@@ -7392,6 +7401,21 @@ if (!class_exists('wpMail')) {
 			
 			if (!empty($plugin) && $plugin == $this_plugin) {
 				$this -> add_option('activation_redirect', true);
+				$this -> update_option('showmessage_about', true);
+				
+				?>
+				
+				<?php _e('Reactivating and redirecting to about page, please wait...', $this -> plugin_name); ?>
+				
+				<script>
+				window.onload = function() {
+					window.top.location.href = '<?php echo admin_url('index.php?page=newsletters-about'); ?>';
+				}
+				</script>
+				
+				<?php
+					
+				exit();
 			}
 			
 			return $upgrade_actions;
@@ -7468,7 +7492,7 @@ require_once(dirname(__FILE__) . DS . 'wp-mailinglist-api.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-functions.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-widget.php');
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'activation_hook'));
-//add_filter('update_plugin_complete_actions', array($wpMail, 'update_plugin_complete_actions'), 10, 2);
+add_filter('update_plugin_complete_actions', array($wpMail, 'update_plugin_complete_actions'), 10, 2);
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'update_options'));
 
 ?>

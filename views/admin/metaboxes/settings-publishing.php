@@ -37,7 +37,7 @@ $excerpt_settings = $this -> get_option('excerpt_settings');
 						<?php
 						
 						$el = $this -> language_getlanguages();
-						$excerpt_more = $this -> language_split($this -> get_option('excerpt_more'));
+						$excerpt_more = $this -> get_option('excerpt_more');
 						
 						?>
 						<?php if (!empty($el)) : ?>					
@@ -53,7 +53,7 @@ $excerpt_settings = $this -> get_option('excerpt_settings');
 					            <?php $tabnumber = 1; ?>
 					            <?php foreach ($el as $language) : ?>
 					            	<div id="excerptmoretab<?php echo $tabnumber; ?>">
-					            		<input class="widefat" type="text" name="excerpt_more[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($excerpt_more[$language])); ?>" id="excerpt_more_<?php echo $language; ?>" />
+					            		<input class="widefat" type="text" name="excerpt_more[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $excerpt_more))); ?>" id="excerpt_more_<?php echo $language; ?>" />
 					            	</div>
 					            	<?php $tabnumber++; ?>
 					            <?php endforeach; ?>

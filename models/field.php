@@ -77,17 +77,21 @@ class wpmlField extends wpMailPlugin {
 		if (!empty($data)) {
 			foreach ($data as $key => $val) {
 				//$this -> {$key} = stripslashes_deep($val);
+				$data = (object) $data;
+				$field_id = $data -> id;
 				
 				switch ($key) {
 					case 'fieldoptions'		:
 						$this -> initialize_classes();
 						$this -> newfieldoptions = false;
-						if ($fieldoptions = $this -> Option -> find_all(array('field_id' => $this -> id), false, array('order', "ASC"))) {
-							if (is_admin() && $_GET['page'] == $this -> sections -> fields) {
-								$this -> newfieldoptions = $fieldoptions;
-							} else {
-								foreach ($fieldoptions as $fieldoption) {
-									$this -> newfieldoptions[$fieldoption -> id] = $fieldoption -> value;
+						if (!empty($field_id)) {							
+							if ($fieldoptions = $this -> Option -> find_all(array('field_id' => $field_id), false, array('order', "ASC"))) {
+								if (is_admin() && $_GET['page'] == $this -> sections -> fields) {
+									$this -> newfieldoptions = $fieldoptions;
+								} else {
+									foreach ($fieldoptions as $fieldoption) {
+										$this -> newfieldoptions[$fieldoption -> id] = $fieldoption -> value;
+									}
 								}
 							}
 						}

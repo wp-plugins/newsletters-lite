@@ -30,7 +30,12 @@ $emails_percentage = (($emails / 1000) * 100);
 	<div class="about-text">
 		<?php echo sprintf(__('Thank you for installing the %s. You are using the Tribulant Newsletters LITE plugin which contains all of the powerful features of the PRO plugin but with some limits. You can upgrade to Tribulant Newsletters PRO by submitting a serial key. If you do not have a serial key, you can buy one now.', $this -> plugin_name), '<a href="' . $plugin_link . '" target="_blank">' . __('Tribulant Newsletters plugin', $this -> plugin_name) . '</a>', $this -> version); ?>
 	</div>
-	<div class="newsletters-badge"><?php echo sprintf(__('Version %s', $this -> plugin_name), $this -> version); ?></div>
+	<div class="newsletters-badge">
+		<div>
+			<i class="fa fa-envelope fa-fw" style="font-size: 72px !important; color: white;"></i>
+		</div>
+		<?php echo sprintf('Version %s', $this -> version); ?>
+	</div>
 	
 	<div class="changelog newsletters-changelog">
 		<h3><?php _e('Upgrade to Tribulant Newsletters PRO', $this -> plugin_name); ?></h3>

@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.1.1
-Stable tag: 4.5
+Stable tag: 4.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -93,6 +93,7 @@ Thank you for these wonderful people who contributed in translating the plugin:
 
 * Afrikaans (af_ZA) by Tribulant Software
 * German (de_DE) by Peter Schonmann
+* Greek (el_GR) by <a href="http://www.aio.gr">Harris Karanikolas | AiO Systems Information</a>
 * Spanish (es_ES) by Juan Llamosas
 * French (fr_FR) by Kim Gjerstad
 * Hungarian (hu_HU) by <a href="http://www.idsign.hu">iD Sign | Gergely Almasi</a>
@@ -147,6 +148,19 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.1 =
+* IMPROVE: Update subscribers custom field values with database update
+* IMPROVE: Move Javascript outside of output into .js file
+* IMPROVE: Remove all dashicons 
+* FIX: Multilingual fields append values as they are submitted
+* FIX: Subscriber radio, checkbox and select fields not updating correctly
+* FIX: Resubscribe link text not translating
+* FIX: Subscribers, radio, checkbox and select values not showing correctly
+* FIX: Select2 drop down conflict with other plugins
+* FIX: "Send as Newsletter" from post/page hangs
+* FIX: field_id database error message
+* FIX: "Update Automatically" button does nothing in lite version 
 
 = 4.5 =
 * ADD: Show newsletters details under Users section in WordPress per user

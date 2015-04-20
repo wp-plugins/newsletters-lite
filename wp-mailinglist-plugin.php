@@ -5,8 +5,8 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5';
-		var $dbversion = '1.1';
+		var $version = '4.5.1';
+		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -2013,6 +2013,7 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			$this -> render('management' . DS . 'customfields', array('subscriber' => $subscriber, 'fields' => $fields), true, 'default');
+			$this -> render('js' . DS . 'management', false, true, 'default');
 			
 			exit();
 			die();	
@@ -3337,7 +3338,7 @@ if (!class_exists('wpMailPlugin')) {
 						}						
 						continue;
 					// detect quicktags
-					} elseif($quicktags && preg_match("#^\[:([a-z-]{2,10})\]$#ism", $block, $matches)) {
+					} elseif($quicktags && preg_match("#^\[:([a-z-]{2,10})\]$#ism", $block, $matches)) {						
 						if($this -> language_isenabled($matches[1])) {
 							$current_language = $matches[1];
 							$languageMap[$current_language] = true;
@@ -3533,7 +3534,6 @@ if (!class_exists('wpMailPlugin')) {
 			if (apply_filters('newsletters_enqueuescript_jquery', true)) { wp_enqueue_script('jquery'); }
 			if (apply_filters('newsletters_enqueuescript_jqueryuicore', true)) { wp_enqueue_script('jquery-ui-core'); }
 			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }			
-			wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, false, false);
 	
 			if (is_admin()) {	
 				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
@@ -3545,6 +3545,10 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
 					
+					wp_deregister_script('select2');
+					wp_deregister_script('wc-enhanced-select');
+					wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, '4.0.0', false);
+					
 					//if (in_array($_GET['page'], (array) $this -> sections)) {
 						if ($_GET['page'] != $this -> sections -> send) {
 							wp_enqueue_media();
@@ -3553,7 +3557,7 @@ if (!class_exists('wpMailPlugin')) {
 						// CKEditor
 						//wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
 						wp_enqueue_script('ckeditor', '//cdn.ckeditor.com/4.4.7/full-all/ckeditor.js', array('jquery'), '4.4.7', false);
-						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.3.4", false);
+						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.4.7", false);
 					
 						wp_enqueue_script('iris', admin_url('js/iris.min.js'), array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1);
 					    wp_enqueue_script('wp-color-picker', admin_url('js/color-picker.min.js'), array( 'iris' ), false, 1);
@@ -3656,7 +3660,11 @@ if (!class_exists('wpMailPlugin')) {
 			    wp_localize_script('datepicker-i18n', 'objectL10n', $aryArgs);
 				
 			/* Front-End Scripts */
-			} else {													
+			} else {	
+				wp_deregister_script('select2');
+				wp_deregister_script('wc-enhanced-select');
+				wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, '4.0.0', false);
+																
 				if (wpml_is_management()) {		
 					wp_enqueue_script('jquery-ui-dialog', false, array('jquery'), false, true);
 																
@@ -4750,17 +4758,18 @@ if (!class_exists('wpMailPlugin')) {
 	
 	  			    foreach ($fields as $field) {
 						if (!empty($subscriber -> {$field -> slug})) {
+							
+							$fieldoptions = $field -> newfieldoptions;
+							
 	                        ?>
 	
 							<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 								<th nowrap="nowrap"><?php _e($field -> title); ?></th>
 								<td>
 									<?php if ($field -> type == "radio" || $field -> type == "select") : ?>
-										<?php $fieldoptions = maybe_unserialize($field -> fieldoptions); ?>
 										<?php echo __($fieldoptions[$subscriber -> {$field -> slug}]); ?>
 									<?php elseif ($field -> type == "checkbox") : ?>
 										<?php $supoptions = maybe_unserialize($subscriber -> {$field -> slug}); ?>
-										<?php $fieldoptions = maybe_unserialize($field -> fieldoptions); ?>
 										<?php if (!empty($supoptions) && is_array($supoptions)) : ?>
 											<?php foreach ($supoptions as $supopt) : ?>
 												&raquo;&nbsp;<?php echo __($fieldoptions[$supopt]); ?><br/>
@@ -4862,7 +4871,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($urlonly)) {
 					$link = $url;
 				} else {
-					$link = '<a href="' . $url . '">' . $this -> get_option('resubscribetext') . '</a>';
+					$link = '<a href="' . $url . '">' . __($this -> get_option('resubscribetext')) . '</a>';
 				}
 			}
 			
@@ -5273,43 +5282,42 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($fields)) {
 						foreach ($fields as $field) {
-							$newsearch[] = '/\[' . $this -> pre . 'field name="' . $field -> slug . '"\]/';
+							
+							$fieldoptions = $field -> newfieldoptions;
+							$newsearch[$field -> slug] = '/\[' . $this -> pre . 'field name="' . $field -> slug . '"\]/';
 							
 							switch ($field -> type) {
 								case 'pre_country'		:
 									$Db -> model = $wpmlCountry -> model;
-									$newreplace[] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
+									$newreplace[$field -> slug] = $Db -> field('value', array('id' => $subscriber -> {$field -> slug}));
 									break;
 								case 'pre_date'			:
 									$date = @unserialize($subscriber -> {$field -> slug});
 									if (!empty($date) && is_array($date)) {
-										$newreplace[] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
+										$newreplace[$field -> slug] = $date['y'] . '-' . $date['m'] . '-' . $date['d'];
+									} else {
+										$newreplace[$field -> slug] = date_i18n(get_option('date_format'), strtotime($subscriber -> {$field -> slug}));
 									}
 									break;
 								case 'pre_gender'		:
-									$newreplace[] = $Html -> gender($subscriber -> {$field -> slug});
+									$newreplace[$field -> slug] = $Html -> gender($subscriber -> {$field -> slug});
 									break;
 								case 'checkbox'			:
 									$supoptions = maybe_unserialize($subscriber -> {$field -> slug});
-									$fieldoptions = maybe_unserialize($field -> fieldoptions);
-									if (!empty($supoptions) && is_array($suboptions)) {
+									if (!empty($supoptions) && is_array($supoptions)) {
 										$replace = "";
-										
-										foreach ($supoptions as $supopt) {
+										foreach ($supoptions as $supopt) {	
 											$replace .= '&raquo; ' . __($fieldoptions[$supopt]) . "\r\n";
 										}
-										
-										$newreplace[] = $replace;
+										$newreplace[$field -> slug] = $replace;
 									} else {
-										$newreplace[] = __('none', $this -> plugin_name);
+										$newreplace[$field -> slug] = __('none', $this -> plugin_name);
 									}
 									break;
 								case 'radio'			:
 								case 'select'			:
-									$value = $subscriber -> {$field -> slug};
-									$fieldoptions = maybe_unserialize($field -> fieldoptions);
-									
-									$newreplace[] = __($fieldoptions[$value]);
+									$value = $subscriber -> {$field -> slug};									
+									$newreplace[$field -> slug] = __($fieldoptions[$value]);
 									break;
 								default					:
 									$value = $subscriber -> {$field -> slug};
@@ -5324,7 +5332,7 @@ if (!class_exists('wpMailPlugin')) {
 										}
 									}
 								
-									$newreplace[] = $subscriber -> {$field -> slug};
+									$newreplace[$field -> slug] = $subscriber -> {$field -> slug};
 									break;
 							}
 						}
@@ -6695,11 +6703,11 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5") < 0) {
+				if (version_compare($cur_version, "4.5.1") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
-					$version = '4.5';	
+					$version = '4.5.1';	
 				}
 			
 				//the current version is older.

@@ -27,10 +27,10 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etsubject_unsubscribeuser')); ?>
+				            <?php $texts = $this -> get_option('etsubject_unsubscribeuser'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabunsubscribeuser<?php echo $tabnumber; ?>">
-				            		<input type="text" name="etsubject_unsubscribeuser[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($texts[$language])); ?>" id="etsubject_unsubscribeuser_<?php echo $language; ?>" class="widefat" />
+				            		<input type="text" name="etsubject_unsubscribeuser[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $texts))); ?>" id="etsubject_unsubscribeuser_<?php echo $language; ?>" class="widefat" />
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -64,7 +64,7 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etmessage_unsubscribeuser')); ?>
+				            <?php $texts = $this -> get_option('etmessage_unsubscribeuser'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabunsubscribeusermessage<?php echo $tabnumber; ?>">
 					            	<?php 
@@ -77,7 +77,7 @@ if ($this -> language_do()) {
 										'quicktags'			=>	true,
 									);
 									
-									wp_editor(stripslashes($texts[$language]), 'etmessage_unsubscribeuser_' . $language, $settings); 
+									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_unsubscribeuser_' . $language, $settings); 
 									
 									?>
 				            		<?php /*<textarea name="etmessage_unsubscribeuser[<?php echo $language; ?>]" id="etmessage_unsubscribeuser_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>

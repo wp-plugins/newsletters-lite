@@ -539,7 +539,7 @@ class wpmlHistory extends wpMailPlugin {
 	 * @param BOOLEAN. Determines whether $data should be validated or not
 	 *
 	 */
-	function save($data = array(), $validate = true) {
+	function save($data = array(), $validate = true, $insertpost = true) {
 		global $wpdb, $Html, $Db, $HistoriesList, $user_ID;
 		
 		$errors = false;
@@ -661,22 +661,24 @@ class wpmlHistory extends wpMailPlugin {
 				
 				/* Custom post type */
 				if ($history = $this -> get($history_id, false)) {
-					$post_data = array(
-						'ID'							=>	((empty($history -> p_id)) ? false : $history -> p_id),
-						'post_content'					=>	$history -> message,
-						'post_title'					=>	$history -> subject,
-						'post_status'					=>	"publish",
-						'post_type'						=>	"newsletter",
-						'post_author'					=>	$user_ID,
-					);
-					
-					if ($p_id = wp_insert_post($post_data, false)) {
-						//set the history_id on the post
-						update_post_meta($p_id, 'newsletters_history_id', $history_id);
+					if (!empty($insertpost) && $insertpost == true) {
+						$post_data = array(
+							'ID'							=>	((empty($history -> p_id)) ? false : $history -> p_id),
+							'post_content'					=>	$history -> message,
+							'post_title'					=>	$history -> subject,
+							'post_status'					=>	"publish",
+							'post_type'						=>	"newsletter",
+							'post_author'					=>	$user_ID,
+						);
 						
-						//custom post has been inserted/updated
-						$Db -> model = $this -> model;
-						$Db -> save_field('p_id', $p_id, array('id' => $history_id));
+						if ($p_id = wp_insert_post($post_data, false)) {
+							//set the history_id on the post
+							update_post_meta($p_id, 'newsletters_history_id', $history_id);
+							
+							//custom post has been inserted/updated
+							$Db -> model = $this -> model;
+							$Db -> save_field('p_id', $p_id, array('id' => $history_id));
+						}
 					}
 				}
 				

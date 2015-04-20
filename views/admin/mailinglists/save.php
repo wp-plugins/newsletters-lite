@@ -6,7 +6,6 @@ $doubleopt = $mailinglist -> doubleopt;
 
 if ($this -> language_do()) {
 	$languages = $this -> language_getlanguages();
-	$mailinglist_title = $this -> language_split($Mailinglist -> data[$Mailinglist -> model] -> title);
 }
 
 ?>
@@ -31,7 +30,7 @@ if ($this -> language_do()) {
 								</ul>
 								<?php foreach ($languages as $language) : ?>
 									<div id="mailinglist-title-tabs-<?php echo $language; ?>">
-										<input type="text" class="widefat" name="Mailinglist[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($mailinglist_title[$language])); ?>" id="Mailinglist_title_<?php echo $language; ?>" />
+										<input type="text" class="widefat" name="Mailinglist[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $Mailinglist -> data[$Mailinglist -> model] -> title))); ?>" id="Mailinglist_title_<?php echo $language; ?>" />
 									</div>
 								<?php endforeach; ?>
 							</div>

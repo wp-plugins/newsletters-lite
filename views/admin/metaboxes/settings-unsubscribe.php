@@ -27,7 +27,7 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 					<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$resubscribetext = $this -> language_split($this -> get_option('resubscribetext'));
+					$resubscribetext = $this -> get_option('resubscribetext');
 					
 					?>
 					<div id="resubscribetexttabs">
@@ -42,7 +42,7 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="resubscribetexttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="resubscribetext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($resubscribetext[$language])); ?>" id="resubscribetext_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="resubscribetext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $resubscribetext))); ?>" id="resubscribetext_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -69,7 +69,7 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 					<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$unsubscribetext = $this -> language_split($this -> get_option('unsubscribetext'));
+					$unsubscribetext = $this -> get_option('unsubscribetext');
 					
 					?>
 					<div id="unsubscribetexttabs">
@@ -84,7 +84,7 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="unsubscribetexttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="unsubscribetext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($unsubscribetext[$language])); ?>" id="unsubscribetext_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="unsubscribetext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $unsubscribetext))); ?>" id="unsubscribetext_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>
@@ -111,7 +111,7 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 					<?php 
 					
 					$el = $this -> language_getlanguages(); 
-					$unsubscribealltext = $this -> language_split($this -> get_option('unsubscribealltext'));
+					$unsubscribealltext = $this -> get_option('unsubscribealltext');
 					
 					?>
 					<div id="unsubscribealltexttabs">
@@ -126,7 +126,7 @@ $unsubscribe_usernotification = $this -> get_option('unsubscribe_usernotificatio
 			            <?php $tabnumber = 1; ?>
 			            <?php foreach ($el as $language) : ?>
 			            	<div id="unsubscribealltexttab<?php echo $tabnumber; ?>">
-			            		<input type="text" name="unsubscribealltext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($unsubscribealltext[$language])); ?>" id="unsubscribealltext_<?php echo $language; ?>" class="widefat" />
+			            		<input type="text" name="unsubscribealltext[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $unsubscribealltext))); ?>" id="unsubscribealltext_<?php echo $language; ?>" class="widefat" />
 			            	</div>
 			            	<?php $tabnumber++; ?>
 			            <?php endforeach; ?>

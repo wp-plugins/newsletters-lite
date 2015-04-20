@@ -27,10 +27,10 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etsubject_schedule')); ?>
+				            <?php $texts = $this -> get_option('etsubject_schedule'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabschedule<?php echo $tabnumber; ?>">
-				            		<input type="text" name="etsubject_schedule[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($texts[$language])); ?>" id="etsubject_schedule_<?php echo $language; ?>" class="widefat" />
+				            		<input type="text" name="etsubject_schedule[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $texts))); ?>" id="etsubject_schedule_<?php echo $language; ?>" class="widefat" />
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -64,7 +64,7 @@ if ($this -> language_do()) {
 				            </ul>
 				            
 				            <?php $tabnumber = 1; ?>
-				            <?php $texts = $this -> language_split($this -> get_option('etmessage_schedule')); ?>
+				            <?php $texts = $this -> get_option('etmessage_schedule'); ?>
 				            <?php foreach ($el as $language) : ?>
 				            	<div id="languagetabschedulemessage<?php echo $tabnumber; ?>">
 					            	<?php 
@@ -77,10 +77,9 @@ if ($this -> language_do()) {
 										'quicktags'			=>	true,
 									);
 									
-									wp_editor(stripslashes($texts[$language]), 'etmessage_schedule_' . $language, $settings); 
+									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_schedule_' . $language, $settings); 
 									
 									?>
-				            		<?php /*<textarea name="etmessage_schedule[<?php echo $language; ?>]" id="etmessage_schedule_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>

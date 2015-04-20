@@ -34,16 +34,7 @@
         </div>
     </form>
     
-    <script type="text/javascript">
-	jQuery(document).ready(function() { 
-		if (jQuery.isFunction(jQuery.fn.button)) { jQuery('#savefieldsbutton').button(); } 
-		if (jQuery.isFunction(jQuery.fn.select2)) { jQuery('.newsletters select').select2(); }
-		
-		jQuery('input:not(:button,:submit),textarea,select').focus(function(element) {
-			jQuery(this).removeClass('<?php echo $this -> pre; ?>fielderror').nextAll('div.newsletters-field-error').slideUp();	
-		});
-	});
-	</script>
+    <script type="text/javascript">jQuery(document).ready(function() { if (jQuery.isFunction(jQuery.fn.button)) { jQuery('#savefieldsbutton').button(); } if (jQuery.isFunction(jQuery.fn.select2)) { jQuery('.newsletters select').select2(); } jQuery('input:not(:button,:submit),textarea,select').focus(function(element) { jQuery(this).removeClass('<?php echo $this -> pre; ?>fielderror').nextAll('div.newsletters-field-error').slideUp(); }); });</script>
 <?php else : ?>
 	<div class="ui-state-error ui-corner-all">
 		<p><i class="fa fa-exclamation-triangle"></i> <?php _e('No custom fields are available at this time.', $this -> plugin_name); ?></p>

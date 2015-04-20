@@ -35,7 +35,7 @@
 						<?php
 						
 						$el = $this -> language_getlanguages();
-						$commentformlabel = $this -> language_split($this -> get_option('commentformlabel'));
+						$commentformlabel = $this -> get_option('commentformlabel');
 						
 						?>
 						<?php if (!empty($el)) : ?>					
@@ -51,7 +51,7 @@
 					            <?php $tabnumber = 1; ?>
 					            <?php foreach ($el as $language) : ?>
 					            	<div id="commentformlabeltab<?php echo $tabnumber; ?>">
-					            		<input class="widefat" type="text" name="commentformlabel[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($commentformlabel[$language])); ?>" id="commentformlabel<?php echo $language; ?>" />
+					            		<input class="widefat" type="text" name="commentformlabel[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $commentformlabel))); ?>" id="commentformlabel<?php echo $language; ?>" />
 					            	</div>
 					            	<?php $tabnumber++; ?>
 					            <?php endforeach; ?>
@@ -113,7 +113,7 @@
 						<?php
 						
 						$el = $this -> language_getlanguages();
-						$registerformlabel = $this -> language_split($this -> get_option('registerformlabel'));
+						$registerformlabel = $this -> get_option('registerformlabel');
 						
 						?>
 						<?php if (!empty($el)) : ?>					
@@ -129,7 +129,7 @@
 					            <?php $tabnumber = 1; ?>
 					            <?php foreach ($el as $language) : ?>
 					            	<div id="registerformlabeltab<?php echo $tabnumber; ?>">
-					            		<input class="widefat" type="text" name="registerformlabel[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($registerformlabel[$language])); ?>" id="registerformlabel<?php echo $language; ?>" />
+					            		<input class="widefat" type="text" name="registerformlabel[<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $registerformlabel))); ?>" id="registerformlabel<?php echo $language; ?>" />
 					            	</div>
 					            	<?php $tabnumber++; ?>
 					            <?php endforeach; ?>
