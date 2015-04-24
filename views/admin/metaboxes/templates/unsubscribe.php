@@ -75,6 +75,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_unsubscribe[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_unsubscribe_' . $language, $settings); 
@@ -94,8 +95,14 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_unsubscribe')), 'etmessage_unsubscribe'); ?>
-					<?php /*<textarea name="etmessage_unsubscribe" id="etmessage_unsubscribe" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_unsubscribe'))); ?></textarea>*/ ?>
+					<?php
+						
+					$settings = array(
+						'teeny'				=>	true,
+					);	
+						
+					?>
+					<?php wp_editor(stripslashes($this -> get_option('etmessage_unsubscribe')), 'etmessage_unsubscribe', $settings); ?>
 				<?php endif; ?>
 			</td>
 		</tr>

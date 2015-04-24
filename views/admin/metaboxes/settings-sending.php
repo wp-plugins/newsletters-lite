@@ -6,6 +6,7 @@ $createpreview = $this -> get_option('createpreview');
 $createspamscore = $this -> get_option('createspamscore');
 $themeintextversion = $this -> get_option('themeintextversion');
 $inlinestyles = $this -> get_option('inlinestyles');
+$defaulttemplate = $this -> get_option('defaulttemplate');
 
 ?>
 
@@ -58,6 +59,12 @@ $inlinestyles = $this -> get_option('inlinestyles');
         		</select>
         		<span class="howto"><?php _e('Choose the encoding of outgoing emails. Recommended is 8bit but if there are character problems, change to base64.', $this -> plugin_name); ?></span>
         	</td>
+        </tr>
+        <tr>
+	        <th><label for="defaulttemplate"><?php _e('Styled Default Template', $this -> plugin_name); ?></label></th>
+	        <td>
+		        <label><input <?php echo (!empty($defaulttemplate)) ? 'checked="checked"' : ''; ?> type="checkbox" name="defaulttemplate" value="1" id="defaulttemplate" /> <?php _e('Use a styled, default template for newsletters and system emails', $this -> plugin_name); ?></label>
+	        </td>
         </tr>
         <tr>
 	        <th><label for="inlinestyles"><?php _e('Auto Inline Styles', $this -> plugin_name); ?></label></th>

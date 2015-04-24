@@ -1,3 +1,5 @@
+<!-- Custom CSS, Theme and Scripts -->
+
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -50,6 +52,62 @@
 
 <p class="howto"><?php _e('Turn On/Off the loading of default scripts in the plugin.', $this -> plugin_name); ?></p>
 
+<?php include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php'); ?>
+<?php if (!empty($defaultscripts)) : ?>
+	<?php
+		
+	$loadscripts = $this -> get_option('loadscripts');
+	$loadscripts_handles = $this -> get_option('loadscripts_handles');	
+	$loadscripts_pages = $this -> get_option('loadscripts_pages');
+		
+	?>
+	<table class="widefat">
+		<thead>
+			<tr>
+				<th class="check-column"><input type="checkbox" name="checkboxall" value="1" /></th>
+				<th><?php _e('Script', $this -> plugin_name); ?>
+				<?php echo $Html -> help(__('The name of the script to load. Tick/check the checkboxes to enable and load scripts. Do not disable loading of scripts unless you specifically need or want to.', $this -> plugin_name)); ?></th>
+				<th><?php _e('Handle', $this -> plugin_name); ?>
+				<?php echo $Html -> help(__('Handle/slug to register the script with. Can be changed if a conflict occurs.', $this -> plugin_name)); ?></th>
+				<th><?php _e('Post/Page IDs', $this -> plugin_name); ?>
+				<?php echo $Html -> help(__('Comma separated post/page IDs to only load the script on, eg. 1,54,3,71', $this -> plugin_name)); ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php $class = false; ?>
+			<?php foreach ($defaultscripts as $handle => $script) : ?>
+				<?php
+				
+				$custom_handle = (empty($loadscripts_handles[$handle])) ? $handle : $loadscripts_handles[$handle];
+				$custom_pages = (empty($loadscripts_pages[$handle])) ? false : $loadscripts_pages[$handle];
+					
+				?>
+				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
+					<th class="check-column">
+						<input <?php echo (!empty($loadscripts) && in_array($handle, $loadscripts)) ? 'checked="checked"' : ''; ?> type="checkbox" name="loadscripts[]" value="<?php echo esc_attr(stripslashes($handle)); ?>" id="loadscripts_<?php echo $handle; ?>" />
+					</td>
+					<td>
+						<label class="row-title" for="loadscripts_<?php echo $handle; ?>"><?php echo $script['name']; ?></label>
+					</td>
+					<td>
+						<input class="widefat" type="text" name="loadscripts_handles[<?php echo $handle; ?>]" value="<?php echo esc_attr(stripslashes($custom_handle)); ?>" id="loadscripts_handles_<?php echo $handle; ?>" />
+					</td>
+					<td>
+						<input class="widefat" type="text" name="loadscripts_pages[<?php echo $handle; ?>]" value="<?php echo esc_attr(stripslashes($custom_pages)); ?>" id="loadscripts_pages_<?php echo $handle; ?>" />
+					</td>
+				</tr>
+				
+				<script type="text/javascript">
+				jQuery(document).ready(function() {
+					jQuery('#loadscripts_pages_<?php echo $handle; ?>').Watermark('<?php echo __('All posts/pages', $this -> plugin_name); ?>');
+				});
+				</script>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+<?php endif; ?>
+
+<?php /*
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -87,4 +145,4 @@
 			</td>
 		</tr>
 	</tbody>
-</table>
+</table>*/ ?>

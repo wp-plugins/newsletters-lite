@@ -75,12 +75,12 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_unsubscribeuser[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_unsubscribeuser_' . $language, $settings); 
 									
 									?>
-				            		<?php /*<textarea name="etmessage_unsubscribeuser[<?php echo $language; ?>]" id="etmessage_unsubscribeuser_<?php echo $language; ?>" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($texts[$language])); ?></textarea>*/ ?>
 				            	</div>
 				            	<?php $tabnumber++; ?>
 				            <?php endforeach; ?>
@@ -95,8 +95,14 @@ if ($this -> language_do()) {
 				    });
 				    </script>
 				<?php else : ?>
-					<?php wp_editor(stripslashes($this -> get_option('etmessage_unsubscribeuser')), 'etmessage_unsubscribeuser'); ?>
-					<?php /*<textarea name="etmessage_unsubscribeuser" id="etmessage_unsubscribeuser" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_unsubscribeuser'))); ?></textarea>*/ ?>
+					<?php
+					
+					$settings = array(
+						'teeny'				=>	true,
+					);	
+						
+					?>
+					<?php wp_editor(stripslashes($this -> get_option('etmessage_unsubscribeuser')), 'etmessage_unsubscribeuser', $settings); ?>
 				<?php endif; ?>
 			</td>
 		</tr>

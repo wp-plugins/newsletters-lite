@@ -39,6 +39,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_posts[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_posts_' . $language, $settings); 
@@ -66,12 +67,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_posts',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 						
 					wp_editor(stripslashes($this -> get_option('etmessage_posts')), 'etmessage_posts', $settings); 
 					
 					?>
-					<?php /*<textarea name="etmessage_schedule" id="etmessage_schedule" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_schedule'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 				
 				<div class="howto">

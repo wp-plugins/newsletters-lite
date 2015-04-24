@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5.1.1
+Version: 4.5.2
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -602,12 +602,14 @@ if (!class_exists('wpMail')) {
 											
 											foreach ($fieldoptions as $fieldoption) {												
 												$option_data = array(
+													'id'					=>	false,
 													'order'					=>	$o,
 													'value'					=>	$fieldoption,
 													'field_id'				=>	$field -> id,
 												);
 												
-												$this -> Option -> save($option_data);												
+												$this -> Option -> save($option_data);	
+												$this -> Option -> id = $this -> Option -> data = false;											
 												$o++;
 											}
 											
@@ -621,7 +623,8 @@ if (!class_exists('wpMail')) {
 											$query = "SELECT `id`, `" . $field -> slug . "` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `" . $field -> slug . "` != ''";
 											if ($subscriber_fields = $wpdb -> get_results($query)) {
 												foreach ($subscriber_fields as $subscriber_field) {											
-													$subscriber_fieldoptions = maybe_unserialize($subscriber_field -> {$field -> slug});											
+													$subscriber_fieldoptions = maybe_unserialize($subscriber_field -> {$field -> slug});
+																																					
 													if (!empty($subscriber_fieldoptions)) {
 														$new_subscriber_fieldoptions = array();
 														
@@ -638,6 +641,8 @@ if (!class_exists('wpMail')) {
 																$this -> SubscribersOption -> save($subscribers_option_data);
 																$new_subscriber_fieldoptions[] = $option_id;
 															}
+															
+															$new_subscriber_fieldoptions = maybe_serialize($new_subscriber_fieldoptions);
 														} else {	
 															$option_id = array_search($fieldoptions[$subscriber_fieldoptions], $newfieldoptionsarray);
 																													
@@ -651,8 +656,10 @@ if (!class_exists('wpMail')) {
 															$new_subscriber_fieldoptions = $option_id;
 														}
 														
-														$Db -> model = $Subscriber -> model;
-														$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
+														if (!empty($newfieldoptionsarray[$new_subscriber_fieldoptions])) {
+															$Db -> model = $Subscriber -> model;
+															$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
+														}
 													}							
 												}
 											}
@@ -2922,7 +2929,7 @@ if (!class_exists('wpMail')) {
 					$mailinglists = $Mailinglist -> get_all('*', true);
 					$templates = $Template -> get_all();
 				
-					if ($history = $History -> get($_GET['id'])) {								
+					if ($history = $History -> get($_GET['id'])) {														
 						$_POST = array(
 							'ishistory'			=>	$history -> id,
 							'p_id'				=>	$history -> p_id,
@@ -5325,6 +5332,15 @@ if (!class_exists('wpMail')) {
 			}
 			
 			switch ($method) {
+				case 'defaulttemplate'		:
+					if (empty($_POST['defaulttemplate'])) {
+						$this -> delete_option('defaulttemplate');
+						$this -> redirect($this -> referer, 'message', __('Default template turned off', $this -> plugin_name));
+					} else {
+						$this -> update_option('defaulttemplate', true);
+						$this -> redirect($this -> referer, 'message', __('Default template turned on', $this -> plugin_name));
+					}
+					break;
 				case 'save'			:
 					if (!empty($_POST)) {
 						if ($Db -> save($_POST)) {
@@ -7020,6 +7036,7 @@ if (!class_exists('wpMail')) {
 						$this -> delete_option('themeintextversion');
 						$this -> delete_option('emailarchive');
 						$this -> delete_option('excerpt_settings');
+						$this -> delete_option('defaulttemplate');
 						
 						if (!empty($_FILES)) {
 							foreach ($_FILES as $fkey => $fval) {
@@ -7053,6 +7070,11 @@ if (!class_exists('wpMail')) {
 							$this -> update_option($key, $val);
 							
 							switch ($key) {
+								case 'defaulttemplate'		:
+									if (!empty($val)) {
+										$this -> update_option('defaulttemplate', true);
+									}
+									break;
 								case 'debugging'			:
 									if (!empty($val)) {
 										update_option('tridebugging', 1);
@@ -7383,6 +7405,7 @@ if (!class_exists('wpMail')) {
 						}
 					
 						do_action($this -> pre . '_extensions_settings_saved', $_POST);
+						do_action('newsletters_extensions_settings_saved', $_POST);
 						$this -> render_message(__('Extensions settings have been saved.', $this -> plugin_name));
 					}
 				

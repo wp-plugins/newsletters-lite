@@ -3,6 +3,14 @@
 	<a class="add-new-h2" href="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save"><?php _e('Add New', $this -> plugin_name); ?></a>
 	<a class="add-new-h2-green" href="http://tribulant.com/emailthemes/" target="_blank"><?php _e('Get More Templates', $this -> plugin_name); ?></a>
 	</h2>
+	
+	<!-- Default Template Setting -->
+	<?php $defaulttemplate = $this -> get_option('defaulttemplate'); ?>	
+	<form method="post" action="?page=<?php echo $this -> sections -> themes; ?>&amp;method=defaulttemplate">
+    	<label><input <?php echo (!empty($defaulttemplate)) ? 'checked="checked"' : ''; ?> type="checkbox" name="defaulttemplate" value="1" id="defaulttemplate" /> <?php _e('Use a styled, default template for newsletters and system emails', $this -> plugin_none); ?></label>
+        <input class="button" type="submit" value="<?php _e('Save', $this -> plugin_name); ?>" name="submit" />
+        <?php echo $Html -> help(__('Turn this on to use a styled, default template for newsletters and system emails when none is selected.', $this -> plugin_name)); ?>
+    </form>
     
     <?php if (!empty($themes)) : ?>
 		<form id="posts-filter" action="<?php echo $this -> url; ?>" method="post">

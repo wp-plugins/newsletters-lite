@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.1.1';
+		var $version = '4.5.2';
 		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -1734,13 +1734,22 @@ if (!class_exists('wpMailPlugin')) {
 	    	
 	    	ob_start();
 	    	$history_data = array(
+		    	'from'				=>	$_POST['from'],
+		    	'fromname'			=>	$_POST['fromname'],
 	    		'post_id'			=>	$_POST['post_id'],
 				'subject'			=>	$_POST['subject'],
 				'message'			=>	$_POST['content'],
+				'text'				=>	((!empty($_POST['customtexton']) && !empty($_POST['customtext'])) ? strip_tags($_POST['customtext']) : false),
 				'theme_id'			=>	$_POST['theme_id'],
+				'condquery'			=>	serialize($_POST['condquery']),
 				'conditions'		=>	serialize($_POST['fields']),
+				'conditionsscope'	=>	$_POST['fieldsconditionsscope'],
+				'daterange'			=>	$_POST['daterange'],
+				'daterangefrom'		=>	$_POST['daterangefrom'],
+				'daterangeto'		=>	$_POST['daterangeto'],
 				'mailinglists'		=>	serialize($_POST['mailinglists']),
 				'groups'			=>	serialize($_POST['groups']),
+				'roles'				=>	maybe_serialize($_POST['roles']),
 				'senddate'			=>	$_POST['senddate'],
 				'scheduled'			=>	$_POST['scheduled'],
 			);
@@ -3545,9 +3554,11 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
 					
-					wp_deregister_script('select2');
-					wp_deregister_script('wc-enhanced-select');
-					wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, '4.0.0', false);
+					if (in_array($_GET['page'], (array) $this -> sections)) {						
+						wp_deregister_script('select2');
+						wp_deregister_script('wc-enhanced-select');
+						wp_enqueue_script('select2', $this -> render_url('js/select2.js', 'admin', false), false, '4.0.0', false);
+					}
 					
 					//if (in_array($_GET['page'], (array) $this -> sections)) {
 						if ($_GET['page'] != $this -> sections -> send) {
@@ -3661,11 +3672,71 @@ if (!class_exists('wpMailPlugin')) {
 				
 			/* Front-End Scripts */
 			} else {	
-				wp_deregister_script('select2');
-				wp_deregister_script('wc-enhanced-select');
-				wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, '4.0.0', false);
+				$loadscripts = $this -> get_option('loadscripts');
+				$loadscripts_handles = $this -> get_option('loadscripts_handles');
+				$loadscripts_pages = $this -> get_option('loadscripts_pages');
+				
+				include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');
+				
+				if (!empty($defaultscripts)) {
+					foreach ($defaultscripts as $handle => $script) {						
+						$custom_handle = (empty($loadscripts_handles[$handle])) ? $handle : $loadscripts_handles[$handle];
+						$custom_pages = (empty($loadscripts_pages[$handle])) ? false : explode(",", $loadscripts_pages[$handle]);
+
+						if (empty($loadscripts) || (!empty($loadscripts) && in_array($handle, $loadscripts)) || wpml_is_management()) {						
+							if (empty($custom_pages) || 
+								(!empty($custom_pages) && (is_single($custom_pages) || is_page($custom_pages))) ||
+								wpml_is_management()) {	
+									if (apply_filters('newsletters_enqueuescript_' . $handle, true)) {															
+										switch ($handle) {
+											case 'select2'								:
+											
+												if (function_exists('is_checkout') && is_checkout()) continue;
+											
+												wp_deregister_script('select2');
+												wp_deregister_style('select2');
+												wp_enqueue_style('select2', $this -> render_url('css/select2.css', 'admin', false), false, false, "all");
+												break;
+										}
+										
+										wp_enqueue_script($custom_handle, $script['url'], $script['deps'], $script['version'], $script['footer']);
+										
+										switch ($handle) {
+											case 'jquery-ui-datepicker'					:
+												wp_enqueue_script('datepicker-i18n', $this -> render_url('js/datepicker-i18n.js', 'admin', false), array('jquery-ui-datepicker'));
+				 
+											    //localize our js
+											    $aryArgs = array(
+											        'closeText'         => __('Done', $this -> plugin_name),
+											        'currentText'       => __('Today', $this -> plugin_name),
+											        'monthNames'        => $Html -> strip_array_indices($wp_locale -> month),
+											        'monthNamesShort'   => $Html -> strip_array_indices($wp_locale -> month_abbrev),
+											        'monthStatus'       => __('Show a different month', $this -> plugin_name),
+											        'dayNames'          => $Html -> strip_array_indices($wp_locale -> weekday),
+											        'dayNamesShort'     => $Html -> strip_array_indices($wp_locale -> weekday_abbrev),
+											        'dayNamesMin'       => $Html -> strip_array_indices($wp_locale -> weekday_initial),
+											        'dateFormat'        => $Html -> date_format_php_to_js(get_option('date_format')),
+											        'firstDay'          => get_option('start_of_week'),
+											        'isRTL'             => $wp_locale -> is_rtl,
+											    );
+											 
+											    // Pass the localized array to the enqueued JS
+											    wp_localize_script('datepicker-i18n', 'objectL10n', $aryArgs);
+												break;
+										}
+									}
+							}
+						}
+					}
+				}
+				
+				if (apply_filters('newsletters_enqueuescript_' . $this -> plugin_name, true)) { wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true); }
+				
+				//wp_deregister_script('select2');
+				//wp_deregister_script('wc-enhanced-select');
+				//wp_enqueue_script('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', false, '4.0.0', false);
 																
-				if (wpml_is_management()) {		
+				/*if (wpml_is_management()) {		
 					wp_enqueue_script('jquery-ui-dialog', false, array('jquery'), false, true);
 																
 					if ($this -> get_option('loadscript_jqueryuitabs') == "Y") {
@@ -3702,7 +3773,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (apply_filters('newsletters_enqueuescript_jqueryuibutton', true)) {  if ($this -> get_option('loadscript_jqueryuibutton') == "Y") { wp_enqueue_script('jquery-ui-button', array('jquery'), false, true); } }
 				if (apply_filters('newsletters_enqueuescript_jqueryuiwatermark', true)) { if ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuiwatermark_handle'), $this -> render_url('js/jquery.watermark.js', 'admin', false), array('jquery'), false, true); } }
 				if (apply_filters('newsletters_enqueuescript_jqueryuploadify', true)) { if ($this -> get_option('loadscript_jqueryuploadify') == "Y") { wp_enqueue_script($this -> get_option('loadscript_jqueryuploadify_handle'), $this -> render_url('js/jquery.uploadify.js', 'admin', false), array('jquery'), false, true); } }
-				if (apply_filters('newsletters_enqueuescript_' . $this -> plugin_name, true)) { wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true); }
+				if (apply_filters('newsletters_enqueuescript_' . $this -> plugin_name, true)) { wp_enqueue_script($this -> plugin_name, $this -> render_url('js/wp-mailinglist.js', 'admin', false), array('jquery'), false, true); }*/
 			}
 			
 			return true;
@@ -3722,6 +3793,11 @@ if (!class_exists('wpMailPlugin')) {
 				$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
 				wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
 				wp_enqueue_style('colorbox', $this -> render_url('css/colorbox.css', 'admin', false), false, $this -> version, "all");
+				
+				if (in_array($_GET['page'], (array) $this -> sections)) {
+					wp_deregister_style('select2');
+					wp_enqueue_style('select2', $this -> render_url('css/select2.css', 'admin', false), false, false, "all");
+				}
 				
 				// Count Down
 				if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> queue) {
@@ -3744,7 +3820,6 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', false, false, "all");
-			wp_enqueue_style('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css', false, false, "all");
 			
 			if ($load) {				
 				if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
@@ -5055,7 +5130,8 @@ if (!class_exists('wpMailPlugin')) {
 			global $Html;
 		
 			if (!empty($subscriber)) {
-				$linktext = __($this -> get_option('activationlinktext'));
+				$linktext = apply_filters('newsletters_activation_link_text', __($this -> get_option('activationlinktext')));
+				
 				$authkey = $this -> gen_auth($subscriber -> id, $subscriber -> mailinglist_id);
 				
 				if (!empty($theme_id)) {
@@ -6450,7 +6526,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$dbversion = $this -> get_option('dbversion');
 			if (empty($dbversion)) {
-				$this -> add_option('dbversion', '1.0');
+				$this -> add_option('dbversion', $this -> dbversion);
 			}
 		
 			if (!$this -> get_option('version')) {
@@ -6703,11 +6779,11 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.1.1") < 0) {
+				if (version_compare($cur_version, "4.5.2") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
-					$version = '4.5.1.1';	
+					$version = '4.5.2';	
 				}
 			
 				//the current version is older.
@@ -6725,6 +6801,7 @@ if (!class_exists('wpMailPlugin')) {
 			$wpml_add_option_count = 0;
 					
 			$options = array();	
+			$options['defaulttemplate'] = true;
 			$options['screenoptions_subscribers_custom'] = array('gravatars');		
 			$options['managementloginsubject'] = __('Authenticate Subscriber Account', $this -> plugin_name);
 			$options['managementauthtype'] = 3;
@@ -7802,13 +7879,56 @@ if (!class_exists('wpMailPlugin')) {
 			return $hashlink;
 		}
 		
+		function admin_footer_text($text = null) {
+			
+			$plugin = '<a href="http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin" target="_blank">Tribulant Newsletters</a>';
+			
+			$stars = '<a href="https://wordpress.org/support/view/plugin-reviews/newsletters-lite?rate=5#postform" target="_blank"><span class="newsletters_footer_rating">
+          <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+        </span></a>';
+        
+        	$stars .= '<style type="text/css">
+        	.newsletters_footer_rating {
+			    unicode-bidi: bidi-override;
+			    direction: rtl;
+			    font-size: 16px;
+			}
+			
+			.newsletters_footer_rating span.star {
+			    font-family: FontAwesome !important;
+			    font-weight: normal;
+			    font-style: normal;
+			    display: inline-block;
+			}
+			
+			.newsletters_footer_rating span.star:before,
+			.newsletters_footer_rating span.star ~ span.star:before {
+				font-family: FontAwesome;
+			    content: "\f005";
+			    color: #e3cf7a;
+			    padding-right: 2px;
+			}
+        	</style>';
+			
+			$newsletters_text = '</p><br class="clear" /><p class="alignleft">' . sprintf(__('If you like %s, please leave us a %s rating on WordPress.org. Thank you in advance!', $this -> plugin_name), $plugin, $stars) . '';
+			$text .= $newsletters_text;
+			
+			return $text;
+		}
+		
 		function render_email($file = null, $params = array(), $output = false, $html = true, $renderht = true, $theme_id = 0, $shortlinks = true, $fullbody = false) {						
 			global $newsletters_history_id;
 			$this -> plugin_name = basename(dirname(__FILE__));
 		
 			if (!empty($file) || !empty($fullbody)) {
-				$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
-				$foot = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'foot.php';
+				$defaulttemplate = $this -> get_option('defaulttemplate');
+				if (!empty($defaulttemplate)) {
+					$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head-default.php';
+					$foot = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'foot-default.php';
+				} else {
+					$head = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'head.php';
+					$foot = $this -> plugin_base() . DS . 'views' . DS . 'email' . DS . 'foot.php';
+				}
 				
 				/* Go through the parameters */				
 				if (!empty($params)) {

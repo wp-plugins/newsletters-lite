@@ -75,6 +75,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_bounce[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_bounce_' . $language, $settings); 
@@ -102,13 +103,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_bounce',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 					
 					wp_editor(stripslashes($this -> get_option('etmessage_bounce')), 'etmessage_bounce', $settings); 
 					
 					?>
-					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_bounce')), 'etmessage_bounce');*/ ?>
-					<?php /*<textarea name="etmessage_bounce" id="etmessage_bounce" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_bounce'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>
 		</tr>

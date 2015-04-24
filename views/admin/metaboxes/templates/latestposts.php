@@ -38,6 +38,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_latestposts[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_latestposts_' . $language, $settings); 
@@ -65,12 +66,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_latestposts',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 					
 					wp_editor(stripslashes($this -> get_option('etmessage_latestposts')), 'etmessage_latestposts', $settings); 
 					
 					?>
-					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_latestposts')), 'etmessage_latestposts');*/ ?>
 				<?php endif; ?>
 				
 				<div class="howto">

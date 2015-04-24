@@ -1,4 +1,65 @@
 <?php
+	
+$defaultscripts = array(
+	'jquery-ui-tabs'		=>	array(
+		'name'					=>	__('jQuery UI Tabs', $this -> plugin_name),
+		'url'					=>	false,
+		'version'				=>	false,
+		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
+		'footer'				=>	false,
+	),
+	'jquery-ui-button'		=>	array(
+		'name'					=>	__('jQuery UI Button', $this -> plugin_name),
+		'url'					=>	false,
+		'version'				=>	false,
+		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
+		'footer'				=>	false,
+	),
+	'jquery-ui-dialog'		=>	array(
+		'name'					=>	__('jQuery UI Dialog', $this -> plugin_name),
+		'url'					=>	false,
+		'version'				=>	false,
+		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
+		'footer'				=>	false,
+	),
+	'jquery-ui-datepicker'	=>	array(
+		'name'					=>	__('jQuery UI Datepicker', $this -> plugin_name),
+		'url'					=>	false,
+		'version'				=>	false,
+		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
+		'footer'				=>	false,
+	),
+	'jquery-cookie'			=>	array(
+		'name'					=>	__('jQuery Cookie', $this -> plugin_name),
+		'url'					=>	$this -> render_url('js/jquery.cookie.js', 'admin', false),
+		'version'				=>	'1.4.1',
+		'deps'					=>	array('jquery'),
+		'footer'				=>	false,
+	),
+	'jquery-uploadify'		=>	array(
+		'name'					=>	__('jQuery Uploadify', $this -> plugin_name),
+		'url'					=>	$this -> render_url('js/jquery.uploadify.js', 'admin', false),
+		'version'				=>	'2.2',
+		'deps'					=>	array('jquery'),
+		'footer'				=>	false,
+	),
+	'watermark'				=>	array(
+		'name'					=>	__('Watermark', $this -> plugin_name),
+		'url'					=>	$this -> render_url('js/jquery.watermark.js', 'admin', false),
+		'version'				=>	'1',
+		'deps'					=>	array('jquery'),
+		'footer'				=>	false,
+	),
+	'select2'				=>	array(
+		'name'					=>	__('Select2 Drop Down', $this -> plugin_name),
+		'url'					=>	$this -> render_url('js/select2.js', 'admin', false),
+		'version'				=>	'4.0.0-rc.2',
+		'deps'					=>	array('jquery'),
+		'footer'				=>	false,
+	)
+);
+
+$defaultscripts = apply_filters('newsletters_default_scripts', $defaultscripts);
 
 $validation_rules = array(
 	'notempty'				=>	array(

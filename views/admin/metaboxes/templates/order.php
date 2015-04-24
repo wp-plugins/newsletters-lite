@@ -75,6 +75,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_order[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_order_' . $language, $settings); 
@@ -102,13 +103,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_order',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 					
 					wp_editor(stripslashes($this -> get_option('etmessage_order')), 'etmessage_order', $settings); 
 					
 					?>
-					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_order')), 'etmessage_order');*/ ?>
-					<?php /*<textarea name="etmessage_order" id="etmessage_order" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_order'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>
 		</tr>

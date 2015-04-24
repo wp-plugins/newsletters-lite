@@ -274,6 +274,7 @@ if (!class_exists('newsletters_lite')) {
 	
 	function load_newsletters_lite() {
 		$newsletters_lite = new newsletters_lite();
+		return $newsletters_lite;
 	}
 }
 

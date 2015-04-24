@@ -75,6 +75,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_expire[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_expire_' . $language, $settings); 
@@ -102,13 +103,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_expire',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 					
 					wp_editor(stripslashes($this -> get_option('etmessage_expire')), 'etmessage_expire', $settings); 
 					
 					?>
-					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_expire')), 'etmessage_expire');*/ ?>
-					<?php /*<textarea name="etmessage_expire" id="etmessage_expire" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_expire'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>
 		</tr>

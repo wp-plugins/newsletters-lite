@@ -101,14 +101,20 @@ if (!function_exists('newsletters_get_snippets')) {
 	}
 }
 
+if (!function_exists('newsletters_get_templates')) {
+	function newsletters_get_templates($conditions = null, $fields = null, $order = null, $limit = null) {
+		return wpml_get_themes($conditions, $fields, $order, $limit);
+	}
+}
+
 if (!function_exists('wpml_get_themes')) {
-	function wpml_get_themes() {
+	function wpml_get_themes($conditions = null, $fields = null, $order = null, $limit = null) {
 		$themes = array();
 		
 		global $wpdb, $Db, $Theme;
 		$Db -> model = $Theme -> model;
 		
-		if ($themes = $Db -> find_all()) {
+		if ($themes = $Db -> find_all($conditions, $fields, $order, $limit)) {
 			//do nothing...
 		}
 		

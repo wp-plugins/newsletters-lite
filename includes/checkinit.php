@@ -93,6 +93,10 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('wp_dashboard_setup', 'dashboard_setup');
 			
 			//Filter hooks
+			if (!$this -> ci_serial_valid()) {
+				$this -> add_filter('admin_footer_text');
+			}
+			
 			$this -> add_filter('cron_schedules', 'cron_schedules', 1, 1);
 			$this -> add_filter('screen_settings', 'screen_settings', 15, 2);
 			$this -> add_filter('plugin_action_links', 'plugin_action_links', 10, 4);

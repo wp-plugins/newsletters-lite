@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.2
-Stable tag: 4.5.1.1
+Stable tag: 4.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -22,7 +22,7 @@ The software works the way you do so you can focus on creating newsletters and g
 
 Some of the features in the WordPress Newsletter plugin include:
 
-* Multiple Mailing Lists 
+* Mailing Lists 
 * Bounce Email Management 
 * Newsletter Queue & Scheduling 
 * Newsletter Templates 
@@ -148,6 +148,19 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.2 =
+* ADD: New interface for enabling/disabling scripts to load
+* ADD: WYSIWYG editor for sending a test email/newsletter
+* ADD: Setting to enable/disable the styled default template for none and system emails 
+* IMPROVE: Load minimal editor under System Emails tab for performance
+* IMPROVE: Admin footer rating request in lite version
+* IMPROVE: Check flush_rewrite_rules() for 'newsletters' custom post type 
+* FIX: From name/email on newsletter not saving
+* FIX: More select drop downs conflicts (WooCommerce, NextGen, etc)
+* FIX: Cannot export subscribers with Ajax progress
+* FIX: Select2 Javascript Error
+* FIX: Subscribers add/import/subscribe, database error 
 
 = 4.5.1.1 =
 * FIX: Subscriber save/import/subscribe issue, db error (apologies!)

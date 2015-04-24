@@ -75,6 +75,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_confirm[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_confirm_' . $language, $settings); 
@@ -100,13 +101,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_confirm',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 					
 					wp_editor(stripslashes($this -> get_option('etmessage_confirm')), 'etmessage_confirm', $settings); 
 					
 					?>
-					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_confirm')), 'etmessage_confirm');*/ ?>
-					<?php /*<textarea name="etmessage_confirm" id="etmessage_confirm" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_confirm'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>
 		</tr>

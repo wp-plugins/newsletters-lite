@@ -105,7 +105,7 @@
 			if (requests >= subscribercount || cancelexport == "Y") { return; }
 			requests++;
 			
-			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>exportsubscribers', delimiter:'<?php echo $delimiter; ?>', subscriber:subscriber, headings:headings, exportfile:'<?php echo $exportfile; ?>'}, function(response) {
+			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>exportsubscribers', {delimiter:'<?php echo $delimiter; ?>', subscriber:subscriber, headings:headings, exportfile:'<?php echo $exportfile; ?>'}, function(response) {
 				completed++;
 				jQuery('#exportajaxcountinside').text(completed);
 				jQuery('#exportajaxsuccessrecords').prepend('<div class="ui-state-highlight ui-corner-all" style="margin-bottom:3px;"><p><i class="fa fa-check"></i> ' + response + '</div>').fadeIn().prev().fadeIn();

@@ -8,7 +8,7 @@ jQuery(document).ready(function() {
 		
 	if (jQuery.isFunction(jQuery.fn.tabs)) {
 		jQuery('#managementtabs').tabs({
-			active: managementtabscookieid,
+			//active: managementtabscookieid,
 			activate: function(event, ui) {	
 				if(history.pushState) {
 				    history.pushState(null, null, ui.newPanel.selector);
@@ -26,7 +26,9 @@ jQuery(document).ready(function() {
 		var thash = hash.substring(hash.lastIndexOf('#'), hash.length);
 		if (thash != "") {
 			jQuery('#managementtabs').find('a[href*='+ thash + ']').closest('li').trigger('click');
-		} 
+		} else {
+			jQuery('#managementtabs').tabs('option', 'active', managementtabscookieid);
+		}
 	}
 });
 

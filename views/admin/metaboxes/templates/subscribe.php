@@ -75,6 +75,7 @@ if ($this -> language_do()) {
 										'textarea_name'		=>	'etmessage_subscribe[' . $language . ']',
 										'textarea_rows'		=>	10,
 										'quicktags'			=>	true,
+										'teeny'				=>	true,
 									);
 									
 									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_subscribe_' . $language, $settings); 
@@ -102,13 +103,12 @@ if ($this -> language_do()) {
 						'textarea_name'		=>	'etmessage_subscribe',
 						'textarea_rows'		=>	10,
 						'quicktags'			=>	true,
+						'teeny'				=>	true,
 					);
 					
 					wp_editor(stripslashes($this -> get_option('etmessage_subscribe')), 'etmessage_subscribe', $settings); 
 					
 					?>
-					<?php /*wp_editor(stripslashes($this -> get_option('etmessage_subscribe')), 'etmessage_subscribe');*/ ?>
-					<?php /*<textarea name="etmessage_subscribe" id="etmessage_subscribe" class="widefat" cols="100%" rows="10"><?php echo esc_attr(stripslashes($this -> get_option('etmessage_subscribe'))); ?></textarea>*/ ?>
 				<?php endif; ?>
 			</td>
 		</tr>
