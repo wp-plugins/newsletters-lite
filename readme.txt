@@ -150,6 +150,30 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 == Changelog ==
 
 = 4.5.3 =
+* ADD: Javascript search under Newsletters > Extensions section
+* ADD: Rename 'newsletter' custom post type slug
+* ADD: Import subscribers date from CSV
+* ADD: IP Address on subscribers CSV import
+* ADD: Filter subscribers export fields/columns
+* ADD: Use newsletter template for WordPress system emails 
+* IMPROVE: Separate jQuery UI CSS with unique CSS selectors and class names
+* IMPROVE: Show lists and roles for newsletter email sent
+* IMPROVE: Prevent false read/opened newsletter tracking
+* IMPROVE: Apply $ = jQuery.noConflict() for plugin/theme conflicts
+* IMPROVE: Class attributes on all generated links for CSS styling
+* IMPROVE: Added Send to Friend to the extensions section
+* IMPROVE: Load minimal editor under System Emails tab for performance
+* IMPROVE: Edit/view links for newsletter on "Save an Autoresponder" page
+* IMPROVE: Review automatic inline styler if a connection isn't made
+* IMPROVE: Only load scripts and styles where needed
+* IMPROVE: Improve deletion of queued emails to prevent duplicates 
+* FIX: Possible duplicates with Ajax sending/queuing
+* FIX: Encoding issues with HTML offsite code and other areas
+* FIX: Subscribers CSV export "IP Address" column values in wrong place
+* FIX: Sending preview gives Forbidden/404 Not Found due to email in URL
+* FIX: Do flush_rewrite_rules() for new custom post type
+* FIX: Custom fields options order not saving
+* FIX: Cannot add new custom fields options on some setups 
 
 = 4.5.2 =
 * ADD: New interface for enabling/disabling scripts to load
