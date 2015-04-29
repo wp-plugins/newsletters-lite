@@ -85,7 +85,7 @@
 				<?php if ($this -> get_option('unsubscribecomments') == "Y") : ?>
 					<h3><?php _e('Comments', $this -> plugin_name); ?> <?php _e('(optional)', $this -> plugin_name); ?></h3>
 					<p>
-						<textarea name="<?php echo $this -> pre; ?>comments" style="width:97%;" rows="5" class="widefat"><?php echo stripslashes(htmlentities(strip_tags($data[$this -> pre . 'comments']))); ?></textarea>
+						<textarea name="<?php echo $this -> pre; ?>comments" style="width:97%;" rows="5" class="widefat"><?php echo stripslashes(htmlentities(strip_tags($data[$this -> pre . 'comments']), false, get_bloginfo('charset'))); ?></textarea>
 					</p>
 				<?php endif; ?>
 				

@@ -255,11 +255,13 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 			
 			requests++;
 			
-			var index = jQuery.grep(subscribers, function(e, i) {					
+			/*var index = jQuery.grep(subscribers, function(e, i) {					
 				if (e.email == subscriber.email) {
 					return i;
 				}
 			});
+			
+			alert(index);
 			
 			requestArray[index] = jQuery.ajax({
 				cache: false,
@@ -274,8 +276,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 					theme_id:'<?php echo $theme_id; ?>',
 					senddate:'<?php echo $_POST['senddate']; ?>'
 				}
-			}).done(function(response) { 		
-				
+			}).done(function(response) {				
 				var data = response.split('<|>');
 				var success = data[0];
 				var email = data[1];
@@ -301,7 +302,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 				completed++;
 				var value = (completed * 100) / subscribercount;
 				jQuery("#sendprogressbar").progressbar("value", value);
-
+				
 				subscribers.splice(index, 1);
 					
 				if (subscribers.length == 0) {
@@ -323,9 +324,9 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 				}
 			}).fail(function(jqXHR, textStatus, errorThrown) {
 				// request failed, do nothing...
-			});
+			});*/
 			
-			/*requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>executemail', {
+			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>executemail', {
 				subscriber:subscriber,
 				attachments:'<?php echo maybe_serialize($attachments); ?>',
 				history_id:'<?php echo $history_id; ?>',
@@ -363,7 +364,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 						executemail(subscribers[(requests + 1)]);
 					}
 				}
-			}));*/
+			}));
 		}
 		
 		function queuemail(subscriber) {		
@@ -373,7 +374,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 			
 			requests++;
 			
-			var index = jQuery.grep(subscribers, function(e, i) {					
+			/*var index = jQuery.grep(subscribers, function(e, i) {					
 				if (e.email == subscriber.email) {
 					return i;
 				}
@@ -441,7 +442,47 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 				}
 			}).fail(function(jqXHR, textStatus, errorThrown) {
 				// request failed, do nothing...
-			});
+			});*/
+			
+			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>queuemail', {
+				subscriber:subscriber,
+				attachments:'<?php echo maybe_serialize($attachments); ?>',
+				history_id:'<?php echo $history_id; ?>',
+				post_id:'<?php echo $post_id; ?>',
+				theme_id:'<?php echo $theme_id; ?>',
+				senddate:'<?php echo $_POST['senddate']; ?>'
+			}, function(response) {
+				var data = response.split('<|>');
+				var success = data[0];
+				var email = data[1];
+				var message = data[2];
+				
+				if (success == "Y") {
+					sent++;
+					if ((sent + failed) <= subscribercount) { 
+						jQuery('#sendajaxcountinside').text(sent); 
+						jQuery('#sendajaxsuccessrecords').prepend(email + '<br/>').fadeIn().prev().fadeIn();
+					}
+				} else {
+					failed++;
+					if ((sent + failed) <= subscribercount) { 
+						jQuery('#sendajaxfailedcountinside').text(failed); 
+						jQuery('#sendajaxfailedrecords').prepend(email + ' - ' + message + '<br/>').fadeIn().prev().fadeIn();
+					}
+				}
+				
+				completed++;
+				var value = (completed * 100) / subscribercount;
+				jQuery("#sendprogressbar").progressbar("value", value);
+			}).success(function() { 			
+				if (completed == subscribercount) {
+					finished();
+				} else {
+					if (requests < subscribercount) {
+						queuemail(subscribers[(requests + 1)]);
+					}
+				}
+			}));
 		}
 		
 		function finished() {

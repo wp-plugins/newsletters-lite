@@ -1,6 +1,6 @@
-<div class="wrap newsletters <?php echo $this -> pre; ?>">
+<div id="<?php echo $this -> sections -> extensions; ?>" class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Manage Extensions', $this -> plugin_name); ?></h2>
-    <?php $this -> render('extensions' . DS . 'navigation', false, true, 'admin'); ?>
+    <?php $this -> render('extensions' . DS . 'navigation', array('section' => $this -> sections -> extensions), true, 'admin'); ?>
     <p><?php _e('These are extensions which extend the functionality of the Newsletter plugin.', $this -> plugin_name); ?></p>
     
     <?php if (!empty($this -> extensions)) : ?>
@@ -17,7 +17,7 @@
                     <th><?php _e('Extension Status', $this -> plugin_name); ?></th>
                 </tr>
             </tfoot>
-        	<tbody>
+        	<tbody class="<?php echo $this -> sections -> extensions; ?>-list">
             	<?php $class = ''; ?>
             	<?php foreach ($this -> extensions as $extension) : ?>                
                 	<?php
@@ -45,8 +45,8 @@
                 			</a>
                 		</th>
                     	<th>
-							<a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" class="row-title"><?php echo $extension['name']; ?></a>
-							<br/><small class="howto"><?php echo $extension['description']; ?></small>
+							<a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" class="row-title newsletters-extension-name"><?php echo $extension['name']; ?></a>
+							<br/><small class="newsletters-extension-description howto"><?php echo $extension['description']; ?></small>
                             <div class="row-actions">
                             	<?php 
 								
@@ -61,14 +61,14 @@
 									case 1	:
 										?>
                                         
-                                        <span class="edit"><?php echo $Html -> link(__('Activate', $this -> plugin_name), wp_nonce_url('?page=' . $this -> sections -> extensions . '&method=activate&plugin=' . plugin_basename($path))); ?></span>
+                                        <span class="edit"><?php echo $Html -> link(__('Activate', $this -> plugin_name), wp_nonce_url('?page=' . $this -> sections -> extensions . '&method=activate&plugin=' . plugin_basename($path), 'newsletters_extension_activate_' . plugin_basename($path))); ?></span>
                                         
                                         <?php
 										break;
 									case 2	:
 										?>
                                         
-                                        <span class="delete"><?php echo $Html -> link(__('Deactivate', $this -> plugin_name), wp_nonce_url('?page=' . $this -> sections -> extensions . '&method=deactivate&plugin=' . plugin_basename($path)), array("onclick" => "if (!confirm('" . __('Are you sure you want to deactivate this extension?', $this -> plugin_name) . "')) { return false; }", 'class' => "submitdelete")); ?></span>
+                                        <span class="delete"><?php echo $Html -> link(__('Deactivate', $this -> plugin_name), wp_nonce_url('?page=' . $this -> sections -> extensions . '&method=deactivate&plugin=' . plugin_basename($path), 'newsletters_extension_deactivate_' . plugin_basename($path)), array('class' => "submitdelete")); ?></span>
                                         
                                         <?php
 										break;	
@@ -89,12 +89,13 @@
 									?>
 									
 									<span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span>
-									<p><?php echo $Html -> link(__('Get it now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'class' => "button button-small", 'onclick' => "jQuery.colorbox({iframe:true, title:'" . esc_attr(stripslashes($extension['name'])) . "', fastIframe:false, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?></p>
+									<p><?php echo $Html -> link(__('Get it now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'class' => "button button-primary", 'onclick' => "jQuery.colorbox({iframe:true, title:'" . esc_attr(stripslashes($extension['name'])) . "', fastIframe:false, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?></p>
 									
 									<?php
 									break;
 								case 1			:
-									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Installed but Inactive', $this -> plugin_name); ?></span><?php
+									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Installed but Inactive', $this -> plugin_name); ?></span>
+									<p><a href="<?php echo wp_nonce_url('admin.php?page=' . $this -> sections -> extensions . '&method=activate&plugin=' . plugin_basename($path), 'newsletters_extension_activate_' . plugin_basename($path)); ?>" class="button"><?php _e('Activate', $this -> plugin_name); ?></a></p><?php
 									break;
 								case 2			:
 									?><span class="<?php echo $this -> pre; ?>success"><?php _e('Installed and Active', $this -> plugin_name); ?></span><?php
@@ -107,7 +108,20 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <ul class="pagination"></ul>
     <?php else : ?>
     	<p class="<?php echo $this -> pre; ?>error"><?php _e('No extensions found.', $this -> plugin_name); ?></p>
     <?php endif; ?>
+    
+	<script type="text/javascript" src="//listjs.com/no-cdn/list.js"></script>
+	
+	<script type="text/javascript">
+	var options = {
+		listClass: '<?php echo $this -> sections -> extensions; ?>-list',
+		valueNames: ['newsletters-extension-name', 'newsletters-extension-description'],
+		searchClass: '<?php echo $this -> sections -> extensions; ?>-search'
+	};
+	
+	var userList = new List('<?php echo $this -> sections -> extensions; ?>', options);
+	</script>
 </div>

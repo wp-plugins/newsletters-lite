@@ -7,8 +7,8 @@
 	
 	<div id="import-export-tabs">
 		<ul>
-			<li><a href="#import-tab"><?php _e('Import', $this -> plugin_name); ?></a></li>
-			<li><a href="#export-tab"><?php _e('Export', $this -> plugin_name); ?></a></li>
+			<li><a href="#import-tab"><i class="fa fa-upload"></i> <?php _e('Import', $this -> plugin_name); ?></a></li>
+			<li><a href="#export-tab"><i class="fa fa-download"></i> <?php _e('Export', $this -> plugin_name); ?></a></li>
 		</ul>
 		<div id="import-tab">
 			<h3><?php _e('Import', $this -> plugin_name); ?></h3>
@@ -22,7 +22,7 @@
 							<td>
 								<input class="widefat" style="width:auto;" type="file" id="importfile" name="file" />
 								<span class="howto"><?php _e('CSV/vCard file', $this -> plugin_name); ?></span>
-		                        <?php if (!empty($importerrors['file'])) : ?><div class="wpmlerror"><?php echo $importerrors['file']; ?></div><?php endif; ?>
+		                        <?php if (!empty($importerrors['file'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['file']; ?></p></div><?php endif; ?>
 							</td>
 						</tr>
 						<tr>
@@ -36,14 +36,11 @@
 											<label><input <?php echo (!empty($_POST['importlists']) && in_array($id, $_POST['importlists'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="importlists[]" value="<?php echo $id; ?>" id="checklist<?php echo $id; ?>" /> <?php echo $title; ?> (<?php echo $Db -> count(array('list_id' => $id)); ?> <?php _e('subscribers', $this -> plugin_name); ?>)</label><br/>
 										<?php endforeach; ?>
 									</div>
-									<?php /*<p>
-										<a class="button" onclick="jQuery.colorbox({href:newsletters_ajaxurl + '?action=newsletters_mailinglist_save'}); return false;" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> lists . '&method=save'); ?>"><?php _e('Create New List', $this -> plugin_name); ?></a>
-									</p>*/ ?>
 								<?php else : ?>
-									<span class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></span>
+									<p class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
 								<?php endif; ?>
 		                        
-		                        <?php if (!empty($importerrors['mailinglists'])) : ?><div class="wpmlerror"><?php echo $importerrors['mailinglists']; ?></div><?php endif; ?>
+		                        <?php if (!empty($importerrors['mailinglists'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['mailinglists']; ?></p></div><?php endif; ?>
 							</td>
 						</tr>
 						<tr>
@@ -51,7 +48,7 @@
 							<td>
 								<label><input onclick="jQuery('#csvdiv').show(); jQuery('#macdiv').hide();" <?php echo (!empty($_POST['filetype']) && $_POST['filetype'] == "csv") ? 'checked="checked"' : ''; ?> type="radio" name="filetype" value="csv" /> <?php _e('CSV Spreadsheet', $this -> plugin_name); ?></label><br/>
 								<label><input onclick="jQuery('#csvdiv').hide(); jQuery('#macdiv').show();" <?php echo (!empty($_POST['filetype']) && $_POST['filetype'] == "mac") ? 'checked="checked"' : ''; ?> type="radio" name="filetype" value="mac" /> <?php _e('Mac OS Address Book (vCard file)', $this -> plugin_name); ?></label>
-		                        <?php if (!empty($importerrors['filetype'])) : ?><div class="wpmlerror"><?php echo $importerrors['filetype']; ?></div><?php endif; ?>
+		                        <?php if (!empty($importerrors['filetype'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['filetype']; ?></p></div><?php endif; ?>
 							</td>
 						</tr>
 					</tbody>
@@ -65,7 +62,7 @@
 								<td>
 									<input class="widefat" style="width:45px;" type="text" name="delimiter" value="<?php echo (empty($_POST['delimiter'])) ? ',' : esc_attr(stripslashes($_POST['delimiter'])); ?>" id="delimiter" />
 									<span class="howto"><?php _e('Operator delimiting field values. Open your CSV in a text editor to confirm with which operator field values are delimited. The default is comma (,).', $this -> plugin_name); ?></span>
-			                        <?php if (!empty($importerrors['delimiter'])) : ?><div class="wpmlerror"><?php echo $importerrors['delimiter']; ?></div><?php endif; ?>
+			                        <?php if (!empty($importerrors['delimiter'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['delimiter']; ?></p></div><?php endif; ?>
 								</td>
 							</tr>
 							<tr>
@@ -80,7 +77,7 @@
 										<table class="form-table">
 											<tbody>
 												<tr>
-													<th><label><input <?php echo $fieldemailcheck = ($_POST['fields']['mailinglists'] == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#mailinglistscolumn').toggle();" type="checkbox" name="fields[mailinglists]" value="Y" /> <?php _e('Mailing List(s)', $this -> plugin_name); ?></label></th>
+													<th style="padding:15px 0;"><label><input <?php echo $fieldemailcheck = ($_POST['fields']['mailinglists'] == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#mailinglistscolumn').toggle();" type="checkbox" name="fields[mailinglists]" value="Y" /> <?php _e('Mailing List(s)', $this -> plugin_name); ?></label></th>
 													<td>
 														<span id="mailinglistscolumn" style="display:<?php echo $fieldemaildisplay = ($_POST['fields']['mailinglists'] == "Y") ? 'block' : 'none'; ?>;">
 															<b><?php _e('Column Number:', $this -> plugin_name); ?></b> <input type="text" class="widefat" style="width:45px;" name="mailinglistscolumn" value="<?php echo $_POST['mailinglistscolumn']; ?>" />
@@ -89,11 +86,30 @@
 														</span>
 													</td>
 												</tr>
+												<!-- Email Address -->
 												<tr>
-													<th><label><input <?php echo $fieldemailcheck = ($_POST['fields']['email'] == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#emailcolumn').toggle();" type="checkbox" name="fields[email]" value="Y" /> <?php _e('Email Address', $this -> plugin_name); ?></label></th>
+													<th style="padding:15px 0;"><label><input <?php echo $fieldemailcheck = ($_POST['fields']['email'] == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#emailcolumn').toggle();" type="checkbox" name="fields[email]" value="Y" /> <?php _e('Email Address', $this -> plugin_name); ?></label></th>
 													<td>
 														<span id="emailcolumn" style="display:<?php echo $fieldemaildisplay = ($_POST['fields']['email'] == "Y") ? 'block' : 'none'; ?>;">
 															<b><?php _e('Column Number:', $this -> plugin_name); ?></b> <input type="text" class="widefat" style="width:45px;" name="emailcolumn" value="<?php echo $_POST['emailcolumn']; ?>" />
+														</span>
+													</td>
+												</tr>
+												<!-- IP Address -->
+												<tr>
+													<th style="padding:15px 0;"><label><input <?php echo $fieldip_addresscheck = ($_POST['fields']['ip_address'] == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#ip_addresscolumn').toggle();" type="checkbox" name="fields[ip_address]" value="Y" /> <?php _e('IP Address', $this -> plugin_name); ?></label></th>
+													<td>
+														<span id="ip_addresscolumn" style="display:<?php echo $fieldip_addressdisplay = ($_POST['fields']['ip_address'] == "Y") ? 'block' : 'none'; ?>;">
+															<b><?php _e('Column Number:', $this -> plugin_name); ?></b> <input type="text" class="widefat" style="width:45px;" name="ip_addresscolumn" value="<?php echo $_POST['ip_addresscolumn']; ?>" />
+														</span>
+													</td>
+												</tr>
+												<!-- Date -->
+												<tr>
+													<th style="padding:15px 0;"><label><input <?php echo $fieldcreatedcheck = ($_POST['fields']['created'] == "Y") ? 'checked="checked"' : ''; ?> onclick="jQuery('#createdcolumn').toggle();" type="checkbox" name="fields[created]" value="Y" /> <?php _e('Date', $this -> plugin_name); ?></label></th>
+													<td>
+														<span id="createdcolumn" style="display:<?php echo $fieldcreateddisplay = ($_POST['fields']['created'] == "Y") ? 'block' : 'none'; ?>;">
+															<b><?php _e('Column Number:', $this -> plugin_name); ?></b> <input type="text" class="widefat" style="width:45px;" name="createdcolumn" value="<?php echo $_POST['createdcolumn']; ?>" />
 														</span>
 													</td>
 												</tr>
@@ -101,7 +117,7 @@
 												<?php if (!empty($fields)) : ?>
 													<?php foreach ($fields as $field) : ?>
 														<tr>
-															<th><label><input onclick="jQuery('#<?php echo $field -> slug; ?>div').toggle();" <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "Y") ? 'checked="checked"' : ''; ?> type="checkbox" name="fields[<?php echo $field -> slug; ?>]" value="Y" /> <?php echo __($field -> title); ?></label></th>
+															<th style="padding:15px 0;"><label><input onclick="jQuery('#<?php echo $field -> slug; ?>div').toggle();" <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "Y") ? 'checked="checked"' : ''; ?> type="checkbox" name="fields[<?php echo $field -> slug; ?>]" value="Y" /> <?php echo __($field -> title); ?></label></th>
 															<td>
 																<span id="<?php echo $field -> slug; ?>div" style="display:<?php echo $display = (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "Y") ? 'block' : 'none'; ?>;">
 																	<b><?php _e('Column Number:', $this -> plugin_name); ?></b> <input type="text" class="widefat" style="width:45px;" name="<?php echo $field -> slug; ?>column" value="<?php echo $_POST[$field -> slug . 'column']; ?>" />
@@ -275,7 +291,7 @@
 										<?php endforeach; ?>
 									</div>
 								<?php else : ?>
-									<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available.', $this -> plugin_name); ?></p>
+									<p class="newsletters_error"><?php _e('No mailing lists are available.', $this -> plugin_name); ?></p>
 								<?php endif; ?>
 								<span class="howto"><?php _e('Choose the mailing list(s) to export', $this -> plugin_name); ?></span>
 							</td>

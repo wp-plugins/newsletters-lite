@@ -62,7 +62,7 @@ if (!class_exists('wpmlOption')) {
 				if (empty($value)) { $this -> errors['value'] = __('Please specify a value', $this -> plugin_name); }
 				if (empty($field_id)) { $this -> errors['field_id'] = __('Please select a field', $this -> plugin_name); }
 				
-				if ($cur_option = $this -> find(array('field_id' => $field_id, 'value' => $value))) {
+				if ($cur_option = $this -> find(array('field_id' => $field_id, 'value' => $value), false, false, false)) {
 					$this -> data -> id = $cur_option -> id;
 				}
 			} else {

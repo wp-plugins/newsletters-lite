@@ -107,7 +107,7 @@
 		<label>
 			<h3 id="code"><label for="<?php echo $this -> pre; ?>code"><?php _e('Offsite Code', $this -> plugin_name); ?></label></h3>
 			<p class="howto"><?php _e('HTML and Javascript code to accept subscriptions on external websites into this one.', $this -> plugin_name); ?></p>
-			<textarea wrap="off" name="code" rows="15" cols="100%" class="widefat" id="<?php echo $this -> pre; ?>code" onclick="this.select();"><?php echo htmlentities(trim($code)); ?></textarea>
+			<textarea wrap="off" name="code" rows="15" cols="100%" class="widefat" id="<?php echo $this -> pre; ?>code" onclick="this.select();"><?php echo htmlentities(trim($code), false, get_bloginfo('charset')); ?></textarea>
 			<span class="howto"><?php _e('Copy and paste the code into any webpage.', $this -> plugin_name); ?></span>
 		</label>
 	<?php endif; ?>

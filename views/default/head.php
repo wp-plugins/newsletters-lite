@@ -11,7 +11,7 @@ var wpmlScroll = "<?php echo ($embed['scroll'] == "Y") ? 'Y' : 'N'; ?>";
 	var wpmlajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>?';
 <?php endif; ?>
 
-jQuery.noConflict();
+$ = jQuery.noConflict();
 
 jQuery(document).ready(function() {
 	if (jQuery.isFunction(jQuery.fn.select2)) {

@@ -522,6 +522,7 @@ table tbody tr.arow {
     filter: alpha(opacity=80);
     zoom: 1;
     border-width: 2px;
+    border-color: #000000;
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;

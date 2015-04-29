@@ -1,4 +1,11 @@
 <!-- Submit box with some settings -->
+
+<?php
+	
+$previewemail = (empty($_POST['previewemail'])) ? $this -> get_option('adminemail') : $_POST['previewemail'];
+	
+?>
+
 <div class="submitbox" id="submitpost">
 	<div id="minor-publishing">
 		<div id="minor-publishing-actions">
@@ -15,7 +22,7 @@
 				<div class="form-field">
 					<label for="previewemail"><?php _e('Send To:', $this -> plugin_name); ?></label>
 					<?php echo $Html -> help(__('Specify the email address(es) to send this newsletter as a preview to. For multiple emails, separate them with a comma (,)', $this -> plugin_name)); ?>
-					<input type="text" name="previewemail" value="<?php echo esc_attr(stripslashes($this -> get_option('adminemail'))); ?>" id="previewemail" />
+					<input type="text" name="previewemail" value="<?php echo esc_attr(stripslashes($previewemail)); ?>" id="previewemail" />
 				</div>
 				<p>
 					<input class="button button-primary" type="submit" name="preview" value="<?php _e('Send', $this -> plugin_name); ?>" />

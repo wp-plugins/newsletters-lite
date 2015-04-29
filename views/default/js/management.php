@@ -28,6 +28,7 @@ jQuery(document).ready(function() {
 			jQuery('#managementtabs').find('a[href*='+ thash + ']').closest('li').trigger('click');
 		} else {
 			jQuery('#managementtabs').tabs('option', 'active', managementtabscookieid);
+			setTimeout(function() { window.scrollTo(0, 0); }, 1);
 		}
 	}
 });

@@ -1006,6 +1006,7 @@ class wpmlSubscriber extends wpMailPlugin {
 							$paid = ($mailinglist -> paid == "Y") ? 'Y' : 'N';
 							if (!empty($mailinglist -> paid) && $mailinglist -> paid == "Y") { $active = "N"; }
 							$sl_data = array('SubscribersList' => array('subscriber_id' => $this -> insertid, 'list_id' => $list_id, 'active' => $active, 'paid' => $paid));
+							$sl_data = apply_filters('newsletters_subscriberslist_save_data', $sl_data);
 							$SubscribersList -> save($sl_data);							
 							$active = $oldactive;
 						}

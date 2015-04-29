@@ -662,12 +662,14 @@ class wpmlHistory extends wpMailPlugin {
 				/* Custom post type */
 				if ($history = $this -> get($history_id, false)) {
 					if (!empty($insertpost) && $insertpost == true) {
+						$custompostslug = $this -> get_option('custompostslug');
+						
 						$post_data = array(
 							'ID'							=>	((empty($history -> p_id)) ? false : $history -> p_id),
 							'post_content'					=>	$history -> message,
 							'post_title'					=>	$history -> subject,
 							'post_status'					=>	"publish",
-							'post_type'						=>	"newsletter",
+							'post_type'						=>	$custompostslug,
 							'post_author'					=>	$user_ID,
 						);
 						

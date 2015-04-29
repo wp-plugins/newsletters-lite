@@ -97,6 +97,9 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                                     	<option <?php echo (!empty($Autoresponder -> data -> history_id) && $Autoresponder -> data -> history_id == $h_id) ? 'selected="selected"' : ''; ?> value="<?php echo $h_id; ?>"><?php echo __($h_subject); ?></option>
                                     <?php endforeach; ?>
                                 </select>
+                                <?php _e('Current:', $this -> plugin_name); ?>
+                                <a target="_blank" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> send . '&method=history&id=' . $Autoresponder -> data -> history_id); ?>"><i class="fa fa-pencil"></i></a>
+                                <a target="_blank" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> history . '&method=view&id=' . $Autoresponder -> data -> history_id); ?>"><i class="fa fa-eye"></i></a>
                             <?php else : ?>
                             	<span class="error"><?php _e('No sent/draft emails found, please add.', $this -> plugin_name); ?></span>
                             <?php endif; ?>

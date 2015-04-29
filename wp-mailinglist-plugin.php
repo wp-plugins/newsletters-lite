@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.2';
+		var $version = '4.5.3';
 		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -1059,23 +1059,32 @@ if (!class_exists('wpMailPlugin')) {
 			define('DOING_AJAX', true);
 			define('SHORTINIT', true);
 			global $wpdb, $Db, $Subscriber, $History, $HistoriesAttachment;
-			//$subscriber = (object) maybe_unserialize(stripslashes($_REQUEST['subscriber']));
 			$subscriber = $subscriber_request = (object) stripslashes_deep($_REQUEST['subscriber']);
 			
 			if (!empty($_REQUEST)) {
 				$historyquery = "SELECT id, message, subject FROM " . $wpdb -> prefix . $History -> table . " WHERE id = '" . $_REQUEST['history_id'] . "' LIMIT 1";
 				$history = $wpdb -> get_row($historyquery);
 			
-				if (!empty($history)) {
-					$subscriber = $Subscriber -> get($subscriber_request -> id, false);
-					$subscriber -> mailinglist_id = $subscriber_request -> mailinglist_id;
-					$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $subscriber_request -> mailinglists);
+				if (!empty($history)) {					
+					if (!empty($subscriber_request -> user_id)) {
+						$user = $this -> userdata($subscriber_request -> user_id);
+						$email = $user -> user_email;
+						$eunique = md5($user -> ID . $history_id . date_i18n("YmdH", time()));
+						$subscriber = false;
+					} else {
+						$subscriber = $Subscriber -> get($subscriber_request -> id, false);
+						$email = $subscriber -> email;
+						$subscriber -> mailinglist_id = $subscriber_request -> mailinglist_id;
+						$subscriber -> mailinglists = $Subscriber -> mailinglists($subscriber -> id, $subscriber_request -> mailinglists);
+						$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
+						$user = false;
+					}
+					
 					$content = $history -> message;
 					$subject = $history -> subject;
 					$history_id = $_REQUEST['history_id'];
 					$post_id = $_REQUEST['post_id'];
 					$theme_id = $_REQUEST['theme_id'];
-					$eunique = md5($subscriber -> id . $subscriber -> mailinglist_id . $history_id . date_i18n("YmdH", time()));
 					$shortlinks = true;
 					
 					$newattachments = array();
@@ -1092,17 +1101,17 @@ if (!class_exists('wpMailPlugin')) {
 					
 					$message = $this -> render_email('send', array('message' => $content, 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id, 'post_id' => $post_id, 'eunique' => $eunique), false, $this -> htmltf($subscriber -> format), true, $theme_id, true);
 					
-					if ($this -> execute_mail($subscriber, false, $subject, $message, $newattachments, $history_id, $eunique)) {
-						$success = "Y<|>" . $subscriber -> email . "<|>" . __('Success', $this -> plugin_name);
+					if ($this -> execute_mail($subscriber, $user, $subject, $message, $newattachments, $history_id, $eunique)) {
+						$success = "Y<|>" . $email . "<|>" . __('Success', $this -> plugin_name);
 					} else {
 						global $mailerrors;
-						$success = "N<|>" . $subscriber -> email . "<|>" . strip_tags($mailerrors);
+						$success = "N<|>" . $email . "<|>" . strip_tags($mailerrors);
 					}
 				} else {
-					$success = "N<|>" . $subscriber -> email . "<|>" . __('History email could not be read', $this -> plugin_name);
+					$success = "N<|>" . $email . "<|>" . __('History email could not be read', $this -> plugin_name);
 				}
 			} else {
-				$success = "N<|>" . $subscriber -> email . "<|>" . __('No data was posted', $this -> plugin_name);
+				$success = "N<|>" . $email . "<|>" . __('No data was posted', $this -> plugin_name);
 			}
 			
 			echo $success;
@@ -3545,34 +3554,38 @@ if (!class_exists('wpMailPlugin')) {
 			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }			
 	
 			if (is_admin()) {	
-				wp_enqueue_script('swfobject', false, array('jquery'), false, true);
-				wp_enqueue_script('chartjs', $this -> render_url('js/chartjs/Chart.js', 'admin', false), array('jquery'), false, false);
+				// Charts
+				if (preg_match("/(index.php)/si", $_SERVER['REQUEST_URI']) || 
+					(!empty($_GET['page']) && ($_GET['page'] == $this -> sections -> welcome || $_GET['page'] == $this -> sections -> history))) {
+					wp_enqueue_script('chartjs', $this -> render_url('js/chartjs/Chart.js', 'admin', false), array('jquery'), false, false);
+				}
 					
+				// Tooltips
 				if (preg_match("/(index\.php|widgets\.php|post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {									
 					wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
 				}
 				
 				if ((!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) || preg_match("/(post\.php|post\-new\.php)/", $_SERVER['REQUEST_URI'], $matches)) {
 					
+					// Select 2
 					if (in_array($_GET['page'], (array) $this -> sections)) {						
 						wp_deregister_script('select2');
 						wp_deregister_script('wc-enhanced-select');
 						wp_enqueue_script('select2', $this -> render_url('js/select2.js', 'admin', false), false, '4.0.0', false);
 					}
 					
-					//if (in_array($_GET['page'], (array) $this -> sections)) {
-						if ($_GET['page'] != $this -> sections -> send) {
-							wp_enqueue_media();
-						}
-						
-						// CKEditor
-						//wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
-						wp_enqueue_script('ckeditor', '//cdn.ckeditor.com/4.4.7/full-all/ckeditor.js', array('jquery'), '4.4.7', false);
-						wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.4.7", false);
+					if ($_GET['page'] != $this -> sections -> send) {
+						wp_enqueue_media();
+					}
 					
-						wp_enqueue_script('iris', admin_url('js/iris.min.js'), array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1);
-					    wp_enqueue_script('wp-color-picker', admin_url('js/color-picker.min.js'), array( 'iris' ), false, 1);
-					//}
+					// CKEditor
+					//wp_enqueue_script('ckeditor', $this -> render_url('vendors/ckeditor/ckeditor.js', 'admin', false), array('jquery'), "4.3.4", false);	
+					wp_enqueue_script('ckeditor', '//cdn.ckeditor.com/4.4.7/full-all/ckeditor.js', array('jquery'), '4.4.7', false);
+					wp_enqueue_script('ckeditor-jquery', $this -> render_url('vendors/ckeditor/adapters/jquery.js', 'admin', false), array('ckeditor', 'jquery'), "4.4.7", false);
+				
+					// Color Picker
+					wp_enqueue_script('iris', admin_url('js/iris.min.js'), array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1);
+				    wp_enqueue_script('wp-color-picker', admin_url('js/color-picker.min.js'), array( 'iris' ), false, 1);
 				    
 				    wp_enqueue_script('jquery-ui-watermark', plugins_url() . '/' . $this -> plugin_name . '/js/jquery.watermark.js', array('jquery'), false, true);
 				    wp_enqueue_script('jquery-ui-tooltip', false, array('jquery'), false, true);
@@ -3917,7 +3930,7 @@ if (!class_exists('wpMailPlugin')) {
 				foreach ($this -> classes as $class) {	
 					global ${$class};
 				
-					if (!is_object(${$class})) {
+					if (!is_object(${$class})) {						
 						switch ($class) {
 							case 'wpmlGroup'		:
 							case 'wpmlOrder'		:
@@ -4372,9 +4385,9 @@ if (!class_exists('wpMailPlugin')) {
 			return false;
 		}
 		
-		function user_role($user_id = null) {
+		function user_role($user_id = null, $user = null) {
 			if (!empty($user_id)) {
-				if ($user = $this -> userdata($user_id)) {
+				if (!empty($user) || $user = $this -> userdata($user_id)) {
 					$user_roles = $user -> roles;
 					$user_role = array_shift($user_roles);
 					
@@ -4946,7 +4959,7 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($urlonly)) {
 					$link = $url;
 				} else {
-					$link = '<a href="' . $url . '">' . __($this -> get_option('resubscribetext')) . '</a>';
+					$link = '<a class="newsletters_resubscribe newsletters_link" href="' . $url . '">' . __($this -> get_option('resubscribetext')) . '</a>';
 				}
 			}
 			
@@ -5013,7 +5026,7 @@ if (!class_exists('wpMailPlugin')) {
 				
 				//if ((!empty($urlonly) && $urlonly == true) || empty($subscriber -> format) || $subscriber -> format == "html") {
 				if (empty($urlonly) || $urlonly == false) {
-					$unsubscribelink = '<a href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
+					$unsubscribelink = '<a class="newsletters_unsubscribe newsletters_link" href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
 				} else {
 					$unsubscribelink = $url;
 				}
@@ -5057,7 +5070,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				if (empty($subscriber -> format) || $subscriber -> format == "html") {
-					$managelink = '<a href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
+					$managelink = '<a class="newsletters_manage newsletters_link" href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
 				} else {
 					$managelink = $url;
 				}
@@ -5113,7 +5126,7 @@ if (!class_exists('wpMailPlugin')) {
 					} else {
 						if (empty($subscriber -> format) || $subscriber -> format == "html") {
 							$text = (empty($print)) ? __($this -> get_option('onlinelinktext')) : __($this -> get_option('printlinktext'));
-							$onlinelink = '<a href="' . $url . '" style="' . $style . '">' . $text . '</a>';
+							$onlinelink = '<a class="newsletters_online newsletters_link" href="' . $url . '" style="' . $style . '">' . $text . '</a>';
 						} else {
 							$onlinelink = $url;
 						}
@@ -5156,7 +5169,7 @@ if (!class_exists('wpMailPlugin')) {
 				$url = $Html -> retainquery($querystring, $this -> get_managementpost(true));
 				
 				if (empty($subscriber -> format) || $subscriber -> format == "html") {
-					$activationlink = '<a href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
+					$activationlink = '<a class="newsletters_activate newsletters_link" href="' . $url . '" title="' . $linktext . '" style="' . $style . '">' . $linktext . '</a>';
 				} else {
 					$activationlink = $url;
 				}
@@ -5271,7 +5284,10 @@ if (!class_exists('wpMailPlugin')) {
 			}
 			
 			if (!empty($message)) {				
-				if (!empty($subscriber)) {								
+				if (!empty($subscriber)) {	
+					global $current_subscriber;
+					$current_subscriber = $subscriber;
+												
 					$Db -> model = $Mailinglist -> model;
 					$mailinglist_name = $Db -> field('title', array('id' => $subscriber -> mailinglist_id));
 					
@@ -5330,6 +5346,8 @@ if (!class_exists('wpMailPlugin')) {
 						"/\[newsletters_resubscribe\]/",
 					);
 					
+					$newsearch = apply_filters('newsletters_processvariables_search', $newsearch, $subscriber);
+					
 					$newreplace = array(
 						$subscriber -> email, 
 						$subscriber -> email,
@@ -5353,6 +5371,8 @@ if (!class_exists('wpMailPlugin')) {
 						$this -> output_custom_fields($subscriber),
 						$this -> gen_resubscribe_link($subscriber),
 					);
+					
+					$newreplace = apply_filters('newsletters_processvariables_replace', $newreplace, $subscriber);
 					
 					$fields = $Field -> get_all();
 					
@@ -6779,11 +6799,11 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.2") < 0) {
+				if (version_compare($cur_version, "4.5.3") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
-					$version = '4.5.2';	
+					$version = '4.5.3';	
 				}
 			
 				//the current version is older.
@@ -6885,6 +6905,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['tinymcebtn'] = "Y";
 			$options['sendasnewsletterbox'] = "Y";
 			$options['subscriberegister'] = "N";
+			$options['custompostslug'] = "newsletter";
 			$options['importusers'] = "N";
 			$options['importusersscheduling'] = "hourly";
 			$options['importuserslists'] = array(1);
@@ -7598,12 +7619,26 @@ if (!class_exists('wpMailPlugin')) {
 			}
 		}
 		
-		function render_error($message) {
+		function render_error($message, $vars = array()) {
+			if (!empty($message) && is_numeric($message)) {
+				include $this -> plugin_base() . DS . 'includes' . DS . 'messages.php';
+				if (!empty($messages[$message])) {
+					$message = vsprintf($messages[$message], $vars);
+				}
+			}
+			
 			$this -> render_admin('error-top', array('message' => $message));
 			flush();
 		}
 		
-		function render_message($message) {
+		function render_message($message, $vars = array()) {
+			if (!empty($message) && is_numeric($message)) {
+				include $this -> plugin_base() . DS . 'includes' . DS . 'messages.php';
+				if (!empty($messages[$message])) {
+					$message = vsprintf($messages[$message], $vars);
+				}
+			}
+			
 			$this -> render_admin('message', array('message' => $message));
 			flush();
 		}
@@ -7884,8 +7919,8 @@ if (!class_exists('wpMailPlugin')) {
 			$plugin = '<a href="http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin" target="_blank">Tribulant Newsletters</a>';
 			
 			$stars = '<a href="https://wordpress.org/support/view/plugin-reviews/newsletters-lite?rate=5#postform" target="_blank"><span class="newsletters_footer_rating">
-          <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
-        </span></a>';
+	          <span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span>
+	        </span></a>';
         
         	$stars .= '<style type="text/css">
         	.newsletters_footer_rating {
@@ -7936,6 +7971,10 @@ if (!class_exists('wpMailPlugin')) {
 						${$pkey} = $pval;
 						
 						switch ($pkey) {
+							case 'subscriber'	:
+								global $current_subscriber;
+								$current_subscriber = $subscriber;
+								break;
 							case 'message'		:
 								global $orig_message;
 								$orig_message = stripslashes($pval);

@@ -134,7 +134,7 @@
 	            	<?php endif; ?>
 	                <th class="column-mailinglist_id <?php echo ($orderby == "mailinglist_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=mailinglist_id&order=' . (($orderby == "mailinglist_id") ? $otherorder : "asc")); ?>#emailssent">
-							<span><?php _e('Mailing List(s)', $this -> plugin_name); ?></span>
+							<span><?php _e('List/Role', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -192,7 +192,7 @@
 	            	<?php endif; ?>
 	                <th class="column-mailinglist_id <?php echo ($orderby == "mailinglist_id") ? 'sorted ' . $order : 'sortable desc'; ?>">
 						<a href="<?php echo $Html -> retainquery('orderby=mailinglist_id&order=' . (($orderby == "mailinglist_id") ? $otherorder : "asc")); ?>#emailssent">
-							<span><?php _e('Mailing List(s)', $this -> plugin_name); ?></span>
+							<span><?php _e('List/Role', $this -> plugin_name); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
@@ -247,8 +247,10 @@
 			                		if (!empty($email -> subscriber_id)) {
 				                		$Db -> model = $Subscriber -> model;
 				                		$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
+				                		$user = false;
 			                		} elseif (!empty($email -> user_id)) {
 				                		$user = $this -> userdata($email -> user_id);
+				                		$subscriber = false;
 			                		}
 			                		
 			                		?>
@@ -270,31 +272,45 @@
 			                		<?php echo $Html -> link(__($history -> subject), '?page=' . $this -> sections -> history . '&amp;method=view&amp;id=' . $history -> id, array('class' => "row-title")); ?>
 			                	</td>
 			                <?php endif; ?>
-		                    <td>	
-		                    	<?php if (!empty($email -> mailinglists)) : ?>
-		                    		<?php
-										
-									$mailinglists = maybe_unserialize($email -> mailinglists);
-									$mailinglists = $Subscriber -> mailinglists($email -> subscriber_id, $mailinglists);
-									if (is_array($mailinglists)) {
-										$m = 1;
-										foreach ($mailinglists as $list_id) {								
-											$Db -> model = $Mailinglist -> model;
-											$mailinglist = $Db -> find(array('id' => $list_id));
-											echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list_id);
-											if ($m < count($mailinglists)) { echo ', '; }
-											$m++;
+		                    <td>
+			                    <?php if (!empty($email -> subscriber_id)) : ?>	
+			                    	<i class="fa fa-list"></i>                    
+			                    	<?php if (!empty($email -> mailinglists)) : ?>
+			                    		<?php
+											
+										$mailinglists = maybe_unserialize($email -> mailinglists);
+										$mailinglists = $Subscriber -> mailinglists($email -> subscriber_id, $mailinglists);
+										if (is_array($mailinglists)) {
+											$m = 1;
+											foreach ($mailinglists as $list_id) {								
+												$Db -> model = $Mailinglist -> model;
+												$mailinglist = $Db -> find(array('id' => $list_id));
+												echo $Html -> link(__($mailinglist -> title), '?page=' . $this -> sections -> lists . '&amp;method=view&amp;id=' . $list_id);
+												if ($m < count($mailinglists)) { echo ', '; }
+												$m++;
+											}
 										}
-									}
-									
-									?>
-		                    	<?php elseif (!empty($email -> mailinglist_id)) : ?>
-		                    		<?php $Db -> model = $Mailinglist -> model; ?>
-									<?php $mailinglist = $Db -> find(array('id' => $email -> mailinglist_id)); ?>
-									<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $email -> mailinglist_id; ?>"><?php echo __($mailinglist -> title); ?></a>
-		                    	<?php else : ?>
-		                    		<?php _e('None', $this -> plugin_name); ?>
-		                    	<?php endif; ?>
+										
+										?>
+			                    	<?php elseif (!empty($email -> mailinglist_id)) : ?>
+			                    		<?php $Db -> model = $Mailinglist -> model; ?>
+										<?php $mailinglist = $Db -> find(array('id' => $email -> mailinglist_id)); ?>
+										<a href="?page=<?php echo $this -> sections -> lists; ?>&amp;method=view&amp;id=<?php echo $email -> mailinglist_id; ?>"><?php echo __($mailinglist -> title); ?></a>
+			                    	<?php else : ?>
+			                    		<?php _e('None', $this -> plugin_name); ?>
+			                    	<?php endif; ?>
+			                    <?php elseif (!empty($email -> user_id)) : ?>
+			                    	<i class="fa fa-user"></i>
+			                    	<?php
+				                    
+				                    global $wp_roles;	
+				                    $role = $this -> user_role($email -> user_id);
+				                    echo '<a href="' . admin_url('users.php?role=' . $role) . '">' . $wp_roles -> role_names[$role] . '</a>';
+				                    	
+				                    ?>
+			                    <?php else : ?>
+			                    	<?php _e('None', $this -> plugin_name); ?>
+			                    <?php endif; ?>
 		                    </td>
 		                    <td>
 		                    	<span class="<?php echo $this -> pre; ?><?php echo ($email -> status == "sent") ? 'success' : 'error'; ?>"><?php echo ($email -> status == "sent") ? __('Sent', $this -> plugin_name) : __('Unsent', $this -> plugin_name); ?></span>

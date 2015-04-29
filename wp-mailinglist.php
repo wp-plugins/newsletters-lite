@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5.2
+Version: 4.5.3
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -236,6 +236,28 @@ if (!class_exists('wpMail')) {
 					$newsletters_emailraw = $emailraw;				
 					
 					$phpmailer = new fakemailer();
+				}
+			} else {
+			
+				// Template system emails?
+				$wpmailconf = $this -> get_option('wpmailconf');
+				if (!empty($wpmailconf)) {
+					$wpmailconf_template = $this -> get_option('wpmailconf_template');				
+					
+					$subject = $phpmailer -> Subject;
+					$body = $phpmailer -> Body;
+					
+					// Text part of email
+					require_once $this -> plugin_base() . DS . 'vendors' . DS . 'class.html2text.php';
+					$htmlToText = new Html2Text($body, 255);
+					$altbody = $htmlToText -> convert();
+					$phpmailer -> AltBody = $altbody;
+					
+					// Html part of email
+					$body = $this -> render_email(false, array('message' => $body), false, true, true, $wpmailconf_template, true, $body);
+					$body = str_replace("[wpmlsubject]", stripslashes($subject), $body);
+					$body = $this -> strip_set_variables($body);
+					$phpmailer -> Body = $body;
 				}
 			}
 			
@@ -517,6 +539,9 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function custom_post_types() {
+			$custompostslug = $this -> get_option('custompostslug');
+			$custompostslug = (empty($custompostslug)) ? 'newsletter' : $custompostslug;
+			
 			$newsletter_args = array(
 				'label'					=>	__('Newsletters', $this -> plugin_name),
 				'labels'				=>	array('name' => __('Newsletters', $this -> plugin_name), 'singular_name' => __('Newsletter', $this -> plugin_name)),
@@ -525,11 +550,11 @@ if (!class_exists('wpMail')) {
 				'show_ui'				=>	false,
 				'hierarchical'			=>	false,
 				'has_archive'			=>	true,
-				'rewrite'				=>	array('slug' => 'newsletter', 'with_front' => false),
+				'rewrite'				=>	array('slug' => $custompostslug, 'with_front' => false),
 				'supports'				=>	array('title', 'editor', 'excerpt', 'custom-fields', 'thumbnail', 'page-attributes'),
 			);
 			
-			register_post_type('newsletter', $newsletter_args);
+			register_post_type($custompostslug, $newsletter_args);
 		}
 		
 		function init() {		
@@ -553,10 +578,12 @@ if (!class_exists('wpMail')) {
 					if (!empty($_GET['subscriber_id'])) { $email_conditions['subscriber_id'] = $_GET['subscriber_id']; }
 					if (!empty($_GET['user_id'])) { $email_conditions['user_id'] = $_GET['user_id']; }
 				
-					$Db -> model = $Email -> model;
-					$Db -> save_field('read', "Y", $email_conditions);
-					$Db -> model = $Email -> model;
-					$Db -> save_field('status', "sent", $email_conditions);
+					if (!empty($email_conditions['subscriber_id']) || !empty($email_conditions['user_id'])) {
+						$Db -> model = $Email -> model;
+						$Db -> save_field('read', "Y", $email_conditions);
+						$Db -> model = $Email -> model;
+						$Db -> save_field('status', "sent", $email_conditions);
+					}
 				
 					$click_data = array(
 						'link_id'			=>	$link -> id,
@@ -915,29 +942,29 @@ if (!class_exists('wpMail')) {
 						break;
 					case 'track'			:	
 						global $Html;
-									
-						$Db -> model = $Email -> model;
-						$Db -> save_field('read', "Y", array('eunique' => $_GET['id']));
-						$Db -> save_field('status', "sent", array('eunique' => $_GET['id']));
-						$Db -> save_field('device', $this -> get_device(), array('eunique' => $_GET['id']));
+							
+						if (!empty($_GET['id'])) {		
+							$Db -> model = $Email -> model;
+							$Db -> save_field('read', "Y", array('eunique' => $_GET['id']));
+							$Db -> save_field('status', "sent", array('eunique' => $_GET['id']));
+							$Db -> save_field('device', $this -> get_device(), array('eunique' => $_GET['id']));
+						}
 						
 						$tracking = $this -> get_option('tracking');
 						$tracking_image = $this -> get_option('tracking_image');
 						$tracking_image_file = $this -> get_option('tracking_image_file');
 						
-						//if (!empty($tracking) && $tracking == "Y") {
-							if (!empty($tracking_image) && $tracking_image == "custom") {
-								$tracking_image_full = $Html -> uploads_path() . DS . $this -> plugin_name . DS . $tracking_image_file;
-								$imginfo = getimagesize($tracking_image_full);
-								header("Content-type: " . $imginfo['mime']);
-								readfile($tracking_image_full);		
-							} else {
-								header("Content-Type: image/jpeg");
-								$image = imagecreate(1, 1);
-								imagejpeg($image);
-								imagedestroy($image);
-							}
-						//}
+						if (!empty($tracking_image) && $tracking_image == "custom") {
+							$tracking_image_full = $Html -> uploads_path() . DS . $this -> plugin_name . DS . $tracking_image_file;
+							$imginfo = getimagesize($tracking_image_full);
+							header("Content-type: " . $imginfo['mime']);
+							readfile($tracking_image_full);		
+						} else {
+							header("Content-Type: image/jpeg");
+							$image = imagecreate(1, 1);
+							imagejpeg($image);
+							imagedestroy($image);
+						}
 						
 						exit();
 						
@@ -3504,28 +3531,34 @@ if (!class_exists('wpMail')) {
 									$emails = explode(",", $_POST['previewemail']);
 									
 									foreach ($emails as $email) {
-										if (!$subscriber_id = $Subscriber -> email_exists($email)) {
-											$subscriber_data = array('email' => $email);										
-											$Subscriber -> save($subscriber_data, false);
-											$subscriber_id = $Subscriber -> insertid;
-										}	
-										
-										$subscriber = $Subscriber -> get($subscriber_id, false);
-										$subject = $_POST['subject'];
-										$message = $this -> render_email('send', array('message' => $_POST['content'], 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id), false, true, true, $_POST['theme_id']);
-										
-										if (!$this -> execute_mail($subscriber, false, $subject, $message, $history -> attachments, $history_id, false, false)) {
-											global $mailerrors;
-											$this -> render_error(sprintf(__('Preview cannot be sent to %s, %s.', $this -> plugin_name), $subscriber -> email, $mailerrors));
+										if (is_email($email)) {
+											if (!$subscriber_id = $Subscriber -> email_exists($email)) {
+												$subscriber_data = array('email' => $email);										
+												$Subscriber -> save($subscriber_data, false);
+												$subscriber_id = $Subscriber -> insertid;
+											}	
+											
+											$subscriber = $Subscriber -> get($subscriber_id, false);
+											$subject = $_POST['subject'];
+											$message = $this -> render_email('send', array('message' => $_POST['content'], 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id), false, true, true, $_POST['theme_id']);
+											
+											if (!$this -> execute_mail($subscriber, false, $subject, $message, $history -> attachments, $history_id, false, false)) {
+												global $mailerrors;
+												//$this -> render_error(sprintf(__('Preview cannot be sent to %s, %s.', $this -> plugin_name), $subscriber -> email, $mailerrors));
+												$this -> render_error(2, array($subscriber -> email, implode(";", $mailerrors)));
+											} else {
+												//$this -> render_message(sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>'));
+												$this -> render_message(1, array($subscriber -> email));
+												//$message = sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>');
+												//$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $History -> insertid, 'message', $message);
+											}
 										} else {
-											//$this -> render_message(sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>'));
-											$message = sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>');
-											$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $History -> insertid, 'message', $message);
+											$this -> render_error(3, array($email));
 										}
 									}
 								}
 								
-								$_POST = array(
+								$newpost = wp_parse_args(array(
 									'ishistory'			=>	$history -> id,
 									'p_id'				=>	$history -> p_id,
 									'from'				=>	$history -> from,
@@ -3546,7 +3579,9 @@ if (!class_exists('wpMail')) {
 									'attachments'		=>	$history -> attachments,
 									'customtexton'		=>	((!empty($history -> text)) ? true : false),
 									'customtext'		=>	$history -> text,
-								);
+								), $_POST);
+								
+								$_POST = $newpost;
 							}
 						} else {
 							if (!empty($_POST['preview'])) {
@@ -5187,7 +5222,7 @@ if (!class_exists('wpMail')) {
 									}
 								}
 								
-								$headings['ipaddress'] = __('IP Address', $this -> plugin_name);
+								$headings['ip_address'] = __('IP Address', $this -> plugin_name);
 								$headings['created'] = __('Created', $this -> plugin_name); 
 								$headings['modified'] = __('Modified', $this -> plugin_name);
 								
@@ -7207,11 +7242,16 @@ if (!class_exists('wpMail')) {
 			if (!empty($_POST)) {
 				delete_option('tridebugging');
 				$this -> delete_option('language_external');
+				$this -> delete_option('wpmailconf');
 			
 				foreach ($_POST as $key => $val) {				
 					$this -> update_option($key, $val);
 					
 					switch ($key) {
+						case 'custompostslug'		:
+							$this -> custom_post_types();
+							flush_rewrite_rules();
+							break;
 						case 'debugging'			:
 							if (!empty($val)) {
 								update_option('tridebugging', 1);
@@ -7381,10 +7421,12 @@ if (!class_exists('wpMail')) {
 		function admin_extensions() {
 			switch ($_GET['method']) {
 				case 'activate'				:
+					check_admin_referer('newsletters_extension_activate_' . $_GET['plugin']);
 					activate_plugin(plugin_basename($_GET['plugin']));
 					$this -> redirect($this -> url, 'message', __('Extension has been activated.', $this -> plugin_name));
 					break;
 				case 'deactivate'			:
+					check_admin_referer('newsletters_extension_deactivate_' . $_GET['plugin']);
 					deactivate_plugins(array(plugin_basename($_GET['plugin'])));
 					$this -> redirect($this -> url, 'error', __('Extension has been deactivated.', $this -> plugin_name));
 					break;

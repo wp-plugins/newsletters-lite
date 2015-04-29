@@ -45,7 +45,7 @@
 </table>
 
 <div id="customcssdiv" style="display:<?php echo ($this -> get_option('customcss') == "Y") ? 'block' : 'none'; ?>;">
-	<textarea name="customcsscode" id="customcsscode" rows="12" class="widefat"><?php echo htmlentities($this -> get_option('customcsscode')); ?></textarea>
+	<textarea name="customcsscode" id="customcsscode" rows="12" class="widefat"><?php echo htmlentities($this -> get_option('customcsscode'), false, get_bloginfo('charset')); ?></textarea>
 </div>
 
 <h4><?php _e('Load Default Scripts', $this -> plugin_name); ?></h4>

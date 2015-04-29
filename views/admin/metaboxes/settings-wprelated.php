@@ -20,7 +20,48 @@ if (!empty($language_external)) {
 	$language_full = $this -> plugin_base() . DS . 'languages' . DS . $mofile;
 }
 
+$wpmailconf = $this -> get_option('wpmailconf');
+$wpmailconf_template = $this -> get_option('wpmailconf_template');
+$custompostslug = $this -> get_option('custompostslug');
+
 ?>
+
+<h2><?php _e('WordPress Emails', $this -> plugin_name); ?></h2>
+
+<table class="form-table">
+	<tbody>
+		<tr>
+			<th><label for="wpmailconf"><?php _e('Style WordPress Emails', $this -> plugin_name); ?></label></th>
+			<td>
+				<label><input onclick="if (jQuery(this).is(':checked')) { jQuery('#wpmailconf_div').show(); } else { jQuery('#wpmailconf_div').hide(); }" <?php echo (!empty($wpmailconf)) ? 'checked="checked"' : ''; ?> type="checkbox" name="wpmailconf" value="1" id="wpmailconf" /> <?php _e('Yes, apply a template to outgoing emails', $this -> plugin_name); ?></label>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<div id="wpmailconf_div" style="display:<?php echo (!empty($wpmailconf)) ? 'block' : 'none'; ?>;">
+	<table class="form-table">
+		<tbody>
+			<tr>
+				<th><label for="wpmailconf_template"><?php _e('Template', $this -> plugin_name); ?></label></th>
+				<td>
+					<?php if ($themes = $Theme -> select()) : ?>
+						<select name="wpmailconf_template" id="wpmailconf_template">
+							<option value=""><?php _e('- None -', $this -> plugin_name); ?></option>
+							<?php foreach ($themes as $theme_id => $theme_title) : ?>
+								<option <?php echo (!empty($wpmailconf_template) && $wpmailconf_template == $theme_id) ? 'selected="selected"' : ''; ?> value="<?php echo $theme_id; ?>"><?php echo __($theme_title); ?></option>
+							<?php endforeach; ?>
+						</select>
+					<?php else : ?>
+						<p class="newsletters_error"><?php _e('No templates are available', $this -> plugin_name); ?></p>
+					<?php endif; ?>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<h2><?php _e('Other WordPress Settings', $this -> plugin_name); ?></h2>
 
 <table class="form-table">
 	<tbody>
@@ -65,6 +106,13 @@ if (!empty($language_external)) {
 				<label><input <?php echo ($this -> get_option('subscriberegister') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="subscriberegister" value="Y" id="subscriberegister_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
 				<label><input <?php echo ($this -> get_option('subscriberegister') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="subscriberegister" value="N" id="subscriberegister_N" /> <?php _e('No', $this -> plugin_name); ?></label>
 				<span class="howto"><?php _e('Would you like to register all new subscribers as users?', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<th><label for="custompostslug"><?php _e('Custom Post Type Slug', $this -> plugin_name); ?></label></th>
+			<td>
+				<input type="text" name="custompostslug" value="<?php echo esc_attr(stripslashes($custompostslug)); ?>" id="custompostslug" />
+				<span class="howto"><?php _e('The slug for the newsletter custom post type used internally', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
 	</tbody>

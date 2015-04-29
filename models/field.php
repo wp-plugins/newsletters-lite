@@ -446,7 +446,15 @@ class wpmlField extends wpMailPlugin {
 				$this -> data[$this -> model] -> newfieldoptions = $newfieldoptions;
 				//$fieldoptions = $newfieldoptions;
 			} else {
+				$fieldoptions = array();
+				$newfieldoptions = array();
 				
+				foreach ($this -> data[$this -> model] -> fieldoptions as $fkey => $fieldoption) {
+					if (!empty($fieldoption['value'])) {
+						$fieldoptions[$fkey] = $fieldoption['value'];
+						$newfieldoptions[$fkey]['value'] = $fieldoption['value'];
+					}
+				}
 			}
 		}
 		
@@ -594,7 +602,7 @@ class wpmlField extends wpMailPlugin {
 					$query = $query1 . $query2 . ");";
 				}
 
-				if ($wpdb -> query($query)) {					
+				if ($wpdb -> query($query)) {										
 					$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;
 					$field_id = $this -> insertid;
 
@@ -610,24 +618,29 @@ class wpmlField extends wpMailPlugin {
 					if (!empty($newfieldoptions)) {
 						$this -> initialize_classes();
 						
-						$o = 1;
+						$fieldoptions_order = array_flip(explode(",", $_POST['Field']['fieldoptions_order']));
+						unset($fieldoptions_order[0]);
+						
+						$o = (count($fieldoptions_order) - 1);
 						foreach ($newfieldoptions as $newfieldoption) {
 							if (!empty($newfieldoption['value'])) {
 								$newfieldoption_data = array(
-									'order'						=>	$o,
+									//'order'						=>	$o,
 									'value'						=>	$newfieldoption['value'],
 									'field_id'					=>	$field_id,
 								);
 								
 								if (!empty($newfieldoption['id'])) {
 									$newfieldoption_data['id'] = $newfieldoption['id'];
+									$newfieldoption_data['order'] = $fieldoptions_order[$newfieldoption['id']];
+								} else {
+									$newfieldoption_data['order'] = $o;
+									$o++;
 								}
 								
 								$Db -> model = $this -> Option -> model;
 								$this -> Option -> save($newfieldoption_data);								
 								$this -> Option -> errors = false;
-								
-								$o++;
 							}
 						}
 					}

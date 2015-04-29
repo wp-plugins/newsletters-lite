@@ -345,7 +345,9 @@ $regex = $Html -> field_value('Field[regex]');
 				<tbody>
 					<tr>
 						<th><label for="Field.fieldoptions"><?php _e('Field Options', $this -> plugin_name); ?></label></th>
-						<td>			
+						<td>	
+							<input type="hidden" name="Field[fieldoptions_order]" value="" id="fieldoptions_order" />
+									
 							<?php
 								
 							$fieldoptions = $Html -> field_value('Field[newfieldoptions]');
@@ -376,7 +378,7 @@ $regex = $Html -> field_value('Field[regex]');
 											});
 											</script>
 										<?php else : ?>
-											
+											<input type="text" class="widefat fieldoption-input-text" name="Field[fieldoptions][][value]" value="" id="" />
 										<?php endif; ?>
 									</span>
 									<span class="fieldoptions-remove"><a href="" data-id="" onclick="newsletters_fieldoptions_remove(this); return false;" class="button"><i class="fa fa-trash"></i></a></span>
@@ -384,7 +386,7 @@ $regex = $Html -> field_value('Field[regex]');
 								</li>
 								<?php $f = 0; ?>
 								<?php foreach ($fieldoptions as $fieldoption) : ?>
-									<li class="fieldoptions-sortable">
+									<li id="<?php echo $fieldoption -> id; ?>" class="fieldoptions-sortable">
 										<span class="fieldoptions-handle"><i class="fa fa-sort fa-fw fa-border"></i></span>
 										<span class="fieldoptions-input">
 											<?php if ($this -> language_do()) : ?>
@@ -408,6 +410,7 @@ $regex = $Html -> field_value('Field[regex]');
 												});
 												</script>
 											<?php else : ?>
+												<input type="hidden" name="Field[fieldoptions][<?php echo $f; ?>][id]" value="<?php echo esc_attr(stripslashes($fieldoption -> id)); ?>" />
 												<input class="widefat" type="text" name="Field[fieldoptions][<?php echo $f; ?>][value]" value="<?php echo esc_attr(stripslashes(__($fieldoption -> value))); ?>" id="" />
 											<?php endif; ?>
 										</span>
@@ -426,8 +429,11 @@ $regex = $Html -> field_value('Field[regex]');
 							jQuery(document).ready(function() {
 								jQuery('#fieldoptions').sortable({
 									handle: '.fieldoptions-handle',
-									//containment: '#fieldoptions',
-									axis: 'y'
+									axis: 'y',
+									update: function(event, ui) {
+										var order = jQuery("#fieldoptions").sortable("toArray");
+						                jQuery('#fieldoptions_order').val(order.join(","));
+									}
 								});
 							});
 							
@@ -436,7 +442,7 @@ $regex = $Html -> field_value('Field[regex]');
 								jQuery(li).find('div#tabs_fieldoptions_sample').tabs();
 								jQuery('ul#fieldoptions').append(li);
 								
-								jQuery(li).closest('.fieldoption-input-text').focus().focus();
+								jQuery(li).find('.fieldoption-input-text').focus().focus();
 								return li;
 							}
 							

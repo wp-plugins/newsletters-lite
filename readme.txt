@@ -3,8 +3,8 @@ Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
-Tested up to: 4.2
-Stable tag: 4.5.2
+Tested up to: 4.2.1
+Stable tag: 4.5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -91,7 +91,7 @@ All language files and the instructions to use them are hosted in an <a href="ht
 
 Thank you for these wonderful people who contributed in translating the plugin:
 
-* Afrikaans (af_ZA) by Tribulant Software
+* Afrikaans (af_ZA) by <a href="http://www.contrid.co.za">Antonie Potgieter</a>
 * German (de_DE) by Peter Schonmann
 * Greek (el_GR) by <a href="http://www.aio.gr">Harris Karanikolas | AiO Systems Information</a>
 * Spanish (es_ES) by Juan Llamosas
@@ -148,6 +148,8 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.3 =
 
 = 4.5.2 =
 * ADD: New interface for enabling/disabling scripts to load

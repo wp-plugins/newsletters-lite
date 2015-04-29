@@ -77,6 +77,14 @@ $extensions = array(
 		'plugin_name'		=>	'newsletters-s2member',
 		'plugin_file'		=>	's2member.php',
 	),
+	'sendtofriend' 		=> array(
+		'name'				=>	__('Send to Friend', $this -> plugin_name),
+		'link'				=>	"http://tribulant.com/extensions/",
+		'description'		=>	sprintf(__("Let subscribers suggest newsletters to friends for the %s.", $this -> plugin_name), '<a href="http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin" target="_blank">' . __('Newsletter plugin', $this -> plugin_name) . '</a>'),
+		'slug'				=>	'sendtofriend',
+		'plugin_name'		=>	'newsletters-sendtofriend',
+		'plugin_file'		=>	'sendtofriend.php',
+	),
 	'control'			=>	array(
 		'name'				=>	__('Total Control', $this -> plugin_name),
 		'link'				=>	"http://tribulant.com/extensions/view/36/total-control",

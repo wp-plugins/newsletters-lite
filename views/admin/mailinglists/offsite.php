@@ -6,7 +6,7 @@
 			htmlentities('<script type="text/javascript"> var wpmlAjax = "' . $this -> url() . '/' . $this -> plugin_name . '-ajax.php"; </script>
 			<script type="text/javascript" src="' . $this -> url() . '/js/wp-mailinglist.js"></script>
 			<script type="text/javascript" src="' . get_option('siteurl') . '/wp-includes/js/scriptaculous/prototype.js"></script>
-			<script type="text/javascript" src="' . get_option('siteurl') . '/wp-includes/js/scriptaculous/scriptaculous.js?load=effects"></script>'); 
+			<script type="text/javascript" src="' . get_option('siteurl') . '/wp-includes/js/scriptaculous/scriptaculous.js?load=effects"></script>', false, get_bloginfo('charset')); 
 		?></textarea>
 		
 		<p><?php _e('Use the code below to create an opt-in form on any website', $this -> plugin_name); ?><br/>
