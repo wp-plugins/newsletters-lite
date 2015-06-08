@@ -348,7 +348,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 					failed++;
 					if ((sent + failed) <= subscribercount) { 
 						jQuery('#sendajaxfailedcountinside').text(failed); 
-						jQuery('#sendajaxfailedrecords').prepend('<div class="ui-state-error ui-corner-all" style="margin-bottom:3px;"><p><label><input type="checkbox" name="failed[]" value="' + email + '" id="" /> <i class="fa fa-exclamation-triangle"></i>' + email + ' - ' + message + '</label></p></div>').fadeIn().prev().fadeIn().prev().fadeIn();
+						jQuery('#sendajaxfailedrecords').prepend('<div class="alert alert-danger" style="margin-bottom:3px;"><p><label><input type="checkbox" name="failed[]" value="' + email + '" id="" /> <i class="fa fa-exclamation-triangle"></i>' + email + ' - ' + message + '</label></p></div>').fadeIn().prev().fadeIn().prev().fadeIn();
 						jQuery('#failedactions').show();
 					}
 				}

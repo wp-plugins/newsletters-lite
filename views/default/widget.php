@@ -15,7 +15,7 @@
 	<?php endif; ?>
 <?php endif; ?>
 
-<form action="<?php echo $action; ?>" onsubmit="jQuery.Watermark.HideAll();" method="post" id="<?php echo $widget_id; ?>-form" class="newsletters-form">
+<form action="<?php echo $action; ?>" method="post" id="<?php echo $widget_id; ?>-form" class="newsletters-form">
 
 	<?php $hidden_values = array('ajax', 'scroll', 'captcha', 'list'); ?>
 	<?php foreach ($instance as $ikey => $ival) : ?>
@@ -109,8 +109,6 @@
 
 <?php do_action('newsletters_subscribe_after_form', $instance); ?>
 
-<?php /*$this -> render('error', array('errors' => $Subscriber -> errors));*/ ?>
-
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	<?php 
@@ -128,7 +126,7 @@ jQuery(document).ready(function() {
 			jQuery(this).find('.<?php echo $this -> pre; ?>fielderror').removeClass('<?php echo $this -> pre; ?>fielderror');
 		
 			jQuery.ajax({
-				url: wpmlajaxurl + 'action=wpmlsubscribe&widget=<?php echo $widget; ?>&widget_id=<?php echo $widget_id; ?>&number=<?php echo $number; ?>&nonce=<?php echo wp_create_nonce($widget); ?>',
+				url: wpmlajaxurl + 'action=wpmlsubscribe&widget=<?php echo $widget; ?>&widget_id=<?php echo $widget_id; ?>&number=<?php echo $number; ?>',
 				data: jQuery('#<?php echo $widget_id; ?>-form').serialize(),
 				type: "POST",
 				cache: false,

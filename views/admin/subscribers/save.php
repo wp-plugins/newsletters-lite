@@ -1,7 +1,7 @@
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Save a Subscriber', $this -> plugin_name); ?></h2>
 	<?php $this -> render('error', array('errors' => $errors)); ?>
-	<form onsubmit="jQuery.Watermark.HideAll();" id="optinform<?php echo $subscriber -> id; ?>" name="optinform<?php echo $subscriber -> id; ?>" action="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save" method="post">
+	<form id="optinform<?php echo $subscriber -> id; ?>" name="optinform<?php echo $subscriber -> id; ?>" action="?page=<?php echo $this -> sections -> subscribers; ?>&amp;method=save" method="post">
 		<?php echo $Form -> hidden('Subscriber[id]'); ?>
 		<input type="hidden" name="Subscriber[active]" value="Y" />
 		<table class="form-table">
@@ -10,7 +10,7 @@
 					<th><label for="Subscriber.email"><?php _e('Email Address', $this -> plugin_name); ?></label>
 					<?php echo $Html -> help(__('This is the email address of the subscriber on which the subscriber will receive email newsletters and other notifications.', $this -> plugin_name)); ?></th>
 					<td>
-						<?php echo $Form -> text('Subscriber[email]'); ?>
+						<?php echo $Form -> text('Subscriber[email]', array('placeholder' => __('Enter email address here', $this -> plugin_name))); ?>
 						<span class="howto"><?php _e('Valid email address of the subscriber to receive newsletters.', $this -> plugin_name); ?></span>
 					</td>
 				</tr>
@@ -57,7 +57,7 @@
 				<tbody>
 					<tr>
 						<th><?php _e('Wordpress Username', $this -> plugin_name); ?></th>
-						<td><?php echo $Form -> text('Subscriber[username]'); ?></td>
+						<td><?php echo $Form -> text('Subscriber[username]', array('placeholder' => __('Enter username here', $this -> plugin_name))); ?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -135,10 +135,3 @@
 		</p>
 	</form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('[name="Subscriber[email]"]').Watermark('<?php echo addslashes(__('Enter email address here', $this -> plugin_name)); ?>');
-	jQuery('[name="Subscriber[username]"]').Watermark('<?php echo addslashes(__('Enter username here', $this -> plugin_name)); ?>');
-});
-</script>

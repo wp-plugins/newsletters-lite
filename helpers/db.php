@@ -595,7 +595,7 @@ class wpmlDbHelper extends wpMailPlugin {
 					$data = array();
 					
 					foreach ($records as $record) {
-						if ((!empty($recursive) && $recursive == true) || $object -> recursive == true) { $record -> recursive = true; }
+						if ((!empty($recursive) && $recursive == true) || (!empty($object -> recursive) && $object -> recursive == true)) { $record -> recursive = true; }
 						$data[] = $this -> init_class($object -> model, $record);
 					}
 					

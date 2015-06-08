@@ -1,3 +1,10 @@
+<?php
+	
+global $newsletters_is_management;
+$newsletters_is_management = true;	
+	
+?>
+
 <h3><?php _e('Additional Data', $this -> plugin_name); ?></h3>
 <p><?php _e('Manage your subscriber profile data in the fields below.', $this -> plugin_name); ?></p>
 
@@ -12,7 +19,7 @@
 <?php endif; ?>
 
 <?php if (!empty($fields) && is_array($fields)) : ?>
-	<form action="" method="post" onsubmit="jQuery.Watermark.HideAll(); wpmlmanagement_savefields(this); return false;" id="subscribersavefieldsform">
+	<form action="" method="post" onsubmit="wpmlmanagement_savefields(this); return false;" id="subscribersavefieldsform">
     	<input type="hidden" name="subscriber_id" value="<?php echo $subscriber -> id; ?>" />
     
 		<?php foreach ($fields as $field) : ?>

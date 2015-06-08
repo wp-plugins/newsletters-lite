@@ -29,7 +29,7 @@ if (!class_exists('wpMailCheckinit')) {
 			return false;
 		}
 		
-		function ci_initialization() {											
+		function ci_initialization() {																	
 			/* RSS Feeds */
 			if ($this -> get_option('rssfeed') == "Y" && !is_admin()) { 
 				global $wp_rewrite;

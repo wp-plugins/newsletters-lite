@@ -1,3 +1,5 @@
+<!-- Bounce Configuration Settings -->
+
 <?php $deleteonbounce = $this -> get_option('deleteonbounce'); ?>
 <table class="form-table">
 	<tbody>

@@ -104,13 +104,13 @@ function wpml_scroll(selector) {
 function newsletters_refreshfields(widgetid) {
 	if (request_getlistfields) { request_getlistfields.abort(); }
 	jQuery('#' + widgetid + '-loading').show();
-	jQuery('#' + widgetid + '-button').button('option', 'disabled', true);
+	jQuery('#' + widgetid + '-button').prop('disabled', true);
 	jQuery('#' + widgetid + ' .wpmlfieldholder :input').attr('readonly', true);
 	var formvalues = jQuery('#' + widgetid + '-form').serialize();
 	
 	request_getlistfields = jQuery.post(wpmlajaxurl + "action=wpmlgetlistfields&widget_id=" + widgetid, formvalues, function(response) {
 		jQuery('#' + widgetid + '-loading').hide();
-		jQuery('#' + widgetid + '-button').button('option', 'disabled', false);
+		jQuery('#' + widgetid + '-button').prop('disabled', false);
 		jQuery('#' + widgetid + '-fields').html(response);
 	});
 }

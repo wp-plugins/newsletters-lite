@@ -485,7 +485,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			}
 		
 			if (!empty($template)) {
-				$output = wpautop(__($template -> content));
+				$output = wpautop(do_shortcode(__(stripslashes($template -> content))));
 			}
 		}
 		
@@ -569,11 +569,19 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	}
 	
 	function subscribe($atts = array(), $content = null) {
-		global $Html, $Subscriber;
+		global $Html, $Subscriber, $post;
+		$post_id = $post -> ID;
 	
 		if (is_feed()) return;
 		
-		$number = 'embed' . rand(999, 9999);
+		if ($rand_transient = get_transient('newsletters_shortcode_subscribe_rand_' . $post_id)) {
+			$rand = $rand_transient;
+		} else {
+			$rand = rand(999, 9999);
+			set_transient('newsletters_shortcode_subscribe_rand_' . $post_id, $rand, HOUR_IN_SECONDS);
+		}
+		
+		$number = 'embed' . $rand;
 		$widget_id = 'newsletters-' . $number;
 		$instance = $this -> widget_instance($number, $atts);
 		

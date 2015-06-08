@@ -30,7 +30,7 @@
             <td>
             	<label><input <?php echo ($this -> get_option('theme_usestyle') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="theme_usestyle" value="Y" id="theme_usestyle_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                 <label><input <?php echo ($this -> get_option('theme_usestyle') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="theme_usestyle" value="N" id="theme_usestyle_N" /> <?php _e('No', $this -> plugin_name); ?></label>
-                <span class="howto"><?php _e('Setting this to "Yes" will load the "css/style.css" file inside the theme folder.', $this -> plugin_name); ?></span>
+                <span class="howto"><?php echo sprintf(__('Setting this to "Yes" will load the %s file inside the theme folder.', $this -> plugin_name), '<code>css/style.css</code>'); ?></span>
             </td>
         </tr>
     	<tr>
@@ -93,56 +93,10 @@
 						<input class="widefat" type="text" name="loadscripts_handles[<?php echo $handle; ?>]" value="<?php echo esc_attr(stripslashes($custom_handle)); ?>" id="loadscripts_handles_<?php echo $handle; ?>" />
 					</td>
 					<td>
-						<input class="widefat" type="text" name="loadscripts_pages[<?php echo $handle; ?>]" value="<?php echo esc_attr(stripslashes($custom_pages)); ?>" id="loadscripts_pages_<?php echo $handle; ?>" />
+						<input placeholder="<?php echo esc_attr(stripslashes(__('All posts/pages', $this -> plugin_name))); ?>" class="widefat" type="text" name="loadscripts_pages[<?php echo $handle; ?>]" value="<?php echo esc_attr(stripslashes($custom_pages)); ?>" id="loadscripts_pages_<?php echo $handle; ?>" />
 					</td>
 				</tr>
-				
-				<script type="text/javascript">
-				jQuery(document).ready(function() {
-					jQuery('#loadscripts_pages_<?php echo $handle; ?>').Watermark('<?php echo __('All posts/pages', $this -> plugin_name); ?>');
-				});
-				</script>
 			<?php endforeach; ?>
 		</tbody>
 	</table>
 <?php endif; ?>
-
-<?php /*
-<table class="form-table">
-	<tbody>
-		<tr>
-			<th><label for="loadscript_jqueryuitabs_Y"><?php _e('jQuery UI Tabs', $this -> plugin_name); ?></label></th>
-			<td>
-				<label><input <?php echo ($this -> get_option('loadscript_jqueryuitabs') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuitabs" value="Y" id="loadscript_jqueryuitabs_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
-				<label><input <?php echo ($this -> get_option('loadscript_jqueryuitabs') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuitabs" value="N" id="loadscript_jqueryuitabs_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
-				<span class="howto"><?php _e('Load the jQuery UI Tabs script for the subscriber management section.', $this -> plugin_name); ?></span>
-			</td>
-		</tr>
-		<tr>
-			<th><label for="loadscript_jqueryuibutton_Y"><?php _e('jQuery UI Button', $this -> plugin_name); ?></label></th>
-			<td>
-				<label><input <?php echo ($this -> get_option('loadscript_jqueryuibutton') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuibutton" value="Y" id="loadscript_jqueryuibutton_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
-				<label><input <?php echo ($this -> get_option('loadscript_jqueryuibutton') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuibutton" value="N" id="loadscript_jqueryuibutton_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
-				<span class="howto"><?php _e('Load the jQuery UI Button script for all the buttons.', $this -> plugin_name); ?></span>
-			</td>
-		</tr>
-		<tr>
-			<th><label for="loadscript_jqueryuiwatermark_Y"><?php _e('jQuery UI Watermark', $this -> plugin_name); ?></label></th>
-			<td>
-				<label><input onclick="jQuery('#loadscript_jqueryuiwatermark_div').show();" <?php echo ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuiwatermark" value="Y" id="loadscript_jqueryuiwatermark_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
-				<label><input onclick="jQuery('#loadscript_jqueryuiwatermark_div').hide();" <?php echo ($this -> get_option('loadscript_jqueryuiwatermark') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuiwatermark" value="N" id="loadscript_jqueryuiwatermark_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
-				<div id="loadscript_jqueryuiwatermark_div" style="display:<?php echo ($this -> get_option('loadscript_jqueryuiwatermark') == "Y") ? 'block' : 'none'; ?>;"><label><strong><?php _e('Handle:', $this -> plugin_name); ?></strong> <input type="text" name="loadscript_jqueryuiwatermark_handle" value="<?php echo esc_attr(stripslashes($this -> get_option('loadscript_jqueryuiwatermark_handle'))); ?>" id="loadscript_jqueryuiwatermark_handle" class="widefat" style="width:150px;" /></label></div>
-				<span class="howto"><?php _e('Load the jQuery UI Watermark script for field watermarks.', $this -> plugin_name); ?></span>
-			</td>
-		</tr>
-		<tr>
-			<th><label for="loadscript_jqueryuploadify_Y"><?php _e('jQuery Uploadify', $this -> plugin_name); ?></label></th>
-			<td>
-				<label><input onclick="jQuery('#loadscript_jqueryuploadify_div').show();" <?php echo ($this -> get_option('loadscript_jqueryuploadify') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuploadify" value="Y" id="loadscript_jqueryuploadify_Y" /> <?php _e('Yes, load this script', $this -> plugin_name); ?></label>
-				<label><input onclick="jQuery('#loadscript_jqueryuploadify_div').hide();" <?php echo ($this -> get_option('loadscript_jqueryuploadify') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="loadscript_jqueryuploadify" value="N" id="loadscript_jqueryuploadify_N" /> <?php _e('No, I have it loaded already', $this -> plugin_name); ?></label>
-				<div id="loadscript_jqueryuploadify_div" style="display:<?php echo ($this -> get_option('loadscript_jqueryuploadify') == "Y") ? 'block' : 'none'; ?>;"><label><strong><?php _e('Handle:', $this -> plugin_name); ?></strong> <input type="text" name="loadscript_jqueryuploadify_handle" value="<?php echo esc_attr(stripslashes($this -> get_option('loadscript_jqueryuploadify_handle'))); ?>" id="loadscript_jqueryuploadify_handle" class="widefat" style="width:150px;" /></label></div>
-				<span class="howto"><?php _e('Load the Uploadify script for file upload custom fields.', $this -> plugin_name); ?></span>
-			</td>
-		</tr>
-	</tbody>
-</table>*/ ?>

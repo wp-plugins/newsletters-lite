@@ -58,23 +58,6 @@ $importuserslists = $this -> get_option('importuserslists');
 
 	<table class="form-table">
 		<tbody>
-			<?php /*
-			<tr>
-				<th><label for="importuserslist"><?php _e('Users Import List(s)', $this -> plugin_name); ?></label></th>
-				<td>					
-					<?php if ($mailinglists = $Mailinglist -> select(true)) : ?>
-						<?php $importuserslists = $this -> get_option('importuserslists'); ?>
-						<div class="scroll-list">
-							<?php foreach ($mailinglists as $list_id => $list_title) : ?>
-								<div><label><input <?php echo (!empty($importuserslists) && in_array($list_id, $importuserslists)) ? 'checked="checked"' : ''; ?> type="checkbox" name="importuserslists[]" value="<?php echo $list_id; ?>" id="importuserslists_<?php echo $list_id; ?>" /> <?php echo __($list_title); ?></label></div>
-							<?php endforeach; ?>
-						</div>
-					<?php else : ?>
-						<div class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></div>
-					<?php endif; ?>
-					<span class="howto"><?php _e('Mailing list(s) to import users into as subscribers.', $this -> plugin_name); ?></span>
-				</td>
-			</tr>*/ ?>
 			<tr>
 				<th><label for="importusersrequireactivate_N"><?php _e('Require Activation', $this -> plugin_name); ?></label></th>
 				<td>
@@ -83,12 +66,24 @@ $importuserslists = $this -> get_option('importuserslists');
 					<span class="howto"><?php _e('Should imported users be required to activate/confirm their subscription via email?', $this -> plugin_name); ?></span>
 				</td>
 			</tr>
-			<tr>
-				<th><label for=""><?php _e('Import Custom Fields', $this -> plugin_name); ?></label></th>
-				<td>
+		</tbody>
+	</table>
+</div>
+
+<table class="form-table">
+	<tbody>
+		<tr>
+			<th><label for=""><?php _e('Custom Fields', $this -> plugin_name); ?></label>
+			<?php echo $Html -> help(__('Users custom fields mapping used for importing users as subscribers as well as when sending newsletters to user roles.', $this -> plugin_name)); ?></th>
+			<td>
+				<div class="scroll-list">
 					<?php if ($fields = $Field -> select()) : ?>
-						<?php $importusersfields = $this -> get_option('importusersfields'); ?>
-						<?php $importusersfieldspre = $this -> get_option('importusersfieldspre'); ?>
+						<?php 
+							
+						$importusersfields = $this -> get_option('importusersfields');
+						$importusersfieldspre = $this -> get_option('importusersfieldspre');
+						
+						?>
 						<table>
 							<tbody>
 								<?php foreach ($fields as $field_id => $field_title) : ?>
@@ -114,9 +109,9 @@ $importuserslists = $this -> get_option('importuserslists');
 					<?php else : ?>
 						<div class="<?php echo $this -> pre; ?>error"><?php _e('No custom fields are available.', $this -> plugin_name); ?></div>
 					<?php endif; ?>
-					<span class="howto"><?php _e('Map user meta by selection or custom key to import into custom fields.', $this -> plugin_name); ?></span>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
+				</div>
+				<span class="howto"><?php _e('Map user meta by selection or custom key to import into custom fields.', $this -> plugin_name); ?></span>
+			</td>
+		</tr>
+	</tbody>
+</table>

@@ -15,7 +15,7 @@ $queuesendorderby = $this -> get_option('queuesendorderby');
 			<th><label for="<?php echo $this -> pre; ?>emailsperinterval"><?php _e('Emails per Interval', $this -> plugin_name); ?></label>
 			<?php echo $Html -> help(__('Specify the number of emails to send per interval. Rather keep the interval short and this number lower to prevent the procedure which sends out the emails to timeout due to too many emails at once.', $this -> plugin_name)); ?></th>
 			<td>
-				<input class="widefat" style="width:45px;" type="text" value="<?php echo esc_attr(stripslashes($this -> get_option('emailsperinterval'))); ?>" id="<?php echo $this -> pre; ?>emailsperinterval" name="emailsperinterval" />
+				<input onkeyup="totalemails_calculate();" class="widefat" style="width:45px;" type="text" value="<?php echo esc_attr(stripslashes($this -> get_option('emailsperinterval'))); ?>" id="<?php echo $this -> pre; ?>emailsperinterval" name="emailsperinterval" />
 				<span class="howto"><?php _e('Recommended below 100', $this -> plugin_name); ?></span>
 			</td>
 		</tr>
@@ -37,19 +37,43 @@ $queuesendorderby = $this -> get_option('queuesendorderby');
                 <th><label for="<?php echo $this -> pre; ?>scheduleinterval"><?php _e('Schedule Interval', $this -> plugin_name); ?></label></th>
                 <td>
                     <?php $scheduleinterval = $this -> get_option('scheduleinterval'); ?>
-                    <select class="widefat" style="width:auto;" id="<?php echo $this -> pre; ?>scheduleinterval" name="scheduleinterval">
-                    <option value=""><?php _e('- Select Interval -', $this -> plugin_name); ?></option>
-                    <?php $schedules = wp_get_schedules(); ?>
-                    <?php if (!empty($schedules)) : ?>
-                        <?php foreach ($schedules as $key => $val) : ?>
-                        <?php $sel = ($scheduleinterval == $key) ? 'selected="selected"' : ''; ?>
-                        <option <?php echo $sel; ?> value="<?php echo $key ?>"><?php echo $val['display']; ?> (<?php echo $val['interval'] ?> <?php _e('seconds', $this -> plugin_name); ?>)</option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                    <select onchange="totalemails_calculate();" class="widefat" style="width:auto;" id="<?php echo $this -> pre; ?>scheduleinterval" name="scheduleinterval">
+	                    <option data-interval="0" value=""><?php _e('- Select Interval -', $this -> plugin_name); ?></option>
+	                    <?php $schedules = wp_get_schedules(); ?>
+	                    <?php if (!empty($schedules)) : ?>
+	                        <?php foreach ($schedules as $key => $val) : ?>
+	                        <?php $sel = ($scheduleinterval == $key) ? 'selected="selected"' : ''; ?>
+	                        <option data-interval="<?php echo esc_attr(stripslashes($val['interval'])); ?>" <?php echo $sel; ?> value="<?php echo $key ?>"><?php echo $val['display']; ?> (<?php echo $val['interval'] ?> <?php _e('seconds', $this -> plugin_name); ?>)</option>
+	                        <?php endforeach; ?>
+	                    <?php endif; ?>
                     </select>
                     
                     <span class="howto"><?php _e('Keep the schedule interval as low as possible for frequent executions.', $this -> plugin_name); ?></span>
                 </td>
+            </tr>
+            <tr>
+	            <th><label for=""><?php _e('Total Emails', $this -> plugin_name); ?></label></th>
+	            <td>
+		            <p id="totalemails">
+			            <!-- total emails will display here -->
+		            </p>
+		            
+		            <script type="text/javascript">
+			        var totalemails_calculate = function() {
+				        var emailsperinterval = jQuery('#wpmlemailsperinterval').val();
+				        var scheduleinterval = jQuery('#wpmlscheduleinterval').find(':selected').data('interval');
+				        
+				        var totalemails_hourly = ((3600 / scheduleinterval) * emailsperinterval);
+				        var totalemails_daily = (totalemails_hourly * 24);
+				        
+				        jQuery('#totalemails').html(totalemails_hourly + ' <?php _e('emails per hour', $this -> plugin_name); ?>, ' + totalemails_daily + ' <?php _e('emails per day', $this -> plugin_name); ?>');
+			        }
+			        
+			        jQuery(document).ready(function() {
+				        totalemails_calculate();
+			        });
+			        </script>
+	            </td>
             </tr>
         </tbody>
     </table>

@@ -112,7 +112,7 @@ if ($this -> language_do()) {
 				<?php $ettemplate_unsubscribeuser = __($this -> get_option('ettemplate_unsubscribeuser')); ?>
 				<?php if ($themes = $Theme -> select()) : ?>
 					<select name="ettemplate_unsubscribeuser" id="ettemplate_unsubscribeuser">
-						<option value=""><?php _e('- None -', $this -> plugin_name); ?></option>
+						<option value=""><?php _e('- Default -', $this -> plugin_name); ?></option>
 						<?php foreach ($themes as $theme_id => $theme_title) : ?>
 							<option <?php echo (!empty($ettemplate_unsubscribeuser) && $ettemplate_unsubscribeuser == $theme_id) ? 'selected="selected"' : ''; ?> value="<?php echo $theme_id; ?>"><?php _e($theme_title); ?></option>
 						<?php endforeach; ?>

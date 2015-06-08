@@ -51,6 +51,7 @@
 			confirmation_subject = jQuery('#confirmation_subject').html();
 			confirmation_email = jQuery('#confirmation_email').html(); 
 			import_preventbu = "<?php echo (!empty($_POST['import_preventbu'])) ? 'Y' : 'N'; ?>";
+			import_overwrite = "<?php echo (!empty($_POST['import_overwrite'])) ? 'Y' : 'N'; ?>";
 			jQuery('#startimporting').removeAttr('disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__("Start Importing", $this -> plugin_name)); ?>');
 		});
 		
@@ -112,7 +113,7 @@
 		
 			requests++;
 		
-			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>importsubscribers', {subscriber:subscriber, import_preventbu:import_preventbu, confirmation_subject:confirmation_subject, confirmation_email:confirmation_email}, function(response) {					
+			requestArray.push(jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>importsubscribers', {subscriber:subscriber, import_preventbu:import_preventbu, import_overwrite:import_overwrite, confirmation_subject:confirmation_subject, confirmation_email:confirmation_email}, function(response) {					
 				var data = response.split('<|>');
 				var success = data[0];
 				var email = data[1];
@@ -130,7 +131,7 @@
 					
 					if ((imported + failed) <= subscribercount) {
 						jQuery('#importajaxfailedcountinside').text(failed);
-						jQuery('#importajaxfailedrecords').prepend('<div class="ui-state-error ui-corner-all" style="margin-bottom:3px;"><p><i class="fa fa-exclamation-triangle"></i> ' + email + ' - ' + message + '</p></div>').fadeIn().prev().fadeIn();
+						jQuery('#importajaxfailedrecords').prepend('<div class="alert alert-danger" style="margin-bottom:3px;"><p><i class="fa fa-exclamation-triangle"></i> ' + email + ' - ' + message + '</p></div>').fadeIn().prev().fadeIn();
 					}
 				}
 				

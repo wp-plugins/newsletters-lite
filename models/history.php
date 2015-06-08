@@ -343,7 +343,7 @@ class wpmlHistory extends wpMailPlugin {
 			}
 		}
 		
-		echo sprintf(__('%s recurring emails queued', $this -> plugin_name), $recurring_queued);
+		echo sprintf(__('%s recurring emails queued', $this -> plugin_name), $recurring_queued) . '<br/>';
 		
 		return true;
 	}
@@ -664,11 +664,13 @@ class wpmlHistory extends wpMailPlugin {
 					if (!empty($insertpost) && $insertpost == true) {
 						$custompostslug = $this -> get_option('custompostslug');
 						
+						$post_status = (empty($history -> sent)) ? 'draft' : 'publish';
+						
 						$post_data = array(
 							'ID'							=>	((empty($history -> p_id)) ? false : $history -> p_id),
 							'post_content'					=>	$history -> message,
 							'post_title'					=>	$history -> subject,
-							'post_status'					=>	"publish",
+							'post_status'					=>	$post_status,
 							'post_type'						=>	$custompostslug,
 							'post_author'					=>	$user_ID,
 						);

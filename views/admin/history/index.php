@@ -12,7 +12,7 @@
 			</ul>
 		<?php endif; ?>
 		<p class="search-box">
-			<input type="text" id="post-search-input" class="search-input" name="searchterm" value="<?php echo (empty($_POST['searchterm'])) ? $_GET[$this -> pre . 'searchterm'] : $_POST['searchterm']; ?>" />
+			<input type="text" id="post-search-input" class="search-input" name="searchterm" value="<?php echo (empty($_POST['searchterm'])) ? ((empty($_GET[$this -> pre . 'searchterm'])) ? '' : $_GET[$this -> pre . 'searchterm']) : $_POST['searchterm']; ?>" />
 			<input type="submit" class="button" name="search" value="<?php _e('Search History', $this -> plugin_name); ?>" />
 		</p>
 	</form>

@@ -22,7 +22,7 @@
 							<td>
 								<input class="widefat" style="width:auto;" type="file" id="importfile" name="file" />
 								<span class="howto"><?php _e('CSV/vCard file', $this -> plugin_name); ?></span>
-		                        <?php if (!empty($importerrors['file'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['file']; ?></p></div><?php endif; ?>
+		                        <?php if (!empty($importerrors['file'])) : ?><div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['file']; ?></p></div><?php endif; ?>
 							</td>
 						</tr>
 						<tr>
@@ -40,7 +40,7 @@
 									<p class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
 								<?php endif; ?>
 		                        
-		                        <?php if (!empty($importerrors['mailinglists'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['mailinglists']; ?></p></div><?php endif; ?>
+		                        <?php if (!empty($importerrors['mailinglists'])) : ?><div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['mailinglists']; ?></p></div><?php endif; ?>
 							</td>
 						</tr>
 						<tr>
@@ -48,7 +48,7 @@
 							<td>
 								<label><input onclick="jQuery('#csvdiv').show(); jQuery('#macdiv').hide();" <?php echo (!empty($_POST['filetype']) && $_POST['filetype'] == "csv") ? 'checked="checked"' : ''; ?> type="radio" name="filetype" value="csv" /> <?php _e('CSV Spreadsheet', $this -> plugin_name); ?></label><br/>
 								<label><input onclick="jQuery('#csvdiv').hide(); jQuery('#macdiv').show();" <?php echo (!empty($_POST['filetype']) && $_POST['filetype'] == "mac") ? 'checked="checked"' : ''; ?> type="radio" name="filetype" value="mac" /> <?php _e('Mac OS Address Book (vCard file)', $this -> plugin_name); ?></label>
-		                        <?php if (!empty($importerrors['filetype'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['filetype']; ?></p></div><?php endif; ?>
+		                        <?php if (!empty($importerrors['filetype'])) : ?><div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['filetype']; ?></p></div><?php endif; ?>
 							</td>
 						</tr>
 					</tbody>
@@ -62,7 +62,7 @@
 								<td>
 									<input class="widefat" style="width:45px;" type="text" name="delimiter" value="<?php echo (empty($_POST['delimiter'])) ? ',' : esc_attr(stripslashes($_POST['delimiter'])); ?>" id="delimiter" />
 									<span class="howto"><?php _e('Operator delimiting field values. Open your CSV in a text editor to confirm with which operator field values are delimited. The default is comma (,).', $this -> plugin_name); ?></span>
-			                        <?php if (!empty($importerrors['delimiter'])) : ?><div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['delimiter']; ?></p></div><?php endif; ?>
+			                        <?php if (!empty($importerrors['delimiter'])) : ?><div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['delimiter']; ?></p></div><?php endif; ?>
 								</td>
 							</tr>
 							<tr>
@@ -242,6 +242,13 @@
 				
 				<table class="form-table">
 					<tbody>
+						<tr>
+							<th><label for="import_overwrite"><?php _e('Update/Overwrite Subscribers', $this -> plugin_name); ?></label></th>
+							<td>
+								<label><input <?php echo (!empty($_POST['import_overwrite'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="import_overwrite" value="1" id="import_overwrite" /> <?php _e('Yes, update/overwrite existing subscribers with import data', $this -> plugin_name); ?></label>
+								<span class="howto"><?php _e('Turning this on will take longer and could overwrite custom field values of subscribers.', $this -> plugin_name); ?></span>
+							</td>
+						</tr>
 						<tr>
 							<th><label for="import_preventbu"><?php _e('Bounces/Unsubscribes', $this -> plugin_name); ?></label>
 							<?php echo $Html -> help(__('You can drastically reduce the load and processing of importing by disabling this.', $this -> plugin_name)); ?></th>

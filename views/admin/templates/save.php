@@ -13,7 +13,7 @@ $post_ID = $this -> get_option('imagespost');
 
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
     <h2><?php _e('Save a Snippet', $this -> plugin_name); ?></h2>
-    <form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> templates_save; ?>" method="post" onsubmit="">
+    <form action="?page=<?php echo $this -> sections -> templates_save; ?>" method="post" onsubmit="">
         <?php wp_nonce_field($this -> sections -> templates_save); ?>
         <?php echo $Form -> hidden('Template[id]'); ?>
         <?php echo $Form -> hidden('Template[sent]'); ?>
@@ -23,7 +23,7 @@ $post_ID = $this -> get_option('imagespost');
 					<div id="titlediv">
 						<div id="titlewrap">
                             <label class="screen-reader-text" for="title"></label>
-							<input onclick="jQuery('iframe#content_ifr').attr('tabindex', '2');" tabindex="1" id="title" autocomplete="off" type="text" name="Template[title]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Template[title]'))); ?>" />
+							<input placeholder="<?php echo esc_attr(stripslashes(__('Enter template title here', $this -> plugin_name))); ?>" onclick="jQuery('iframe#content_ifr').attr('tabindex', '2');" tabindex="1" id="title" autocomplete="off" type="text" name="Template[title]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Template[title]'))); ?>" />
                         </div>
                     </div>
                     <div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section">                        
@@ -63,9 +63,3 @@ $post_ID = $this -> get_option('imagespost');
         </div>
     </form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('#title').Watermark('<?php echo addslashes(__('Enter template title here', $this -> plugin_name)); ?>');
-});
-</script>

@@ -128,6 +128,7 @@
 	
 	<div class="newsletters-dashboard-widget-column">
 		<h4><?php _e('Overview', $this -> plugin_name); ?></h4>
+		<?php $options = false; ?>
 		<?php $Html -> pie_chart('overview-chart', array('width' => 200), $data, $options); ?>
 	</div>
 	

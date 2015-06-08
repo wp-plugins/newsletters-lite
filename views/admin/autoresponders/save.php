@@ -13,7 +13,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
 <div class="wrap newsletters <?php echo $this -> pre; ?>">
 	<h2><?php _e('Save an Autoresponder', $this -> plugin_name); ?></h2>
     
-    <form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save" method="post">
+    <form action="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save" method="post">
     	<?php echo $Form -> hidden('Autoresponder[id]'); ?>
     
     	<table class="form-table">
@@ -22,7 +22,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                 	<th><label for="Autoresponder.title"><?php _e('Name', $this -> plugin_name); ?></label>
                 	<?php echo $Html -> help(__('The name/title of your autoresponder for internal identification purposes. Your subscribers will not see this.', $this -> plugin_name)); ?></th>
                     <td>
-                    	<?php echo $Form -> text('Autoresponder[title]'); ?>
+                    	<?php echo $Form -> text('Autoresponder[title]', array('placeholder' => __('Enter autoresponder title here', $this -> plugin_name))); ?>
                     	<span class="howto"><?php _e('Fill in a name/title for this autoresponder for identification purposes.', $this -> plugin_name); ?></span>
                     </td>
                 </tr>
@@ -115,7 +115,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
 	        <div id="post-body-content">
 				<div id="titlediv">
             		<div id="titlewrap">
-            			<input class="widefat" type="text" id="title" name="Autoresponder[nnewsletter][subject]" value="<?php echo esc_attr(stripslashes($Autoresponder -> data -> nnewsletter['subject'])); ?>" id="Autoresponder_nnewsletter_subject" />
+            			<input placeholder="<?php echo esc_attr(stripslashes(__('Enter email subject here', $this -> plugin_name))); ?>" class="widefat" type="text" id="title" name="Autoresponder[nnewsletter][subject]" value="<?php echo esc_attr(stripslashes($Autoresponder -> data -> nnewsletter['subject'])); ?>" id="Autoresponder_nnewsletter_subject" />
             		</div>
             	</div>
                 <?php echo $Html -> field_error('Autoresponder[nnewsletter_subject]'); ?>
@@ -211,10 +211,3 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
         </p>
     </form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('[name="Autoresponder[title]"]').Watermark('<?php echo addslashes(__('Enter autoresponder title here', $this -> plugin_name)); ?>');
-	jQuery('[name="Autoresponder[nnewsletter][subject]"]').Watermark('<?php echo addslashes(__('Enter email subject here', $this -> plugin_name)); ?>');
-});
-</script>

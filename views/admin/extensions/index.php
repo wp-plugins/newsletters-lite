@@ -40,12 +40,12 @@
                 
                 	<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
                 		<th style="width:85px;">
-                			<a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" style="border:none;">
+                			<a href="<?php echo $extension['link']; ?>" target="_blank" title="<?php echo esc_attr($extension['name']); ?>" style="border:none;">
                 				<img class="extensionicon" style="border:none; width:75px; height:75px;" border="0" src="<?php echo $img; ?>" alt="<?php echo $extension['slug']; ?>" />
                 			</a>
                 		</th>
                     	<th>
-							<a onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" title="<?php echo esc_attr($extension['name']); ?>" class="row-title newsletters-extension-name"><?php echo $extension['name']; ?></a>
+							<a href="<?php echo $extension['link']; ?>" target="_blank" title="<?php echo esc_attr($extension['name']); ?>" class="row-title newsletters-extension-name"><?php echo $extension['name']; ?></a>
 							<br/><small class="newsletters-extension-description howto"><?php echo $extension['description']; ?></small>
                             <div class="row-actions">
                             	<?php 
@@ -54,7 +54,7 @@
 									case 0	:
 										?>
                                         
-                                        <span class="edit"><a onclick="jQuery.colorbox({iframe:true, title:'<?php echo esc_attr(stripslashes($extension['name'])); ?>', fastIframe:false, width:'80%', height:'80%', href:'<?php echo $extension['link']; ?>'}); return false;" href="<?php echo $extension['link']; ?>" target="_blank"><?php _e('Get this extension now', $this -> plugin_name); ?></a></span>
+                                        <span class="edit"><a href="<?php echo $extension['link']; ?>" target="_blank"><?php _e('Get this extension now', $this -> plugin_name); ?></a></span>
                                         
                                         <?php
 										break;
@@ -89,7 +89,7 @@
 									?>
 									
 									<span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span>
-									<p><?php echo $Html -> link(__('Get it now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'class' => "button button-primary", 'onclick' => "jQuery.colorbox({iframe:true, title:'" . esc_attr(stripslashes($extension['name'])) . "', fastIframe:false, width:'80%', height:'80%', href:'" . $extension['link'] . "'}); return false;")); ?></p>
+									<p><?php echo $Html -> link(__('Get it now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'class' => "button button-primary")); ?></p>
 									
 									<?php
 									break;

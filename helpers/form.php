@@ -57,6 +57,7 @@ class wpmlFormHelper extends wpMailPlugin {
 			'id' 			=> 	$Html -> field_id($name),
 			'autocomplete'	=>	"on",
 			'tabindex'		=>	false,
+			'placeholder'	=>	false,
 		);
 		
 		$r = wp_parse_args($options, $defaults);
@@ -68,7 +69,7 @@ class wpmlFormHelper extends wpMailPlugin {
 		
 		ob_start();
 		
-		?><input autocomplete="<?php echo $autocomplete; ?>" <?php echo (empty($tabindex)) ? '' : 'tabindex="' . esc_attr(stripslashes($tabindex)) . '"'; ?> class="<?php echo $class; ?>" style="width:<?php echo $width; ?>;" id="<?php echo $id; ?>" type="text" name="<?php echo $name; ?>" value="<?php echo esc_attr(stripslashes($Html -> field_value($name))); ?>" /><?php
+		?><input placeholder="<?php echo esc_attr(stripslashes($placeholder)); ?>" autocomplete="<?php echo $autocomplete; ?>" <?php echo (empty($tabindex)) ? '' : 'tabindex="' . esc_attr(stripslashes($tabindex)) . '"'; ?> class="<?php echo $class; ?>" style="width:<?php echo $width; ?>;" id="<?php echo $id; ?>" type="text" name="<?php echo $name; ?>" value="<?php echo esc_attr(stripslashes($Html -> field_value($name))); ?>" /><?php
 		
 		if ($error != false) {
 			echo $Html -> field_error($name);

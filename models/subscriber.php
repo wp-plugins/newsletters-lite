@@ -513,7 +513,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		return false;
 	}
 	
-	function optin($data = array(), $validate = true, $checkexists = true, $confirm = true) {
+	function optin($data = array(), $validate = true, $checkexists = true, $confirm = true, $skipsubscriberupdate = false) {
 		//global Wordpress variables
 		global $wpdb, $Db, $Auth, $Html, $SubscribersList, $Field, $Mailinglist;
 		$this -> errors = array();
@@ -630,7 +630,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				}
 				
 				// Go head, try tosave the subscriber
-				if ($this -> save($data, false, false)) {					
+				if ($this -> save($data, false, false, $skipsubscriberupdate)) {					
 					$subscriber = $this -> get($this -> insertid, false);
 					$subscriberauth = $Auth -> gen_subscriberauth();
 					$subscriberauth = $this -> gen_auth($subscriber -> id);
@@ -661,7 +661,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		return false;
 	}
 	
-	function save($data = array(), $validate = true, $return_query = false) {
+	function save($data = array(), $validate = true, $return_query = false, $skipsubscriberupdate = false) {
 		global $wpdb, $Html, $Db, $wpmlCountry, $Field, $FieldsList, $Mailinglist, $SubscribersList, 
 		$Bounce, $Unsubscribe;
 		
@@ -800,15 +800,6 @@ class wpmlSubscriber extends wpMailPlugin {
 						
 				/* Custom Fields */	
 				$usedfields = array();
-				/*$fieldsquery = "SELECT `id`, `type`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `slug` != 'email' AND `slug` != 'list'";
-				
-				$query_hash = md5($fieldsquery);
-				if ($ob_fields = $this -> get_cache($query_hash)) {
-					$fields = $ob_fields;
-				} else {
-					$fields = $wpdb -> get_results($fieldsquery);
-					$this -> set_cache($query_hash, $fields);
-				}*/
 				
 				if (!empty($fields)) {				
 					foreach ($fields as $field) {
@@ -989,8 +980,13 @@ class wpmlSubscriber extends wpMailPlugin {
 			}
 			
 			if (empty($return_query) || $return_query == false) {				
-				if ($wpdb -> query($query)) {
-					$this -> insertid = $subscriber_id = (empty($id)) ? $wpdb -> insert_id : $id;
+				if ($skipsubscriberupdate == true || $wpdb -> query($query)) {
+					
+					if ($skipsubscriberupdate == true) {
+						$this -> insertid = $subscriber_id = $id;	
+					} else {
+						$this -> insertid = $subscriber_id = (empty($id)) ? $wpdb -> insert_id : $id;
+					}
 					
 					$unsubscribe_delete_query = "DELETE FROM " . $wpdb -> prefix . $Unsubscribe -> table . " WHERE `email` = '" . $data['email'] . "'";
 					$wpdb -> query($unsubscribe_delete_query);

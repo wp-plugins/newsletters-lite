@@ -6,7 +6,7 @@
 	<?php endif; ?>
 </div>
 
-<p style="text-align:center;"><a class="button button-secondary button-small" id="spamscorerunnerbutton" href="" onclick="spamscorerunner(); return false;"><?php _e('Check Now', $this -> plugin_name); ?></a>
+<p style="text-align:center;"><a class="button button-secondary" id="spamscorerunnerbutton" href="" onclick="spamscorerunner(); return false;"><?php _e('Check Now', $this -> plugin_name); ?></a>
 <span id="spamscorerunnerloading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span></p>
 
 <?php /*<script type="text/javascript" src="<?php echo $this -> render_url('js/justgage.js', 'admin', false); ?>"></script>
@@ -24,6 +24,7 @@ var history_id = false;
 <?php endif; ?>
 
 function spamscorerunner() {
+	jQuery('#spamscore_report_link_holder').hide();
 	jQuery('iframe#content_ifr').attr('tabindex', "2");
 	var formvalues = jQuery('form#post').serialize();
 	var content = jQuery("iframe#content_ifr").contents().find("body#tinymce").html();

@@ -8,7 +8,7 @@
         <?php _e('Please ensure that all links, images and other references use full, absolute URLs.', $this -> plugin_name); ?>
     </p>
     
-    <form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save" method="post" enctype="multipart/form-data">
+    <form action="?page=<?php echo $this -> sections -> themes; ?>&amp;method=save" method="post" enctype="multipart/form-data">
     	<?php echo $Form -> hidden('Theme[id]'); ?>
     	<?php echo $Form -> hidden('Theme[name]'); ?>
     
@@ -18,7 +18,7 @@
                 	<th><label for="Theme.title"><?php _e('Title', $this -> plugin_name); ?></label>
                 	<?php echo $Html -> help(__('The title of this newsletter template for internal usage.', $this -> plugin_name)); ?></th>
                     <td>
-                    	<?php echo $Form -> text('Theme[title]'); ?>
+                    	<?php echo $Form -> text('Theme[title]', array('placeholder' => __('Enter template title here', $this -> plugin_name))); ?>
                     </td>
                 </tr>
                 <tr>
@@ -275,9 +275,3 @@
         </p>
     </form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('[name="Theme[title]"]').Watermark('<?php echo addslashes(__('Enter template title here', $this -> plugin_name)); ?>');
-});
-</script>

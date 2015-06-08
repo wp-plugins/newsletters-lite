@@ -3,8 +3,8 @@
 class Newsletters_Widget extends WP_Widget {
 	
 	public function __construct() {
-		$widget_ops = array( 'classname' => 'newsletters widget_newsletters wpml', 'description' => __('Subscribe form for your sidebar(s)', 'wp-mailinglist'));
-		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'newsletters' );
+		$widget_ops = array('classname' => 'newsletters widget_newsletters wpml', 'description' => __('Subscribe form for your sidebar(s)', 'wp-mailinglist'));
+		$control_ops = array('width' => 300, 'height' => 350, 'id_base' => 'newsletters');
 		parent::__construct('newsletters', __('Newsletters', 'wp-mailinglist'), $widget_ops, $control_ops);
 	}
 	
@@ -143,19 +143,9 @@ class Newsletters_Widget extends WP_Widget {
 					
 					<script type="text/javascript">
 					jQuery(document).ready(function() {
-						if (jQuery.isFunction(jQuery.cookie)) {
-							var widgettabscookie = jQuery.cookie('widgettabscookie') || 0;
-						}
 							
 						if (jQuery.isFunction(jQuery.fn.tabs)) {
-							jQuery('#languagetabs<?php echo $this -> number; ?>').tabs({
-								active: widgettabscookie,
-								activate: function(event, ui) {
-									if (jQuery.isFunction(jQuery.cookie)) {
-										jQuery.cookie('widgettabscookie', ui.newTab.index(), {expires: 365, path: '/'});
-									}
-								}
-							});
+							jQuery('#languagetabs<?php echo $this -> number; ?>').tabs();
 						}
 					});
 					</script>

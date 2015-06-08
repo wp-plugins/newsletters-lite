@@ -324,7 +324,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 				<ul class="insertfieldslist">
 					<?php foreach ($templates as $template) : ?>
 						<li>
-							<a href="<?php echo apply_filters($this -> pre . '_admin_createnewsletter_snippetbuttonhref', "", $template); ?>" class="press button button-secondary" onclick='<?php echo apply_filters($this -> pre . '_admin_createnewsletter_snippetbuttononclick', 'wpml_tinymcetag("[' . $this -> pre . 'snippet id=\"' . $template -> id . '\"]"); return false;', $template); ?>'><?php echo __($template -> title); ?></a>
+							<a href="<?php echo apply_filters($this -> pre . '_admin_createnewsletter_snippetbuttonhref', "", $template); ?>" class="press button button-secondary" onclick='<?php echo apply_filters($this -> pre . '_admin_createnewsletter_snippetbuttononclick', 'wpml_tinymcetag("[newsletters_snippet id=\"' . $template -> id . '\"]"); return false;', $template); ?>'><?php echo __($template -> title); ?></a>
 							<?php if (apply_filters($this -> pre . '_admin_createnewsletter_loadintoeditorlinks', true)) : ?><small><a href="?page=<?php echo $this -> sections -> send; ?>&method=template&id=<?php echo $template -> id; ?>" class=""><?php _e('Load into Editor', $this -> plugin_name); ?></a></small><?php endif; ?>
 						</li>
 					<?php endforeach; ?>
@@ -337,20 +337,9 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 </div>
 
 <script type="text/javascript">
-jQuery(document).ready(function() {
-	if (jQuery.isFunction(jQuery.cookie)) {
-		var inserttabscookieid = jQuery.cookie('inserttabscookie') || 0;
-	}
-		
+jQuery(document).ready(function() {		
 	if (jQuery.isFunction(jQuery.fn.tabs)) {
-		jQuery('#inserttabs').tabs({
-			active:inserttabscookieid,
-			activate: function(event, ui) {
-				if (jQuery.isFunction(jQuery.cookie)) {
-					jQuery.cookie("inserttabscookie", ui.newTab.index(), {expires:365, path:'/'});
-				}
-			}
-		});
+		jQuery('#inserttabs').tabs();
 	}
 });
 </script>

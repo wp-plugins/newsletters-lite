@@ -34,12 +34,6 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 <script type="text/javascript">
 jQuery(document).ready(function(){    
     var divOffset = jQuery("#tableofcontentsdiv").offset().top;
-    
-    jQuery('#settings-form').submit(function() {
-	    if (jQuery.isFunction(jQuery.fn.Watermark)) {
-		    jQuery.Watermark.HideAll();
-		}
-    });
 	
 	jQuery(window).bind("scroll", function() {
 	    var offset = jQuery(this).scrollTop();

@@ -41,7 +41,7 @@ class wpmlpaginate extends wpMailPlugin {
 	var $plugin_url = '';
 	var $sub = '';
 	var $parent = '';
-	
+	var $after = '';
 	var $allRecords = array();
 	
 	var $pagination = '';
@@ -298,18 +298,14 @@ class wpmlpaginate extends wpMailPlugin {
 			$order = (empty($odir)) ? '' : '&order=' . strtolower($odir);
 			$this -> pagination .= '<span class="displaying-num">' . sprintf(__('%s items', $this -> plugin_name), $this -> per_page) . '</span>';
 			$this -> pagination .= '<span class="pagination-links">';
-			//$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
 			$this -> pagination .= '<a href="' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=1' . $search . $orderby . $order . $this -> after) . '" class="first-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '">&laquo;</a>';
-			//$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
 			$this -> pagination .= '<a class="prev-page' . (($this -> page == 1) ? ' disabled" onclick="return false;' : '') . '" href="' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=' . ($this -> page - 1) . $search . $orderby . $order . $this -> after) . '" title="' . __('Previous Page', $this -> plugin_name) . '">&#8249;</a>';
 			$this -> pagination .= '<span class="paging-input">';
 			$this -> pagination .= '<input class="newsletters-paged-input current-page" type="text" name="paged" id="paged-input" value="' . esc_attr(stripslashes($this -> page)) . '" size="1"> ';
 			$this -> pagination .= __('of', $this -> plugin_name); 
 			$this -> pagination .= ' <span class="total-pages">' . $totalpagescount . '</span>';
 			$this -> pagination .= '</span>';
-			//$this -> pagination .= '<a class="next-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '" href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . ($this -> page + 1) . $search . $orderby . $order . $this -> after . '" title="' . __('Next Page', $this -> plugin_name) . '">&#8250;</a>';
 			$this -> pagination .= '<a class="next-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '" href="' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=' . ($this -> page + 1) . $search . $orderby . $order . $this -> after) . '" title="' . __('Next Page', $this -> plugin_name) . '">&#8250;</a>';
-			//$this -> pagination .= '<a href="?page=' . $this -> url_page . '&amp;' . $this -> pre . 'page=' . $totalpagescount . $search . $orderby . $order . $this -> after . '" class="last-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '">&raquo;</a>';
 			$this -> pagination .= '<a href="' . $Html -> retainquery(((!empty($this -> sub)) ? 'page=' . $this -> sub . '&amp;' : false) . $this -> pre . 'page=' . $totalpagescount . $search . $orderby . $order . $this -> after) . '" class="last-page' . (($this -> page == $totalpagescount) ? ' disabled" onclick="return false;' : '') . '">&raquo;</a>';
 			$this -> pagination .= '</span>';
 			

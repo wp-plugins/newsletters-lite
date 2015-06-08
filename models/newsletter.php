@@ -201,7 +201,7 @@ if (!class_exists('newsletters_lite')) {
 				$Db -> model = $Mailinglist -> model;
 				$list_count = $Db -> count();
 				
-				if ($list_count >= $newsletters_lite_listlimit) {
+				if (empty($data -> id) && $list_count >= $newsletters_lite_listlimit) {
 					$error = sprintf(__('Mailing list limit of %s has been reached, you can %s for unlimited.', $this -> plugin_name), $newsletters_lite_listlimit, '<a href="' . admin_url('admin.php?page=' . $this -> sections -> lite_upgrade) . '">Upgrade to PRO</a>');
 					$errors['limit'] = $error;
 					$this -> render_error($error);

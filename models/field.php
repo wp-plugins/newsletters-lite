@@ -75,7 +75,7 @@ class wpmlField extends wpMailPlugin {
 		$this -> table = $this -> pre . $this -> controller;	
 	
 		if (!empty($data)) {
-			foreach ($data as $key => $val) {
+			foreach ($data as $key => $val) {				
 				//$this -> {$key} = stripslashes_deep($val);
 				$data = (object) $data;
 				$field_id = $data -> id;
@@ -378,40 +378,6 @@ class wpmlField extends wpMailPlugin {
 			$this -> data[$this -> model] -> errormessage = $this -> language_join($this -> data[$this -> model] -> errormessage, false, true);
 		}
 		
-		/*if ($this -> language_do()) {		
-			if (true) {
-				$this -> data[$this -> model] -> title = $this -> language_join($this -> data[$this -> model] -> title, false, true);
-				$this -> data[$this -> model] -> caption = $this -> language_join($this -> data[$this -> model] -> caption, false, true);
-				$this -> data[$this -> model] -> watermark = $this -> language_join($this -> data[$this -> model] -> watermark, false, true);
-				$this -> data[$this -> model] -> errormessage = $this -> language_join($this -> data[$this -> model] -> errormessage, false, true);
-				
-				$languages = array();
-				$fieldoptions = array();
-				$newfieldoptions = array();
-				
-				if (!empty($this -> data[$this -> model] -> fieldoptions)) {
-					foreach ($this -> data[$this -> model] -> fieldoptions as $fokey => $fo) {
-						$languages[] = $fokey;
-						$fieldoptions[] = explode("\r\n", $fo);
-					}
-					
-					for ($j = 0; $j < count($fieldoptions); $j++) {
-						for ($i = 0; $i < count($fieldoptions[$j]); $i++) {
-							$newfieldoptions[$i][$languages[$j]] = $fieldoptions[$j][$i];
-						}
-					}
-					
-					foreach ($newfieldoptions as $newfieldoption_key => $newfieldoption) {
-						$newfieldoptions[$newfieldoption_key] = $this -> language_join($newfieldoption);
-					}
-					
-					$newfieldoptions = @implode("\r\n", $newfieldoptions);
-					$this -> data[$this -> model] -> fieldoptions = $newfieldoptions;
-					$fieldoptions = $newfieldoptions;
-				}
-			}
-		}*/
-		
 		if (!empty($this -> data[$this -> model] -> fieldoptions)) {
 			$fieldoptions_data = $this -> data[$this -> model] -> fieldoptions;
 			$el = $this -> language_getlanguages();
@@ -498,29 +464,6 @@ class wpmlField extends wpMailPlugin {
 						if (empty($fieldoptions)) {
 							$this -> errors['fieldoptions'] = __('Please fill in some options', $this -> plugin_name);
 						} else {							
-							/*$fieldoptions = explode("\r\n", $fieldoptions);
-							$newoptions = array();
-							
-							if (!empty($fieldoptions)) {
-								$n = 1;
-												
-								foreach ($fieldoptions as $option) {
-									$option = trim($option);
-									
-									if (!empty($option)) {
-										$newoptions[$n] = stripslashes($option);
-										$n++;
-									}
-								}
-							}
-							
-							if (!empty($newoptions)) {
-								$fieldoptions = maybe_serialize($newoptions);
-							} else {
-								$fieldoptions = '';
-								$this -> errors['fieldoptions'] = __('Please fill in some options', $this -> plugin_name);
-							}*/
-							
 							$fieldoptions = maybe_serialize($fieldoptions);							
 							$this -> data[$this -> model] -> fieldoptions = $fieldoptions;
 						}

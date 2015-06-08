@@ -15,7 +15,7 @@ $regex = $Html -> field_value('Field[regex]');
 	<?php $this -> render_admin('error', array('errors' => $errors)); ?>
 	<?php $slug = $Html -> field_value('Field[slug]'); ?>
     
-	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> fields; ?>&amp;method=save" method="post" id="Field.saveform">
+	<form action="?page=<?php echo $this -> sections -> fields; ?>&amp;method=save" method="post" id="Field.saveform">
 		<?php echo $Form -> hidden('Field[id]'); ?>
 		<table class="form-table">
 			<tbody>
@@ -37,13 +37,13 @@ $regex = $Html -> field_value('Field[regex]');
 								<?php $tabs_title = 1; ?>
 								<?php foreach ($el as $language) : ?>
 									<div id="tabs_title_<?php echo $tabs_title; ?>">
-										<input <?php echo ($tabs_title == 1) ? 'onkeyup="wpml_titletoslug(this.value);"' : ''; ?> type="text" class="widefat" name="Field[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[title]', $language))); ?>" id="Field_title_<?php echo $language; ?>" />
+										<input placeholder="<?php echo esc_attr(stripslashes(__('Enter field title/name here', $this -> plugin_name))); ?>" <?php echo ($tabs_title == 1) ? 'onkeyup="wpml_titletoslug(this.value);"' : ''; ?> type="text" class="widefat" name="Field[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[title]', $language))); ?>" id="Field_title_<?php echo $language; ?>" />
 									</div>
 									<?php $tabs_title++; ?>
 								<?php endforeach; ?>
 							</div>
 						<?php else : ?>
-							<input onkeyup="wpml_titletoslug(this.value);" type="text" class="widefat" name="Field[title]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[title]'))); ?>" id="Field_title" />
+							<input placeholder="<?php echo esc_attr(stripslashes(__('Enter field title/name here', $this -> plugin_name))); ?>" onkeyup="wpml_titletoslug(this.value);" type="text" class="widefat" name="Field[title]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[title]'))); ?>" id="Field_title" />
 						<?php endif; ?>
                         <span class="howto"><?php _e('Title/name for this custom field as it will be displayed on subscribe forms.', $this -> plugin_name); ?></span>
                         <?php echo $Html -> field_error('Field[title]'); ?>
@@ -53,7 +53,7 @@ $regex = $Html -> field_value('Field[regex]');
 	                <tr>
 	                	<th><label for="Field_slug"><?php _e('Slug/Nicename', $this -> plugin_name); ?></label></th>
 	                    <td>
-	                    	<input id="Field_slug" type="text" class="widefat" name="Field[slug]" value="<?php echo $Html -> field_value('Field[slug]'); ?>" />
+	                    	<input placeholder="<?php echo esc_attr(stripslashes(__('Enter field slug for database and shortcodes use here', $this -> plugin_name))); ?>" id="Field_slug" type="text" class="widefat" name="Field[slug]" value="<?php echo $Html -> field_value('Field[slug]'); ?>" />
 	                        <?php $fieldslugerror = $Html -> field_error('Field[slug]'); ?>
 	                        <?php if (!empty($fieldslugerror)) : ?>
 	                        	<div class="<?php echo $this -> pre; ?>"><?php echo $fieldslugerror; ?></div>
@@ -84,13 +84,13 @@ $regex = $Html -> field_value('Field[regex]');
 								<?php $tabs_caption = 1; ?>
 								<?php foreach ($el as $language) : ?>
 									<div id="tabs_caption_<?php echo $tabs_caption; ?>">
-										<input type="text" class="widefat" name="Field[caption][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[caption]', $language))); ?>" id="Field_caption_<?php echo $language; ?>" />
+										<input placeholder="<?php echo esc_attr(stripslashes(__('Enter a caption/description to show below the field here', $this -> plugin_name))); ?>" type="text" class="widefat" name="Field[caption][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[caption]', $language))); ?>" id="Field_caption_<?php echo $language; ?>" />
 									</div>
 									<?php $tabs_caption++; ?>
 								<?php endforeach; ?>
 							</div>
 						<?php else : ?>
-							<?php echo $Form -> text('Field[caption]'); ?>
+							<?php echo $Form -> text('Field[caption]', array('placeholder' => __('Enter a caption/description to show below the field here', $this -> plugin_name))); ?>
 						<?php endif; ?>
 						<span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Give this field a descriptive caption/notation for subscribers to see.', $this -> plugin_name); ?></span>
 					</td>
@@ -115,13 +115,13 @@ $regex = $Html -> field_value('Field[regex]');
 								<?php $tabs_watermark = 1; ?>
 								<?php foreach ($el as $language) : ?>
 									<div id="tabs_watermark_<?php echo $tabs_watermark; ?>">
-										<input type="text" class="widefat" name="Field[watermark][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[watermark]', $language))); ?>" id="Field_watermark_<?php echo $language; ?>" />
+										<input placeholder="<?php echo esc_attr(stripslashes(__('Enter watermark text here', $this -> plugin_name))); ?>" type="text" class="widefat" name="Field[watermark][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($Html -> field_value('Field[watermark]', $language))); ?>" id="Field_watermark_<?php echo $language; ?>" />
 									</div>
 									<?php $tabs_watermark++; ?>
 								<?php endforeach; ?>
 							</div>
 						<?php else : ?>
-							<?php echo $Form -> text('Field[watermark]'); ?>
+							<?php echo $Form -> text('Field[watermark]', array('placeholder' => __('Enter watermark text here', $this -> plugin_name))); ?>
 						<?php endif; ?>
 						<span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Watermark to show inside the input field which will disappear when the field is clicked on.', $this -> plugin_name); ?></span>
 					</td>
@@ -579,12 +579,6 @@ jQuery(document).ready(function() {
 		jQuery('#tabs_watermark').tabs();
 		jQuery('#tabs_errormessage').tabs();
 		jQuery('#tabs_fieldoptions').tabs();
-	<?php else : ?>
-		/* Watermarks */
-		jQuery('#Field_title').Watermark('<?php echo addslashes(__('Enter field title/name here', $this -> plugin_name)); ?>');
-		jQuery('#Field_slug').Watermark('<?php echo addslashes(__('Enter field slug for database and shortcodes use here', $this -> plugin_name)); ?>');
-		jQuery('[name="Field[caption]"]').Watermark('<?php echo addslashes(__('Enter a caption/description to show below the field here', $this -> plugin_name)); ?>');
-		jQuery('[name="Field[watermark]"]').Watermark('<?php echo addslashes(__('Enter watermark text here', $this -> plugin_name)); ?>');
 	<?php endif; ?>
 });
 </script>

@@ -63,11 +63,11 @@ $count_users = count_users();
 	        	<div id="daterange_div" style="display:<?php echo (!empty($_POST['daterange']) && $_POST['daterange'] == "Y") ? 'block' : 'none'; ?>;">
 	        		<p>
 	        			<label for="daterangefrom"><?php _e('From Date', $this -> plugin_name); ?></label>
-	        			<input onblur="update_subscribers();" onkeyup="update_subscribers();" type="text" name="daterangefrom" value="<?php echo esc_attr(stripslashes($_POST['daterangefrom'])); ?>" id="daterangefrom" class="widefat" style="width:120px;" />
+	        			<input placeholder="<?php echo esc_attr(stripslashes($Html -> gen_date("Y-m-d", strtotime("-1 month")))); ?>" onblur="update_subscribers();" onkeyup="update_subscribers();" type="text" name="daterangefrom" value="<?php echo esc_attr(stripslashes($_POST['daterangefrom'])); ?>" id="daterangefrom" class="widefat" style="width:120px;" />
 	        		</p>
 	        		<p>
 	        			<label for="daterangeto"><?php _e('To Date', $this -> plugin_name); ?></label>
-	        			<input onblur="update_subscribers();" onkeyup="update_subscribers();" type="text" name="daterangeto" value="<?php echo esc_attr(stripslashes($_POST['daterangeto'])); ?>" id="daterangeto" class="widefat" style="width:120px;" />
+	        			<input placeholder="<?php echo esc_attr(stripslashes($Html -> gen_date("Y-m-d", time()))); ?>" onblur="update_subscribers();" onkeyup="update_subscribers();" type="text" name="daterangeto" value="<?php echo esc_attr(stripslashes($_POST['daterangeto'])); ?>" id="daterangeto" class="widefat" style="width:120px;" />
 	        		</p>
 	        	</div>
 	        	
@@ -249,20 +249,9 @@ jQuery(document).ready(function() {
 	<?php if (!empty($_POST['mailinglists']) || !empty($_POST['roles'])) : ?>
 		update_subscribers();
 	<?php endif; ?>	
-	
-	if (jQuery.isFunction(jQuery.cookie)) {
-		var mailingliststabscookieid = jQuery.cookie('mailingliststabscookie') || 0;
-	}
 		
 	if (jQuery.isFunction(jQuery.fn.tabs)) {
-		jQuery('#mailingliststabs').tabs({
-			active:mailingliststabscookieid,
-			activate: function(event, ui) {
-				if (jQuery.isFunction(jQuery.cookie)) {
-					jQuery.cookie("mailingliststabscookie", ui.newTab.index(), {expires:365, path:'/'});
-				}
-			}
-		});
+		jQuery('#mailingliststabs').tabs();
 	}
 });
 

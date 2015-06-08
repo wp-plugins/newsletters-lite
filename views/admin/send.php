@@ -24,7 +24,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 	<?php else : ?>
 		<h2><?php _e('Create Newsletter', $this -> plugin_name); ?></h2>
 	<?php endif; ?>
-	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> send; ?>" method="post" id="post" name="post" enctype="multipart/form-data">
+	<form action="?page=<?php echo $this -> sections -> send; ?>" method="post" id="post" name="post" enctype="multipart/form-data">
 		<?php wp_nonce_field($this -> sections -> send); ?>
 		<input type="hidden" name="group" value="all" />
 		<input type="hidden" id="ishistory" name="ishistory" value="<?php echo $_POST['ishistory']; ?>" />
@@ -39,7 +39,7 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 					<div id="titlediv">
 						<div id="titlewrap">
 							<label class="screen-reader-text" for="title"></label>
-							<input onclick="jQuery('iframe#content_ifr').attr('tabindex', '2');" tabindex="1" id="title" autocomplete="off" type="text" name="subject" value="<?php echo esc_attr(stripslashes($_POST['subject'])); ?>" />
+							<input onclick="jQuery('iframe#content_ifr').attr('tabindex', '2');" tabindex="1" id="title" autocomplete="off" type="text" placeholder="<?php echo esc_attr(stripslashes(__('Enter email subject here', $this -> plugin_name))); ?>" name="subject" value="<?php echo esc_attr(stripslashes($_POST['subject'])); ?>" />
 						</div>
 						<?php if (!empty($errors['subject'])) : ?>
 							<p class="<?php echo $this -> pre; ?>error"><?php echo $errors['subject']; ?></p>
@@ -141,12 +141,6 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 </div>
 
 <script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('#title').Watermark('<?php echo addslashes(__('Enter email subject here', $this -> plugin_name)); ?>').focus();
-	jQuery('#daterangefrom').Watermark('eg. <?php echo $Html -> gen_date("Y-m-d", strtotime("-1 month")); ?>');
-	jQuery('#daterangeto').Watermark('eg. <?php echo $Html -> gen_date("Y-m-d", time()); ?>');
-});
-
 var warnMessage = "<?php echo addslashes(__('You have unsaved changes on this page! All unsaved changes will be lost and it cannot be undone.', $this -> plugin_name)); ?>";
 
 function deletecontentarea(number, history_id) {
@@ -257,7 +251,7 @@ jQuery(document).ready(function() {
 	    	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>
 	    		//spamscorerunner();
 	    	<?php endif; ?>
-	    }, 5000);
+	    }, 3000);
     
         window.onbeforeunload = function () {
             if (warnMessage != null) return warnMessage;

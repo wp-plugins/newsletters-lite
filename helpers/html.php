@@ -132,7 +132,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	
 		if (!empty($content)) {				
 			if (is_plugin_active(plugin_basename('wp-super-cache/wp-cache.php'))) {			
-				return $content;
+				//return $content;
 			
 				//global $wp_cache_config_file, $newsletters_wpsc_cachedata;
 				//include $wp_cache_config_file;
@@ -255,8 +255,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	 * with jQuery equivalent codeword
 	 * @author Tristan Jahier
 	 */
-	function dateformat_PHP_to_jQueryUI($php_format)
-	{
+	function dateformat_PHP_to_jQueryUI($php_format = null) {
 	    $SYMBOLS_MATCHING = array(
 	        // Day
 	        'd' => 'dd',
@@ -834,7 +833,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				global ${$mn[1]};
 				if (!empty(${$mn[1]} -> errors[$mn[2]])) {
 					ob_start();
-					echo '<div class="ui-corner-all ui-state-error"><p><i class="fa fa-exclamation-triangle"></i> ' . ${$mn[1]} -> errors[$mn[2]] . '</p></div>';
+					echo '<div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> ' . ${$mn[1]} -> errors[$mn[2]] . '</p></div>';
 					return ob_get_clean();
 				}
 			}
@@ -1026,7 +1025,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 		$add = ltrim($add, '&');
 		
 		$url_parts = @parse_url($url);
-		parse_str($url_parts['query'], $path_parts);
+		if (!empty($url_parts['query'])) parse_str($url_parts['query'], $path_parts);
 		$add = str_replace("&amp;", "&", $add);
 		parse_str($add, $add_parts);
 		

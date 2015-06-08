@@ -3,7 +3,7 @@
 		<p>
 			<label>
 				<?php _e('Subscriber:', $this -> plugin_name); ?><br/>
-				<input type="text" name="searchterm" value="" id="newsletters_quicksearch_input" />
+				<input placeholder="<?php echo esc_attr(stripslashes(__('Subscriber...', $this -> plugin_name))); ?>" type="text" name="searchterm" value="" id="newsletters_quicksearch_input" />
 			</label>
 		</p>
 		<p class="submit">
@@ -11,9 +11,3 @@
 		</p>
 	</form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('#newsletters_quicksearch_input').Watermark('<?php echo __('Subscriber...', $this -> plugin_name); ?>');
-});
-</script>

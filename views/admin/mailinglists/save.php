@@ -13,7 +13,7 @@ if ($this -> language_do()) {
 <div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Save a Mailing List', $this -> plugin_name); ?></h2>
 	<?php $this -> render_admin('error', array('errors' => $errors)); ?>
-	<form onsubmit="jQuery.Watermark.HideAll();" action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=save" method="post" id="mailinglistform">
+	<form action="?page=<?php echo $this -> sections -> lists; ?>&amp;method=save" method="post" id="mailinglistform">
 		<?php echo $Form -> hidden('Mailinglist[id]'); ?>
 	
 		<table class="form-table">
@@ -30,7 +30,7 @@ if ($this -> language_do()) {
 								</ul>
 								<?php foreach ($languages as $language) : ?>
 									<div id="mailinglist-title-tabs-<?php echo $language; ?>">
-										<input type="text" class="widefat" name="Mailinglist[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $Mailinglist -> data[$Mailinglist -> model] -> title))); ?>" id="Mailinglist_title_<?php echo $language; ?>" />
+										<input placeholder="<?php echo esc_attr(stripslashes(__('Enter mailing list title here', $this -> plugin_name))); ?>" type="text" class="widefat" name="Mailinglist[title][<?php echo $language; ?>]" value="<?php echo esc_attr(stripslashes($this -> language_use($language, $Mailinglist -> data[$Mailinglist -> model] -> title))); ?>" id="Mailinglist_title_<?php echo $language; ?>" />
 									</div>
 								<?php endforeach; ?>
 							</div>
@@ -43,7 +43,7 @@ if ($this -> language_do()) {
 							});
 							</script>
 						<?php else : ?>
-							<?php echo $Form -> text('Mailinglist[title]'); ?>
+							<?php echo $Form -> text('Mailinglist[title]', array('placeholder' => __('Enter mailing list title here', $this -> plugin_name))); ?>
 						<?php endif; ?>
                     	<span class="howto"><?php _e('Fill in a title for your list as your users will see it.', $this -> plugin_name); ?></span>    
                     </td>
@@ -95,14 +95,14 @@ if ($this -> language_do()) {
                 <tr>
 	                <th><label for="Mailinglist.subredirect"><?php _e('Subscribe Redirect URL', $this -> plugin_name); ?></label></th>
 	                <td>
-		                <?php echo $Form -> text('Mailinglist[subredirect]'); ?>
+		                <?php echo $Form -> text('Mailinglist[subredirect]', array('placeholder' => __('http://domain.com/custom/url/to/go/to/', $this -> plugin_name))); ?>
 		                <span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Leave empty for default, global behaviour. Else fill in a subscribe redirect URL for this list', $this -> plugin_name); ?></span>
 	                </td>
                 </tr>
                 <tr>
                 	<th><label for="Mailinglist.redirect"><?php _e('Confirm Redirect URL', $this -> plugin_name); ?></label></th>
                 	<td>
-                		<?php echo $Form -> text('Mailinglist[redirect]'); ?>
+                		<?php echo $Form -> text('Mailinglist[redirect]', array('placeholder' => __('http://domain.com/custom/url/to/go/to/', $this -> plugin_name))); ?>
                 		<span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Leave empty for default, global behaviour, else fill in a confirmation redirect URL location for this list.', $this -> plugin_name); ?></span>
                 	</td>
                 </tr>
@@ -154,7 +154,7 @@ if ($this -> language_do()) {
 					<tr>
 						<th><label for="Mailinglist.adminemail"><?php _e('Administrator Email', $this -> plugin_name); ?></label></th>
 						<td>
-							<?php echo $Form -> text('Mailinglist[adminemail]'); ?>
+							<?php echo $Form -> text('Mailinglist[adminemail]', array('placeholder' => __('Enter a valid email address', $this -> plugin_name))); ?>
 							<span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Email address to send notifications to for events of this mailing list.', $this -> plugin_name); ?></span>
 						</td>
 					</tr>
@@ -170,12 +170,3 @@ if ($this -> language_do()) {
 		</p>
 	</form>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('[name="Mailinglist[title]"]').Watermark('<?php echo addslashes(__('Enter mailing list title here', $this -> plugin_name)); ?>');
-	jQuery('[name="Mailinglist[adminemail]"]').Watermark('<?php echo addslashes(__('Enter a valid email address', $this -> plugin_name)); ?>');
-	jQuery('[name="Mailinglist[subredirect]"]').Watermark('<?php echo addslashes(__('http://domain.com/custom/url/to/go/to/', $this -> plugin_name)); ?>');
-	jQuery('[name="Mailinglist[redirect]"]').Watermark('<?php echo addslashes(__('http://domain.com/custom/url/to/go/to/', $this -> plugin_name)); ?>');
-});
-</script>

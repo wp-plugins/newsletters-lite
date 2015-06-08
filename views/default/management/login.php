@@ -15,10 +15,10 @@
 	<div class="newsletters <?php echo $this -> pre; ?>" id="subscriberauthloginformdiv">
 	    <form id="subscriberauthloginform" action="<?php echo $Html -> retainquery('newsletters_method=management_login&method=login', get_permalink($this -> get_managementpost())); ?>" method="post">
 	        <label><?php _e('Email Address:', $this -> plugin_name); ?></label>
-	        <input type="text" name="email" value="<?php echo esc_attr(stripslashes($email)); ?>" id="email" />
+	        <input type="text" placeholder="<?php echo esc_attr(stripslashes(__('Enter email address', $this -> plugin_name))); ?>" name="email" value="<?php echo esc_attr(stripslashes($email)); ?>" id="email" />
 	        <input type="submit" name="authenticate" class="newsletters_button ui-button-primary" value="<?php _e('Send Confirmation', $this -> plugin_name); ?>" id="authenticate" />
 	    </form>
 	</div>
 	
-	<script type="text/javascript">jQuery(document).ready(function() { jQuery('input#authenticate').button(); jQuery('#email').Watermark('<?php echo addslashes(__('Enter email address', $this -> plugin_name)); ?>'); });</script>
+	<script type="text/javascript">jQuery(document).ready(function() { jQuery('input#authenticate').button(); });</script>
 </div>
