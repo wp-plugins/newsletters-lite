@@ -3,8 +3,8 @@ Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
-Tested up to: 4.2.1
-Stable tag: 4.5.3
+Tested up to: 4.2.2
+Stable tag: 4.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -148,6 +148,44 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.4 =
+* ADD: Show emails per hour/day total based on email scheduling settings
+* ADD: Setting to update/overwrite subscribers with import or not
+* ADD: Support for a functions.php file in theme folder or child theme folder
+* ADD: When sending to roles, map meta to custom fields 
+* IMPROVE: Change WP_CONTENT_DIR to a hookable function
+* IMPROVE: Improvements to spam score report utility
+* IMPROVE: Change spam score checker from PHP CURL to wp_remote_post for performance
+* IMPROVE: Remove jQuery Cookie
+* IMPROVE: Remove jQuery UI (tabs, buttons, dialog, etc) completely on front-end
+* IMPROVE: display:none; inline style on the honeypot field
+* IMPROVE: Change out jQuery.Watermark with "placeholder" property/attribute
+* IMPROVE: Open links under Newsletters > Extensions in a new tab
+* IMPROVE: Recursive snippets
+* IMPROVE: More action/filter hooks for developers
+* IMPROVE: Select2 CSS should load in the HEAD, not footer
+* IMPROVE: CSS selector for jQuery UI styles in admin dashboard
+* IMPROVE: Default E-mail Template Outlook Conflict 
+* FIX: Spam score report overlay blank on second load
+* FIX: Subscribing in Manage Subscriptions overwrites custom fields
+* FIX: Draft/unsent/private newsletters should not create published /newsletter/ custom post
+* FIX: Radio button pre-selected in subscribe form
+* FIX: Cannot edit the Default List in the lite/free newsletter plugin version
+* FIX: Sending to user roles causes duplicate emails
+* FIX: Importing overwrites existing subscribers
+* FIX: Undefined Notices
+* FIX: Cannot go to PayPal when buying Pro version in overlay
+* FIX: Not all system emails have a template setting
+* FIX: Bounce not recording with "Subscriber delete on bounce" turned off
+* FIX: Delete User on Unsubscribe
+* FIX: CSS Conflict with Elegant Themes Panel
+* FIX: W3 Total Cache breaks some pages
+* FIX: Content areas not loading in autoresponders
+* FIX: All scripts can't be disabled, at least one stays selected
+* FIX: CKEditor is adding overflow-y:hidden to the HTML tag of templates
+* FIX: Dashboard charts not loading
+* FIX: Serial key declined and with second attempt it's accepted with no success message 
 
 = 4.5.3 =
 * ADD: Javascript search under Newsletters > Extensions section

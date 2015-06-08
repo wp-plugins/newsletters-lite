@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.3.1';
+		var $version = '4.5.4';
 		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -3817,7 +3817,7 @@ if (!class_exists('wpMailPlugin')) {
 				
 				wp_enqueue_style('colorbox', $this -> render_url('css/colorbox.css', 'admin', false), false, $this -> version, "all");
 				
-				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
+				if ((preg_match("/(widgets\.php)/", $_SERVER['REQUEST_URI'], $matches)) || (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections))) {
 					$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
 					wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
 					
@@ -6748,14 +6748,14 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.3.1") < 0) {
+				if (version_compare($cur_version, "4.5.4") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
 					//update the theme folder to default2
 					$this -> update_option('theme_folder', "default2");
 					
-					$version = '4.5.3.1';	
+					$version = '4.5.4';	
 				}
 			
 				//the current version is older.
