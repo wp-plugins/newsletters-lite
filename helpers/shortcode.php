@@ -445,7 +445,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		if (!empty($excerpt_settings)) {
 			global $shortcode_post, $shortcode_post_language, $wpml_target;
-			$excerpt_more = ($this -> language_do()) ? $this -> language_use($shortcode_post_language, $this -> language_join($this -> get_option('excerpt_more'))) : $this -> get_option('excerpt_more');
+			$excerpt_more = $this -> get_option('excerpt_more');
+			if (is_array($excerpt_more)) { $excerpt_more = $this -> language_join($excerpt_more); }
+			$excerpt_more = ($this -> language_do()) ? $this -> language_use($shortcode_post_language, $excerpt_more) : $excerpt_more;
 			
 			global ${'newsletters_acolor'};
 			if (!empty(${'newsletters_acolor'})) {

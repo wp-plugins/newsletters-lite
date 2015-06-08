@@ -62,7 +62,7 @@ if (!$servercronstring = $this -> get_option('servercronstring')) {
 	$servercronstring = substr(md5(rand(1,999)), 0, 12);
 }
 
-$commandurl = home_url() . '/?' . $this -> pre . 'method=docron&amp;auth=' . $servercronstring;
+$commandurl = home_url() . '/?' . $this -> pre . 'method=docron&auth=' . $servercronstring;
 $command = '<code>wget -O /dev/null "' . $commandurl . '" > /dev/null 2>&1</code>';
 
 ?>
@@ -77,7 +77,7 @@ $command = '<code>wget -O /dev/null "' . $commandurl . '" > /dev/null 2>&1</code
 		<?php _e('Please see the documentation for instructions and check with your hosting provider that the WGET command is fully supported on your hosting.', $this -> plugin_name); ?>
 	</p>
 	<p>
-		<?php echo sprintf(__('If you cannot create a cron job or your hosting does not support WGET, you can use %s with the URL %s', $this -> plugin_name), '<a href="https://tribulant.com/partners/easycron/" target="_blank">EasyCron</a>', '<code>' . $commandurl . '</code>'); ?>
+		<?php echo sprintf(__('If you cannot create a cron job or your hosting does not support WGET, you can use %s with the URL %s', $this -> plugin_name), '<a class="button button-primary" href="https://www.easycron.com/cron-job-scheduler?ref=7951&url=' . urlencode($commandurl) . '&testFirst=0&specifiedBy=1&specifiedValue=2&cronJobName=' . urlencode(__('Newsletter plugin cron', $this -> plugin_name)) . '" target="_blank">EasyCron <i class="fa fa-external-link"></i></a>', '<code>' . $commandurl . '</code>'); ?>
 	</p>
 </div>
 

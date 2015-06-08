@@ -291,7 +291,7 @@
 		<table class="body-wrap">
 			<tr>
 				<td></td>
-				<td class="container" width="">
+				<td class="container" width="600">
 					<div class="content">
 						<table class="main" width="100%" cellpadding="0" cellspacing="0">
 							<tr>

@@ -100,19 +100,17 @@
             	jQuery('textarea#Theme_paste').ckeditor({
                 	fullPage: true,
 					allowedContent: true,
-					//height: 500,
+					height: 500,
 					entities: false,
-					extraPlugins: 'image2,autogrow,codesnippet,tableresize',
+					//extraPlugins: 'image2,autogrow,codesnippet,tableresize',
+					extraPlugins: 'image2,codesnippet,tableresize',
 					autoGrow_onStartup: true
             	});
-            	
-            	//CKEDITOR.disableAutoInline = true;
-				//CKEDITOR.inline( 'Theme_paste' );
         	});
         	</script>
         </div>
         
-        <?php if (empty($Theme -> data -> id)) : ?>
+        <?php if (true || empty($Theme -> data -> id)) : ?>
         	<table class="form-table">
 	        	<tbody>
 		        	<tr>

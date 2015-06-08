@@ -42,8 +42,7 @@ $emails_percentage = (($emails / 1000) * 100);
 		<p><?php _e('You can click "Submit Serial" below to activate Tribulant Newsletters PRO.', $this -> plugin_name); ?><br/>
 		<?php _e('Alternatively, click "Buy PRO Now" to open the plugin page and buy a serial key to submit.', $this -> plugin_name); ?></p>
 		<p>
-			<?php /*<a class="button button-secondary button-large" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> submitserial); ?>" onclick="jQuery.colorbox({href:ajaxurl + '?action=<?php echo $this -> pre; ?>serialkey'}); return false;"><?php _e('Submit Serial', $this -> plugin_name); ?></a>*/ ?>
-			<a class="button button-primary button-hero" href="<?php echo $plugin_link; ?>" onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'90%', height:'90%', href:'<?php echo $plugin_link; ?>', fastIframe:false}); return false;"><?php _e('Buy PRO Now', $this -> plugin_name); ?></a>
+			<a class="button button-primary button-hero" href="<?php echo $plugin_link; ?>" target="_blank"><?php _e('Buy PRO Now', $this -> plugin_name); ?></a>
 			<p><?php _e('or', $this -> plugin_name); ?> <a href="<?php echo admin_url('admin.php?page=' . $this -> sections -> submitserial); ?>" onclick="jQuery.colorbox({href:ajaxurl + '?action=<?php echo $this -> pre; ?>serialkey'}); return false;"><?php _e('submit a serial key', $this -> plugin_name); ?></a></p>
 		</p>
 	</div>
@@ -74,7 +73,7 @@ $emails_percentage = (($emails / 1000) * 100);
 			<div class="col-3 last-feature">
 				<h4><?php _e('Upgrade to PRO', $this -> plugin_name); ?></h4>
 				<p><?php _e('Upgrading to Tribulant Newsletters PRO is quick and easy by clicking the button below:', $this -> plugin_name); ?></p>
-				<p><a href="<?php echo $plugin_link; ?>" class="button button-primary" onclick="jQuery.colorbox({iframe:true, fastIframe:false, width:'90%', height:'90%', href:'<?php echo $plugin_link; ?>'}); return false;"><?php _e('Buy PRO Now', $this -> plugin_name); ?></a></p>
+				<p><a href="<?php echo $plugin_link; ?>" class="button button-primary" target="_blank"><?php _e('Buy PRO Now', $this -> plugin_name); ?></a></p>
 				<p><?php _e('Once you have purchased a serial key, simply submit it to activate Tribulant Newsletters PRO:', $this -> plugin_name); ?></p>
 				<p><a class="button button-secondary" href="<?php echo admin_url('admin.php?page=' . $this -> sections -> submitserial); ?>" onclick="jQuery.colorbox({href:ajaxurl + '?action=<?php echo $this -> pre; ?>serialkey'}); return false;"><?php _e('Submit Serial', $this -> plugin_name); ?></a></p>
 			</div>
@@ -88,6 +87,31 @@ $emails_percentage = (($emails / 1000) * 100);
 		<?php _e('We are a full-time business developing, promoting and supporting WordPress plugins to the community.', $this -> plugin_name); ?></p>
 		<p>
 			<a class="button button-primary button-large" target="_blank" href="http://tribulant.com"><?php _e('Visit Our Site', $this -> plugin_name); ?></a>
+		</p>
+		
+		<h3><?php _e('Find Us On Social Networks', $this -> plugin_name); ?></h3>
+		<p>
+			<!-- Facebook Like -->
+			<div id="fb-root"></div>
+			<script>(function(d, s, id) {
+			  var js, fjs = d.getElementsByTagName(s)[0];
+			  if (d.getElementById(id)) return;
+			  js = d.createElement(s); js.id = id;
+			  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.3&appId=229106274013";
+			  fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));</script>
+			
+			<div class="fb-like" data-href="https://www.facebook.com/tribulantsoftware" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>
+			
+			<!-- Twitter Follow -->
+			<a href="https://twitter.com/tribulant" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @tribulant</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+			
+			<!-- Google+ Follow -->
+			<!-- Place this tag in your head or just before your close body tag. -->
+			<script src="https://apis.google.com/js/platform.js" async defer></script>
+			
+			<!-- Place this tag where you want the widget to render. -->
+			<div class="g-follow" data-annotation="none" data-height="20" data-href="//plus.google.com/u/0/116807944061700692613" data-rel="publisher"></div>
 		</p>
 	</div>
 </div>

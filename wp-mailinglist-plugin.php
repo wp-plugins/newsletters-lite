@@ -3554,8 +3554,11 @@ if (!class_exists('wpMailPlugin')) {
 			if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }			
 	
 			if (is_admin()) {	
+				
+				$screen = get_current_screen();
+				
 				// Charts
-				if (preg_match("/(index.php)/si", $_SERVER['REQUEST_URI']) || 
+				if ($screen -> id == "dashboard" || preg_match("/(index.php)/si", $_SERVER['REQUEST_URI']) || 
 					(!empty($_GET['page']) && ($_GET['page'] == $this -> sections -> welcome || $_GET['page'] == $this -> sections -> history))) {
 					wp_enqueue_script('chartjs', $this -> render_url('js/chartjs/Chart.js', 'admin', false), array('jquery'), false, false);
 				}
