@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5.4
+Version: 4.5.4.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -7088,6 +7088,7 @@ if (!class_exists('wpMail')) {
 						$this -> delete_option('emailarchive');
 						$this -> delete_option('excerpt_settings');
 						$this -> delete_option('defaulttemplate');
+						$this -> delete_option('loadstyles');
 						$this -> delete_option('loadscripts');
 						
 						if (!empty($_FILES)) {
@@ -7174,7 +7175,10 @@ if (!class_exists('wpMail')) {
 	                    	$this -> latestposts_scheduling();
 	                    }
 	
-						$this -> render_message(__('Configuration settings successfully updated', $this -> plugin_name));
+						//$this -> render_message(__('Configuration settings successfully updated', $this -> plugin_name));
+						//$message = __('Configuration settings successfully updated', $this -> plugin_name);
+						$message = 6;
+						$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> settings), 'message', $message);
 					}
 					
 					$mailinglists = $Mailinglist -> get_all('*', true);

@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.2.2
-Stable tag: 4.5.4
+Stable tag: 4.5.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -148,6 +148,12 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.4.1 =
+* ADD: Panel for turning on/off default styles (CSS) that load on the front-end
+* IMPROVE: Better placement/alignment for "Uploaded file" from file upload custom field
+* IMPROVE: Improved panel for turning on/off loading of default scripts
+* FIX: Autoresponders filtering/sorting causes database error 
 
 = 4.5.4 =
 * ADD: Show emails per hour/day total based on email scheduling settings

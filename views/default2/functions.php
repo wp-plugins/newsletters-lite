@@ -3,36 +3,117 @@
 if (!class_exists('newslettersBootstrap')) {
 	class newslettersBootstrap extends wpMailPlugin {
 		
-		function enqueue_scripts() {
-			// load custom scripts here using wp_enqueue_script as needed...
+		function default_styles($defaultstyles = array()) {
 			
-			wp_enqueue_script('bootstrap', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js', array('jquery'), '3.3.4', false);
-			wp_enqueue_script('bootstrap-datepicker', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js', array('jquery', 'bootstrap'), '1.4.0', false);
-			wp_enqueue_script('bootstrap-datepicker-i18n', $this -> render_url('js/datepicker-i18n.js', 'default2', false), array('jquery', 'bootstrap', 'bootstrap-datepicker'));
+			$defaultstyles['newsletters'] = array(
+				'name'					=>	"Theme Folder style.css",
+				'url'					=>	$this -> render_url('css/style.css', 'default2', false),
+				'version'				=>	false,
+				'deps'					=>	false,
+				'media'					=>	"all",
+			);
 			
-			//localize our js
-			global $Html, $wp_locale;
-		    
-		    $aryArgs = array(
-			    'days'				=>	$Html -> strip_array_indices($wp_locale -> weekday),
-			    'daysShort'			=>	$Html -> strip_array_indices($wp_locale -> weekday_abbrev),
-			    'daysMin'			=>	$Html -> strip_array_indices($wp_locale -> weekday_initial),
-			    'months'			=>	$Html -> strip_array_indices($wp_locale -> month),
-			    'monthsShort'		=>	$Html -> strip_array_indices($wp_locale -> month_abbrev),
-			    'today'				=>	__('Today', $this -> plugin_name),
-			    'clear'				=>	__('Clear', $this -> plugin_name),
-			    'rtl'				=>	(!empty($wp_locale -> is_rtl) ? true : false),
-		    );
-		 
-		    // Pass the localized array to the enqueued JS
-		    wp_localize_script('bootstrap-datepicker-i18n', 'bootstrap_datepicker_dates', $aryArgs);
+			$defaultstyles['bootstrap'] = array(
+				'name'					=>	"Bootstrap",
+				'url'					=>	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css',
+				'version'				=>	'3.3.4',
+				'deps'					=>	false,
+				'media'					=>	"all",
+			);
+			
+			$defaultstyles['bootstrap-datepicker'] = array(
+				'name'					=>	"Bootstrap Datepicker",
+				'url'					=>	'//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css',
+				'version'				=>	'1.4.0',
+				'deps'					=>	array('bootstrap'),
+				'media'					=>	"all",
+			);
+			
+			$defaultstyles['fontawesome'] = array(
+				'name'					=>	"FontAwesome",
+				'url'					=>	'//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css',
+				'version'				=>	'4.3.0',
+				'deps'					=>	false,
+				'media'					=>	"all",
+			);
+			
+			$defaultstyles['select2'] = array(
+				'name'					=>	"Select2",
+				'url'					=>	'//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css',
+				'version'				=>	'4.0.0',
+				'deps'					=>	false,
+				'media'					=>	"all",
+			);
+			
+			$defaultstyles['uploadify'] = array(
+				'name'					=>	"Uploadify",
+				'url'					=>	$this -> render_url('css/uploadify.css', 'default2', false),
+				'version'				=>	'2.2',
+				'deps'					=>	false,
+				'media'					=>	"all",
+			);
+			
+			return $defaultstyles;
 		}
 		
-		function enqueue_styles() {
-			// load custom styles here using wp_enqueue_style as needed...
+		function default_scripts($defaultscripts = array()) {
 			
-			wp_enqueue_style('bootstrap', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css', false, '3.3.4', "all");
-			wp_enqueue_style('bootstrap-datepicker', '//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css', false, '1.4.0', "all");
+			$defaultscripts['bootstrap'] = array(
+				'name'					=>	"Bootstrap",
+				'url'					=>	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js',
+				'version'				=>	'3.3.4',
+				'deps'					=>	array('jquery'),
+				'footer'				=>	false,
+			);
+			
+			$defaultscripts['bootstrap-datepicker'] = array(
+				'name'					=>	"Bootstrap Datepicker",
+				'url'					=>	"//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js",
+				'version'				=>	"1.4.0",
+				'deps'					=>	array('jquery', 'bootstrap'),
+				'footer'				=>	false,
+			);
+			
+			$defaultscripts['select2'] = array(
+				'name'					=>	"Select2",
+				'url'					=>	"//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js",
+				'version'				=>	"4.0.0",
+				'deps'					=>	array('jquery'),
+				'footer'				=>	false,
+			);
+			
+			$defaultscripts['uploadify'] = array(
+				'name'					=>	"Uploadify",
+				'url'					=>	$this -> render_url('js/jquery.uploadify.js', 'default2', false),
+				'version'				=>	"2.2",
+				'deps'					=>	array('jquery'),
+				'footer'				=>	false,
+			);
+			
+			return $defaultscripts;
+		}
+		
+		function enqueuescript_after($handle = null, $script = null) {
+			if (!empty($handle) && $handle == "bootstrap-datepicker") {
+				wp_enqueue_script('bootstrap-datepicker-i18n', $this -> render_url('js/datepicker-i18n.js', 'default2', false), array('jquery', 'bootstrap', 'bootstrap-datepicker'));
+				
+				//localize our js
+				global $Html, $wp_locale;
+			    
+			    $aryArgs = array(
+				    'days'				=>	$Html -> strip_array_indices($wp_locale -> weekday),
+				    'daysShort'			=>	$Html -> strip_array_indices($wp_locale -> weekday_abbrev),
+				    'daysMin'			=>	$Html -> strip_array_indices($wp_locale -> weekday_initial),
+				    'months'			=>	$Html -> strip_array_indices($wp_locale -> month),
+				    'monthsShort'		=>	$Html -> strip_array_indices($wp_locale -> month_abbrev),
+				    'today'				=>	__('Today', $this -> plugin_name),
+				    'clear'				=>	__('Clear', $this -> plugin_name),
+				    'rtl'				=>	(!empty($wp_locale -> is_rtl) ? true : false),
+			    );
+			 
+			    // Pass the localized array to the enqueued JS
+			    wp_localize_script('bootstrap-datepicker-i18n', 'bootstrap_datepicker_dates', $aryArgs);
+			}
 		}
 		
 		function datepicker_output($output = null, $optinid = null, $field = null) {
@@ -131,17 +212,14 @@ if (!class_exists('newslettersBootstrap')) {
 		    );
 		    $jqueryui_format = "";
 		    $escaping = false;
-		    for($i = 0; $i < strlen($php_format); $i++) {
+		    for ($i = 0; $i < strlen($php_format); $i++) {
 		        $char = $php_format[$i];
-		        if($char === '\\') // PHP date format escaping character
-		        {
+		        if ($char === '\\') {
 		            $i++;
 		            if($escaping) $jqueryui_format .= $php_format[$i];
 		            else $jqueryui_format .= '\'' . $php_format[$i];
 		            $escaping = true;
-		        }
-		        else
-		        {
+		        } else {
 		            if($escaping) { $jqueryui_format .= "'"; $escaping = false; }
 		            if(isset($SYMBOLS_MATCHING[$char]))
 		                $jqueryui_format .= $SYMBOLS_MATCHING[$char];
@@ -154,8 +232,10 @@ if (!class_exists('newslettersBootstrap')) {
 	}
 	
 	$newslettersBootstrap = new newslettersBootstrap();
-	add_action('wp_enqueue_scripts', array($newslettersBootstrap, 'enqueue_scripts'));
-	add_action('wp_enqueue_scripts', array($newslettersBootstrap, 'enqueue_styles'));
+	
+	add_filter('newsletters_default_styles', array($newslettersBootstrap, 'default_styles'));
+	add_filter('newsletters_default_scripts', array($newslettersBootstrap, 'default_scripts'));
+	add_action('newsletters_enqueuescript_after', array($newslettersBootstrap, 'enqueuescript_after'), 10, 2);
 	add_filter('newsletters_datepicker_output', array($newslettersBootstrap, 'datepicker_output'), 10, 3);
 }	
 	

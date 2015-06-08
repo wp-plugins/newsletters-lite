@@ -60,10 +60,12 @@ class wpmlpaginate extends wpMailPlugin {
 	}
 	
 	function start_paging($page = null) {
-		global $wpdb, $Html, $Subscriber, $wpmlClick, $Bounce, $Email, $SubscribersList, $History, $HistoriesList, $Autoresponder, $AutorespondersList;
+		global $wpdb, $Html, $Subscriber, $wpmlClick, $Bounce, $Email, $SubscribersList, $History, $HistoriesList, 
+		$Autoresponder, $AutorespondersList;
 	
 		$page = (empty($page)) ? 1 : $page;
 		
+		$autoresponders_table = $wpdb -> prefix . $Autoresponder -> table;
 		$subscribers_table = $wpdb -> prefix . $Subscriber -> table;
 		$emails_table = $wpdb -> prefix . $Email -> table;
 		$clicks_table = $wpdb -> prefix . $wpmlClick -> table;
@@ -265,6 +267,9 @@ class wpmlpaginate extends wpMailPlugin {
 				break;
 			case 'SubscribersList'			:
 				$query .= " ORDER BY IF (" . $subscribers_table . "." . $ofield . " = '' OR " . $subscribers_table . "." . $ofield . " IS NULL,1,0), " . $subscribers_table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";	
+				break;
+			case 'AutorespondersList'		:
+				$query .= " ORDER BY IF (" . $autoresponders_table . "." . $ofield . " = '' OR " . $autoresponders_table . "." . $ofield . " IS NULL,1,0), " . $autoresponders_table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";	
 				break;
 			default							:
 				$query .= " ORDER BY IF (" . $this -> table . "." . $ofield . " = '' OR " . $this -> table . "." . $ofield . " IS NULL,1,0), " . $this -> table . "." . $ofield . " " . $odir . " LIMIT " . $begRecord . " , " . $this -> per_page . ";";	

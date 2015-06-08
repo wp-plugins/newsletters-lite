@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.4';
+		var $version = '4.5.4.1';
 		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -3785,12 +3785,13 @@ if (!class_exists('wpMailPlugin')) {
 						$custom_handle = (empty($loadscripts_handles[$handle])) ? $handle : $loadscripts_handles[$handle];
 						$custom_pages = (empty($loadscripts_pages[$handle])) ? false : explode(",", $loadscripts_pages[$handle]);
 
-						if (empty($loadscripts) || (!empty($loadscripts) && in_array($handle, $loadscripts)) || wpml_is_management()) {						
+						if ((!empty($loadscripts) && in_array($handle, $loadscripts)) || wpml_is_management()) {						
 							if (empty($custom_pages) || 
 								(!empty($custom_pages) && (is_single($custom_pages) || is_page($custom_pages))) ||
 								wpml_is_management()) {	
-									if (apply_filters('newsletters_enqueuescript_' . $handle, true)) {										
+									if (apply_filters('newsletters_enqueuescript_' . $handle, true)) {																				
 										wp_enqueue_script($custom_handle, $script['url'], $script['deps'], $script['version'], $script['footer']);
+										do_action('newsletters_enqueuescript_after', $handle, $script);
 									}
 							}
 						}
@@ -3809,13 +3810,10 @@ if (!class_exists('wpMailPlugin')) {
 			
 			// Admin dashboard
 			if (is_admin()) {			
-				if (true || !empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
-					$load = true;	
-					$stylesource = plugins_url() . '/' . $this -> plugin_name . '/css/wp-mailinglist.css';
-					wp_enqueue_style('wp-color-picker');
-				}
-				
+				wp_enqueue_style('wp-color-picker');
 				wp_enqueue_style('colorbox', $this -> render_url('css/colorbox.css', 'admin', false), false, $this -> version, "all");
+				wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', false, false, "all");
+				wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
 				
 				if ((preg_match("/(widgets\.php)/", $_SERVER['REQUEST_URI'], $matches)) || (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections))) {
 					$uisrc = $this -> render_url('css/jquery-ui.css', 'admin', false);
@@ -3829,18 +3827,45 @@ if (!class_exists('wpMailPlugin')) {
 				if (!empty($_GET['page']) && $_GET['page'] == $this -> sections -> queue) {
 					wp_enqueue_style('jquery-countdown', $this -> render_url('css/jquery-countdown.css', 'admin', false), false, false, "all");
 				}
+				
+				$stylesource = plugins_url() . '/' . $this -> plugin_name . '/css/wp-mailinglist.css';
+				wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen");
 								
 			// Front-end
 			} else {
+				$loadstyles = $this -> get_option('loadstyles');
+				$loadstyles_handles = $this -> get_option('loadstyles_handles');
+				$loadstyles_pages = $this -> get_option('loadstyles_pages');
+				
+				include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');
+				
+				if (!empty($defaultstyles)) {
+					foreach ($defaultstyles as $handle => $style) {						
+						$custom_handle = (empty($loadstyles_handles[$handle])) ? $handle : $loadstyles_handles[$handle];
+						$custom_pages = (empty($loadstyles_pages[$handle])) ? false : explode(",", $loadstyles_pages[$handle]);
+
+						if ((!empty($loadstyles) && in_array($handle, $loadstyles)) || wpml_is_management()) {						
+							if (empty($custom_pages) || 
+								(!empty($custom_pages) && (is_single($custom_pages) || is_page($custom_pages))) ||
+								wpml_is_management()) {	
+									if (apply_filters('newsletters_enqueuestyle_' . $handle, true)) {																				
+										wp_enqueue_style($custom_handle, $style['url'], $style['deps'], $style['version'], $style['media']);
+										do_action('newsletters_enqueuestyle_after', $handle, $style);
+									}
+							}
+						}
+					}
+				}
+				
 				//$uisrc = $this -> render_url('css/jquery-ui.css', 'default', false);
 				//wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
 				
-				$loadscripts = $this -> get_option('loadscripts');
+				/*$loadscripts = $this -> get_option('loadscripts');
 				
-				if ($this -> get_option('theme_usestyle') == "Y") {
+				//if ($this -> get_option('theme_usestyle') == "Y") {
 					$load = true;	
-					$stylesource = $this -> render_url('css/style.css', 'default', false);
-				}
+				//	$stylesource = $this -> render_url('css/style.css', 'default', false);
+				//}
 				
 				// Select 2 CSS
 				if (!empty($loadscripts) && in_array('select2', $loadscripts)) {
@@ -3849,15 +3874,15 @@ if (!class_exists('wpMailPlugin')) {
 						wp_deregister_style('select2');
 						wp_enqueue_style('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css', false, false, "all");
 					}
-				}
+				}*/
 			}
 			
-			wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', false, false, "all");
+			//wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', false, false, "all");
 			
-			if ($load) {				
-				if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
-				wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
-			}
+			//if ($load) {				
+			//	if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
+			//	wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
+			//}
 			
 			return true;
 		}
@@ -4752,6 +4777,15 @@ if (!class_exists('wpMailPlugin')) {
 						<?php
 					}
 					
+					if (!empty($field -> type) && $field -> type == "file") {
+						if (!empty($field -> filesizelimit)) { echo '<small>' . sprintf(__('Maximum file size of <strong>%s</strong>', $this -> plugin_name), $field -> filesizelimit) . '</small><br/>'; }	
+						if (!empty($filetypes)) { echo '<small>' . sprintf(__('Allowed file types are <strong>%s</strong>', $this -> plugin_name), $filetypes) . '</small><br/>'; }
+						
+						if (!empty($_POST[$field -> slug])) {
+							echo $Html -> file_custom_field($_POST[$field -> slug], $field -> filesizelimit, $filetypes);
+						}
+					}
+					
 					echo '</div>';
 					echo '</div>' . "\r\n";
 					
@@ -4761,15 +4795,6 @@ if (!class_exists('wpMailPlugin')) {
 						}
 						
 						${'newsletters_fields_count_' . $optinid}++;
-					}
-					
-					if (!empty($field -> type) && $field -> type == "file") {
-						if (!empty($field -> filesizelimit)) { echo '<small>' . sprintf(__('Maximum file size of <strong>%s</strong>', $this -> plugin_name), $field -> filesizelimit) . '</small><br/>'; }	
-						if (!empty($filetypes)) { echo '<small>' . sprintf(__('Allowed file types are <strong>%s</strong>', $this -> plugin_name), $filetypes) . '</small><br/>'; }
-						
-						if (!empty($_POST[$field -> slug])) {
-							echo $Html -> file_custom_field($_POST[$field -> slug], $field -> filesizelimit, $filetypes);
-						}
 					}
 				}
 			}
@@ -6748,14 +6773,38 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.4") < 0) {
+				if (version_compare($cur_version, "4.5.4.1") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
 					//update the theme folder to default2
 					$this -> update_option('theme_folder', "default2");
 					
-					$version = '4.5.4';	
+					include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');
+					$stylesdone = false;
+					$scriptsdone = false;
+					
+					if (!empty($defaultstyles)) {
+						$loadstyles = array();
+						foreach ($defaultstyles as $handle => $style) {
+							$loadstyles[] = $handle;
+						}
+						$this -> update_option('loadstyles', $loadstyles);
+						$stylesdone = true;
+					}
+					if (!empty($defaultscripts)) {
+						$loadscripts = array();
+						foreach ($defaultscripts as $handle => $script) {
+							$loadscripts[] = $handle;
+						}
+						$this -> update_option('loadscripts', $loadscripts);
+						$scriptsdone = true;
+					}
+					
+					if (!empty($stylesdone) && !empty($scriptsdone)) {
+						// all done, update the version
+						$version = '4.5.4.1';	
+					}
 				}
 			
 				//the current version is older.
@@ -7019,7 +7068,7 @@ if (!class_exists('wpMailPlugin')) {
 			
 			$Field -> check_default_fields();
 			
-			flush_rewrite_rules();
+			//flush_rewrite_rules();
 			
 			return $wpml_add_option_count;
 		}
@@ -7803,7 +7852,7 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function theme_folder_functions() {
-			if (!is_admin() || defined('DOING_AJAX')) {
+			//if (!is_admin() || defined('DOING_AJAX')) {
 				if ($theme_folder = $this -> active_theme_folder()) {
 					$functions_path = $theme_folder . 'functions.php';
 					
@@ -7813,7 +7862,7 @@ if (!class_exists('wpMailPlugin')) {
 						return true;
 					}
 				}
-			}
+			//}
 			
 			return false;
 		}

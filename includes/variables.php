@@ -1,56 +1,13 @@
 <?php
 	
+$defaultstyles = array(
+	// Default styles go here
+);
+
+$defaultstyles = apply_filters('newsletters_default_styles', $defaultstyles);
+	
 $defaultscripts = array(
-	/*'jquery-ui-tabs'		=>	array(
-		'name'					=>	__('jQuery UI Tabs', $this -> plugin_name),
-		'url'					=>	false,
-		'version'				=>	false,
-		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
-		'footer'				=>	false,
-	),
-	'jquery-ui-button'		=>	array(
-		'name'					=>	__('jQuery UI Button', $this -> plugin_name),
-		'url'					=>	false,
-		'version'				=>	false,
-		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
-		'footer'				=>	false,
-	),*/
-	/*'jquery-ui-dialog'		=>	array(
-		'name'					=>	__('jQuery UI Dialog', $this -> plugin_name),
-		'url'					=>	false,
-		'version'				=>	false,
-		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
-		'footer'				=>	false,
-	),*/
-	/*'jquery-ui-datepicker'	=>	array(
-		'name'					=>	__('jQuery UI Datepicker', $this -> plugin_name),
-		'url'					=>	false,
-		'version'				=>	false,
-		'deps'					=>	array('jquery', 'jquery-ui-core', 'jquery-ui-widget'),
-		'footer'				=>	false,
-	),*/
-	/*'jquery-cookie'			=>	array(
-		'name'					=>	__('jQuery Cookie', $this -> plugin_name),
-		'url'					=>	$this -> render_url('js/jquery.cookie.js', 'admin', false),
-		'version'				=>	'1.4.1',
-		'deps'					=>	array('jquery'),
-		'footer'				=>	false,
-	),*/
-	'jquery-uploadify'		=>	array(
-		'name'					=>	__('Uploadify - File Uploader', $this -> plugin_name),
-		'url'					=>	$this -> render_url('js/jquery.uploadify.js', 'admin', false),
-		'version'				=>	'2.2',
-		'deps'					=>	array('jquery'),
-		'footer'				=>	false,
-	),
-	'select2'				=>	array(
-		'name'					=>	__('Select2 - Drop Downs', $this -> plugin_name),
-		//'url'					=>	$this -> render_url('js/select2.js', 'admin', false),
-		'url'					=>	'//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js',
-		'version'				=>	'4.0.0',
-		'deps'					=>	array('jquery'),
-		'footer'				=>	false,
-	)
+	// Default scripts go here
 );
 
 $defaultscripts = apply_filters('newsletters_default_scripts', $defaultscripts);

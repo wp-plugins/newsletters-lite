@@ -394,7 +394,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 			$imageurl = $this -> uploads_url() . '/' . $this -> plugin_name . '/uploadify/' . $imagename;
 			$imageinfo = pathinfo($imagepath);
 			$ajaxuploadurl = site_url() . '/?' . $this -> pre . 'method=ajaxupload&file=' . urlencode($imagename);
-			$currentfile .= '<a href="' . $ajaxuploadurl . '" target="_blank">' . __('Uploaded file', $this -> plugin_name) . '</a>';			
+			$currentfile .= '<a class="btn btn-default btn-sm" href="' . $ajaxuploadurl . '" target="_blank"><i class="fa fa-paperclip"></i> ' . __('Uploaded file', $this -> plugin_name) . '</a>';			
 			$currentfile .= '</p>';
 			$output .= $currentfile;
 		}
@@ -403,20 +403,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	}
 	
 	function get_gravatar($email = null, $s = 50, $d = 'mm', $r = 'g', $img = true, $atts = array() ) {
-		/*$src = 'http://www.gravatar.com/avatar/';
-		$src .= md5( strtolower( trim( $email ) ) );
-		$src .= "?s=$s&d=$d&r=$r";
-		if ($img) {
-			$url = '';
-			$url .= '<div class="newsletters_gravatar_wrapper">';
-			$url .= '<img class="newsletters_gravatar newsletters_circular" src="' . $src . '"';
-			foreach ( $atts as $key => $val )
-				$url .= ' ' . $key . '="' . $val . '"';
-			$url .= ' />';
-			$url .= '</div>';
-		}
-		return $url;*/
-		
+		// Uses WordPress get_avatar() function
 		return get_avatar($email, $s, null, false);
 	}
 	

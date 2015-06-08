@@ -95,7 +95,7 @@
 		</div>
     <?php endif; ?>
     
-    <div class="newslettername-wrapper" style="visibility: hidden;">
+    <div class="newslettername-wrapper" style="display:none;">
     	<input type="text" name="newslettername" value="" id="<?php echo $widget_id; ?>newslettername" class="newslettername" />
     </div>
 	
