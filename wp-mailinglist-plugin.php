@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.4.1';
+		var $version = '4.5.4.2';
 		var $dbversion = '1.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -6773,12 +6773,12 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.4.1") < 0) {
+				if (version_compare($cur_version, "4.5.4.2") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
-					//update the theme folder to default2
-					$this -> update_option('theme_folder', "default2");
+					//update the theme folder to default
+					$this -> update_option('theme_folder', "default");
 					
 					include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');
 					$stylesdone = false;
@@ -6803,7 +6803,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($stylesdone) && !empty($scriptsdone)) {
 						// all done, update the version
-						$version = '4.5.4.1';	
+						$version = '4.5.4.2';	
 					}
 				}
 			
@@ -6840,7 +6840,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['emailencoding'] = "8bit";
 			$options['clicktrack'] = "Y";
 			$options['shortlinks'] = "N";
-			$options['theme_folder'] = "default2";
+			$options['theme_folder'] = "default";
 			$options['theme_usestyle'] = "Y";
 			$options['customcss'] = "N";
 			$options['loadscript_jqueryuploadify'] = "Y";
@@ -7036,6 +7036,23 @@ if (!class_exists('wpMailPlugin')) {
 			
 			foreach ($options as $okey => $oval) {
 				$this -> add_option($okey, $oval);
+			}
+			
+			// Styles & Scripts
+			include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');			
+			if (!empty($defaultstyles)) {
+				$loadstyles = array();
+				foreach ($defaultstyles as $handle => $style) {
+					$loadstyles[] = $handle;
+				}
+				$this -> add_option('loadstyles', $loadstyles);
+			}
+			if (!empty($defaultscripts)) {
+				$loadscripts = array();
+				foreach ($defaultscripts as $handle => $script) {
+					$loadscripts[] = $handle;
+				}
+				$this -> add_option('loadscripts', $loadscripts);
 			}
 			
 			// Scheduled tasks
@@ -7856,8 +7873,15 @@ if (!class_exists('wpMailPlugin')) {
 				if ($theme_folder = $this -> active_theme_folder()) {
 					$functions_path = $theme_folder . 'functions.php';
 					
+					$theme_folder_option = $this -> get_option('theme_folder');
+					$functions_path_original = $this -> plugin_base() . DS . 'views' . DS . $theme_folder_option . DS . 'functions.php';
+					
 					if (file_exists($functions_path)) {
 						require_once($functions_path);
+						
+						return true;
+					} elseif (file_exists($functions_path_original)) {
+						require_once($functions_path_original);
 						
 						return true;
 					}
