@@ -5041,6 +5041,8 @@ if (!class_exists('wpMail')) {
 												$datasets[$d] = (array) $Subscriber -> get($current_id);
 												$skipsubscriberupdate = false;
 											}
+										} else {
+											$skipsubscriberupdate = false;
 										}
 										
 										if ($_POST['filetype'] == "mac") {

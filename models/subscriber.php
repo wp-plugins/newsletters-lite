@@ -989,7 +989,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			}
 			
 			if (empty($return_query) || $return_query == false) {			
-				if (empty($skipsubscriberupdate)) {
+				if (empty($skipsubscriberupdate) || empty($id)) {
 					$result = $wpdb -> query($query);
 				}
 												
