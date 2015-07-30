@@ -195,9 +195,9 @@
 	                        </td>
 	                        <td>
 	                        	<?php if (!empty($autoresponder -> status) && $autoresponder -> status == "inactive") : ?>
-	                            	<span class="<?php echo $this -> pre; ?>error"><?php _e('Inactive', $this -> plugin_name); ?></span>
+	                            	<span class="newsletters_error"><?php _e('Inactive', $this -> plugin_name); ?></span>
 	                            <?php else : ?>
-	                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Active', $this -> plugin_name); ?></span>
+	                            	<span class="newsletters_success"><?php _e('Active', $this -> plugin_name); ?></span>
 	                            <?php endif; ?>
 	                        </td>
 	                        <td><abbr title="<?php echo $autoresponder -> modified; ?>"><?php echo $Html -> gen_date(false, strtotime($autoresponder -> modified)); ?></abbr></td>

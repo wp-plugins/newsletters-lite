@@ -68,7 +68,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
                                     <label><input <?php if (!$rr_active) { echo 'disabled="disabled"'; } else { echo ($embed['captcha'][$language] == "Y") ? 'checked="checked"' : ''; } ?> type="radio" name="embed[captcha][<?php echo $language; ?>]" value="Y" id="captchaY_<?php echo $language; ?>" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                                     <label><input <?php if (!$rr_active) { echo 'disabled="disabled" checked="checked"'; } else { echo (empty($embed['captcha'][$language]) || $embed['captcha'][$language] == "N") ? 'checked="checked"' : ''; } ?> type="radio" name="embed[captcha][<?php echo $language; ?>]" value="N" id="captchaN_<?php echo $language; ?>" /> <?php _e('No', $this -> plugin_name); ?></label>
                                     <?php if (!$rr_active) : ?>
-                                        <br/><span class="<?php echo $this -> pre; ?>error"><?php _e('Please configure a security captcha under Newsletters > Configuration > System > Captcha in order to use this.', $this -> plugin_name); ?></span>
+                                        <br/><span class="newsletters_error"><?php _e('Please configure a security captcha under Newsletters > Configuration > System > Captcha in order to use this.', $this -> plugin_name); ?></span>
                                         <input type="hidden" name="captcha" value="N" />
                                     <?php endif; ?>
                                     <span class="howto"><?php _e('Requires captcha/turing image input upon subscribing.', $this -> plugin_name); ?></span>
@@ -89,7 +89,7 @@ $rr_active = (empty($captcha_type) || $captcha_type == "none") ? false : true;
         });
 		</script>
     <?php else : ?>
-    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No languages have been defined.', $this -> plugin_name); ?></p>
+    	<p class="newsletters_error"><?php _e('No languages have been defined.', $this -> plugin_name); ?></p>
     <?php endif; ?>
 <?php else : ?>
     <table class="form-table">

@@ -8,6 +8,25 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		return true;
 	}
 	
+	function bloginfo($atts = array(), $content = null) {
+		$output = "";
+		
+		$defaults = array(
+			'show'			=>	"name",
+			'filter'		=>	"raw",
+		);
+		
+		extract(shortcode_atts($defaults, $atts));
+		
+		if (!empty($show)) {
+			if ($value = get_bloginfo($show, $filter)) {
+				$output = stripslashes($value);
+			}
+		}
+		
+		return $output;
+	}
+	
 	function newsletters_if($atts = array(), $content = null) {
 		global $newsletters_history_id, $Db;
 		
@@ -598,7 +617,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		$r = shortcode_atts($defaults, $atts);
 		extract($r);
 		
-		$action = ($this -> language_do()) ? $this -> language_converturl($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
+		$action = ($this -> language_do() && !empty($instance['language'])) ? $this -> language_converturl($_SERVER['REQUEST_URI'], $instance['language']) : $_SERVER['REQUEST_URI'];
 		$action = $Html -> retainquery($this -> pre . 'method=optin', $action) . '#' . $widget_id;
 		
 		$output = "";

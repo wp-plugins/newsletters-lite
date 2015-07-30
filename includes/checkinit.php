@@ -133,6 +133,7 @@ if (!class_exists('wpMailCheckinit')) {
 			add_shortcode($this -> pre . 'post_permalink', array($Shortcode, 'post_permalink'));
 			add_shortcode($this -> pre . 'subscriberscount', array($Shortcode, 'subscriberscount'));
 			
+			add_shortcode('newsletters_bloginfo', array($Shortcode, 'bloginfo'));
 			add_shortcode('newsletters_management', array($this, 'sc_management'));
 			add_shortcode('newsletters_subscribe', array($Shortcode, 'subscribe'));
 			add_shortcode('newsletters_template', array($Shortcode, 'template'));

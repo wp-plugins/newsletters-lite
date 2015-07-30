@@ -440,7 +440,7 @@ if (!class_exists('wpMail')) {
 				// Database update required?
 				$showmessage_dbupdate = $this -> get_option('showmessage_dbupdate');
 				if (!empty($showmessage_dbupdate)) {
-					$message = sprintf(__('Newsletters requires a database update to continue %s', $this -> plugin_name), '<a class="button" href="' . $Html -> retainquery('newsletters_method=dbupdate') . '">' . __('do it now', $this -> plugin_name) . '</a>');
+					$message = sprintf(__('Newsletters requires a database update to continue %s. Make a database backup before running this.', $this -> plugin_name), '<a class="button" href="' . $Html -> retainquery('newsletters_method=dbupdate') . '">' . __('do it now', $this -> plugin_name) . '</a>');
 					$message .= $Html -> help(__('Depending on your current database, this may take some time. If it times out for any reason, please refresh.', $this -> plugin_name));
 					$this -> render_error($message);
 				}
@@ -608,7 +608,7 @@ if (!class_exists('wpMail')) {
 						$this -> remove_server_limits();
 						$cur_version = $this -> get_option('dbversion');
 						
-						if (version_compare($cur_version, $this -> dbversion) < 0) {	// 1.0						
+						if (version_compare($cur_version, '1.2') < 0) {	// 1.0						
 							global $wpdb, $Db, $Field, $Mailinglist, $Subscriber, $wpmlGroup, $History;
 					
 							$this -> update_options();
@@ -707,9 +707,32 @@ if (!class_exists('wpMail')) {
 							// Increase history subject length
 							$query = "ALTER TABLE " . $wpdb -> prefix . $History -> table . " CHANGE `subject` `subject` VARCHAR(255) NOT NULL DEFAULT ''";
 							$wpdb -> query($query);
+							
+							$new_version = '1.2';
 						}
 						
-						$new_version = '1.2';
+						if (version_compare($cur_version, '1.2.1') < 0) {							
+							global $wpdb, $Db, $Field, $Subscriber;
+							
+							$Db -> model = $Field -> model;
+							if ($fields = $Db -> find_all(array('type' => "'pre_date'"))) {
+								foreach ($fields as $field) {
+									$query = "SELECT `id`, `" . $field -> slug . "` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `" . $field -> slug . "` != '' AND `" . $field -> slug . "` != '0000-00-00'";
+									if ($subscribers = $wpdb -> get_results($query)) {
+										foreach ($subscribers as $subscriber) {
+											$new_date = date_i18n("Y-m-d", strtotime($subscriber -> {$field -> slug}));
+											$query = "UPDATE `" . $wpdb -> prefix . $Subscriber -> table . "` SET `" . $field -> slug . "` = '" . $new_date . "' WHERE `id` = '" . $subscriber -> id . "'";
+											$wpdb -> query($query);
+										}
+									}
+								}
+								
+								$this -> change_field($Subscriber -> table, $field -> slug, $field -> slug, "DATE NOT NULL DEFAULT '0000-00-00'");
+							}
+							
+							$new_version = '1.2.1';
+						}
+						
 						$this -> update_option('dbversion', $new_version);
 						$this -> delete_option('showmessage_dbupdate');
 						$this -> render_message(__('Newsletters database update done', $this -> plugin_name));
@@ -1971,6 +1994,8 @@ if (!class_exists('wpMail')) {
 		function autoresponders_hook() {				
 			$addedtoqueue = 0;
 			
+			do_action('newsletters_autoresponders_hook_start');
+			
 			/* Do the Autoresponders */
 			global $wpdb, $Db, $Queue, $Html, $History, $HistoriesAttachment, $Subscriber, $SubscribersList, $Autoresponder, $Autoresponderemail;
 			
@@ -2032,6 +2057,8 @@ if (!class_exists('wpMail')) {
 			
 			//update scheduling
 			$this -> autoresponder_scheduling();
+			
+			do_action('newsletters_autoresponders_hook_end');
 			
 			echo $addedtoqueue . ' ' . __('autoresponder emails have been sent out.', $this -> plugin_name) . '<br/>';
 		}
@@ -3552,8 +3579,8 @@ if (!class_exists('wpMail')) {
 												$this -> render_error(2, array($subscriber -> email, implode(";", $mailerrors)));
 											} else {
 												//$this -> render_message(sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>'));
-												$this -> render_message(1, array($subscriber -> email));
-												//$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> send . '&method=history&id=' . $history_id), 'message', 1, false, array($subscriber -> email));
+												//$this -> render_message(1, array($subscriber -> email));
+												$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> send . '&method=history&id=' . $history_id), 'message', 1, false);
 												//$message = sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>');
 												//$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $History -> insertid, 'message', $message);
 											}
@@ -7119,8 +7146,8 @@ if (!class_exists('wpMail')) {
 							}
 						}
 						
-						foreach ($_POST as $key => $val) {				
-							$this -> update_option($key, $val);
+						foreach ($_POST as $key => $val) {		
+							$this -> update_option($key, $val);		
 							
 							switch ($key) {
 								case 'defaulttemplate'		:
@@ -7175,8 +7202,6 @@ if (!class_exists('wpMail')) {
 	                    	$this -> latestposts_scheduling();
 	                    }
 	
-						//$this -> render_message(__('Configuration settings successfully updated', $this -> plugin_name));
-						//$message = __('Configuration settings successfully updated', $this -> plugin_name);
 						$message = 6;
 						$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> settings), 'message', $message);
 					}

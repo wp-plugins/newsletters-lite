@@ -37,7 +37,7 @@ $count_users = count_users();
                     <?php endforeach; ?>
                 </div>
             <?php else : ?>
-                <p class="<?php echo $this -> pre; ?>error"><?php _e('No lists are available', $this -> plugin_name); ?></p>
+                <p class="newsletters_error"><?php _e('No lists are available', $this -> plugin_name); ?></p>
             <?php endif; ?>
         </div>
         <?php if (current_user_can('newsletters_admin_send_sendtoroles')) : ?>
@@ -224,7 +224,7 @@ $count_users = count_users();
         <!-- Mailing Lists Errors -->
         <?php global $errors, $wpdb; ?>
         <?php if (!empty($errors['mailinglists'])) : ?>
-            <p class="<?php echo $this -> pre; ?>error"><?php echo $errors['mailinglists']; ?></p>
+            <p class="newsletters_error"><?php echo $errors['mailinglists']; ?></p>
         <?php endif; ?>
         
         <?php if (apply_filters('newsletters_admin_createnewsletter_subscribercount', true)) : ?>

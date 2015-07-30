@@ -34,6 +34,6 @@
 		});
 		</script>
 	<?php else : ?>
-		<p class="<?php echo $this -> pre; ?>error"><?php _e('No custom fields were found', $this -> plugin_name); ?></p>													
+		<p class="newsletters_error"><?php _e('No custom fields were found', $this -> plugin_name); ?></p>													
 	<?php endif; ?>
 </div>

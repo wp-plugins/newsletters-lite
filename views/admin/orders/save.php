@@ -23,7 +23,7 @@
 								<?php endforeach; ?>
 							</select>
 						<?php else : ?>
-							<span class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available.', $this -> plugin_name); ?></span>
+							<span class="newsletters_error"><?php _e('No mailing lists are available.', $this -> plugin_name); ?></span>
 						<?php endif; ?>
 					</td>
 				</tr>

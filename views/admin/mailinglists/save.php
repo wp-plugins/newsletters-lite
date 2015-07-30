@@ -79,7 +79,7 @@ if ($this -> language_do()) {
                         	<?php echo $Form -> select('Mailinglist[group_id]', $groupsselect); ?>
                             <span class="howto"><small><?php _e('(optional)', $this -> plugin_name); ?></small> <?php _e('Put this mailing list into a group of lists.', $this -> plugin_name); ?></span>
                         <?php else : ?>
-                        	<p class="<?php echo $this -> pre; ?>error"><?php _e('No groups are available.', $this -> plugin_name); ?></p>
+                        	<p class="newsletters_error"><?php _e('No groups are available.', $this -> plugin_name); ?></p>
                         <?php endif; ?>
                     </td>
                 </tr>

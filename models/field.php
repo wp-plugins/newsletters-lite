@@ -548,13 +548,18 @@ class wpmlField extends wpMailPlugin {
 				if ($wpdb -> query($query)) {										
 					$this -> insertid = (empty($id)) ? $wpdb -> insert_id : $id;
 					$field_id = $this -> insertid;
+					
+					$attributes = "TEXT NOT NULL";
+					if (!empty($type) && $type == "pre_date") {
+						$attributes = "DATE NOT NULL DEFAULT '0000-00-00'";
+					}
 
 					if (!empty($id)) {
 						$FieldsList -> delete_all(array('field_id' => $this -> insertid));
-						$this -> change_field($Subscriber -> table, $field_old -> slug, $slug);
+						$this -> change_field($Subscriber -> table, $field_old -> slug, $slug, $attributes);
 					} else {
 						$this -> insert_id = $data['id'] = $wpdb -> insert_id;						
-						$this -> add_field($Subscriber -> table, $slug);
+						$this -> add_field($Subscriber -> table, $slug, $attributes);
 					}
 					
 					// Field options
@@ -629,7 +634,7 @@ class wpmlField extends wpMailPlugin {
 						}
 						
 						switch ($field -> type) {
-							case 'pre_date'			:								
+							case 'pre_date'			:															
 								//if (empty($data[$field -> slug]['y']) || empty($data[$field -> slug]['m']) || empty($data[$field -> slug]['d'])) {
 								if (empty($data[$field -> slug])) {
 									$this -> errors[$field -> slug] = __($field -> errormessage);
@@ -659,11 +664,18 @@ class wpmlField extends wpMailPlugin {
 								break;
 						}
 					}
+					
+					if (!empty($field -> type) && $field -> type == "pre_date") {
+						if (!empty($data[$field -> slug])) {
+							$data[$field -> slug] = date_i18n("Y-m-d", strtotime($data[$field -> slug]));
+						}
+					}
 				}
 			}
 		}
 		
-		return $this -> errors;
+		return $data;
+		//return $this -> errors;
 	}
 	
 	function delete($field_id = null) {

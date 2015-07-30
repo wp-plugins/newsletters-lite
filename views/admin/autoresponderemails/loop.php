@@ -155,9 +155,9 @@
 	                        </td>
 	                        <td>
 	                        	<?php if ($aemail -> status == "sent") : ?>
-	                            	<span class="<?php echo $this -> pre; ?>success"><?php _e('Sent', $this -> plugin_name); ?></span>
+	                            	<span class="newsletters_success"><?php _e('Sent', $this -> plugin_name); ?></span>
 	                            <?php else : ?>
-	                            	<span class="<?php echo $this -> pre; ?>error"><?php _e('Unsent', $this -> plugin_name); ?></span>
+	                            	<span class="newsletters_error"><?php _e('Unsent', $this -> plugin_name); ?></span>
 	                            <?php endif; ?>
 	                        </td>
 	                        <td>

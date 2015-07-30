@@ -95,7 +95,7 @@
 						<?php endforeach; ?>
 					</p>
 				<?php else : ?>
-					<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
+					<p class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
 				<?php endif; ?>
 			</div>
 	<?php endif; ?>

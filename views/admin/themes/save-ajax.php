@@ -55,7 +55,7 @@
                         <td>
                         	<input class="widefat" type="file" name="upload" value="" />
                             <?php if (!empty($Theme -> errors['upload'])) : ?>
-                            	<div class="<?php echo $this -> pre; ?>error"><?php echo $Theme -> errors['upload']; ?></div>
+                            	<div class="newsletters_error"><?php echo $Theme -> errors['upload']; ?></div>
                             <?php endif; ?>
                         </td>
                     </tr>

@@ -107,7 +107,7 @@ $importuserslists = $this -> get_option('importuserslists');
 							</tbody>
 						</table>
 					<?php else : ?>
-						<div class="<?php echo $this -> pre; ?>error"><?php _e('No custom fields are available.', $this -> plugin_name); ?></div>
+						<div class="newsletters_error"><?php _e('No custom fields are available.', $this -> plugin_name); ?></div>
 					<?php endif; ?>
 				</div>
 				<span class="howto"><?php _e('Map user meta by selection or custom key to import into custom fields.', $this -> plugin_name); ?></span>

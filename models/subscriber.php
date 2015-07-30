@@ -538,7 +538,7 @@ class wpmlSubscriber extends wpMailPlugin {
 			
 			// Should everything be validated?
 			if ($validate == true) {				
-				$Field -> validate_optin($data);					
+				$data = $Field -> validate_optin($data);					
 				if (!empty($Field -> errors)) {
 					$this -> errors = array_merge($this -> errors, $Field -> errors);
 				}
@@ -843,6 +843,10 @@ class wpmlSubscriber extends wpMailPlugin {
 									if (!empty($data[$field -> slug])) {
 										$data[$field -> slug] = strtolower($data[$field -> slug]);
 									}
+								} elseif ($field -> type == "pre_date") {
+									if (!empty($data[$field -> slug])) {
+										$data[$field -> slug] = date_i18n("Y-m-d", strtotime($data[$field -> slug]));
+									}
 								} elseif (!empty($field -> type) && $field -> type == "pre_country") {
 									if (!is_numeric($data[$field -> slug])) {
 										$countryquery = "SELECT `id` FROM `" . $wpdb -> prefix . $wpmlCountry -> table . "` WHERE `value` = '" . esc_sql($data[$field -> slug]) . "'";
@@ -940,6 +944,10 @@ class wpmlSubscriber extends wpMailPlugin {
 								} elseif ($field -> type == "pre_gender") {
 									if (!empty($data[$field -> slug])) {
 										$data[$field -> slug] = strtolower($data[$field -> slug]);
+									}
+								} elseif ($field -> type == "pre_date") {
+									if (!empty($data[$field -> slug])) {
+										$data[$field -> slug] = date_i18n("Y-m-d", strtotime($data[$field -> slug]));
 									}
 								} elseif (!empty($field -> type) && $field -> type == "pre_country") {
 									if (!is_numeric($data[$field -> slug])) {

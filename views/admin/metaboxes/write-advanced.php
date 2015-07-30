@@ -90,7 +90,7 @@ $sendonpublishef = (empty($_POST[$this -> pre . 'sendonpublishef'])) ? get_post_
 							</tr>
 						<?php endforeach; ?>
 					<?php else : ?>
-						<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
+						<p class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
 					<?php endif; ?>
 				</tbody>
 			</table>

@@ -820,7 +820,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				global ${$mn[1]};
 				if (!empty(${$mn[1]} -> errors[$mn[2]])) {
 					ob_start();
-					echo '<div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> ' . ${$mn[1]} -> errors[$mn[2]] . '</p></div>';
+					echo '<div class="alert alert-danger ui-state-error ui-corner-all"><p><i class="fa fa-exclamation-triangle"></i> ' . ${$mn[1]} -> errors[$mn[2]] . '</p></div>';
 					return ob_get_clean();
 				}
 			}

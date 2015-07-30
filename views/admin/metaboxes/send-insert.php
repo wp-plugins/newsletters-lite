@@ -330,7 +330,7 @@ $inserttabs = apply_filters($this -> pre . '_admin_createnewsletter_inserttabs',
 					<?php endforeach; ?>
 				</ul>
 			<?php else : ?>
-				<p class="<?php echo $this -> pre; ?>error"><?php _e('No email snippets available.', $this -> plugin_name); ?></p>
+				<p class="newsletters_error"><?php _e('No email snippets available.', $this -> plugin_name); ?></p>
 			<?php endif; ?>
 		</div>
 	<?php endif; ?>

@@ -52,6 +52,8 @@ class wpmlDbHelper extends wpMailPlugin {
 					$object -> data -> nnewsletter['content'] = $_POST['content'];	
 				}
 				
+				$object -> errors = apply_filters('newsletters_' . strtolower(str_replace("wpml", "", $object -> model)) . '_before_save', $this -> errors, $object -> data, $object);
+				
 				if (empty($object -> errors)) {
 					switch ($object -> model) {
 						case 'Theme'			:
@@ -217,6 +219,8 @@ class wpmlDbHelper extends wpMailPlugin {
 						unset($object -> fields['key']);
 						unset($object -> fields['id']);
 						
+						$object -> fields = apply_filters('newsletters_db_insert_fields', $object -> fields, $object -> model);
+						
 						foreach (array_keys($object -> fields) as $field) {
 							if (!empty($data -> {$field})) {
 								$query1 .= "`" . $field . "`";
@@ -260,6 +264,8 @@ class wpmlDbHelper extends wpMailPlugin {
 					
 					$c = 1;
 					unset($object -> fields['key']);
+					
+					$object -> fields = apply_filters('newsletters_db_update_fields', $object -> fields, $object -> model);
 					
 					foreach (array_keys($object -> fields) as $field) {						
 						if (!empty($data -> {$field}) || $data -> {$field} == "0") {
@@ -566,9 +572,17 @@ class wpmlDbHelper extends wpMailPlugin {
 						if (!empty($cmatches[1]) || $cmatches[1] == "0") {
 							$query .= " `" . $ckey . "` < " . $cmatches[1] . "";	
 						}
+					} elseif (preg_match("/^(!=)\s?(.*)?/si", $cval, $cmatches)) {
+						if (!empty($cmatches[2]) || $cmatches[2] == 0) {
+							$query .= " `" . $ckey . "` != " . $cmatches[2] . "";
+						}
 					} elseif (preg_match("/(LIKE)/", $cval, $cmatches)) {
 						$query .= " `" . $ckey . "` " . $cval;
 					} else {				
+						/*if (!preg_match("/^(').*(')$/si", $cval)) {
+							$cval = "'" . $cval . "'";
+						}*/
+						
 						$query .= " " . $ckey . " = " . $cval . "";
 					}
 					

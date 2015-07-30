@@ -500,7 +500,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 		}
 		</script>
 	<?php else : ?>
-		<p class="<?php echo $this -> pre; ?>error"><?php _e('No subscribers are available, please try again.', $this -> plugin_name); ?></p>
+		<p class="newsletters_error"><?php _e('No subscribers are available, please try again.', $this -> plugin_name); ?></p>
 		<p>
 			<a href="javascript:history.go(-1);" class="button button-primary" onclick=""><?php _e('&laquo; Back', $this -> plugin_name); ?></a>
 		</p>

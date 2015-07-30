@@ -88,13 +88,13 @@
 								case 0			:
 									?>
 									
-									<span class="<?php echo $this -> pre; ?>error"><?php _e('Not Installed', $this -> plugin_name); ?></span>
+									<span class="newsletters_error"><?php _e('Not Installed', $this -> plugin_name); ?></span>
 									<p><?php echo $Html -> link(__('Get it now', $this -> plugin_name), $extension['link'], array('target' => "_blank", 'class' => "button button-primary")); ?></p>
 									
 									<?php
 									break;
 								case 1			:
-									?><span class="<?php echo $this -> pre; ?>error"><?php _e('Installed but Inactive', $this -> plugin_name); ?></span>
+									?><span class="newsletters_error"><?php _e('Installed but Inactive', $this -> plugin_name); ?></span>
 									<p><a href="<?php echo wp_nonce_url('admin.php?page=' . $this -> sections -> extensions . '&method=activate&plugin=' . plugin_basename($path), 'newsletters_extension_activate_' . plugin_basename($path)); ?>" class="button"><?php _e('Activate', $this -> plugin_name); ?></a></p><?php
 									break;
 								case 2			:
@@ -110,7 +110,7 @@
         </table>
         <ul class="pagination"></ul>
     <?php else : ?>
-    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No extensions found.', $this -> plugin_name); ?></p>
+    	<p class="newsletters_error"><?php _e('No extensions found.', $this -> plugin_name); ?></p>
     <?php endif; ?>
     
 	<script type="text/javascript" src="//listjs.com/no-cdn/list.js"></script>

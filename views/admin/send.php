@@ -42,7 +42,9 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 							<input onclick="jQuery('iframe#content_ifr').attr('tabindex', '2');" tabindex="1" id="title" autocomplete="off" type="text" placeholder="<?php echo esc_attr(stripslashes(__('Enter email subject here', $this -> plugin_name))); ?>" name="subject" value="<?php echo esc_attr(stripslashes($_POST['subject'])); ?>" />
 						</div>
 						<?php if (!empty($errors['subject'])) : ?>
-							<p class="<?php echo $this -> pre; ?>error"><?php echo $errors['subject']; ?></p>
+							<div class="ui-state-error ui-corner-all">
+								<p><i class="fa fa-exclamation-triangle"></i> <?php echo $errors['subject']; ?></p>
+							</div>
 						<?php endif; ?>
 						<div class="inside">
 						<div id="edit-slug-box" class="hide-if-no-js" style="display:<?php echo (!empty($_POST['ishistory'])) ? 'block' : 'none'; ?>;">
@@ -115,7 +117,9 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						</table>
 						
 						<?php if (!empty($errors['content'])) : ?>
-							<p class="<?php echo $this -> pre; ?>error"><?php echo $errors['content']; ?></p>
+							<div class="ui-state-error ui-corner-all">
+								<p><i class="fa fa-exclamation-triangle"></i> <?php echo $errors['content']; ?></p>
+							</div>
 						<?php endif; ?>
 						
 						<p>
@@ -251,7 +255,7 @@ jQuery(document).ready(function() {
 	    	<?php if (!empty($createspamscore) && $createspamscore == "Y") : ?>
 	    		//spamscorerunner();
 	    	<?php endif; ?>
-	    }, 3000);
+	    }, 0);
     
         window.onbeforeunload = function () {
             if (warnMessage != null) return warnMessage;

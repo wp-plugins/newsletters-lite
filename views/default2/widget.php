@@ -156,6 +156,6 @@ jQuery(document).ready(function() {
 		jQuery(this).removeClass('<?php echo $this -> pre; ?>fielderror').nextAll('div.newsletters-field-error').slideUp();	
 	});
 	
-	jQuery('.newsletters-management .newsletters-fieldholder, .entry-content .newsletters-fieldholder, .entry .newsletters-fieldholder').addClass('col-md-6');
+	jQuery('.newsletters-management .newsletters-fieldholder, .entry-content .newsletters-fieldholder, .post-entry .newsletters-fieldholder, .entry .newsletters-fieldholder').addClass('col-md-6');
 });
 </script>

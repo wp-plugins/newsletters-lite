@@ -43,7 +43,7 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 					<?php endforeach; ?>
 				</p>
 			<?php else : ?>
-				<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
+				<p class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
 			<?php endif; ?>
 		</div>
         
@@ -326,5 +326,5 @@ $paidsubscriptions = $this -> get_option('subscriptions');
 		}
 		</script>
 <?php /*<?php else : ?>
-	<p class="<?php echo $this -> pre; ?>error"><?php _e('No subscribers were found', $this -> plugin_name); ?></p>
+	<p class="newsletters_error"><?php _e('No subscribers were found', $this -> plugin_name); ?></p>
 <?php endif; ?>*/ ?>

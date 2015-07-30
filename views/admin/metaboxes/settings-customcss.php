@@ -6,18 +6,17 @@
         	<th><label for="theme_folder"><?php _e('Select Theme Folder', $this -> plugin_name); ?></label></th>
             <td>
             	<?php if ($themefolders = $this -> get_themefolders()) : ?>
-                	<select onchange="jQuery('#settings-form').submit();" name="theme_folder" id="theme_folder">
+                	<select onchange="if (!confirm('<?php _e('The settings will now be saved and the page will reload. Please reconfigure both styles and scripts once the page reloaded.', $this -> plugin_name); ?>')) { return false; } jQuery('#settings-form').submit();" name="theme_folder" id="theme_folder">
                     	<?php foreach ($themefolders as $themefolder) : ?>
                         	<option <?php echo ($this -> get_option('theme_folder') == $themefolder) ? 'selected="selected"' : ''; ?> name="<?php echo $themefolder; ?>"><?php echo $themefolder; ?></option>
                         <?php endforeach; ?>
                     </select>
                     <span class="howto"><?php echo sprintf(__('Select the folder inside "%s" to render template files from. eg. "default"', $this -> plugin_name), $this -> plugin_name . '/views/'); ?></span>
                 <?php else : ?>
-                	<p class="<?php echo $this -> pre; ?>error"><?php _e('No theme folders could be found inside the "' . $this -> plugin_name . '/views/" folder.', $this -> plugin_name); ?>
+                	<p class="newsletters_error"><?php _e('No theme folders could be found inside the "' . $this -> plugin_name . '/views/" folder.', $this -> plugin_name); ?>
                 <?php endif; ?>
             </td>
         </tr>
-        
 	        <tr>
 	        	<th><?php _e('Child Theme Folder', $this -> plugin_name); ?></th>
 	        	<td>
@@ -28,14 +27,6 @@
 	        		<?php endif; ?>
 	        	</td>
 	        </tr>
-        <?php /*<tr>
-        	<th><label for="theme_usestyle_Y"><?php _e('Use Theme Style File?', $this -> plugin_name); ?></label></th>
-            <td>
-            	<label><input <?php echo ($this -> get_option('theme_usestyle') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="theme_usestyle" value="Y" id="theme_usestyle_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
-                <label><input <?php echo ($this -> get_option('theme_usestyle') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="theme_usestyle" value="N" id="theme_usestyle_N" /> <?php _e('No', $this -> plugin_name); ?></label>
-                <span class="howto"><?php echo sprintf(__('Setting this to "Yes" will load the %s file inside the theme folder.', $this -> plugin_name), '<code>css/style.css</code>'); ?></span>
-            </td>
-        </tr>*/ ?>
 	</tbody>
 </table>
 

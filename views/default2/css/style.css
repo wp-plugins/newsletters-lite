@@ -31,6 +31,10 @@ input.newslettername {
 	text-decoration: none !important;
 }
 
+.newsletters .newsletters-dateholder {
+	position: relative;
+}
+
 /* Manage Subscriptions */
 
 .newsletters ul.nav {

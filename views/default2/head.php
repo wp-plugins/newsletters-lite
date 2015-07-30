@@ -37,3 +37,5 @@ jQuery(document).ready(function() {
 }
 </style>
 <![endif]-->
+
+<link rel="stylesheet/less" type="text/css" href="<?php echo $this -> render_url('css/style.less', 'default2', false); ?>" />

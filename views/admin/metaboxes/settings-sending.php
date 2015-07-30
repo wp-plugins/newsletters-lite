@@ -144,7 +144,7 @@ $defaulttemplate = $this -> get_option('defaulttemplate');
 				<label><input onclick="jQuery('#embedimagesdiv').show();" <?php if ($embedimagesdisabled == true) : ?>disabled="disabled"<?php endif; ?> <?php echo ($embedimagesdisabled == false && $this -> get_option('embedimages') == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="embedimages" value="Y" id="embedimages_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
 				<label><input onclick="jQuery('#embedimagesdiv').hide();" <?php if ($embedimagesdisabled == true) : ?>disabled="disabled"<?php endif; ?> <?php echo ($embedimagesdisabled == true || $this -> get_option('embedimages') == "N") ? 'checked="checked"' : ''; ?> type="radio" name="embedimages" value="N" id="embedimages_N" /> <?php _e('No', $this -> plugin_name); ?></label>
 				<?php if ($embedimagesdisabled == true) : ?>
-					<span class="<?php echo $this -> pre; ?>error howto"><?php _e('You do not have the Embedded Images extension installed or it is not active.', $this -> plugin_name); ?></span>
+					<span class="newsletters_error howto"><?php _e('You do not have the Embedded Images extension installed or it is not active.', $this -> plugin_name); ?></span>
 				<?php endif; ?>
 				<span class="howto"><?php _e('Embed/attach images into emails instead of loading them remotely from their absolute URL.', $this -> plugin_name); ?></span>
 			</td>

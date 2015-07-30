@@ -94,7 +94,7 @@
 				
 				<?php $users_can_register = get_option('users_can_register'); ?>
 				<?php if (empty($users_can_register) || $users_can_register == 0) : ?>
-					<div class="<?php echo $this -> pre; ?>error"><?php _e('WordPress registration is currently deactivated', $this -> plugin_name); ?></div>
+					<div class="newsletters_error"><?php _e('WordPress registration is currently deactivated', $this -> plugin_name); ?></div>
 				<?php endif; ?>
                 
                 <span class="howto"><?php _e('Turn this on to place a subscribe checkbox on the registration form.', $this -> plugin_name); ?></span>
@@ -178,7 +178,7 @@
 						</div>
 						<span class="howto"><?php _e('To which list(s) should new users be subscribed upon registration?', $this -> plugin_name); ?></span>
 					<?php else : ?>
-						<span class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></span>
+						<span class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></span>
 					<?php endif; ?>
 				</td>
 			</tr>

@@ -542,7 +542,7 @@ $regex = $Html -> field_value('Field[regex]');
 									</div>
 									<?php echo $Html -> field_error('Field[mailinglists]'); ?>
 								<?php else : ?>
-									<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists were found', $this -> plugin_name); ?></p>
+									<p class="newsletters_error"><?php _e('No mailing lists were found', $this -> plugin_name); ?></p>
 								<?php endif; ?>
 							</td>
 						</tr>

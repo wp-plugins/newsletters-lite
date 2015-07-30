@@ -11,7 +11,7 @@
 			<p class="<?php echo $this -> pre; ?>success"><?php echo $message; ?></p>
 		<?php endif; ?>
 	<?php else : ?>
-		<p class="<?php echo $this -> pre; ?>error"><?php _e('Unfortunately a POP3 error occurred:', $this -> plugin_name); ?> <?php echo stripslashes($error); ?></p>
+		<p class="newsletters_error"><?php _e('Unfortunately a POP3 error occurred:', $this -> plugin_name); ?> <?php echo stripslashes($error); ?></p>
 	<?php endif; ?>
 	
 	<p>

@@ -100,7 +100,7 @@
 		                        
 		                        <span class="howto"><?php _e('categories for posts to be taken from.', $this -> plugin_name); ?></span>
 		                    <?php else : ?>
-		                    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No categories are available', $this -> plugin_name); ?></p>
+		                    	<p class="newsletters_error"><?php _e('No categories are available', $this -> plugin_name); ?></p>
 		                    <?php endif; ?>
 		                </td>
 		            </tr>
@@ -183,7 +183,7 @@
 	                            <?php endforeach; ?>
 	                        </div>
 	                    <?php else : ?>
-	                    	<p class="<?php echo $this -> pre; ?>error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
+	                    	<p class="newsletters_error"><?php _e('No mailing lists are available', $this -> plugin_name); ?></p>
 	                    <?php endif; ?>
 	                	<span class="howto"><?php _e('mailing list(s) to send latest posts subscriptions to.', $this -> plugin_name); ?></span>
 	                </td>
@@ -237,7 +237,7 @@
 	                                <?php endforeach; ?>
 	                            </select>
 	                        <?php else : ?>
-	                            <p class="<?php echo $this -> pre; ?>error"><?php _e('No schedules are available', $this -> plugin_name); ?></p>
+	                            <p class="newsletters_error"><?php _e('No schedules are available', $this -> plugin_name); ?></p>
 	                        <?php endif; ?>
 	                        <span class="howto"><?php _e('set how often the latest posts subscription should be sent out.', $this -> plugin_name); ?></span>
 	                        <span class="howto"><?php _e('the first execution will be the time of the interval from the current date/time.', $this -> plugin_name); ?></span>

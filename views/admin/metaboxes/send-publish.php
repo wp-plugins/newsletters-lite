@@ -39,7 +39,7 @@
 								<label><input <?php echo $check = ($isthiscat) ? 'checked="checked"' : ''; ?> type="checkbox" name="cat[]" value="<?php echo $category -> cat_ID; ?>" /> <?php echo $category -> cat_name; ?></label><br/>
 							<?php endforeach; ?>
 						<?php else : ?>
-							<span style="<?php echo $this -> pre; ?>error"><?php _e('No categories were found', $this -> plugin_name); ?></span>
+							<span style="newsletters_error"><?php _e('No categories were found', $this -> plugin_name); ?></span>
 						<?php endif; ?>
 					</div>
 				</td>

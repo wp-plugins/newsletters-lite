@@ -7,6 +7,7 @@ $ID = $this -> get_option('imagespost');
 $post_ID = $this -> get_option('imagespost');
 
 $alwayssend = $Autoresponder -> data -> alwayssend;
+$sendauto = $Autoresponder -> data -> sendauto;
 
 ?>
 
@@ -15,6 +16,8 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
     
     <form action="?page=<?php echo $this -> sections -> autoresponders; ?>&amp;method=save" method="post">
     	<?php echo $Form -> hidden('Autoresponder[id]'); ?>
+    	
+    	<?php do_action('newsletters_admin_autoresponder_save_fields_before', $Autoresponder -> data); ?>
     
     	<table class="form-table">
         	<tbody>
@@ -53,7 +56,7 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                     	<label><input <?php echo ($applyexisting == "Y") ? 'checked="checked"' : ''; ?> type="radio" name="Autoresponder[applyexisting]" value="Y" id="Autoresponder_applyexisting_Y" /> <?php _e('Yes', $this -> plugin_name); ?></label>
                         <label><input <?php echo (empty($applyexisting) || $applyexisting == "N") ? 'checked="checked"' : ''; ?> type="radio" name="Autoresponder[applyexisting]" value="N" id="Autoresponder_applyexisting_N" /> <?php _e('No', $this -> plugin_name); ?></label>
                         
-                        <?php if ($applyexisting == "Y") : ?><div class="<?php echo $this -> pre; ?>error"><?php _e('Autoresponder has already been applied to the existing subscribers before.', $this -> plugin_name); ?><br/>
+                        <?php if ($applyexisting == "Y") : ?><div class="newsletters_error"><?php _e('Autoresponder has already been applied to the existing subscribers before.', $this -> plugin_name); ?><br/>
                         <?php _e('This autoresponder will not be queued to the same subscribers as before again, only new ones.'); ?></div><?php endif; ?>
                     	<span class="howto">
 							<?php _e('Should this autoresponder be applied to existing subscribers of the list(s) above?', $this -> plugin_name); ?><br/>
@@ -180,17 +183,36 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
         
         <table class="form-table">
         	<tbody>
-            	<tr>
-                	<th><label for="Autoresponder.delay"><?php _e('Send Delay', $this -> plugin_name); ?></label>
-                	<?php echo $Html -> help(__('The send delay is measured in days. How many days after the subscriber has subscribed do you want this autoresponder message to send to the subscriber? You can specify 0 (zero) to have the autoresponder send to the subscriber immediately upon activation.', $this -> plugin_name)); ?></th>
-                    <td>
-                    	<?php echo $Form -> text('Autoresponder[delay]', array('width' => "45px")); ?>
-                    	<?php $delayintervals = array('minutes' => __('Minutes', $this -> plugin_name), 'hours' => __('Hours', $this -> plugin_name), 'days' => __('Days', $this -> plugin_name), 'weeks' => __('Weeks', $this -> plugin_name), 'years' => __('Years', $this -> plugin_name)); ?>
-                    	<?php echo $Form -> select('Autoresponder[delayinterval]', $delayintervals); ?>
-                    	<?php _e('after subscribing and confirming', $this -> plugin_name); ?>
-                    	<span class="howto"><?php _e('Delay before sending this message. Set to 0 to send immediately upon subscribe/confirm.', $this -> plugin_name); ?></span>
-                    </td>
-                </tr>
+	        	<tr>
+		        	<th><label for="Autoresponder_sendauto"><?php _e('Send Automatically?', $this -> plugin_name); ?></label></th>
+		        	<td>
+			        	<label><input <?php echo (!empty($sendauto)) ? 'checked="checked"' : ''; ?> onclick="if (jQuery(this).is(':checked')) { jQuery('#Autoresponder_sendauto_div').show(); } else { jQuery('#Autoresponder_sendauto_div').hide(); }" type="checkbox" name="Autoresponder[sendauto]" id="Autoresponder_sendauto" value="1" /> <?php _e('Yes, send/schedule automatically upon subscribe', $this -> plugin_name); ?></label>
+			        	<span class="howto"><?php _e('Specify if this will be sent automatically or untick to use for another purpose.', $this -> plugin_name); ?></span>
+		        	</td>
+	        	</tr>
+        	</tbody>
+        </table>
+        
+        <div id="Autoresponder_sendauto_div" style="display:<?php echo (!empty($sendauto)) ? 'block' : 'none'; ?>;">
+	        <table class="form-table">
+		        <tbody>
+			    	<tr>
+	                	<th><label for="Autoresponder.delay"><?php _e('Send Delay', $this -> plugin_name); ?></label>
+	                	<?php echo $Html -> help(__('The send delay is measured in days. How many days after the subscriber has subscribed do you want this autoresponder message to send to the subscriber? You can specify 0 (zero) to have the autoresponder send to the subscriber immediately upon activation.', $this -> plugin_name)); ?></th>
+	                    <td>
+	                    	<?php echo $Form -> text('Autoresponder[delay]', array('width' => "45px")); ?>
+	                    	<?php $delayintervals = array('minutes' => __('Minutes', $this -> plugin_name), 'hours' => __('Hours', $this -> plugin_name), 'days' => __('Days', $this -> plugin_name), 'weeks' => __('Weeks', $this -> plugin_name), 'years' => __('Years', $this -> plugin_name)); ?>
+	                    	<?php echo $Form -> select('Autoresponder[delayinterval]', $delayintervals); ?>
+	                    	<?php _e('after subscribing and confirming', $this -> plugin_name); ?>
+	                    	<span class="howto"><?php _e('Delay before sending this message. Set to 0 to send immediately upon subscribe/confirm.', $this -> plugin_name); ?></span>
+	                    </td>
+	                </tr> 
+		        </tbody>
+	        </table>
+        </div>
+        
+        <table class="form-table">
+	        <tbody>
                 <tr>
                 	<th><label for="Autoresponder.status.active"><?php _e('Status', $this -> plugin_name); ?></label>
                 	<?php echo $Html -> help(__('The status of this autoresponder will determine if it is effective or not. If it is Active, it will be effective and this autoresponder will be sent to subscribers accordingly. If it is Inactive, it will be ignored and will not be used and no messages will be sent from this autoresponder.', $this -> plugin_name)); ?></th>
@@ -202,6 +224,8 @@ $alwayssend = $Autoresponder -> data -> alwayssend;
                 </tr>
             </tbody>
         </table>
+        
+        <?php do_action('newsletters_admin_autoresponder_save_fields_after', $Autoresponder -> data); ?>
     
     	<p class="submit">
         	<?php echo $Form -> submit(__('Save Autoresponder', $this -> plugin_name)); ?>

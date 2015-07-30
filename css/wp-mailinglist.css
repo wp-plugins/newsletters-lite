@@ -32,6 +32,15 @@ td.column-newsletters, th.column-newsletters {
     font-size: 110%;
 }
 
+.select2-container {
+	/*width: auto !important;*/
+	min-width: 100px !important;
+}
+
+.select2-multiple .select2-container {
+	width: auto !important;
+}
+
 .select2-search__field {
     box-shadow: none !important;
     margin: 0;

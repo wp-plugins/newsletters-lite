@@ -5,17 +5,10 @@ if (!class_exists('newslettersBootstrap')) {
 		
 		function default_styles($defaultstyles = array()) {
 			
-			$defaultstyles['newsletters'] = array(
-				'name'					=>	"Theme Folder style.css",
-				'url'					=>	$this -> render_url('css/style.css', 'default2', false),
-				'version'				=>	false,
-				'deps'					=>	false,
-				'media'					=>	"all",
-			);
-			
 			$defaultstyles['bootstrap'] = array(
 				'name'					=>	"Bootstrap",
-				'url'					=>	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css',
+				//'url'					=>	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css',
+				'url'					=>	$this -> render_url('css/bootstrap.css', 'default2', false),
 				'version'				=>	'3.3.4',
 				'deps'					=>	false,
 				'media'					=>	"all",
@@ -49,6 +42,14 @@ if (!class_exists('newslettersBootstrap')) {
 				'name'					=>	"Uploadify",
 				'url'					=>	$this -> render_url('css/uploadify.css', 'default2', false),
 				'version'				=>	'2.2',
+				'deps'					=>	false,
+				'media'					=>	"all",
+			);
+			
+			$defaultstyles['newsletters'] = array(
+				'name'					=>	"Theme Folder style.css (recommended)",
+				'url'					=>	$this -> render_url('css/style.css', 'default2', false),
+				'version'				=>	false,
 				'deps'					=>	false,
 				'media'					=>	"all",
 			);
@@ -119,6 +120,10 @@ if (!class_exists('newslettersBootstrap')) {
 		function datepicker_output($output = null, $optinid = null, $field = null) {
 			global $Html;
 			
+			if (is_admin() && !defined('DOING_AJAX')) {
+				return $output;
+			}
+			
 			$output = "";
 			$locale = get_locale();
 			
@@ -145,7 +150,7 @@ if (!class_exists('newslettersBootstrap')) {
 			
 			?>
 			
-			<div id="newsletters-<?php echo $optinid . $field -> slug; ?>-dateholder">
+			<div id="newsletters-<?php echo $optinid . $field -> slug; ?>-dateholder" class="newsletters-dateholder">
 				<div class="input-group date">
 					<input type="text" class="form-control wpmlpredate wpmltext wpml wpmlpredate<?php echo ((!empty($_POST['wpmlerrors'][$field -> slug])) ? ' ' . 'wpmlfielderror' : ''); ?>" value="<?php echo $currentDate; ?>" name="<?php echo $field -> slug; ?>" id="wpml-<?php echo $optinid . $field -> slug; ?>" />
 					<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -156,6 +161,7 @@ if (!class_exists('newslettersBootstrap')) {
 				<script type="text/javascript">			
 				jQuery(document).ready(function() {
 					jQuery('#newsletters-<?php echo $optinid . $field -> slug; ?>-dateholder .input-group.date').datepicker({
+						container: '#newsletters-<?php echo $optinid . $field -> slug; ?>-dateholder',
 						autoclose: true,
 						format: '<?php echo $this -> dateformat_php_to_bootstrap_datepicker(get_option('date_format')); ?>',
 						//language: '<?php echo str_replace("_", "-", $locale); ?>',

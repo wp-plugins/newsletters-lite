@@ -11,6 +11,7 @@ class wpmlAutoresponder extends wpMailPlugin {
 		'title'				=>	"VARCHAR(250) NOT NULL DEFAULT ''",
 		'history_id'		=>	"INT(11) NOT NULL DEFAULT '0'",
 		'status'			=>	"ENUM('active','inactive') NOT NULL DEFAULT 'active'",
+		'sendauto'			=>	"INT(1) NOT NULL DEFAULT '1'",
 		'delay'				=>	"INT(11) NOT NULL DEFAULT '0'",
 		'delayinterval'		=>	"VARCHAR(50) NOT NULL DEFAULT 'days'",
 		'applyexisting'		=>	"ENUM('Y','N') NOT NULL DEFAULT 'N'",
@@ -25,6 +26,7 @@ class wpmlAutoresponder extends wpMailPlugin {
 		'title'				=>	array("VARCHAR(250)", "NOT NULL DEFAULT ''"),
 		'history_id'		=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'status'			=>	array("ENUM('active','inactive')", "NOT NULL DEFAULT 'active'"),
+		'sendauto'			=>	array("INT(1)", "NOT NULL DEFAULT '1'"),
 		'delay'				=>	array("INT(11)", "NOT NULL DEFAULT '0'"),
 		'delayinterval'		=>	array("VARCHAR(50)", "NOT NULL DEFAULT 'days'"),
 		'applyexisting'		=>	array("ENUM('Y','N')", "NOT NULL DEFAULT 'N'"),
@@ -97,10 +99,16 @@ class wpmlAutoresponder extends wpMailPlugin {
 				}
 			}
 			
-			if (empty($delay) && $delay != "0") { $this -> errors['delay'] = __('Please fill in a send delay.', $this -> plugin_name); }
+			if (!empty($sendauto)) {
+				if (empty($delay) && $delay != "0") { $this -> errors['delay'] = __('Please fill in a send delay.', $this -> plugin_name); }
+			} else {
+				$this -> data -> sendauto = 0;
+			}
 		} else {
 			$this -> errors[] = __('No data was posted', $this -> plugin_name);
 		}
+		
+		$this -> errors = apply_filters('newsletters_autoresponder_validation', $this -> errors, $data);
 		
 		return $this -> errors;
 	}
