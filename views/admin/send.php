@@ -65,9 +65,6 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						ob_start();
 						
 						echo "function (ed) {
-							/*ed.onChange.add(function (ed, l) {
-								jQuery('#previewiframe').contents().find('html div.newsletters_content').html(l.content);
-							});*/
 							
 							ed.on('change', function(e) {
 								jQuery('#previewiframe').contents().find('html div.newsletters_content').html(ed.getContent());

@@ -5,7 +5,7 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.4.2';
+		var $version = '4.5.5';
 		var $dbversion = '1.2.1';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -1272,8 +1272,18 @@ if (!class_exists('wpMailPlugin')) {
 								$subscriber['username'] = $email;
 								
 								$skipsubscriberupdate = false;
-								if (empty($import_overwrite) || $import_overwrite == "N") {
-									$skipsubscriberupdate = true;
+								
+								if ($current_id = $Subscriber -> email_exists($email)) {
+									$subscriber['id'] = $current_id;
+									
+									if (empty($import_overwrite) || $import_overwrite == "N") {
+										$skipsubscriberupdate = true;
+									} else {												
+										$skipsubscriberupdate = false;
+									}
+								} else {									
+									$skipsubscriberupdate = false;
+									$subscriber['id'] = false;
 								}
 							
 								if ($Subscriber -> save($subscriber, true, false, $skipsubscriberupdate)) {
@@ -1342,7 +1352,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 			} else {
 				$success = "N<|>" . $email;
-				$message = __('No data was posted.', $this -> plugin_name);
+				$message = __('No data was posted, blank row?', $this -> plugin_name);
 			}
 			
 			echo $success . "<|>" . $message;
@@ -1972,22 +1982,7 @@ if (!class_exists('wpMailPlugin')) {
 				return json_decode($response['body']);
 			} else {
 				return $response;
-			}                                                                             
-			 
-			/*$ch = curl_init($url);                                                                      
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");    
-			curl_setopt($ch, CURLOPT_POST, true);                                                                 
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);                                                                  
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                                   
-			 
-			$result = curl_exec($ch);
-			
-			if (curl_errno($ch)) {
-				return false;
-			} else {
-				return json_decode($result);	
-			}*/
+			}
 		}
 	    
 	    function ajax_tinymce_dialog() {
@@ -3163,10 +3158,16 @@ if (!class_exists('wpMailPlugin')) {
 				return $text;
 			}
 			
-			if (is_array($text)) {
+			if (is_array($text) || is_object($text)) {				
 				// handle arrays recursively
-				foreach($text as $key => $t) {
-					$text[$key] = $this -> language_use($lang, $text[$key], $show_available);
+				if (is_array($text)) {
+					foreach($text as $key => $t) {
+						$text[$key] = $this -> language_use($lang, $text[$key], $show_available);
+					}
+				} elseif (is_object($text)) {
+					foreach($text as $key => $t) {
+						$text -> {$key} = $this -> language_use($lang, $text -> {$key}, $show_available);
+					}
 				}
 				
 				return $text;
@@ -3531,8 +3532,9 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				foreach($result as $lang => $lang_content) {
-					$result[$lang] = preg_replace("#(<!--more-->|<!--nextpage-->)+$#ism","",$lang_content);
+					$result[$lang] = rtrim(preg_replace("#(<!--more-->|<!--nextpage-->)+$#ism","",$lang_content), '[:]');
 				}
+				
 				return $result;
 			}
 			
@@ -3917,33 +3919,7 @@ if (!class_exists('wpMailPlugin')) {
 						}
 					}
 				}
-				
-				//$uisrc = $this -> render_url('css/jquery-ui.css', 'default', false);
-				//wp_enqueue_style('jquery-ui', $uisrc, false, '1.0', "all");
-				
-				/*$loadscripts = $this -> get_option('loadscripts');
-				
-				//if ($this -> get_option('theme_usestyle') == "Y") {
-					$load = true;	
-				//	$stylesource = $this -> render_url('css/style.css', 'default', false);
-				//}
-				
-				// Select 2 CSS
-				if (!empty($loadscripts) && in_array('select2', $loadscripts)) {
-					if (!function_exists('is_checkout') || !is_checkout()) {
-						wp_deregister_script('select2');
-						wp_deregister_style('select2');
-						wp_enqueue_style('select2', '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css', false, false, "all");
-					}
-				}*/
 			}
-			
-			//wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css', false, false, "all");
-			
-			//if ($load) {				
-			//	if (!empty($stylesource)) { wp_enqueue_style($this -> plugin_name, $stylesource, false, $this -> version, "screen"); }
-			//	wp_enqueue_style('uploadify', $this -> render_url('css/uploadify.css', 'default', false), false, $this -> version, "all");
-			//}
 			
 			return true;
 		}
@@ -6845,13 +6821,13 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.4.2") < 0) {
+				if (version_compare($cur_version, "4.5.5") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
 					//update the theme folder to default
 					$this -> update_option('theme_folder', "default");
-					
+					$this -> theme_folder_functions();
 					include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');
 					$stylesdone = false;
 					$scriptsdone = false;
@@ -6875,7 +6851,7 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($stylesdone) && !empty($scriptsdone)) {
 						// all done, update the version
-						$version = '4.5.4.2';	
+						$version = '4.5.5';	
 					}
 				}
 			
@@ -6912,7 +6888,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['emailencoding'] = "8bit";
 			$options['clicktrack'] = "Y";
 			$options['shortlinks'] = "N";
-			$options['theme_folder'] = "default";
+			$options['theme_folder'] = "default2";
 			$options['theme_usestyle'] = "Y";
 			$options['customcss'] = "N";
 			$options['loadscript_jqueryuploadify'] = "Y";
@@ -7110,6 +7086,7 @@ if (!class_exists('wpMailPlugin')) {
 				$this -> add_option($okey, $oval);
 			}
 			
+			$this -> theme_folder_functions();
 			// Styles & Scripts
 			include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php');			
 			if (!empty($defaultstyles)) {

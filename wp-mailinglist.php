@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5.4.2
+Version: 4.5.5
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -448,12 +448,14 @@ if (!class_exists('wpMail')) {
 					$this -> render_error($message);
 				}
 				
-				// Show about notice?
-				$showmessage_about = $this -> get_option('showmessage_about');
-				if (!empty($showmessage_about) && (empty($_GET['page']) || $_GET['page'] != "newsletters-about")) {
-					$message = sprintf(__('Welcome to Tribulant Newsletters %s. See what is new %s', $this -> plugin_name), '<strong>' . $this -> version . '</strong>', '<a class="button button-primary" href="' . admin_url('index.php?page=newsletters-about') . '"><i class="fa fa-info-circle"></i> ' . __('About this Update', $this -> plugin_name) . '</a>');
-					$message .= ' <a class="button button-secondary" href="' . $Html -> retainquery('newsletters_method=hidemessage&message=about') . '"><i class="fa fa-times"></i> ' . __('Hide', $this -> plugin_name) . '</a>';
-					$this -> render_message($message);
+				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
+					// Show about notice?
+					$showmessage_about = $this -> get_option('showmessage_about');
+					if (!empty($showmessage_about) && (empty($_GET['page']) || $_GET['page'] != "newsletters-about")) {
+						$message = sprintf(__('Welcome to Tribulant Newsletters %s. See what is new %s', $this -> plugin_name), '<strong>' . $this -> version . '</strong>', '<a class="button button-primary" href="' . admin_url('index.php?page=newsletters-about') . '"><i class="fa fa-info-circle"></i> ' . __('About this Update', $this -> plugin_name) . '</a>');
+						$message .= ' <a class="button button-secondary" href="' . $Html -> retainquery('newsletters_method=hidemessage&message=about') . '"><i class="fa fa-times"></i> ' . __('Hide', $this -> plugin_name) . '</a>';
+						$this -> render_message($message);
+					}
 				}
 				
 				global $queue_count, $queue_status;
@@ -510,12 +512,14 @@ if (!class_exists('wpMail')) {
 					}
 				}
 				
-				if (current_user_can('edit_plugins') && $this -> has_update() && (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates))) {
-					$hideupdate = $this -> get_option('hideupdate');
-					if (empty($hideupdate) || (!empty($hideupdate) && version_compare($this -> version, $hideupdate, '>'))) {
-						$update = $this -> vendor('update');
-						$update_info = $update -> get_version_info(true);
-						$this -> render('update', array('update_info' => $update_info), true, 'admin');	
+				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
+					if (current_user_can('edit_plugins') && $this -> has_update() && (empty($_GET['page']) || (!empty($_GET['page']) && $_GET['page'] != $this -> sections -> settings_updates))) {
+						$hideupdate = $this -> get_option('hideupdate');
+						if (empty($hideupdate) || (!empty($hideupdate) && version_compare($this -> version, $hideupdate, '>'))) {
+							$update = $this -> vendor('update');
+							$update_info = $update -> get_version_info(true);
+							$this -> render('update', array('update_info' => $update_info), true, 'admin');	
+						}
 					}
 				}
 				

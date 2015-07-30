@@ -37,6 +37,9 @@ function spamscorerunner() {
 	jQuery('#spamscorerunnerbutton').attr('disabled', "disabled");
 	jQuery('#spamscorerunnerloading').show();
 	
+	jQuery('#sendbutton').prop('disabled', true);
+	jQuery('#savedraftbutton').prop('disabled', true);
+	
 	spamscorerequest = jQuery.ajax({
 		data: formvalues,
 		dataType: 'xml',
@@ -55,6 +58,9 @@ function spamscorerunner() {
 		},
 		cache: true
 	});
+	
+	jQuery('#sendbutton').prop('disabled', false);
+	jQuery('#savedraftbutton').prop('disabled', false);
 }
 
 jQuery(document).ready(function() {

@@ -245,24 +245,24 @@ $tracking_image_file = $this -> get_option('tracking_image_file');
 <script type="text/javascript">
 function testsettings() {
 	jQuery('#testsettingsloading').show();
-	jQuery('#testsettings').attr('disabled', "disabled");
+	jQuery('#testsettings').prop('disabled', true);
 	var formvalues = jQuery('#settings-form').serialize();
 	
 	jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>testsettings&init=1', formvalues, function(response) {
 		jQuery.colorbox({html:response}).resize();
 		jQuery('#testsettingsloading').hide();
-		jQuery('#testsettings').removeAttr('disabled');
+		jQuery('#testsettings').prop('disabled', false);
 	});
 }
 
 function dkimwizard(formvalues) {
 	jQuery('#testsettingsloading').show();
-	jQuery('#dkimwizard').attr('disabled', 'disabled');
+	jQuery('#dkimwizard').prop('disabled', true);
 	
 	jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>dkimwizard', formvalues, function(response) {
 		jQuery.colorbox({html:response});
 		jQuery('#testsettingsloading').hide();
-		jQuery('#dkimwizard').removeAttr('disabled');
+		jQuery('#dkimwizard').prop('disabled', false);
 	});
 }
 </script>

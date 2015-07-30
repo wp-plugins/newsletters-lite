@@ -8,8 +8,9 @@
 		
 		<p class="submit">
 			<a href="javascript:history.go(-1);" class="button button-primary" onclick=""><i class="fa fa-arrow-left"></i> <?php _e('Back', $this -> plugin_name); ?></a>
-			<a href="" onclick="cancelimporting(); return false;" id="cancelimporting" disabled="disabled" style="display:none;" class="button-secondary"><i class="fa fa-pause"></i> <?php _e('Stop', $this -> plugin_name); ?></a>
+			<a href="" onclick="cancelimporting(); return false;" id="cancelimporting" disabled="disabled" style="display:none;" class="button-secondary"><i class="fa fa-pause"></i> <?php _e('Pause', $this -> plugin_name); ?></a>
 			<a href="" onclick="startimporting(); return false;" id="startimporting" disabled="disabled" class="button-primary"><i class="fa fa-refresh fa-spin"></i> <?php _e('Reading data, please wait', $this -> plugin_name); ?></a>
+			<span id="import_loading" style="display:none;"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
 			<span id="importmore" style="display:none;"><a href="?page=<?php echo $this -> sections -> importexport; ?>" id="" class="button-secondary"><?php _e('Import More', $this -> plugin_name); ?></a></span>
 		</p>
 		
@@ -23,17 +24,6 @@
 		<div id="importajaxfailedrecords" class="scroll-list" style="display:none;"><!-- failed records --></div>
 		
 		<div id="importajaxresponse"><!-- response here --></div>
-		
-		<?php /*<div id="importajaxbox" style="display:none;"><?php
-		
-		$i = 1;		
-		foreach ($subscribers as $subscriber) {
-			echo maybe_serialize($subscriber);
-			if ($i <= count($subscribers)) { echo '<|>'; }
-			$i++;
-		}
-		
-		?></div>*/ ?>
 		
 		<script type="text/javascript">
 		var allsubscribers = [];
@@ -52,13 +42,14 @@
 			confirmation_email = jQuery('#confirmation_email').html(); 
 			import_preventbu = "<?php echo (!empty($_POST['import_preventbu'])) ? 'Y' : 'N'; ?>";
 			import_overwrite = "<?php echo (!empty($_POST['import_overwrite'])) ? 'Y' : 'N'; ?>";
-			jQuery('#startimporting').removeAttr('disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__("Start Importing", $this -> plugin_name)); ?>');
+			jQuery('#startimporting').prop('disabled', false).html('<i class="fa fa-play"></i> <?php echo addslashes(__("Start Importing", $this -> plugin_name)); ?>');
 		});
 		
 		function cancelimporting() {
 			cancelimport = "Y";
-			jQuery('#cancelimporting').attr('disabled', 'disabled');
-			jQuery('#startimporting').removeAttr('disabled').attr('onclick', 'resumeimporting(); return false;').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Resume Importing', $this -> plugin_name)); ?>');
+			jQuery('#cancelimporting').prop('disabled', true);
+			jQuery('#startimporting').prop('disabled', false).attr('onclick', 'resumeimporting(); return false;').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Resume Importing', $this -> plugin_name)); ?>');
+			jQuery('#import_loading').hide();
 			
 			for (var r = 0; r < requestArray.length; r++) {
 				requestArray[r].abort();
@@ -66,12 +57,10 @@
 		}
 		
 		function startimporting() {
-			jQuery('#cancelimporting').removeAttr('disabled').show();
-			jQuery('#startimporting').attr('disabled', 'disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Importing Now', $this -> plugin_name)); ?>');
-		
-			//text = jQuery('#importajaxbox').text();
-			//subscribercount = '<?php echo count($subscribers); ?>';
-			//subscribers = text.split('<|>');
+			jQuery('#cancelimporting').prop('disabled', false).show();
+			jQuery('#startimporting').prop('disabled', true).html('<i class="fa fa-play"></i> <?php echo addslashes(__('Importing Now', $this -> plugin_name)); ?>');
+			jQuery('#import_loading').show();
+
 			subscribercount = allsubscribers.length;
 			subscribers = allsubscribers;
 			completed = 0;
@@ -95,8 +84,9 @@
 		
 		function resumeimporting() {
 			cancelimport = "N";
-			jQuery('#startimporting').attr('disabled', 'disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Importing Now', $this -> plugin_name)); ?>');
-			jQuery('#cancelimporting').removeAttr('disabled');
+			jQuery('#startimporting').prop('disabled', true).html('<i class="fa fa-play"></i> <?php echo addslashes(__('Importing Now', $this -> plugin_name)); ?>');
+			jQuery('#cancelimporting').prop('disabled', false);
+			jQuery('#import_loading').show();
 			
 			var newimportingnumber = (importingnumber - completed);
 			requests = (completed - 1);
@@ -142,8 +132,9 @@
 				if (completed == subscribercount) {
 					jQuery('#cancelimporting').hide();
 					warnMessage = null;
-					jQuery('#startimporting').html('<?php echo addslashes(__('Continue to Subscribers', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').removeAttr('disabled').removeAttr('onclick').attr("href", "?page=<?php echo $this -> sections -> subscribers; ?>");
+					jQuery('#startimporting').html('<?php echo addslashes(__('Continue to Subscribers', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').prop('disabled', false).removeAttr('onclick').attr("href", "?page=<?php echo $this -> sections -> subscribers; ?>");
 					jQuery('#importmore').show();
+					jQuery('#import_loading').hide();
 				} else {
 					importsubscriber(subscribers[(requests + 1)]); 
 				}

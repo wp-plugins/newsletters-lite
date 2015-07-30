@@ -38,6 +38,9 @@ function previewrunner() {
 	jQuery('#previewrunnerbutton').attr('disabled', "disabled");
 	jQuery('#previewrunnerloading').show();
 	
+	jQuery('#sendbutton').prop('disabled', true);
+	jQuery('#savedraftbutton').prop('disabled', true);
+	
 	jQuery.ajaxSetup({cache:false});
 	
 	previewrequest = jQuery.ajax({
@@ -65,6 +68,9 @@ function previewrunner() {
 			if (typeof previewcontent != 'undefined') { jQuery('#previewiframe').contents().find('html').html(previewcontent); }
 			jQuery('#previewrunnerbutton').removeAttr('disabled');
 			jQuery('#previewrunnerloading').hide();
+			
+			jQuery('#sendbutton').prop('disabled', false);
+			jQuery('#savedraftbutton').prop('disabled', false);
 			
 			var iframeheight = jQuery("#previewiframe").contents().find("html").outerHeight();
 			jQuery("#previewiframe").height(iframeheight).css({height: iframeheight}).attr("height", iframeheight);

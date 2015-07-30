@@ -11,7 +11,7 @@
 		<?php _e('The private key above has been filled into the DKIM Private Key box for you.', $this -> plugin_name); ?>
 	</p>
 
-	<form action="" onsubmit="do_private_key(); jQuery('#dkimbutton').attr('disabled', 'disabled'); jQuery('#dkimloading').show(); dkimwizard(jQuery(this).serialize()); return false;">	
+	<form action="" onsubmit="do_private_key(); jQuery('#dkimbutton').prop('disabled', true); jQuery('#dkimloading').show(); dkimwizard(jQuery(this).serialize()); return false;">	
 		<input type="hidden" name="domain" value="<?php echo stripslashes($domain); ?>" />
 		<input type="hidden" name="selector" value="<?php echo stripslashes($selector); ?>" />
 		<input type="hidden" name="public" value="<?php echo stripslashes($public); ?>" />

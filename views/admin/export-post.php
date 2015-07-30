@@ -11,7 +11,7 @@
 		
 		<p class="submit">
 			<a href="javascript:history.go(-1);" class="button button-primary" onclick=""><i class="fa fa-arrow-left"></i> <?php _e('Back', $this -> plugin_name); ?></a>
-			<a href="" onclick="cancelexporting(); return false;" id="cancelexporting" disabled="disabled" style="display:none;" class="button-secondary"><i class="fa fa-pause"></i> <?php _e('Stop', $this -> plugin_name); ?></a>
+			<a href="" onclick="cancelexporting(); return false;" id="cancelexporting" disabled="disabled" style="display:none;" class="button-secondary"><i class="fa fa-pause"></i> <?php _e('Pause', $this -> plugin_name); ?></a>
 			<a href="" onclick="startexporting(); return false;" id="startexporting" disabled="disabled" class="button-primary"><i class="fa fa-refresh fa-spin"></i> <?php _e('Reading data, please wait', $this -> plugin_name); ?></a>
 			<span id="exportmore" style="display:none;"><a href="?page=<?php echo $this -> sections -> importexport; ?>#export" id="" class="button-secondary"><?php _e('Export More', $this -> plugin_name); ?></a></span>
 		</p>
@@ -43,13 +43,13 @@
 			requestArray = new Array();
 			cancelexport = "N";
 			exportingnumber = 2000;
-			jQuery('#startexporting').removeAttr('disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__("Start Exporting", $this -> plugin_name)); ?>');
+			jQuery('#startexporting').prop('disabled', false).html('<i class="fa fa-play"></i> <?php echo addslashes(__("Start Exporting", $this -> plugin_name)); ?>');
 		});
 		
 		function cancelexporting() {
 			cancelexport = "Y";
-			jQuery('#cancelexporting').attr('disabled', 'disabled');
-			jQuery('#startexporting').removeAttr('disabled').attr('onclick', 'resumeexporting(); return false;').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Resume Exporting', $this -> plugin_name)); ?>');
+			jQuery('#cancelexporting').prop('disabled', true);
+			jQuery('#startexporting').prop('disabled', false).attr('onclick', 'resumeexporting(); return false;').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Resume Exporting', $this -> plugin_name)); ?>');
 			
 			for (var r = 0; r < requestArray.length; r++) {
 				requestArray[r].abort();
@@ -58,8 +58,8 @@
 		
 		function resumeexporting() {
 			cancelexport = "N";
-			jQuery('#startexporting').attr('disabled', 'disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Exporting Now', $this -> plugin_name)); ?>');
-			jQuery('#cancelexporting').removeAttr('disabled');
+			jQuery('#startexporting').prop('disabled', true).html('<i class="fa fa-play"></i> <?php echo addslashes(__('Exporting Now', $this -> plugin_name)); ?>');
+			jQuery('#cancelexporting').prop('disabled', false);
 			
 			var newexportingnumber = (exportingnumber - completed);
 			requests = (completed - 1);
@@ -72,8 +72,8 @@
 		}
 		
 		function startexporting() {
-			jQuery('#cancelexporting').removeAttr('disabled').show();
-			jQuery('#startexporting').attr('disabled', 'disabled').html('<i class="fa fa-play"></i> <?php echo addslashes(__('Exporting Now', $this -> plugin_name)); ?>');
+			jQuery('#cancelexporting').prop('disabled', false).show();
+			jQuery('#startexporting').prop('disabled', true).html('<i class="fa fa-play"></i> <?php echo addslashes(__('Exporting Now', $this -> plugin_name)); ?>');
 		
 			//text = jQuery('#exportajaxbox').text();
 			//subscribercount = '<?php echo count($subscribers); ?>';
@@ -115,7 +115,7 @@
 				if (completed == subscribercount) {
 					jQuery('#cancelexporting').hide();
 					warnMessage = null;
-					jQuery('#startexporting').html('<?php echo addslashes(__('Download CSV', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').removeAttr('disabled').removeAttr('onclick').attr("href", "<?php echo $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencode($exportfile), home_url()); ?>");
+					jQuery('#startexporting').html('<?php echo addslashes(__('Download CSV', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').prop('disabled', false).removeAttr('onclick').attr("href", "<?php echo $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencode($exportfile), home_url()); ?>");
 					jQuery('#exportmore').show();
 				} else {
 					exportsubscriber(subscribers[(requests + 1)]); 

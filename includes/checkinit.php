@@ -161,6 +161,9 @@ if (!class_exists('wpMailCheckinit')) {
 			add_shortcode($this -> pre . 'lagoon_rssurl', array($Shortcode, 'lagoon_rssurl'));
 			
 			/* Post Shortcodes */
+			
+			add_shortcode('newsletters_posts_loop_wrapper', array($Shortcode, 'posts_loop_wrapper'));
+			
 			$post_shortcodes = array('post_loop', 'category_heading', 'post_id', 'post_author', 'post_title', 'post_link', 'post_date_wrapper', 'post_date', 'post_thumbnail', 'post_excerpt', 'post_content');
 			foreach ($post_shortcodes as $post_shortcode) {
 				add_shortcode($post_shortcode, array($Shortcode, 'shortcode_posts'));

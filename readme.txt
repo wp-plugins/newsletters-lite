@@ -3,8 +3,8 @@ Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
-Tested up to: 4.2.2
-Stable tag: 4.5.4.2
+Tested up to: 4.2.3
+Stable tag: 4.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -148,6 +148,31 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.5 =
+
+* ADD: Remove width/height attributes on IMG tags before newsletter is rendered
+* ADD: [newsletters_bloginfo show=X] for blog name, description, url, etc.
+* ADD: New "default2", Bootstrap theme folder, beautiful! 
+* IMPROVE: Change jQuery attr() to prop() for disabled
+* IMPROVE: Improved usability of the styles/scripts panel for theme folders
+* IMPROVE: Anti Spam Filters (Precedence, List-Unsubscribe)
+* IMPROVE: Improvements to queue table locking and select
+* IMPROVE: Change "Stop" button to "Pause" for Ajax procedures
+* IMPROVE: Limit/restrict alerts/notices to just the sections of the Newsletter plugin in admin
+* IMPROVE: CSS selector/scope for "default2" bootstrap theme to prevent conflicts
+* IMPROVE: Remove some flush() calls in unnecessary places 
+* BUG: Default styles/scripts not loading with new installation
+* BUG: Duplicate history/draft emails when creating newsletter
+* BUG: Posts shortcode title permalink broken/incorrect
+* BUG: From name/address change on newsletter not effective
+* BUG: Importing subscribers CSV issues
+* BUG: Attachments don't send with preview
+* BUG: jQuery cookie called in default theme folder
+* BUG: WPML/qTranslate filter on Multiple Posts Shortcode
+* BUG: Sending preview doesn't load newsletter content/settings again
+* BUG: New content areas not loading after sending preview
+* BUG: Ajax Subscribers Import 
 
 = 4.5.4.2 =
 * IMPROVE: Change back to "default", too many CSS conflicts

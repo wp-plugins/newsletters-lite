@@ -241,22 +241,54 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		if ($posts = get_posts($arguments)) {	
 			$shortcode_post_showdate = $showdate;
 			
-			if ($this -> language_do()) {
+			if ($this -> language_do()) {				
 				$shortcode_post_language = $currentlanguage;			
-				foreach ($posts as $pkey => $post) {
+				foreach ($posts as $pkey => $post) {										
 					$posts[$pkey] = $this -> language_use($currentlanguage, $post, false);
 				}
 				
 				$shortcode_posts = $posts;
-				$output = do_shortcode($this -> et_message('posts', false, $language));
+				//$output = do_shortcode($this -> et_message('posts', false, $language));
+				$output = do_shortcode('[newsletters_posts_loop_wrapper]');
 			} else {
 				$shortcode_posts = $posts;
-				$output = do_shortcode($this -> et_message('posts'));
+				//$output = do_shortcode($this -> et_message('posts'));
+				$output = do_shortcode('[newsletters_posts_loop_wrapper]');
 			}
 		}
 		
 		wp_reset_query();
 		return $output;
+	}
+	
+	function posts_loop_wrapper($atts = array(), $content = null, $tag = null) {
+		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_categories, $shortcode_category, $shortcode_categories_done, 
+		$shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate, $shortcode_thumbnail;
+		
+		$return = "";
+		
+		if (!empty($shortcode_categories)) {	
+			$shortcode_post_row = 1;			
+			foreach ($shortcode_categories as $category) {
+				$shortcode_category = $category['category'];
+				$shortcode_posts = $category['posts'];
+				
+				foreach ($shortcode_posts as $post) {					
+					$shortcode_post = $post;					
+					$return .= do_shortcode($this -> et_message('posts', false, $shortcode_post_language));
+					$shortcode_post_row++;
+				}
+			}
+		} elseif (!empty($shortcode_posts)) {
+			$shortcode_post_row = 1;				
+			foreach ($shortcode_posts as $post) {				
+				$shortcode_post = $post;				
+				$return .= do_shortcode($this -> et_message('posts', false, $shortcode_post_language));
+				$shortcode_post_row++;
+			}
+		}
+		
+		return $return;
 	}
 	
 	function shortcode_posts($atts = array(), $content = null, $tag = null) {
@@ -284,7 +316,10 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 				return $category_heading;
 				break;
 			case 'post_loop'				:
-			case 'newsletters_post_loop'	:			
+			case 'newsletters_post_loop'	:	
+			
+				return do_shortcode($content);
+								
 				if (!empty($shortcode_categories)) {	
 					$shortcode_post_row = 1;			
 					foreach ($shortcode_categories as $category) {

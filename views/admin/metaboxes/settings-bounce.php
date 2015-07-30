@@ -150,12 +150,12 @@ function testbouncesettings() {
 	var pop_port = jQuery('#bouncepop_port').val();
 	var formvalues = {host:pop_host, user:pop_user, pass:pop_pass, port:pop_port};
 	jQuery('#testbouncesettingsloading').show();
-	jQuery('#testbouncesettings').attr('disabled', "disabled");
+	jQuery('#testbouncesettings').prop('disabled', true);
 	
 	jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>testbouncesettings', formvalues, function(response) {
 		jQuery.colorbox({html:response});
 		jQuery('#testbouncesettingsloading').hide();
-		jQuery('#testbouncesettings').removeAttr('disabled');
+		jQuery('#testbouncesettings').prop('disabled', false);
 	});
 }
 </script>

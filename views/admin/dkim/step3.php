@@ -10,7 +10,7 @@
 	<textarea onmouseup="jQuery(this).unbind('mouseup'); return false;" onfocus="jQuery(this).select();" style="white-space:nowrap;" class="code" rows="2" cols="60"><?php echo esc_attr(stripslashes("check-auth@verifier.port25.com")); ?></textarea>
 
 	<span style="display:none;">	
-		<form action="" onsubmit="jQuery('#dkimbutton').attr('disabled', 'disabled'); jQuery('#dkimloading').show(); dkimwizard(jQuery(this).serialize()); return false;" id="dkimform3">
+		<form action="" onsubmit="jQuery('#dkimbutton').prop('disabled', true); jQuery('#dkimloading').show(); dkimwizard(jQuery(this).serialize()); return false;" id="dkimform3">
 			<input type="hidden" name="domain" value="<?php echo stripslashes($domain); ?>" />
 			<input type="hidden" name="selector" value="<?php echo stripslashes($selector); ?>" />
 			<input type="hidden" name="public" value="<?php echo stripslashes($public); ?>" />

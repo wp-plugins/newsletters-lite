@@ -295,7 +295,7 @@ jQuery(document).ready(function() {
 });
 
 function latestposts_save() {
-	jQuery('#latestposts_save_button').attr('disabled', "disabled");
+	jQuery('#latestposts_save_button').prop('disabled', true);
 	jQuery('#latestposts_loading').show();
 	var formdata = jQuery('#latestposts_form').serialize();
 	jQuery.post(wpmlajaxurl + '?action=newsletters_latestposts_save', formdata, function(response) {

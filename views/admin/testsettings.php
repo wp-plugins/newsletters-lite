@@ -48,12 +48,12 @@
 		function wpml_testsettings(form) {			
 			var formvalues = jQuery('#testsettingsform').serialize();
 			jQuery('#wpml_testsettings_loading').show();
-			jQuery('#testsettingsbutton').attr('disabled', "disabled");
+			jQuery('#testsettingsbutton').prop('disabled', true);
 			
 			jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>testsettings', formvalues, function(response) {
 				jQuery('#testsettingswrapper').html(response);
 				jQuery('#wpml_testsettings_loading').hide();
-				jQuery('#testsettingsbutton').removeAttr('disabled');
+				jQuery('#testsettingsbutton').prop('disabled', false);
 				jQuery.colorbox.resize();
 			});
 		}

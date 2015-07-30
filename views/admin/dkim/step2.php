@@ -20,7 +20,7 @@
 		<?php echo sprintf(__('Once you have added the DNS entry, %s to check the status of the DNS to ensure it is working.', $this -> plugin_name), '<a href="http://www.dnswatch.info/dns/dnslookup?la=en&host=' . $selector . '._domainkey.' . $domain . '&type=TXT&submit=Resolve" target="_blank">' . __('click here', $this -> plugin_name) . '</a>'); ?>
 	</p>
 	
-	<form action="" onsubmit="jQuery('#dkimbutton').attr('disabled', 'disabled'); jQuery('#dkimloading').show(); dkimwizard(jQuery(this).serialize()); return false;" id="dkimform2">
+	<form action="" onsubmit="jQuery('#dkimbutton').prop('disabled', true); jQuery('#dkimloading').show(); dkimwizard(jQuery(this).serialize()); return false;" id="dkimform2">
 		<input type="hidden" name="domain" value="<?php echo stripslashes($domain); ?>" />
 		<input type="hidden" name="selector" value="<?php echo stripslashes($selector); ?>" />
 		<input type="hidden" name="public" value="<?php echo stripslashes($public); ?>" />

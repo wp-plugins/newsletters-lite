@@ -10,7 +10,7 @@ $previewemail = (empty($_POST['previewemail'])) ? $this -> get_option('adminemai
 	<div id="minor-publishing">
 		<div id="minor-publishing-actions">
 			<div id="save-action">
-				<input id="save-post" type="submit" name="draft" value="<?php _e('Save Draft', $this -> plugin_name); ?>" class="button button-highlighted" />
+				<input id="savedraftbutton" style="float:left;" type="submit" name="draft" value="<?php _e('Save Draft', $this -> plugin_name); ?>" class="button button-highlighted" />
 			</div>
 			<div id="preview-action">
 				<input type="button" name="previewemail_button" id="previewemail_button" class="button" value="<?php echo apply_filters('newsletters_admin_createnewsletter_sendpreview_text', __('Send Preview', $this -> plugin_name)); ?>" />

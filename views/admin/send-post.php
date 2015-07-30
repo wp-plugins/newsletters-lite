@@ -110,7 +110,7 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 			
 			settexts();
 			
-			jQuery('#startsending').removeAttr('disabled').html(startsendingtext);
+			jQuery('#startsending').prop('disabled', false).html(startsendingtext);
 			cancensend = "N";
 		});
 		
@@ -191,8 +191,8 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 		
 		function cancelsending() {
 			cancelsend = "Y";
-			jQuery('#cancelbutton').attr("value", "<i class=\"fa fa-times\"></i> <?php echo addslashes(__('Cancelled', $this -> plugin_name)); ?>").attr('disabled', 'disabled');
-			jQuery('#startsending').removeAttr('disabled').attr('onclick', 'resumesending(); return false;').html(resumesendingtext);
+			jQuery('#cancelbutton').attr("value", "<i class=\"fa fa-times\"></i> <?php echo addslashes(__('Cancelled', $this -> plugin_name)); ?>").prop('disabled', true);
+			jQuery('#startsending').prop('disabled', false).attr('onclick', 'resumesending(); return false;').html(resumesendingtext);
 			
 			for (var f in requestArray) {
 				requestArray[f].abort();
@@ -203,8 +203,8 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 		
 		function resumesending() {
 			cancelsend = "N";
-			jQuery('#startsending').attr('disabled', 'disabled').html(sendingnowtext);
-			jQuery('#cancelbutton').removeAttr('disabled');
+			jQuery('#startsending').prop('disabled', true).html(sendingnowtext);
+			jQuery('#cancelbutton').prop('disabled', false);
 			
 			var newsendingnumber = (startsendingnumber - completed);
 			requests = (completed - 1);
@@ -222,8 +222,8 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 		
 		function startsending() {
 			jQuery('#queuecheckboxspan').hide();
-			jQuery('#startsending').attr('disabled', 'disabled');
-			jQuery('#cancelbutton').removeAttr('disabled').show();
+			jQuery('#startsending').prop('disabled', true);
+			jQuery('#cancelbutton').prop('disabled', false).show();
 			jQuery('#startsending').html(sendingnowtext);
 			cancelsend = "N";
 			subscribercount = allsubscribers.length;
@@ -490,9 +490,9 @@ $downloadurl = $Html -> retainquery('wpmlmethod=exportdownload&file=' . urlencod
 			warnMessage = false;
 			
 			if (sendtype == "send") {
-				jQuery('#startsending').html('<?php echo addslashes(__('Continue to History', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').removeAttr('disabled').removeAttr('onclick').attr("href", "?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history_id; ?>");
+				jQuery('#startsending').html('<?php echo addslashes(__('Continue to History', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').prop('disabled', false).removeAttr('onclick').attr("href", "?page=<?php echo $this -> sections -> history; ?>&method=view&id=<?php echo $history_id; ?>");
 			} else {
-				jQuery('#startsending').html('<?php echo addslashes(__('Continue to Queue', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').removeAttr('disabled').removeAttr('onclick').attr("href", "?page=<?php echo $this -> sections -> queue; ?>");
+				jQuery('#startsending').html('<?php echo addslashes(__('Continue to Queue', $this -> plugin_name)); ?> <i class="fa fa-arrow-right"></i>').prop('disabled', false).removeAttr('onclick').attr("href", "?page=<?php echo $this -> sections -> queue; ?>");
 			}
 				
 			jQuery('#sendprogressbar').progressbar("option", "disabled", true);

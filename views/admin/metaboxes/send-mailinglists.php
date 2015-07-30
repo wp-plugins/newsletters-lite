@@ -347,12 +347,13 @@ function update_subscribers() {
 	srequest = jQuery.post(ajaxurl, data, function(response) {
 		if (response == "0") {
 			jQuery('#sendbutton').attr('disabled', "disabled");
+			jQuery('#savedraftbutton').prop('disabled', true);
 			jQuery('#subscriberscount').html('<?php echo addslashes(__('No subscribers available.', $this -> plugin_name)); ?>');
 		} else {
 			delete data.action;
-			//newresponse = '<p><a href="" onclick="jQuery.colorbox({href:\'' + ajaxurl + '?action=subscribercountdisplay&' + jQuery.param(data) + '\'}); return false;">' + response + '</a></p>';
 			newresponse = '<p>' + response + '</p>';
 			jQuery('#sendbutton').removeAttr('disabled');
+			jQuery('#savedraftbutton').prop('disabled', false);
 			jQuery('#subscriberscount').html(newresponse);
 			jQuery('#updatesubscriberscountbutton').removeAttr('disabled');
 		}
