@@ -3496,7 +3496,7 @@ if (!class_exists('wpMail')) {
 										}
 									}
 																
-									$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $History -> insertid, 'message', 4);
+									$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $history_id, 'message', 4);
 								} else {
 									$this -> render_error(5);
 								}
@@ -3552,10 +3552,9 @@ if (!class_exists('wpMail')) {
 								}
 								
 								$History -> save($history_data, false);
+								$history_id = $History -> insertid;
 								
-								if (!empty($_POST['contentarea'])) {
-									$history_id = $History -> insertid;
-									
+								if (!empty($_POST['contentarea'])) {									
 									foreach ($_POST['contentarea'] as $number => $content) {
 										$content_data = array(
 											'number'			=>	$number,
