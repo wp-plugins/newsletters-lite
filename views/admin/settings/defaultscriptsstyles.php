@@ -1,5 +1,9 @@
 <?php include($this -> plugin_base() . DS . 'includes' . DS . 'variables.php'); ?>
 
+<?php if (!empty($successmessage)) : ?>
+	<?php $this -> render('message', array('message' => $successmessage), true, 'admin'); ?>
+<?php endif; ?>
+
 <h4><?php _e('Load Default Styles', $this -> plugin_name); ?></h4>
 <p class="howto"><?php _e('Turn On/Off the loading of default styles in the plugin.', $this -> plugin_name); ?></p>
 

@@ -5,6 +5,8 @@ if (!class_exists('newslettersBootstrap')) {
 		
 		function default_styles($defaultstyles = array()) {
 			
+			$defaultstyles = array();
+			
 			$defaultstyles['bootstrap'] = array(
 				'name'					=>	"Bootstrap",
 				//'url'					=>	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css',
@@ -58,6 +60,8 @@ if (!class_exists('newslettersBootstrap')) {
 		}
 		
 		function default_scripts($defaultscripts = array()) {
+			
+			$defaultscripts = array();
 			
 			$defaultscripts['bootstrap'] = array(
 				'name'					=>	"Bootstrap",

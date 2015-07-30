@@ -171,6 +171,7 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Ajax */
 			if (is_admin()) {
+				add_action('wp_ajax_newsletters_change_themefolder', array($this, 'ajax_change_themefolder'));
 				add_action('wp_ajax_newsletters_delete_option', array($this, 'ajax_delete_option'));
 				add_action('wp_ajax_newsletters_pause_queue', array($this, 'ajax_pause_queue'));
 				add_action('wp_ajax_newsletters_autocomplete_histories', array($this, 'ajax_autocomplete_histories'));

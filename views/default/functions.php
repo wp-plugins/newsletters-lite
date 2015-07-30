@@ -5,6 +5,8 @@ if (!class_exists('newslettersDefault')) {
 		
 		function default_styles($defaultstyles = array()) {
 			
+			$defaultstyles = array();
+			
 			$defaultstyles['newsletters'] = array(
 				'name'					=>	"Theme Folder style.css",
 				'url'					=>	$this -> render_url('css/style.css', 'default', false),
@@ -48,7 +50,10 @@ if (!class_exists('newslettersDefault')) {
 			return $defaultstyles;
 		}
 		
-		function default_scripts($defaultscripts = array()) {			
+		function default_scripts($defaultscripts = array()) {		
+			
+			$defaultscripts = array();
+				
 			$defaultscripts['jquery-ui-tabs'] = array(
 				'name'					=>	__('jQuery UI Tabs', $this -> plugin_name),
 				'url'					=>	false,

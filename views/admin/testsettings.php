@@ -43,19 +43,6 @@
 	    <script type="text/javascript">   
 		jQuery(document).ready(function() {
 			setTimeout(function() { jQuery('#testemail').focus(); }, 500);
-			
-			CKEDITOR.config.toolbar_Basic = [
-			    ['Source', '-', 'Bold', 'Italic']
-			];
-			// Load toolbar_Name where Name = Basic.
-			CKEDITOR.config.toolbar = 'Basic';
-			
-			jQuery('textarea#message').ckeditor({
-            	fullPage: true,
-				allowedContent: true,
-				height: 200,
-				entities: false
-        	});
 		});
 		     
 		function wpml_testsettings(form) {			

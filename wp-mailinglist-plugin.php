@@ -1018,6 +1018,25 @@ if (!class_exists('wpMailPlugin')) {
 			die();
 		}
 		
+		function ajax_change_themefolder() {
+			
+			define('DOING_AJAX', true);
+			define('SHORTINIT', true);
+			
+			$message = false;
+			if (!empty($_POST['themefolder'])) {
+				$this -> update_option('theme_folder', $_POST['themefolder']);
+				$this -> delete_all_cache('all');
+				$this -> theme_folder_functions($_POST['themefolder']);
+				$message = __('Theme folder has been changed, please reconfigure styles/scripts below', $this -> plugin_name);
+			}
+			
+			$this -> render('settings' . DS . 'defaultscriptsstyles', array('successmessage' => $message), true, 'admin');
+			
+			exit();
+			die();
+		}
+		
 		function ajax_delete_option() {
 			
 			define('DOING_AJAX', true);
@@ -7920,24 +7939,22 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function theme_folder_functions() {
-			//if (!is_admin() || defined('DOING_AJAX')) {
-				if ($theme_folder = $this -> active_theme_folder()) {
-					$functions_path = $theme_folder . 'functions.php';
+			if ($theme_folder = $this -> active_theme_folder()) {
+				$functions_path = $theme_folder . 'functions.php';
+				
+				$theme_folder_option = $this -> get_option('theme_folder');
+				$functions_path_original = $this -> plugin_base() . DS . 'views' . DS . $theme_folder_option . DS . 'functions.php';
+				
+				if (file_exists($functions_path)) {
+					require_once($functions_path);
 					
-					$theme_folder_option = $this -> get_option('theme_folder');
-					$functions_path_original = $this -> plugin_base() . DS . 'views' . DS . $theme_folder_option . DS . 'functions.php';
+					return true;
+				} elseif (file_exists($functions_path_original)) {
+					require_once($functions_path_original);
 					
-					if (file_exists($functions_path)) {
-						require_once($functions_path);
-						
-						return true;
-					} elseif (file_exists($functions_path_original)) {
-						require_once($functions_path_original);
-						
-						return true;
-					}
+					return true;
 				}
-			//}
+			}
 			
 			return false;
 		}

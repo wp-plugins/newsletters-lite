@@ -249,7 +249,7 @@ function testsettings() {
 	var formvalues = jQuery('#settings-form').serialize();
 	
 	jQuery.post(wpmlajaxurl + '?action=<?php echo $this -> pre; ?>testsettings&init=1', formvalues, function(response) {
-		jQuery.colorbox({html:response});
+		jQuery.colorbox({html:response}).resize();
 		jQuery('#testsettingsloading').hide();
 		jQuery('#testsettings').removeAttr('disabled');
 	});

@@ -6,11 +6,12 @@
         	<th><label for="theme_folder"><?php _e('Select Theme Folder', $this -> plugin_name); ?></label></th>
             <td>
             	<?php if ($themefolders = $this -> get_themefolders()) : ?>
-                	<select onchange="if (!confirm('<?php _e('The settings will now be saved and the page will reload. Please reconfigure both styles and scripts once the page reloaded.', $this -> plugin_name); ?>')) { return false; } jQuery('#settings-form').submit();" name="theme_folder" id="theme_folder">
+                	<select onchange="newsletters_change_themefolder(this.value);" name="theme_folder" id="theme_folder">
                     	<?php foreach ($themefolders as $themefolder) : ?>
                         	<option <?php echo ($this -> get_option('theme_folder') == $themefolder) ? 'selected="selected"' : ''; ?> name="<?php echo $themefolder; ?>"><?php echo $themefolder; ?></option>
                         <?php endforeach; ?>
                     </select>
+                    <span id="change_themefolder_loading" style="display:none;"><i class="fa fa-spin fa-fw fa-refresh"></i></span>
                     <span class="howto"><?php echo sprintf(__('Select the folder inside "%s" to render template files from. eg. "default"', $this -> plugin_name), $this -> plugin_name . '/views/'); ?></span>
                 <?php else : ?>
                 	<p class="newsletters_error"><?php _e('No theme folders could be found inside the "' . $this -> plugin_name . '/views/" folder.', $this -> plugin_name); ?>
@@ -29,6 +30,27 @@
 	        </tr>
 	</tbody>
 </table>
+
+<script type="text/javascript">
+	var newsletters_change_themefolder = function(themefolder) {
+		if (typeof themefolder != 'undefined') {
+			jQuery('#change_themefolder_loading').show();
+			jQuery('#defaultscriptsstyles').slideUp();
+			
+			jQuery.ajax({
+				url: newsletters_ajaxurl + '?action=newsletters_change_themefolder',
+				method: "POST",
+				data: {themefolder:themefolder}
+			}).done(function(response) {
+				jQuery('#defaultscriptsstyles').html(response).slideDown();
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				alert('<?php _e('Ajax call failed: ' + errorThrown, $this -> plugin_name); ?>');
+			}).always(function() {
+				jQuery('#change_themefolder_loading').hide();
+			});
+		}
+	}
+</script>
 
 <!-- Default Scripts & Styles -->
 <div id="defaultscriptsstyles">
