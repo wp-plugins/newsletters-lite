@@ -6821,7 +6821,7 @@ if (!class_exists('wpMailPlugin')) {
 					$version = '4.4.6.1';
 				}
 				
-				if (version_compare($cur_version, "4.5.5") < 0) {
+				if (version_compare($cur_version, "4.5.4.2") < 0) {
 					global $wpdb;
 					$this -> update_options();
 					
@@ -6851,8 +6851,13 @@ if (!class_exists('wpMailPlugin')) {
 					
 					if (!empty($stylesdone) && !empty($scriptsdone)) {
 						// all done, update the version
-						$version = '4.5.5';	
+						$version = '4.5.4.2';	
 					}
+				}
+				
+				if (version_compare($cur_version, "4.5.5") < 0) { 
+					$this -> update_options();
+					$version = '4.5.5';
 				}
 			
 				//the current version is older.
