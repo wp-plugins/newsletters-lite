@@ -1849,7 +1849,7 @@ if (!class_exists('wpMailPlugin')) {
 		    define('DOING_AJAX', true);
 	    	define('SHORTINIT', true);
 	    	
-	    	$history_id = $this -> ajax_previewrunner(true);
+	    	//$history_id = $this -> ajax_previewrunner(true);
 		    
 	    	global $Db, $History, $Html, $Subscriber, $newsletters_presend, $newsletters_emailraw;
 	    	$newsletters_presend = true;
@@ -2297,7 +2297,8 @@ if (!class_exists('wpMailPlugin')) {
 				$query = "SELECT DISTINCT " . $wpdb -> prefix . $Subscriber -> table . ".id FROM " . $wpdb -> prefix . "" . $SubscribersList -> table . " LEFT JOIN 
 				" . $wpdb -> prefix . "" . $Subscriber -> table . " ON 
 				" . $wpdb -> prefix . "" . $SubscribersList -> table . ".subscriber_id = " . $wpdb -> prefix . "" . $Subscriber -> table . ".id LEFT JOIN 
-				" . $wpdb -> prefix . $Mailinglist -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".list_id = " . $wpdb -> prefix . $Mailinglist -> table . ".id WHERE (";
+				" . $wpdb -> prefix . $Mailinglist -> table . " ON " . $wpdb -> prefix . $SubscribersList -> table . ".list_id = " . $wpdb -> prefix . $Mailinglist -> table . ".id LEFT JOIN 
+				" . $wpdb -> prefix . $this -> SubscribersOption -> table . " ON " . $wpdb -> prefix . $Subscriber -> table . ".id = " . $wpdb -> prefix . $this -> SubscribersOption -> table . ".subscriber_id WHERE (";
 				
 				$m = 1;
 				foreach ($_POST['mailinglists'] as $mailinglist_id) {
@@ -2316,9 +2317,12 @@ if (!class_exists('wpMailPlugin')) {
 				
 				if (!empty($_POST['fields'])) {	
 					$query .= " AND (";			
-					$supportedfields = array('text', 'radio', 'select', 'pre_country', 'pre_gender');
+					$supportedfields = array('text', 'radio', 'checkbox', 'select', 'pre_country', 'pre_gender');
 					$scopeall = (empty($_POST['fieldsconditionsscope']) || $_POST['fieldsconditionsscope'] == "all") ? true : false;
 					$f = 1;
+					
+					$checkboxjoinquery = "";
+					
 					foreach ($_POST['fields'] as $fkey => $field) {					
 						if (!empty($field[0]) && $field[1] != "") {
 							if (preg_match("/\d+/si", $field[0], $matches)) {
@@ -2326,28 +2330,54 @@ if (!class_exists('wpMailPlugin')) {
 								
 								$Db -> model = $Field -> model;
 								if ($customfield = $Db -> find(array('id' => $field_id), array('id', 'slug', 'type'))) {	
-									$condition = $_POST['condquery'][$customfield -> slug];
-															
-									if (in_array($customfield -> type, $supportedfields)) {									
-										switch ($condition) {
-											case 'smaller'			:
-												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " < " . $field[1] . "";
-												break;
-											case 'larger'			:
-												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " > " . $field[1] . "";
-												break;
-											case 'contains'			:
-												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " LIKE '%" . $field[1] . "%'";
-												break;
-											case 'equals'			:
-											default  				:
-												$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " = '" . $field[1] . "'";
-												break;
-										}
-										
-										if ($f < count($_POST['fields'])) {
-											$query .= ($scopeall) ? " AND" : " OR";
-										}
+									
+									switch ($customfield -> type) {
+										case 'checkbox'						:
+											
+											//$query .= " 1 = 1";
+											
+											
+											
+											$condition = $_POST['condquery'][$customfield -> slug];
+											switch ($condition) {
+												case 'contains'				:
+												
+													break;
+												case 'equals'				:
+													$query .= " wp_wpmlsubscribers.id IN (SELECT subscriber_id FROM " . $wpdb -> prefix . $this -> SubscribersOption -> table . " WHERE `field_id` = '" . $field_id . "' AND `option_id` = '" . $field[1] . "')";
+													break;
+											}
+											
+											if ($f < count($_POST['fields'])) {
+												$query .= ($scopeall) ? " AND" : " OR";
+											}
+											
+											break;
+										default 							:
+											$condition = $_POST['condquery'][$customfield -> slug];
+																	
+											if (in_array($customfield -> type, $supportedfields)) {									
+												switch ($condition) {
+													case 'smaller'			:
+														$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " < " . $field[1] . "";
+														break;
+													case 'larger'			:
+														$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " > " . $field[1] . "";
+														break;
+													case 'contains'			:
+														$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " LIKE '%" . $field[1] . "%'";
+														break;
+													case 'equals'			:
+													default  				:
+														$query .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $customfield -> slug . " = '" . $field[1] . "'";
+														break;
+												}
+												
+												if ($f < count($_POST['fields'])) {
+													$query .= ($scopeall) ? " AND" : " OR";
+												}
+											}	
+											break;
 									}
 								}
 							}
@@ -5990,6 +6020,9 @@ if (!class_exists('wpMailPlugin')) {
 					} elseif (!empty($user)) {
 						$to = $user -> user_email;
 					}
+					
+					$phpmailer -> AddCustomHeader('Precedence', "bulk");
+					$phpmailer -> AddCustomHeader('List-Unsubscribe', $this -> gen_unsubscribe_link($subscriber, $user, $theme_id, $history_id, false, true));
 					
 					$phpmailer -> AddAddress($to);
 					$phpmailer -> AddReplyTo($smtpfrom, $smtpfromname);

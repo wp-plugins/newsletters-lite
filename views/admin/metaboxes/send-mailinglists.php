@@ -80,8 +80,12 @@ $count_users = count_users();
 	        </div>
 	    <?php endif; ?>
 	    <?php if (apply_filters('newsletters_admin_createnewsletter_fieldsconditionssettings', true)) : ?>
-	        <?php $Db -> model = $Field -> model; ?>
-	        <?php $fieldsquery = "SELECT `id`, `title`, `type`, `validation`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `type` = 'text' OR `type` = 'radio' OR `type` = 'select' OR `type` = 'pre_country' OR `type` = 'pre_gender' ORDER BY `order` ASC"; ?>
+	        <?php 
+		        
+		    $Db -> model = $Field -> model;
+		    $fieldsquery = "SELECT `id`, `title`, `type`, `validation`, `slug`, `fieldoptions` FROM `" . $wpdb -> prefix . $Field -> table . "` WHERE `type` = 'text' OR `type` = 'radio' OR `type` = 'checkbox' OR `type` = 'select' OR `type` = 'pre_country' OR `type` = 'pre_gender' ORDER BY `order` ASC"; 
+		    
+		    ?>
 	        <?php
 	        
 	        $query_hash = md5($fieldsquery);
@@ -94,6 +98,15 @@ $count_users = count_users();
 	        
 	        ?>
 	        <?php if (!empty($fields)) : ?>
+	        
+	        	<?php
+		        	
+		        foreach ($fields as $fkey => $field) {
+			        $fields[$fkey] = $this -> init_class($Field -> model, $field);
+		        }	
+		        	
+		        ?>
+	        
 	        	<div class="misc-pub-section">
 	                <h4><label><input <?php echo (!empty($_POST['dofieldsconditions']) && !empty($_POST['conditions'])) ? 'checked="checked"' : ''; ?> type="checkbox" name="dofieldsconditions" value="1" id="dofieldsconditions" onclick="update_subscribers(); if (this.checked == true) { jQuery('#fieldsconditions').show(); } else { jQuery('#fieldsconditions').hide(); }" /> <?php _e('Fields Conditions', $this -> plugin_name); ?></label>
 	                <?php echo $Html -> help(__('The fields conditions work on the custom fields of your subscribers. You can filter or segment the subscribers in the chosen mailing list(s) to queue/send to subscribers with specific custom field values only. For example, with a "Gender" custom field, you can choose "Male" here under fields conditions to send only to male subscribers.', $this -> plugin_name)); ?></h4>
@@ -108,106 +121,120 @@ $count_users = count_users();
 		                	<?php _e('of these conditions:', $this -> plugin_name); ?>
 		                </p>
 	                
-						<?php foreach ($fields as $field) : ?>
-	                    	<?php $supportedfields = array('text', 'radio', 'select', 'pre_country', 'pre_gender'); ?>
-	                    	<?php if (!empty($field -> type) && in_array($field -> type, $supportedfields)) : ?>
-	                            <p>
-	                                <label for="fields_<?php echo $field -> id; ?>" style="font-weight:normal;"><?php echo __($field -> title); ?></label><br/>
-	                                
-	                                <small>
-	                                <?php
-	                                
-	                                $condquery = false;
-	                                if (!empty($_POST['condquery'][$field -> slug])) {
-	                                	$condquery = $_POST['condquery'][$field -> slug];
-									}
-	                                
-	                                switch ($field -> validation) {
-	                                	case 'numeric'					:
-	                                		?>
-	                                		<label><input onclick="update_subscribers();" <?php echo (!empty($condquery) && $condquery == "smaller") ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="smaller" id="condquery_<?php echo $field -> slug; ?>_smaller" /> <?php _e('Smaller', $this -> plugin_name); ?></label>
-	                                		<label><input onclick="update_subscribers();" <?php echo (!empty($condquery) && $condquery == "larger") ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="larger" id="condquery_<?php echo $field -> slug; ?>_larger" /> <?php _e('Larger', $this -> plugin_name); ?></label>
-	                                		<?php
-		                                case 'notempty'					:
-		                                default							:
-		                                	?>
-	                                		<label><input onclick="update_subscribers();" <?php echo (empty($condquery) || (!empty($condquery) && $condquery == "equals")) ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="equals" id="condquery_<?php echo $field -> slug; ?>_equals" /> <?php _e('Equals', $this -> plugin_name); ?></label>
-											<label><input onclick="update_subscribers();" <?php echo (!empty($condquery) && $condquery == "contains") ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="contains" id="condquery_<?php echo $field -> slug; ?>_contains" /> <?php _e('Contains', $this -> plugin_name); ?></label>
-		                                	<?php
-		                                	break;
-	                                }
-	                                
-	                                ?>
-	                                </small>	                                
-	                                
-	                                <?php
-	                                
-	                                switch ($field -> type) {
-	                                	case 'text'				:
-	                                		?>
-	                                		
-	                                		<input onkeyup="update_subscribers();" type="text" name="fields[<?php echo $field -> slug; ?>]" value="<?php echo esc_attr(stripslashes($_POST['fields'][$field -> slug])); ?>" id="fields_<?php echo $field -> id; ?>" />
-	                                		
-	                                		<?php
-	                                		break;
-										case 'radio'			:									
-											?>
-	                                        
-	                                        <?php if ($fieldoptions = unserialize($field -> fieldoptions)) : ?>
-	                                        	<?php $r = 1; ?>
-	                                            <label><input <?php echo (empty($_POST['fields'][$field -> slug])) ? 'checked="checked"' : ''; ?> type="radio" name="fields[<?php echo $field -> slug; ?>]" value="" onclick="update_subscribers();" id="fields_<?php echo $field -> id; ?>-0" /> <?php _e('ALL', $this -> plugin_name); ?></label><br/>
-	                                        	<?php foreach ($fieldoptions as $fieldoption_key => $fieldoption_val) : ?>
-	                                            	<label><input <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == $fieldoption_key) ? 'checked="checked"' : ''; ?> onclick="update_subscribers();" type="radio" name="fields[<?php echo $field -> slug; ?>]" value="<?php echo $fieldoption_key; ?>" id="fields_<?php echo $field -> id; ?>-<?php echo $r; ?>"  /> <?php echo __($fieldoption_val); ?></label><br/>
-	                                                <?php $r++; ?>
-	                                            <?php endforeach; ?>
-	                                        <?php endif; ?>
-	                                        
-	                                        <?php
-											break;
-	                                    case 'select'			:
-	                                        ?><select style="max-width:250px;" name="fields[<?php echo $field -> slug; ?>]" id="fields_<?php echo $field -> id; ?>" onchange="update_subscribers();">
-	                                        <option value=""><?php _e('- Select -', $this -> plugin_name); ?></option>
-	                                        <?php 
-	                                        
-	                                        $fieldoptions = @unserialize($field -> fieldoptions);
-	                                        foreach ($fieldoptions as $fieldoption_key => $fieldoption_val) {
-	                                            ?><option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == $fieldoption_key) ? 'selected="selected"' : ''; ?> value="<?php echo $fieldoption_key; ?>"><?php echo __($fieldoption_val); ?></option><?php	
-	                                        }
-	                                        
-	                                        ?>
-	                                        </select><?php
-	                                        break;
-										case 'pre_country'		:
-											?>
-	                                        
-	                                        <?php if ($countries = $wpmlCountry -> select()) : ?>
-	                                            <select style="max-width:250px;" name="fields[<?php echo $field -> slug; ?>]" id="fields_<?php echo $field -> id; ?>" onchange="update_subscribers();">
-	                                                <option value=""><?php _e('- Select Country -', $this -> plugin_name); ?></option>
-	                                                <?php foreach ($countries as $country_id => $country_name) : ?>
-	                                                	<option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == $country_id) ? 'selected="selected"' : ''; ?> value="<?php echo $country_id; ?>"><?php echo $country_name; ?></option>
-	                                                <?php endforeach; ?>
-	                                            </select>
-	                                        <?php endif; ?>
-	                                        
-	                                        <?php
-											break;
-										case 'pre_gender'		:
-											?>
-	                                        
-	                                        <select style="max-width:250px;" name="fields[<?php echo $field -> slug; ?>]" id="fields_<?php echo $field -> id; ?>" onchange="update_subscribers();">
-	                                        	<option value=""><?php _e('- Select Gender -', $this -> plugin_name); ?></option>
-	                                            <option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "male") ? 'selected="selected"' : ''; ?> value="male"><?php _e('Male', $this -> plugin_name); ?></option>
-	                                            <option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "female") ? 'selected="selected"' : ''; ?> value="female"><?php _e('Female', $this -> plugin_name); ?></option>
-	                                        </select>
-	                                        
-	                                        <?php
-											break;	
-	                                }
-	                                
-	                                ?>
-	                            </p>
-	                        <?php endif; ?>
-	                    <?php endforeach; ?>
+						<div id="fieldsconditionsfields">
+							<?php foreach ($fields as $field) : ?>
+		                    	<?php $supportedfields = array('text', 'radio', 'checkbox', 'select', 'pre_country', 'pre_gender'); ?>
+		                    	<?php if (!empty($field -> type) && in_array($field -> type, $supportedfields)) : ?>
+		                            <p>
+		                                <label for="fields_<?php echo $field -> id; ?>" style="font-weight:normal;"><?php echo __($field -> title); ?></label><br/>
+		                                
+		                                <small>
+		                                <?php
+		                                
+		                                $condquery = false;
+		                                if (!empty($_POST['condquery'][$field -> slug])) {
+		                                	$condquery = $_POST['condquery'][$field -> slug];
+										}
+		                                
+		                                switch ($field -> validation) {
+		                                	case 'numeric'					:
+		                                		?>
+		                                		<label><input onclick="update_subscribers();" <?php echo (!empty($condquery) && $condquery == "smaller") ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="smaller" id="condquery_<?php echo $field -> slug; ?>_smaller" /> <?php _e('Smaller', $this -> plugin_name); ?></label>
+		                                		<label><input onclick="update_subscribers();" <?php echo (!empty($condquery) && $condquery == "larger") ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="larger" id="condquery_<?php echo $field -> slug; ?>_larger" /> <?php _e('Larger', $this -> plugin_name); ?></label>
+		                                		<?php
+			                                case 'notempty'					:
+			                                default							:
+			                                	?>
+		                                		<label><input onclick="update_subscribers();" <?php echo (empty($condquery) || (!empty($condquery) && $condquery == "equals")) ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="equals" id="condquery_<?php echo $field -> slug; ?>_equals" /> <?php _e('Equals', $this -> plugin_name); ?></label>
+												<label><input onclick="update_subscribers();" <?php echo (!empty($condquery) && $condquery == "contains") ? 'checked="checked"' : ''; ?> type="radio" name="condquery[<?php echo $field -> slug; ?>]" value="contains" id="condquery_<?php echo $field -> slug; ?>_contains" /> <?php _e('Contains', $this -> plugin_name); ?></label>
+			                                	<?php
+			                                	break;
+		                                }
+		                                
+		                                ?>
+		                                </small>	                                
+		                                
+		                                <?php
+		                                
+		                                switch ($field -> type) {
+		                                	case 'text'				:
+		                                		?>
+		                                		
+		                                		<input onkeyup="update_subscribers();" type="text" name="fields[<?php echo $field -> slug; ?>]" value="<?php echo esc_attr(stripslashes($_POST['fields'][$field -> slug])); ?>" id="fields_<?php echo $field -> id; ?>" />
+		                                		
+		                                		<?php
+		                                		break;
+											case 'radio'			:									
+												?>
+		                                        
+		                                        <?php if ($fieldoptions = unserialize($field -> fieldoptions)) : ?>
+		                                        	<?php $r = 1; ?>
+		                                            <label><input <?php echo (empty($_POST['fields'][$field -> slug])) ? 'checked="checked"' : ''; ?> type="radio" name="fields[<?php echo $field -> slug; ?>]" value="" onclick="update_subscribers();" id="fields_<?php echo $field -> id; ?>-0" /> <?php _e('ALL', $this -> plugin_name); ?></label><br/>
+		                                        	<?php foreach ($fieldoptions as $fieldoption_key => $fieldoption_val) : ?>
+		                                            	<label><input <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == $fieldoption_key) ? 'checked="checked"' : ''; ?> onclick="update_subscribers();" type="radio" name="fields[<?php echo $field -> slug; ?>]" value="<?php echo $fieldoption_key; ?>" id="fields_<?php echo $field -> id; ?>-<?php echo $r; ?>"  /> <?php echo __($fieldoption_val); ?></label><br/>
+		                                                <?php $r++; ?>
+		                                            <?php endforeach; ?>
+		                                        <?php endif; ?>
+		                                        
+		                                        <?php
+												break;
+											case 'checkbox'			:
+												?>
+												<div>
+												<?php if (!empty($field -> newfieldoptions)) : ?>
+													<label style="font-weight:bold"><input type="checkbox" name="checkboxall<?php echo $field -> id; ?>" value="1" id="checkboxall<?php echo $field -> id; ?>" onclick="jqCheckAll(this, false, 'fields[<?php echo $field -> slug; ?>]');" /> <?php _e('Select all', $this -> plugin_name); ?></label><br/>
+													<?php foreach ($field -> newfieldoptions as $option_id => $option_value) : ?>
+														<label><input onclick="update_subscribers();" type="checkbox" name="fields[<?php echo $field -> slug; ?>][]" value="<?php echo $option_id; ?>" id="fields_<?php echo $field -> id; ?>" /> <?php _e($option_value); ?></label><br/>
+													<?php endforeach; ?>
+												<?php endif; ?>
+												</div>
+												<?php											
+												break;
+		                                    case 'select'			:
+		                                        ?><select style="max-width:250px;" name="fields[<?php echo $field -> slug; ?>]" id="fields_<?php echo $field -> id; ?>" onchange="update_subscribers();">
+		                                        <option value=""><?php _e('- Select -', $this -> plugin_name); ?></option>
+		                                        <?php 
+		                                        
+		                                        $fieldoptions = @unserialize($field -> fieldoptions);
+		                                        foreach ($fieldoptions as $fieldoption_key => $fieldoption_val) {
+		                                            ?><option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == $fieldoption_key) ? 'selected="selected"' : ''; ?> value="<?php echo $fieldoption_key; ?>"><?php echo __($fieldoption_val); ?></option><?php	
+		                                        }
+		                                        
+		                                        ?>
+		                                        </select><?php
+		                                        break;
+											case 'pre_country'		:
+												?>
+		                                        
+		                                        <?php if ($countries = $wpmlCountry -> select()) : ?>
+		                                            <select style="max-width:250px;" name="fields[<?php echo $field -> slug; ?>]" id="fields_<?php echo $field -> id; ?>" onchange="update_subscribers();">
+		                                                <option value=""><?php _e('- Select Country -', $this -> plugin_name); ?></option>
+		                                                <?php foreach ($countries as $country_id => $country_name) : ?>
+		                                                	<option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == $country_id) ? 'selected="selected"' : ''; ?> value="<?php echo $country_id; ?>"><?php echo $country_name; ?></option>
+		                                                <?php endforeach; ?>
+		                                            </select>
+		                                        <?php endif; ?>
+		                                        
+		                                        <?php
+												break;
+											case 'pre_gender'		:
+												?>
+		                                        
+		                                        <select style="max-width:250px;" name="fields[<?php echo $field -> slug; ?>]" id="fields_<?php echo $field -> id; ?>" onchange="update_subscribers();">
+		                                        	<option value=""><?php _e('- Select Gender -', $this -> plugin_name); ?></option>
+		                                            <option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "male") ? 'selected="selected"' : ''; ?> value="male"><?php _e('Male', $this -> plugin_name); ?></option>
+		                                            <option <?php echo (!empty($_POST['fields'][$field -> slug]) && $_POST['fields'][$field -> slug] == "female") ? 'selected="selected"' : ''; ?> value="female"><?php _e('Female', $this -> plugin_name); ?></option>
+		                                        </select>
+		                                        
+		                                        <?php
+												break;	
+		                                }
+		                                
+		                                ?>
+		                            </p>
+		                        <?php endif; ?>
+		                    <?php endforeach; ?>
+						</div>
 	                </div>
 	            </div>
 	        <?php endif; ?>
@@ -285,7 +312,9 @@ function update_subscribers() {
 		var fieldsarray = new Array();
 		var f = 0;
 		jQuery('[name^="fields"]').each(function() {
-			if (jQuery(this).attr('type') == "radio") {					
+			var type = jQuery(this).attr('type');
+			
+			if (type == "radio" || type == "checkbox") {					
 				if (jQuery(this).is(":checked")) {
 					if (jQuery(this).val() != "") {
 						fieldsarray[f] = new Array(jQuery(this).attr('id'), jQuery(this).val());	

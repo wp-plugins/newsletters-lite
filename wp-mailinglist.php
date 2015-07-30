@@ -223,6 +223,9 @@ if (!class_exists('wpMail')) {
 				$phpmailer -> MessageID = $this -> phpmailer_messageid();
 				$phpmailer -> SMTPKeepAlive = true;
 				
+				$phpmailer -> AddCustomHeader('Precedence', "bulk");
+				$phpmailer -> AddCustomHeader('List-Unsubscribe', $this -> get_managementpost(true));
+				
 				global $Subscriber, $newsletters_presend, $newsletters_emailraw;				
 				if (!empty($newsletters_presend) && $newsletters_presend == true) {	
 					$subscriber_id = $Subscriber -> admin_subscriber_id();
@@ -3482,9 +3485,9 @@ if (!class_exists('wpMail')) {
 								}
 								
 								if ($History -> save($history_data, false)) {
-									if (!empty($_POST['contentarea'])) {
-										$history_id = $History -> insertid;
-										
+									$history_id = $History -> insertid;
+									
+									if (!empty($_POST['contentarea'])) {										
 										foreach ($_POST['contentarea'] as $number => $content) {
 											$content_data = array(
 												'number'			=>	$number,
@@ -3496,7 +3499,8 @@ if (!class_exists('wpMail')) {
 										}
 									}
 																
-									$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $history_id, 'message', 4);
+									$redirect_url = admin_url('admin.php?page=' . $this -> sections -> send . '&method=history&id=' . $history_id, 'message');
+									$this -> redirect($redirect_url, 4);
 								} else {
 									$this -> render_error(5);
 								}
