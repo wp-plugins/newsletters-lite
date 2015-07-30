@@ -19,6 +19,7 @@ class wpmlSubscriber extends wpMailPlugin {
 	var $recursive = true;
 
 	var $error = array();
+	var $errors = array();
 	
 	var $table_fields = array(
 		'id'			=>	"INT(11) NOT NULL AUTO_INCREMENT",
@@ -987,9 +988,12 @@ class wpmlSubscriber extends wpMailPlugin {
 				$query = $query1 . $query2 . ");";
 			}
 			
-			if (empty($return_query) || $return_query == false) {				
-				if ($skipsubscriberupdate == true || $wpdb -> query($query)) {
-					
+			if (empty($return_query) || $return_query == false) {			
+				if (empty($skipsubscriberupdate)) {
+					$result = $wpdb -> query($query);
+				}
+												
+				if ($skipsubscriberupdate == true || ($result !== false && $result >= 0)) {					
 					if ($skipsubscriberupdate == true) {
 						$this -> insertid = $subscriber_id = $id;	
 					} else {

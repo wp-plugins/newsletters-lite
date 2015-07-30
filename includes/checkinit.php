@@ -42,7 +42,7 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_filter('attachment_fields_to_edit', 'attachment_fields_to_edit', null, 2);
 			
 			//Action hooks
-			$this -> add_action('register_form');
+			$this -> add_action('register_form', 'register_form', 999, 1);
 			$this -> add_action('admin_menu');
 			$this -> add_action('admin_menu', 'add_dashboard', 10, 1);
 			$this -> add_action('admin_head');

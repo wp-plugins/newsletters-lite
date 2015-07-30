@@ -81,14 +81,6 @@ if (!class_exists('newslettersDefault')) {
 				'footer'				=>	false,
 			);
 			
-			$defaultscripts['jquery-cookie'] = array(
-				'name'					=>	__('jQuery Cookie', $this -> plugin_name),
-				'url'					=>	$this -> render_url('js/jquery.cookie.js', 'admin', false),
-				'version'				=>	'1.4.1',
-				'deps'					=>	array('jquery'),
-				'footer'				=>	false,
-			);
-			
 			$defaultscripts['jquery-uploadify'] = array(
 				'name'					=>	__('Uploadify - File Uploader', $this -> plugin_name),
 				'url'					=>	$this -> render_url('js/jquery.uploadify.js', 'default', false),

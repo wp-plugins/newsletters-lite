@@ -1242,7 +1242,8 @@ if (!class_exists('wpMailPlugin')) {
 				$import_overwrite = $_REQUEST['import_overwrite'];
 				
 				
-				if ($current_id = $Subscriber -> email_exists($email) && $import_overwrite == "Y") {
+				//if ($current_id = $Subscriber -> email_exists($email) && $import_overwrite == "Y") {
+				if (true) {
 					$Db -> model = $Unsubscribe -> model;
 					if (empty($import_preventbu) || $import_preventbu == "N" || ($import_preventbu == "Y" && !$Db -> find(array('email' => $email)))) {
 						$Db -> model = $Bounce -> model;
@@ -1250,8 +1251,13 @@ if (!class_exists('wpMailPlugin')) {
 							if (!empty($subscriber)) {
 								$subscriber['fromregistration'] = true;
 								$subscriber['username'] = $email;
+								
+								$skipsubscriberupdate = false;
+								if (empty($import_overwrite) || $import_overwrite == "N") {
+									$skipsubscriberupdate = true;
+								}
 							
-								if ($Subscriber -> save($subscriber, true, false)) {
+								if ($Subscriber -> save($subscriber, true, false, $skipsubscriberupdate)) {
 									$subscriber_id = $Subscriber -> insertid;
 									$afterlists = $subscriber['afterlists'];
 								
@@ -3932,7 +3938,9 @@ if (!class_exists('wpMailPlugin')) {
 			
 				if (class_exists($name)) {
 					if ($class = new $name($params)) {	
-						$class -> plugin_name = $this -> plugin_name;
+						if (!empty($this -> plugin_name)) {
+							$class -> plugin_name = $this -> plugin_name;
+						}
 						return $class;
 					}
 				}
@@ -3954,7 +3962,8 @@ if (!class_exists('wpMailPlugin')) {
 						if (class_exists($classname)) {
 							global ${$this -> pre . $model};
 							${$this -> pre . $model} = new $classname();
-							$this -> {$model} = ${$this -> pre . $model};							
+							$this -> {$model} = ${$this -> pre . $model};
+							if (!empty($this -> plugin_name)) { $this -> {$model} -> plugin_name = $this -> plugin_name; }
 							$this -> {$model} -> fields = apply_filters('newsletters_db_table_fields_new', $this -> {$model} -> fields, $model);
 							$this -> tablenames[$this -> pre . $this -> {$model} -> controller] = $wpdb -> prefix . $this -> {$model} -> table;
 							$this -> tables[$this -> pre . $this -> {$model} -> controller] = $this -> {$model} -> fields;
@@ -4483,9 +4492,14 @@ if (!class_exists('wpMailPlugin')) {
 		
 			if (!empty($field_id)) {
 				if ($field = $Field -> get($field_id)) {	
-					$_POST[$field -> slug] = (empty($_POST[$field -> slug]) && !empty($_GET[$field -> slug])) ? $_GET[$field -> slug] : $_POST[$field -> slug];					
+					if (empty($_POST[$field -> slug]) && !empty($_GET[$field -> slug])) {
+						$_POST[$field -> slug] = $_GET[$field -> slug];
+					} elseif (empty($_POST[$field -> slug]) && empty($_GET[$field -> slug])) {
+						$_POST[$field -> slug] = false;
+					}
+						
 					$list = (empty($instance['list'])) ? __($_POST['list_id'][0]) : __($instance['list']);
-					if ($this -> language_do()) {
+					if ($this -> language_do() && !empty($instance['lang'])) {
 						$list = $this -> language_use($instance['lang'], $list, false);
 					}
 					

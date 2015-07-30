@@ -129,6 +129,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 	
 	function fragment_cache($content = null, $object = null, $method = null, $data = null) {
 		$output = $content;
+		return stripslashes($content);
 	
 		if (!empty($content)) {				
 			if (is_plugin_active(plugin_basename('wp-super-cache/wp-cache.php'))) {			

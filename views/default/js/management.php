@@ -1,23 +1,14 @@
 <script type="text/javascript">
 var unsubscribe_comments = "";
 	
-jQuery(document).ready(function() { 
-	if (jQuery.isFunction(jQuery.cookie)) {
-		var managementtabscookieid = jQuery.cookie('managementtabscookie') || 0;
-	}
-		
+jQuery(document).ready(function() { 		
 	if (jQuery.isFunction(jQuery.fn.tabs)) {
 		jQuery('#managementtabs').tabs({
-			//active: managementtabscookieid,
 			activate: function(event, ui) {	
 				if(history.pushState) {
 				    history.pushState(null, null, ui.newPanel.selector);
 				} else {
 				    window.location.hash = ui.newPanel.selector;
-				}
-							
-				if (jQuery.isFunction(jQuery.cookie)) {					
-					jQuery.cookie('managementtabscookie', ui.newTab.index(), {expires: 365, path: '/'});
 				}
 			}
 		});
@@ -27,7 +18,7 @@ jQuery(document).ready(function() {
 		if (thash != "") {
 			jQuery('#managementtabs').find('a[href*='+ thash + ']').closest('li').trigger('click');
 		} else {
-			jQuery('#managementtabs').tabs('option', 'active', managementtabscookieid);
+			jQuery('#managementtabs').tabs('option', 'active', 0);
 			setTimeout(function() { window.scrollTo(0, 0); }, 1);
 		}
 	}

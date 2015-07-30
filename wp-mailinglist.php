@@ -2075,8 +2075,20 @@ if (!class_exists('wpMail')) {
 	    }
 		
 		function cron_hook() {	
-			global $History;		
+			global $History, $wpdb, $Db, $Email, $History, $Subscriber, $SubscribersList, $Queue;		
 			do_action('newsletters_cron_fired');
+			
+			// Let's do some checks before we get started. Check if queued emails exist and that the table isn't in use?
+			$checkexistsquery = "SELECT EXISTS(SELECT 1 FROM `" . $wpdb -> prefix . $Queue -> table . "` LIMIT 1)";
+			$checkexistsresult = $wpdb -> get_var($checkexistsquery);
+			
+			$checklockquery = "SHOW OPEN TABLES WHERE `Table` LIKE '" . $wpdb -> prefix . $Queue -> table . "' AND `In_use` > 0";
+			$checklockresults = $wpdb -> get_results($checklockquery);
+			
+			if (empty($checkexistsresult) && empty($checklockresults)) {
+				//the queue is empty, don't do anything
+				return;
+			}
 			
 			global $queue_status;
 			$queue_status = $this -> get_option('queue_status');
@@ -2098,7 +2110,6 @@ if (!class_exists('wpMail')) {
 				}					
 				set_transient('newsletters_cron', true, ($expiration));
 			
-				global $wpdb, $Db, $Email, $History, $Subscriber, $SubscribersList, $Queue;
 				$emailssent = 0;
 			
 				//update scheduling
@@ -2121,7 +2132,7 @@ if (!class_exists('wpMail')) {
 					$emailsquery = "SELECT * FROM `" . $wpdb -> prefix . $Queue -> table . "` WHERE `senddate` < '" . date_i18n("Y-m-d H:i:s", time()) . "' ORDER BY `error` ASC, `" . $queuesendorderby . "` " . $queuesendorder . " LIMIT " . $emailsperinterval . " FOR UPDATE";
 					
 					//retrieve all the queue emails for this execution
-					if ($emails = $wpdb -> get_results($emailsquery)) {					
+					if ($emails = $wpdb -> get_results($emailsquery)) {											
 						if ($this -> get_option('schedulenotify') == "Y" && $this -> get_option('scheduling') == "Y") {
 							$subscriber_id = $Subscriber -> admin_subscriber_id($_POST['mailinglists']);
 							$subscriber = $Subscriber -> get($subscriber_id, false);
@@ -3112,7 +3123,9 @@ if (!class_exists('wpMail')) {
 							unset($_POST['fields']);
 						}
 	
-						if (empty($errors)) {					
+						if (empty($errors)) {		
+							
+							// Not a preview or a draft but actually sending/queuing			
 							if (empty($_POST['preview']) && empty($_POST['draft'])) {																		
 								if (!empty($_POST)) {															
 									if (!empty($errors)) {
@@ -3573,16 +3586,11 @@ if (!class_exists('wpMail')) {
 											$subject = $_POST['subject'];
 											$message = $this -> render_email('send', array('message' => $_POST['content'], 'subject' => $subject, 'subscriber' => $subscriber, 'history_id' => $history_id), false, true, true, $_POST['theme_id']);
 											
-											if (!$this -> execute_mail($subscriber, false, $subject, $message, $history -> attachments, $history_id, false, false)) {
+											if (!$this -> execute_mail($subscriber, false, $subject, $message, $newattachments, $history_id, false, false)) {
 												global $mailerrors;
-												//$this -> render_error(sprintf(__('Preview cannot be sent to %s, %s.', $this -> plugin_name), $subscriber -> email, $mailerrors));
 												$this -> render_error(2, array($subscriber -> email, implode(";", $mailerrors)));
 											} else {
-												//$this -> render_message(sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>'));
-												//$this -> render_message(1, array($subscriber -> email));
 												$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> send . '&method=history&id=' . $history_id), 'message', 1, false);
-												//$message = sprintf(__('Preview has been sent to %s', $this -> plugin_name), ' <strong>' . $subscriber -> email . '</strong>');
-												//$this -> redirect('?page=' . $this -> sections -> send . '&method=history&id=' . $History -> insertid, 'message', $message);
 											}
 										} else {
 											$this -> render_error(3, array($email));
@@ -3608,7 +3616,7 @@ if (!class_exists('wpMail')) {
 									'daterangefrom'		=>	$history -> daterangefrom,
 									'daterangeto'		=>	$history -> daterangeto,
 									'fields'			=>	maybe_unserialize($history -> conditions),
-									'attachments'		=>	$history -> attachments,
+									'attachments'		=>	$newattachments,
 									'customtexton'		=>	((!empty($history -> text)) ? true : false),
 									'customtext'		=>	$history -> text,
 								), $_POST);
@@ -4949,6 +4957,8 @@ if (!class_exists('wpMail')) {
 						
 						if (empty($error)) {
 							$numberimported = 0;
+							$numberupdated = 0;
+							$numbernotimported = 0;
 							$datasets = array();
 							
 							if ($_POST['filetype'] == "mac") {
@@ -5010,6 +5020,8 @@ if (!class_exists('wpMail')) {
 									}
 								}
 								
+								$skipsubscriberupdate = false;
+								
 								while (($row = fgetcsv($fh, "1000", $delimiter)) !== false) {
 									$this -> remove_server_limits();
 									$datasets[$d] = array();
@@ -5022,10 +5034,13 @@ if (!class_exists('wpMail')) {
 										
 										if ($current_id = $Subscriber -> email_exists($email)) {
 											if (empty($import_overwrite) || $import_overwrite == false) {
-												$numberimported++;
-												continue;
-											} else {
+												//$numberimported++;
+												//$numberupdated++;
+												//continue;
+												$skipsubscriberupdate = true;
+											} else {												
 												$datasets[$d] = (array) $Subscriber -> get($current_id);
+												$skipsubscriberupdate = false;
 											}
 										}
 										
@@ -5132,7 +5147,7 @@ if (!class_exists('wpMail')) {
 														$datasets[$d]['fromregistration'] = true;
 														$datasets[$d]['username'] = $email;
 														
-														if ($Subscriber -> save($datasets[$d], false, false)) {
+														if ($Subscriber -> save($datasets[$d], false, false, $skipsubscriberupdate)) {
 															$Db -> model = $Subscriber -> model;
 															$subscriber = $Db -> find(array('id' => $Subscriber -> insertid));
 														
@@ -5155,7 +5170,13 @@ if (!class_exists('wpMail')) {
 																}
 															}
 														
-															$numberimported++;	
+															if (empty($datasets[$d]['id'])) {
+																$numberimported++;	
+															} else {
+																$numberupdated++;
+															}
+														} else {															
+															$numbernotimported++;
 														}
 													}
 													
@@ -5167,8 +5188,8 @@ if (!class_exists('wpMail')) {
 								}
 								
 								if (empty($import_progress) || $import_progress == false) {									
-									if (!empty($numberimported)) {
-										$this -> render_message($numberimported . ' ' . __('subscribers successfully imported', $this -> plugin_name));
+									if (!empty($numberimported) || !empty($numberupdated) || !empty($numbernotimported)) {
+										$this -> render_message($numberimported . ' ' . sprintf(__('subscribers successfully imported, %s updated and %s not imported.', $this -> plugin_name), $numberupdated, $numbernotimported));
 									} else {
 										$this -> render_message(__('No subscribers were imported, broken file? Change delimiter setting?', $this -> plugin_name));
 									}

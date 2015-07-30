@@ -222,7 +222,7 @@ class wpmlDbHelper extends wpMailPlugin {
 						$object -> fields = apply_filters('newsletters_db_insert_fields', $object -> fields, $object -> model);
 						
 						foreach (array_keys($object -> fields) as $field) {
-							if (!empty($data -> {$field})) {
+							if (!empty($data -> {$field}) || $data -> {$field} == 0) {
 								$query1 .= "`" . $field . "`";
 								$query2 .= "'" . $data -> {$field} . "'";
 								
