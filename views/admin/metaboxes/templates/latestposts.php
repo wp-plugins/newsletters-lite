@@ -41,7 +41,7 @@ if ($this -> language_do()) {
 										'teeny'				=>	true,
 									);
 									
-									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_latestposts_' . $language, $settings); 
+									wp_editor(wpautop(stripslashes($this -> language_use($language, $texts))), 'etmessage_latestposts_' . $language, $settings); 
 									
 									?>
 				            	</div>

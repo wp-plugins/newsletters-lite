@@ -92,9 +92,9 @@ wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false);
 						?>
 						
 						<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
-							<?php wp_editor(stripslashes($_POST['content']), 'content', array('tabindex' => "2", 'tinymce' => $tinymce)); ?>
+							<?php wp_editor(wpautop(stripslashes($_POST['content'])), 'content', array('tabindex' => "2", 'tinymce' => $tinymce)); ?>
 						<?php else : ?>
-							<?php the_editor(stripslashes($_POST['content']), 'content', 'title', true, 2); ?>
+							<?php the_editor(wpautop(stripslashes($_POST['content'])), 'content', 'title', true, 2); ?>
 						<?php endif; ?>
 						
 						<table id="post-status-info" cellpadding="0" cellspacing="0">

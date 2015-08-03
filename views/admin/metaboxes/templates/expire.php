@@ -78,7 +78,7 @@ if ($this -> language_do()) {
 										'teeny'				=>	true,
 									);
 									
-									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_expire_' . $language, $settings); 
+									wp_editor(wpautop(stripslashes($this -> language_use($language, $texts))), 'etmessage_expire_' . $language, $settings); 
 									
 									?>
 				            	</div>

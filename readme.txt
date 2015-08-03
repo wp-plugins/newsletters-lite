@@ -4,7 +4,7 @@ Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
 Tested up to: 4.2.3
-Stable tag: 4.5.5
+Stable tag: 4.5.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
 
@@ -149,8 +149,15 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 
 == Changelog ==
 
-= 4.5.5 =
+= 4.5.5.1 =
+* ADD: Setting to turn on/off stripping of width/height attributes on images 
+* FIXED: Posts shortcode and latest posts duplicates and incorrect values
+* FIXED: Parse language on import confirmation email
+* FIXED: Paragraphs in editor becoming one block when creating newsletter
+* FIXED: Thumbnail_size Parameter not Working
+* FIXED: Unsubscribe page styling broken 
 
+= 4.5.5 =
 * ADD: Remove width/height attributes on IMG tags before newsletter is rendered
 * ADD: [newsletters_bloginfo show=X] for blog name, description, url, etc.
 * ADD: New "default2", Bootstrap theme folder, beautiful! 

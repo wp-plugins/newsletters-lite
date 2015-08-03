@@ -78,7 +78,7 @@ if ($this -> language_do()) {
 										'teeny'				=>	true,
 									);
 									
-									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_schedule_' . $language, $settings); 
+									wp_editor(wpautop(stripslashes($this -> language_use($language, $texts))), 'etmessage_schedule_' . $language, $settings); 
 									
 									?>
 				            	</div>

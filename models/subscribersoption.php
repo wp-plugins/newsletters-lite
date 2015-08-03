@@ -49,7 +49,7 @@ if (!class_exists('wpmlSubscribersOption')) {
 		}
 		
 		function validate($data = array()) {
-			global $Html;
+			global $Html, $Db;
 			$this -> errors = array();
 			
 			$data = (empty($data[$this -> model])) ? $data : $data[$this -> model];
@@ -62,6 +62,13 @@ if (!class_exists('wpmlSubscribersOption')) {
 				if (empty($option_id)) { $this -> errors['option_id'] = 'empty'; }
 			} else {
 				$this -> errors[] = __('No data was provided', $this -> plugin_name);
+			}
+			
+			if (empty($this -> errors)) {				
+				if ($record = $this -> find(array('field_id' => $field_id, 'subscriber_id' => $subscriber_id, 'option_id' => $option_id))) {
+					$this -> data -> id = $record -> id;
+					$this -> data -> modified = $Html -> gen_date();
+				}
 			}
 			
 			return $this -> errors;

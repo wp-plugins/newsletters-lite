@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5.5
+Version: 4.5.5.1
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -739,6 +739,155 @@ if (!class_exists('wpMail')) {
 							
 							$new_version = '1.2.1';
 						}
+						
+						/*if (version_compare($cur_version, '1.2.2')) {
+							
+							$this -> debug('do db update');
+							
+							global $wpdb, $Db, $Field, $Mailinglist, $Subscriber, $wpmlGroup, $History;
+					
+							$this -> update_options();
+							
+							// truncate the SubscribersOption database table.
+							$query = "TRUNCATE `" . $wpdb -> prefix . $this -> SubscribersOption -> table . "`";
+							//$wpdb -> query($query);
+							
+							$query = "SELECT * FROM " . $wpdb -> prefix . $Field -> table . " WHERE `type` = 'radio' OR `type` = 'select' OR `type` = 'checkbox'";
+							if ($fields = $wpdb -> get_results($query)) {
+								foreach ($fields as $field) {
+									
+									$newfieldoptions = $this -> Option -> find_all(array('field_id' => $field -> id), false, array('order', "ASC"));
+									$newfieldoptionsarray = array();
+									foreach ($newfieldoptions as $newfieldoption) {
+										$newfieldoptionsarray[$newfieldoption -> id] = $newfieldoption -> value;
+									}
+									
+									$this -> debug($newfieldoptionsarray);
+									
+									$query = "SELECT `id`, `" . $field -> slug . "` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `" . $field -> slug . "` != ''";
+									if ($subscriber_fields = $wpdb -> get_results($query)) {
+										foreach ($subscriber_fields as $subscriber_field) {											
+											$subscriber_fieldoptions = maybe_unserialize($subscriber_field -> {$field -> slug});
+											
+											$this -> debug($subscriber_fieldoptions);
+											
+											if (!empty($subscriber_fieldoptions)) {
+												$new_subscriber_fieldoptions = array();
+												
+												if (is_array($subscriber_fieldoptions)) {															
+													foreach ($subscriber_fieldoptions as $subscriber_fieldoption) {																
+														$option_id = $subscriber_fieldoption;
+														
+														$subscribers_option_data = array(
+															'subscriber_id'					=>	$subscriber_field -> id,
+															'field_id'						=>	$field -> id,
+															'option_id'						=>	$option_id,
+														);
+														
+														$this -> SubscribersOption -> save($subscribers_option_data);
+														$new_subscriber_fieldoptions[] = $option_id;
+													}
+													
+													$new_subscriber_fieldoptions = maybe_serialize($new_subscriber_fieldoptions);
+												} else {	
+													$option_id = $subscriber_fieldoption;
+																											
+													$subscribers_option_data = array(
+														'subscriber_id'					=>	$subscriber_field -> id,
+														'field_id'						=>	$field -> id,
+														'option_id'						=>	$option_id,
+													);
+													
+													$this -> SubscribersOption -> save($subscribers_option_data);
+													$new_subscriber_fieldoptions = $option_id;
+												}
+												
+												/*if (!empty($newfieldoptionsarray[$new_subscriber_fieldoptions])) {
+													$Db -> model = $Subscriber -> model;
+													//$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
+												}*/
+											/*}						
+										}
+									}
+									
+									/*if (!empty($field -> fieldoptions)) {
+										$fieldoptions = maybe_unserialize($field -> fieldoptions);
+										
+										if (!empty($fieldoptions) && is_array($fieldoptions)) {
+											$o = 1;
+											
+											foreach ($fieldoptions as $fieldoption) {												
+												$option_data = array(
+													'id'					=>	false,
+													'order'					=>	$o,
+													'value'					=>	$fieldoption,
+													'field_id'				=>	$field -> id,
+												);
+												
+												$this -> Option -> save($option_data);	
+												$this -> Option -> id = $this -> Option -> data = false;											
+												$o++;
+											}
+											
+											// Subscriber stuff
+											$newfieldoptions = $this -> Option -> find_all(array('field_id' => $field -> id), false, array('order', "ASC"));
+											$newfieldoptionsarray = array();
+											foreach ($newfieldoptions as $newfieldoption) {
+												$newfieldoptionsarray[$newfieldoption -> id] = $newfieldoption -> value;
+											}
+											
+											$query = "SELECT `id`, `" . $field -> slug . "` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `" . $field -> slug . "` != ''";
+											if ($subscriber_fields = $wpdb -> get_results($query)) {
+												foreach ($subscriber_fields as $subscriber_field) {											
+													$subscriber_fieldoptions = maybe_unserialize($subscriber_field -> {$field -> slug});
+																																					
+													if (!empty($subscriber_fieldoptions)) {
+														$new_subscriber_fieldoptions = array();
+														
+														if (is_array($subscriber_fieldoptions)) {															
+															foreach ($subscriber_fieldoptions as $subscriber_fieldoption) {																
+																$option_id = array_search($fieldoptions[$subscriber_fieldoption], $newfieldoptionsarray);
+																
+																$subscribers_option_data = array(
+																	'subscriber_id'					=>	$subscriber_field -> id,
+																	'field_id'						=>	$field -> id,
+																	'option_id'						=>	$option_id,
+																);
+																
+																$this -> SubscribersOption -> save($subscribers_option_data);
+																$new_subscriber_fieldoptions[] = $option_id;
+															}
+															
+															$new_subscriber_fieldoptions = maybe_serialize($new_subscriber_fieldoptions);
+														} else {	
+															$option_id = array_search($fieldoptions[$subscriber_fieldoptions], $newfieldoptionsarray);
+																													
+															$subscribers_option_data = array(
+																'subscriber_id'					=>	$subscriber_field -> id,
+																'field_id'						=>	$field -> id,
+																'option_id'						=>	$option_id,
+															);
+															
+															$this -> SubscribersOption -> save($subscribers_option_data);
+															$new_subscriber_fieldoptions = $option_id;
+														}
+														
+														if (!empty($newfieldoptionsarray[$new_subscriber_fieldoptions])) {
+															$Db -> model = $Subscriber -> model;
+															$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
+														}
+													}							
+												}
+											}
+										}
+									}*/
+								/*}
+							}
+							
+							$new_version = '1.2.1';
+						}
+						
+						exit();*/
 						
 						$this -> update_option('dbversion', $new_version);
 						$this -> delete_option('showmessage_dbupdate');
@@ -7147,6 +7296,7 @@ if (!class_exists('wpMail')) {
 						$this -> delete_option('defaulttemplate');
 						$this -> delete_option('loadstyles');
 						$this -> delete_option('loadscripts');
+						$this -> delete_option('remove_width_height_attr');
 						
 						if (!empty($_FILES)) {
 							foreach ($_FILES as $fkey => $fval) {

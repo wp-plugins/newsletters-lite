@@ -10,7 +10,7 @@ $settings = array(
 	'entity_encoding'	=>	"raw",
 );
 
-wp_editor(stripslashes($contentarea -> content), 'contentarea' . $contentarea -> number, $settings); 
+wp_editor(wpautop(stripslashes($contentarea -> content)), 'contentarea' . $contentarea -> number, $settings); 
 
 ?>
 <table id="post-status-info" cellpadding="0" cellspacing="0">

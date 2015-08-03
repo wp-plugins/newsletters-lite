@@ -128,7 +128,7 @@ $sendauto = $Autoresponder -> data -> sendauto;
                     <div id="<?php echo (user_can_richedit()) ? 'postdivrich' : 'postdiv'; ?>" class="postarea edit-form-section">                                    
                         <!-- The Editor -->
 						<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
-							<?php wp_editor(stripslashes($Autoresponder -> data -> nnewsletter['content']), 'content', array('tabindex' => 2)); ?>
+							<?php wp_editor(wpautop(stripslashes($Autoresponder -> data -> nnewsletter['content'])), 'content', array('tabindex' => 2)); ?>
 						<?php else : ?>
 							<?php the_editor(stripslashes($Autoresponder -> data -> nnewsletter['content']), 'content', 'title', true, 2); ?>
 						<?php endif; ?>

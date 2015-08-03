@@ -73,6 +73,14 @@ $defaulttemplate = $this -> get_option('defaulttemplate');
 		        <span class="howto"><?php _e('Turning this on will take your STYLE tags CSS and automatically apply it as inline styles upon sending', $this -> plugin_name); ?></span>
 	        </td>
         </tr>
+        <tr>
+	        <th><label for="remove_width_height_attr"><?php _e('Remove Width/Height Attributes', $this -> plugin_name); ?></label>
+	        <?php echo $Html -> help(__('By turning this on, ensure that you do not resize images inside the editor but that you rather insert images at the correct image size eg. thumbnail, medium, large, full, etc.', $this -> plugin_name)); ?></th>
+	        <td>
+		        <label><input type="checkbox" name="remove_width_height_attr" value="1" id="remove_width_height_attr" <?php echo (!empty($remove_width_height_attr)) ? 'checked="checked"' : ''; ?> /> <?php _e('Yes, strip them out, I do not resize images in the editor.', $this -> plugin_name); ?></label>
+		        <span class="howto"><?php _e('Removes width/height attributes from images which break responsive newsletters.', $this -> plugin_name); ?></span>
+	        </td>
+        </tr>
     	<tr>
         	<th><label for="multimime_Y"><?php _e('Send Multipart Emails', $this -> plugin_name); ?></label></th>
             <td>

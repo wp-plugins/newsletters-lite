@@ -182,10 +182,12 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					$shortcode_post_language = $language;
 					$post = $this -> language_use($language, $post, false);
 					$shortcode_posts = array($post);
-					$output = do_shortcode($this -> et_message('posts', false, $language));
+					//$output = do_shortcode($this -> et_message('posts', false, $language));
+					$output = do_shortcode('[newsletters_posts_loop_wrapper]');
 				} else {
 					$shortcode_posts = array($post);
-					$output = do_shortcode($this -> et_message('posts'));
+					//$output = do_shortcode($this -> et_message('posts'));
+					$output = do_shortcode('[newsletters_posts_loop_wrapper]');
 				}
 			}
 		}
@@ -288,6 +290,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			}
 		}
 		
+		wp_reset_query();
 		return $return;
 	}
 	
@@ -318,7 +321,9 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 			case 'post_loop'				:
 			case 'newsletters_post_loop'	:	
 			
-				return do_shortcode($content);
+				$return = do_shortcode($content);
+				wp_reset_query();
+				return $return;
 								
 				if (!empty($shortcode_categories)) {	
 					$shortcode_post_row = 1;			
@@ -402,12 +407,24 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 					'class'			=>	"newsletters_thumbnail",
 				);
 				
+				$style = false;
+				if (!empty($align) && !empty($hspace)) {
+					switch ($align) {
+						case 'left'					:
+							$style = "margin-right:" . $hspace . "px;";
+							break;
+						case 'right'				:
+							$style = "margin-left:" . $hspace . "px;";
+							break;
+					}
+				}
+				
 				extract(shortcode_atts($defaults, $atts));
 				if (!empty($shortcode_post)) {
 					if (function_exists('has_post_thumbnail')) {
 						if (has_post_thumbnail($shortcode_post -> ID)) {							
 							$return .= '<a target="' . $wpml_target . '" href="' . $this -> direct_post_permalink($shortcode_post -> ID) . '">';
-							$attr = apply_filters('newsletters_post_thumbnail_attr', array('style' => "margin-right:15px;", 'align' => $align, 'hspace' => $hspace, 'class' => $class), $shortcode_post -> ID);
+							$attr = apply_filters('newsletters_post_thumbnail_attr', array('style' => $style, 'align' => $align, 'hspace' => $hspace, 'class' => $class), $shortcode_post -> ID);
 							$return .= get_the_post_thumbnail($shortcode_post -> ID, $size, $attr);
 							$return .= '</a>';						
 							return $return;

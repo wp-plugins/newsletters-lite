@@ -78,7 +78,7 @@ if ($this -> language_do()) {
 										'teeny'				=>	true,
 									);
 									
-									wp_editor(stripslashes($this -> language_use($language, $texts)), 'etmessage_confirm_' . $language, $settings); 
+									wp_editor(wpautop(stripslashes($this -> language_use($language, $texts))), 'etmessage_confirm_' . $language, $settings); 
 									
 									?>
 				            	</div>
@@ -89,7 +89,9 @@ if ($this -> language_do()) {
 				    
 				    <script type="text/javascript">
 				    jQuery(document).ready(function() {
-					    jQuery('#languagetabsconfirmmessage').tabs();
+					    if (jQuery.isFunction(jQuery.fn.tabs)) {
+					    	jQuery('#languagetabsconfirmmessage').tabs();
+					    }
 				    });
 				    </script>
 				<?php else : ?>

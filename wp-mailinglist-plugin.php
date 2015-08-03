@@ -5,8 +5,8 @@ if (!class_exists('wpMailPlugin')) {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.5';
-		var $dbversion = '1.2.1';
+		var $version = '4.5.5.1';
+		var $dbversion = '1.2.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -403,7 +403,7 @@ if (!class_exists('wpMailPlugin')) {
 										
 				foreach ($posts as $post) {
 					if ($this -> language_do()) {
-						$posts_by_category[] = array('text' => $this -> language_use($_REQUEST['language'], $post -> post_title, false), 'value' => $post -> ID);
+						$posts_by_category[] = array('text' => __($this -> language_use($_REQUEST['language'], $post -> post_title, false)), 'value' => $post -> ID);
 						//$posts_by_category .= '<option value="' . $post -> ID . '">' . $this -> language_use($_REQUEST['language'], $post -> post_title, false) . '</option>';
 					} else {
 						$posts_by_category[] = array('text' => __($post -> post_title), 'value' => $post -> ID);
@@ -417,44 +417,6 @@ if (!class_exists('wpMailPlugin')) {
 		    exit();
 		    die();
 	    }
-	    
-	    function ajax_posts_by_category_bak() {
-	    	define('DOING_AJAX', true);
-	    	define('SHORTINIT', true);
-	    
-			$posts_by_category = "";
-			
-			$arguments = array(
-				'numberposts'			=>	"-1",
-				'orderby'				=>	'post_title',
-				'order'					=>	"ASC",
-				'post_type'				=>	"post",
-				'post_status'			=>	"publish",
-			);
-			
-			if (!empty($_REQUEST['cat_id']) && $_REQUEST['cat_id'] > 0) {
-				$arguments['category'] = $_REQUEST['cat_id'];	
-			}
-			
-			if (!empty($_REQUEST['post_type'])) {
-				$arguments['post_type'] = $_REQUEST['post_type'];
-			}
-			
-			if ($posts = get_posts($arguments)) {								
-				foreach ($posts as $post) {
-					if ($this -> language_do()) {
-						$posts_by_category .= '<option value="' . $post -> ID . '">' . $this -> language_use($_REQUEST['language'], $post -> post_title, false) . '</option>';
-					} else {
-						$posts_by_category .= '<option value="' . $post -> ID . '">' . $post -> post_title . '</option>';
-					}
-				}
-			}
-			
-			echo $posts_by_category;
-			
-			exit();
-			die();
-		}
 	    
 	    function ajax_getposts() {
 	    	define('DOING_AJAX', true);
@@ -3474,7 +3436,7 @@ if (!class_exists('wpMailPlugin')) {
 			return $text;
 		}
 		
-		function language_split($text, $quicktags = true, array &$languageMap = NULL) {
+		function language_split($text, $quicktags = true, array $languageMap = NULL) {
 			$array = false;
 			
 			if (!empty($text)) {	
@@ -3532,7 +3494,7 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				foreach($result as $lang => $lang_content) {
-					$result[$lang] = rtrim(preg_replace("#(<!--more-->|<!--nextpage-->)+$#ism","",$lang_content), '[:]');
+					$result[$lang] = str_replace('[:]', '', preg_replace("#(<!--more-->|<!--nextpage-->)+$#ism", "", $lang_content));
 				}
 				
 				return $result;
@@ -8252,16 +8214,20 @@ if (!class_exists('wpMailPlugin')) {
 		}
 		
 		function remove_width_height_attr($html = null) {
-			$dom = new DOMDocument();
-			$dom -> loadHTML($html);
+			$remove_width_height_attr = $this -> get_option('remove_width_height_attr');
 			
-			foreach ($dom -> getElementsByTagName('img') as $img) {				
-				$img -> removeAttribute('width');
-				$img -> removeAttribute('height');
+			if (!empty($remove_width_height_attr)) {
+				$dom = new DOMDocument();
+				$dom -> loadHTML($html);
+				
+				foreach ($dom -> getElementsByTagName('img') as $img) {				
+					$img -> removeAttribute('width');
+					$img -> removeAttribute('height');
+				}
+				
+				$html = $dom -> saveHTML();
+				$html = trim(preg_replace(array("/^\<\!DOCTYPE.*?<html><body>/si", "!</body></html>$!si"), "", $html));
 			}
-			
-			$html = $dom -> saveHTML();
-			$html = trim(preg_replace(array("/^\<\!DOCTYPE.*?<html><body>/si", "!</body></html>$!si"), "", $html));
 			
 			return $html;
 		}

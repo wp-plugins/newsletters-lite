@@ -29,7 +29,7 @@
 				
 				<p><?php _e('Tick/check the list(s) below from which you want to unsubscribe.', $this -> plugin_name); ?></p>
 				
-				<table>
+				<table class="table newsletters_table">
 					<tbody>
 						<tr>
 							<td><strong><?php _e('Email Address:', $this -> plugin_name); ?></strong></td>
@@ -85,12 +85,12 @@
 				<?php if ($this -> get_option('unsubscribecomments') == "Y") : ?>
 					<h3><?php _e('Comments', $this -> plugin_name); ?> <?php _e('(optional)', $this -> plugin_name); ?></h3>
 					<p>
-						<textarea name="<?php echo $this -> pre; ?>comments" style="width:97%;" rows="5" class="widefat"><?php echo stripslashes(htmlentities(strip_tags($data[$this -> pre . 'comments']), false, get_bloginfo('charset'))); ?></textarea>
+						<textarea name="<?php echo $this -> pre; ?>comments" style="width:97%;" rows="5" class="form-control widefat"><?php echo stripslashes(htmlentities(strip_tags($data[$this -> pre . 'comments']), false, get_bloginfo('charset'))); ?></textarea>
 					</p>
 				<?php endif; ?>
 				
 				<p class="submit">
-					<input type="submit" name="confirm" value="<?php _e('Confirm Unsubscribe', $this -> plugin_name); ?>" class="<?php echo $this -> pre; ?>button" />
+					<input type="submit" name="confirm" value="<?php _e('Confirm Unsubscribe', $this -> plugin_name); ?>" class="newsletters_button btn btn-primary" />
 				</p>
 			</form>
 			

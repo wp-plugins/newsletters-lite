@@ -40,13 +40,14 @@ class wpmlDbHelper extends wpMailPlugin {
 				$data = (empty($data[$object -> model])) ? $data : $data[$object -> model];
 				$r = wp_parse_args($data, $defaults);
 				$object -> data = (object) $r;
-				extract($r, EXTR_SKIP);
-			
+				
 				if ($validate == true) {
 					if (method_exists($object, 'validate')) {
 						$object -> validate($data);
 					}
 				}
+				
+				extract($r, EXTR_SKIP);
 				
 				if ($object -> model == "Autoresponder") {
 					$object -> data -> nnewsletter['content'] = $_POST['content'];	
@@ -264,6 +265,7 @@ class wpmlDbHelper extends wpMailPlugin {
 					
 					$c = 1;
 					unset($object -> fields['key']);
+					unset($object -> fields['created']);
 					
 					$object -> fields = apply_filters('newsletters_db_update_fields', $object -> fields, $object -> model);
 					

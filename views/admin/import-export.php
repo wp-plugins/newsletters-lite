@@ -224,13 +224,13 @@
 									<?php $confirmation_subject = (empty($_POST['confirmation_subject'])) ? $this -> get_option('etsubject_confirm') : $_POST['confirmation_subject']; ?>
 									<div id="titlediv">
 		                        		<div id="titlewrap">
-											<input type="text" name="confirmation_subject" value="<?php echo esc_attr(stripslashes($confirmation_subject)); ?>" id="title" class="widefat" />
+											<input type="text" name="confirmation_subject" value="<?php echo esc_attr(stripslashes(__($confirmation_subject))); ?>" id="title" class="widefat" />
 		                        		</div>
 									</div>
-									<?php $confirmation_email = (empty($_POST['confirmation_email'])) ? $this -> get_option('etmessage_confirm') : $_POST['confirmation_email']; ?>							
+									<?php $confirmation_email = (empty($_POST['confirmation_email'])) ? __($this -> et_message('confirm')) : __($_POST['confirmation_email']); ?>							
 									<!-- The Editor -->
 									<?php if (version_compare(get_bloginfo('version'), "3.3") >= 0) : ?>
-										<?php wp_editor(stripslashes($confirmation_email), 'content', array('tabindex' => 2, 'textarea_name' => "confirmation_email", 'textarea_rows' => "10")); ?>
+										<?php wp_editor(wpautop(stripslashes($confirmation_email)), 'content', array('tabindex' => 2, 'textarea_name' => "confirmation_email", 'textarea_rows' => "10")); ?>
 									<?php else : ?>
 										<?php the_editor(stripslashes($confirmation_email), 'confirmation_email', 'title', true, 2); ?>
 									<?php endif; ?>
