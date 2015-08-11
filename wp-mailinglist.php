@@ -7665,26 +7665,32 @@ if (!class_exists('wpMail')) {
 		}
 		
 		function activated_plugin($plugin = null, $network = null) {						
-			if ($plugin == plugin_basename(__FILE__)) {
-				
+			if ($plugin == plugin_basename(__FILE__)) {				
 				$old_folder = $this -> plugin_base();
+				$old_folder_name = basename($old_folder);
 				$new_folder = dirname($this -> plugin_base()) . DS . 'wp-mailinglist';
 				
-				$this -> recurse_copy($old_folder, $new_folder);
+				if (!empty($old_folder)) {
+					if (!empty($old_folder_name) && $old_folder_name != "wp-mailinglist") {
+						$this -> recurse_copy($old_folder, $new_folder);
 				
-				$old_plugin = basename($old_folder) . DS . 'wp-mailinglist.php';
-				$plugin = 'wp-mailinglist/wp-mailinglist.php';
-				
-				wp_cache_flush();				
-				$cache_plugins = wp_cache_get( 'plugins', 'plugins' );
-				if ( !empty( $cache_plugins ) ) {
-					$cache_plugins[''][$plugin] = $plugin;
-					wp_cache_set('plugins', $cache_plugins, 'plugins');
+						$old_plugin = basename($old_folder) . DS . 'wp-mailinglist.php';
+						$plugin = 'wp-mailinglist/wp-mailinglist.php';
+						
+						if (!is_plugin_active($plugin)) {
+							wp_cache_flush();				
+							$cache_plugins = wp_cache_get( 'plugins', 'plugins' );
+							if ( !empty( $cache_plugins ) ) {
+								$cache_plugins[''][$plugin] = $plugin;
+								wp_cache_set('plugins', $cache_plugins, 'plugins');
+							}
+							
+							activate_plugin($plugin);
+							deactivate_plugins(plugin_basename(__FILE__));
+							$this -> recurse_rmdir($old_folder);
+						}
+					}
 				}
-				
-				activate_plugin($plugin);
-				deactivate_plugins(plugin_basename(__FILE__));
-				$this -> recurse_rmdir($old_folder);
 			}
 		}
 		

@@ -72,7 +72,6 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('newsletters_emailarchivehook', 'emailarchive_hook', 10, 1);
 			$this -> add_action($this -> pre . '_cronhook', 'cron_hook', 10, 1);
 	        $this -> add_action($this -> pre . '_pophook', 'pop_hook', 10, 1);
-			//$this -> add_action($this -> pre . '_latestposts', 'latestposts_hook', 10, 1);
 			$this -> add_action('newsletters_latestposts', 'latestposts_hook', 10, 1);
 			$this -> add_action($this -> pre . '_activateaction', 'activateaction_hook', 10, 1);
 			$this -> add_action($this -> pre . '_autoresponders', 'autoresponders_hook', 10, 1);
@@ -86,10 +85,8 @@ if (!class_exists('wpMailCheckinit')) {
 			$this -> add_action('profile_update');
 			$this -> add_action('comment_form');
 			$this -> add_action('wp_insert_comment', 'comment_post', 10, 2);
-			//$this -> add_action('wp_print_styles', 'print_styles');
 			$this -> add_action('wp_enqueue_scripts', 'print_styles');
 			$this -> add_action('admin_print_styles', 'print_styles');
-			//$this -> add_action('wp_print_scripts', 'print_scripts');
 			$this -> add_action('wp_enqueue_scripts', 'print_scripts');
 			$this -> add_action('admin_print_scripts', 'print_scripts');
 			$this -> add_action('wp_dashboard_setup', 'dashboard_setup');
