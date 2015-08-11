@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('Newsletters_Widget')) {
 class Newsletters_Widget extends WP_Widget {
 	
 	public function __construct() {
@@ -256,6 +257,7 @@ class Newsletters_Widget extends WP_Widget {
 		
 		return $instance;
 	}
+}
 }
 
 ?>

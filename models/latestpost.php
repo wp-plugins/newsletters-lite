@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlLatestpost')) {
 class wpmlLatestpost extends wpMailPlugin {
 	
 	var $model = 'Latestpost';
@@ -67,6 +68,7 @@ class wpmlLatestpost extends wpMailPlugin {
 		
 		return $this -> errors;
 	}
+}
 }
 
 ?>

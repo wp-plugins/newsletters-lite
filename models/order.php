@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlOrder')) {
 class wpmlOrder extends wpMailPlugin {
 	
 	var $name = 'wpmlorder';
@@ -238,6 +239,7 @@ class wpmlOrder extends wpMailPlugin {
 			return false;
 		}
 	}
+}
 }
 
 ?>

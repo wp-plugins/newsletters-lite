@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlMailinglist')) {
 class wpmlMailinglist extends wpMailPlugin {
 
 	var $plugin_name;
@@ -507,6 +508,7 @@ class wpmlMailinglist extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 include_once(dirname(__FILE__) . DS . 'newsletter.php');

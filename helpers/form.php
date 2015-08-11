@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlFormHelper')) {
 class wpmlFormHelper extends wpMailPlugin {
 
 	var $name = 'Form';
@@ -193,6 +194,7 @@ class wpmlFormHelper extends wpMailPlugin {
 		$submit = ob_get_clean();
 		return $submit;
 	}
+}
 }
 
 ?>

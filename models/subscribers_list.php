@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlSubscribersList')) {
 class wpmlSubscribersList extends wpMailPlugin {
 
 	var $subscriber_id = 0;
@@ -394,6 +395,7 @@ class wpmlSubscribersList extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

@@ -17,6 +17,7 @@
 //
 ////////////////////////////////////////////////////
 
+if (!class_exists('wpmlPost')) {
 class wpmlPost extends wpMailPlugin {
 
 	var $model = 'Post';
@@ -104,6 +105,7 @@ class wpmlPost extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

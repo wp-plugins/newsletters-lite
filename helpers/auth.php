@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlAuthHelper')) {
 class wpmlAuthHelper extends wpMailPlugin {
 
 	var $name = 'Auth';
@@ -212,6 +213,7 @@ class wpmlAuthHelper extends wpMailPlugin {
 		$subscriberauth = md5(microtime());	
 		return $subscriberauth;	
 	}
+}
 }
 
 ?>

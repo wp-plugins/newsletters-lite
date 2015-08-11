@@ -14,6 +14,7 @@ $count_users = count_users();
 		<li><a href="#mailingliststabs-segment"><?php _e('Segment', $this -> plugin_name); ?></a></li>
 	</ul>
 	
+	<!-- Groups, Roles and Mailing Lists -->
 	<div id="mailingliststabs-subscribers">
 		<div id="groupsdiv">
             <?php if ($groups = $wpmlGroup -> select()) : ?>
@@ -54,6 +55,8 @@ $count_users = count_users();
 	        <?php endif; ?>
 	    <?php endif; ?>
 	</div>
+	
+	<!-- Segmentation & Fields Conditions -->
 	<div id="mailingliststabs-segment">
 		<?php if (apply_filters('newsletters_admin_createnewsletter_daterangesettings', true)) : ?>
 	        <div class="misc-pub-section">
@@ -178,13 +181,13 @@ $count_users = count_users();
 		                                        
 		                                        <?php
 												break;
-											case 'checkbox'			:
+											case 'checkbox'			:											
 												?>
 												<div>
 												<?php if (!empty($field -> newfieldoptions)) : ?>
 													<label style="font-weight:bold"><input type="checkbox" name="checkboxall<?php echo $field -> id; ?>" value="1" id="checkboxall<?php echo $field -> id; ?>" onclick="jqCheckAll(this, false, 'fields[<?php echo $field -> slug; ?>]');" /> <?php _e('Select all', $this -> plugin_name); ?></label><br/>
 													<?php foreach ($field -> newfieldoptions as $option_id => $option_value) : ?>
-														<label><input onclick="update_subscribers();" type="checkbox" name="fields[<?php echo $field -> slug; ?>][]" value="<?php echo $option_id; ?>" id="fields_<?php echo $field -> id; ?>" /> <?php _e($option_value); ?></label><br/>
+														<label><input onclick="update_subscribers();" <?php echo (!empty($_POST['fields'][$field -> slug]) && in_array($option_id, $_POST['fields'][$field -> slug])) ? 'checked="checked"' : ''; ?>  type="checkbox" name="fields[<?php echo $field -> slug; ?>][]" value="<?php echo $option_id; ?>" id="fields_<?php echo $field -> id; ?>" /> <?php _e($option_value); ?></label><br/>
 													<?php endforeach; ?>
 												<?php endif; ?>
 												</div>

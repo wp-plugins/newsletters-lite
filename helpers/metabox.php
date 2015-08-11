@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlMetaboxHelper')) {
 class wpmlMetaboxHelper extends wpMailPlugin {
 	
 	var $name = 'Metabox';
@@ -323,6 +324,7 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 	function extensions_settings_submit() {
 		$this -> render('metaboxes' . DS . 'extensions' . DS . 'submit', false, true, 'admin');
 	}
+}
 }
 
 ?>

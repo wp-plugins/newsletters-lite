@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlGroup')) {
 class wpmlGroup extends wpMailPlugin {
 	
 	var $model = 'wpmlGroup';
@@ -86,6 +87,7 @@ class wpmlGroup extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

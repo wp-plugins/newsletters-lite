@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlEmail')) {
 class wpmlEmail extends wpMailPlugin {
 
 	var $name = 'wpmlEmail';
@@ -118,6 +119,7 @@ class wpmlEmail extends wpMailPlugin {
 		
 		return $data;
 	}
+}
 }
 
 ?>

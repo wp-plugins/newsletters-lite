@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlHistory')) {
 class wpmlHistory extends wpMailPlugin {
 
 	var $id;
@@ -393,26 +394,54 @@ class wpmlHistory extends wpMailPlugin {
 								if (!empty($field_value)) {
 									$Db -> model = $Field -> model;
 									$customfield = $Db -> find(array('slug' => $field_slug), array('id', 'slug', 'type'));
-									$condition = $condquery[$field_slug];
 									
-									switch ($condition) {
-										case 'smaller'				:
-											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " < '" . $field_value . "'";
+									switch ($customfield -> type) {
+										case 'checkbox'					:
+											$condition = $condquery[$customfield -> slug];
+											switch ($condition) {
+												case 'contains'				:
+													$query .= " wp_wpmlsubscribers.id IN (SELECT subscriber_id FROM " . $wpdb -> prefix . $this -> SubscribersOption -> table . " WHERE `field_id` = '" . $field_id . "' AND `option_id` = '" . $field[1] . "')";
+													break;
+												case 'equals'				:
+													$query .= " wp_wpmlsubscribers.id IN (SELECT subscriber_id FROM " . $wpdb -> prefix . $this -> SubscribersOption -> table . " WHERE `field_id` = '" . $field_id . "' AND `option_id` = '" . $field[1] . "')";
+													break;
+											}
+											
+											if ($f < count($fieldsconditions)) {
+												//$query .= ($scopeall) ? " AND" : " OR";
+												switch ($condition) {
+													case 'contains'			:
+														$query .= " OR";
+														break;
+													case 'equals'			:
+														$query .= " AND";
+														break;
+												}
+											}
 											break;
-										case 'larger'				:
-											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " > '" . $field_value . "'";
+										default							:
+											$condition = $condquery[$field_slug];
+											
+											switch ($condition) {
+												case 'smaller'				:
+													$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " < '" . $field_value . "'";
+													break;
+												case 'larger'				:
+													$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " > '" . $field_value . "'";
+													break;
+												case 'contains'				:
+													$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
+													break;
+												case 'equals'				:
+												default						:
+													$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
+													break;
+											}
+											
+											if ($f < count($fieldsconditions)) {
+												$fieldsquery .= ($scopeall) ? " AND" : " OR";
+											}	
 											break;
-										case 'contains'				:
-											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " LIKE '%" . $field_value . "%'";
-											break;
-										case 'equals'				:
-										default						:
-											$fieldsquery .= " " . $wpdb -> prefix . $Subscriber -> table . "." . $field_slug . " = '" . $field_value . "'";
-											break;
-									}
-									
-									if ($f < count($fieldsconditions)) {
-										$fieldsquery .= ($scopeall) ? " AND" : " OR";
 									}
 								}
 								
@@ -884,6 +913,7 @@ class wpmlHistory extends wpMailPlugin {
 		
 		return $historyselect;
 	}
+}
 }
 
 ?>

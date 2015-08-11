@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlBounce')) {
 class wpmlBounce extends wpMailPlugin {
 
 	var $model = 'Bounce';
@@ -137,6 +138,7 @@ class wpmlBounce extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

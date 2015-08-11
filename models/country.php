@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlCountry')) {
 class wpmlCountry extends wpMailPlugin {
 
 	var $model = 'wpmlCountry';
@@ -68,6 +69,7 @@ class wpmlCountry extends wpMailPlugin {
 		
 		return $select;
 	}
+}
 }
 
 ?>

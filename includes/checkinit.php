@@ -162,6 +162,7 @@ if (!class_exists('wpMailCheckinit')) {
 			
 			/* Post Shortcodes */
 			
+			add_shortcode('newsletters_latestposts_loop_wrapper', array($Shortcode, 'latestposts_loop_wrapper'));
 			add_shortcode('newsletters_posts_loop_wrapper', array($Shortcode, 'posts_loop_wrapper'));
 			
 			$post_shortcodes = array('post_loop', 'category_heading', 'post_id', 'post_author', 'post_title', 'post_link', 'post_date_wrapper', 'post_date', 'post_thumbnail', 'post_excerpt', 'post_content');

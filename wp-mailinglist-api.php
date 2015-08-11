@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpMailAPI')) {
 class wpMailAPI extends wpMail {
 
 	var $api_methods = array(
@@ -128,5 +129,6 @@ class wpMailAPI extends wpMail {
 $wpMailAPI = new wpMailAPI();
 add_action('wp_ajax_newsletters_api', array($wpMailAPI, 'api_init'));
 add_action('wp_ajax_nopriv_newsletters_api', array($wpMailAPI, 'api_init'));
+}
 
 ?>

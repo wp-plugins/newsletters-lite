@@ -6,7 +6,7 @@ if (!class_exists('wpMailPlugin')) {
 		var $plugin_base;
 		var $pre = 'wpml';	
 		var $version = '4.5.5.2';
-		var $dbversion = '1.2.1';
+		var $dbversion = '1.2.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
 		var $post_errors = array();
@@ -1755,7 +1755,8 @@ if (!class_exists('wpMailPlugin')) {
 				'text'				=>	((!empty($_POST['customtexton']) && !empty($_POST['customtext'])) ? strip_tags($_POST['customtext']) : false),
 				'theme_id'			=>	$_POST['theme_id'],
 				'condquery'			=>	serialize($_POST['condquery']),
-				'conditions'		=>	serialize($_POST['fields']),
+				//'conditions'		=>	serialize($_POST['fields']),
+				'conditions'		=>	maybe_serialize($_POST['fields']),
 				'conditionsscope'	=>	$_POST['fieldsconditionsscope'],
 				'daterange'			=>	$_POST['daterange'],
 				'daterangefrom'		=>	$_POST['daterangefrom'],
@@ -2138,6 +2139,14 @@ if (!class_exists('wpMailPlugin')) {
 						if (!empty($Field -> errors)) {
 							$errors = array_merge($errors, $Field -> errors);
 						}
+						
+						if (!empty($fields)) {
+							foreach ($fields as $field) {
+								if (empty($_POST[$field -> slug])) {
+									$_POST[$field -> slug] = false;
+								}
+							}
+						}
 					
 						if (empty($errors)) {
 							foreach ($_POST as $pkey => $pval) {										
@@ -2308,16 +2317,11 @@ if (!class_exists('wpMailPlugin')) {
 								if ($customfield = $Db -> find(array('id' => $field_id), array('id', 'slug', 'type'))) {	
 									
 									switch ($customfield -> type) {
-										case 'checkbox'						:
-											
-											//$query .= " 1 = 1";
-											
-											
-											
+										case 'checkbox'						:		
 											$condition = $_POST['condquery'][$customfield -> slug];
 											switch ($condition) {
 												case 'contains'				:
-												
+													$query .= " wp_wpmlsubscribers.id IN (SELECT subscriber_id FROM " . $wpdb -> prefix . $this -> SubscribersOption -> table . " WHERE `field_id` = '" . $field_id . "' AND `option_id` = '" . $field[1] . "')";
 													break;
 												case 'equals'				:
 													$query .= " wp_wpmlsubscribers.id IN (SELECT subscriber_id FROM " . $wpdb -> prefix . $this -> SubscribersOption -> table . " WHERE `field_id` = '" . $field_id . "' AND `option_id` = '" . $field[1] . "')";
@@ -2325,7 +2329,15 @@ if (!class_exists('wpMailPlugin')) {
 											}
 											
 											if ($f < count($_POST['fields'])) {
-												$query .= ($scopeall) ? " AND" : " OR";
+												//$query .= ($scopeall) ? " AND" : " OR";
+												switch ($condition) {
+													case 'contains'			:
+														$query .= " OR";
+														break;
+													case 'equals'			:
+														$query .= " AND";
+														break;
+												}
 											}
 											
 											break;
@@ -2793,7 +2805,8 @@ if (!class_exists('wpMailPlugin')) {
 				case 'unsubscribe'			:
 					global $wpdb, $Html, $Auth, $Db, $Subscriber, $Mailinglist, $SubscribersList, $Queue;
 				
-					$data = (empty($_POST)) ? $_GET : $_POST;
+					//$data = (empty($_POST)) ? $_GET : $_POST;
+					$data = $_REQUEST;
 					$dorender = true;
 					$error = false;
 					$success = false;
@@ -2876,10 +2889,10 @@ if (!class_exists('wpMailPlugin')) {
 							if ($this -> get_option('unsubscribeconfirmation') == "N") {
 								$data['unsubscribelists'] = $mailinglists;
 							}
-							
-							$this -> user_unsubscription_notification($subscriber, $mailinglists);
 						
 							if (!empty($data['unsubscribelists'])) {	
+								$this -> user_unsubscription_notification($subscriber, $mailinglists);
+								
 								$subscribedlists = $Subscriber -> mailinglists($subscriber -> id);	//all subscribed mailing lists	
 																
 								foreach ($data['unsubscribelists'] as $unsubscribelist_id) {
@@ -5152,7 +5165,7 @@ if (!class_exists('wpMailPlugin')) {
 					$activationlink = $url;
 				}
 				
-				return $activationlink;
+				return apply_filters('newsletters_activation_link', $activationlink, $url, $linktext, $style, $linktext);
 			}
 			
 			return false;
@@ -8491,10 +8504,12 @@ if (!class_exists('wpMailPlugin')) {
 	}
 }
 
-class fakemailer {
-    public function Send() {
-        throw new phpmailerException( 'Cancelling mail' );
-    }
+if (!class_exists('fakemailer')) {
+	class fakemailer {
+	    public function Send() {
+	        throw new phpmailerException( 'Cancelling mail' );
+	    }
+	}
 }
 
 if ( ! class_exists( 'phpmailerException' ) ) {

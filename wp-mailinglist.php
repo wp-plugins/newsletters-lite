@@ -441,11 +441,15 @@ if (!class_exists('wpMail')) {
 				}
 				
 				// Database update required?
+				$hidedbupdate = $this -> get_option('hidedbupdate');
 				$showmessage_dbupdate = $this -> get_option('showmessage_dbupdate');
 				if (!empty($showmessage_dbupdate)) {
-					$message = sprintf(__('Newsletters requires a database update to continue %s. Make a database backup before running this.', $this -> plugin_name), '<a class="button" href="' . $Html -> retainquery('newsletters_method=dbupdate') . '">' . __('do it now', $this -> plugin_name) . '</a>');
-					$message .= $Html -> help(__('Depending on your current database, this may take some time. If it times out for any reason, please refresh.', $this -> plugin_name));
-					$this -> render_error($message);
+					if (empty($hidedbupdate) || (!empty($hidedbupdate) && version_compare($this -> dbversion, $hidedbupdate, '>'))) {
+						$message = sprintf(__('Newsletters requires a database update to continue %s. Make a database backup before running this.', $this -> plugin_name), '<a class="button" href="' . $Html -> retainquery('newsletters_method=dbupdate') . '">' . __('do it now', $this -> plugin_name) . '</a>');
+						$message .= $Html -> help(__('Depending on your current database, this may take some time. If it times out for any reason, please refresh.', $this -> plugin_name));
+						$message .= ' <a class="button button-secondary" href="' . $Html -> retainquery('newsletters_method=hidemessage&message=dbupdate&version=' . $this -> dbversion) . '"><i class="fa fa-times"></i> ' . __('Hide', $this -> plugin_name) . '</a>';
+						$this -> render_error($message);
+					}
 				}
 				
 				if (!empty($_GET['page']) && in_array($_GET['page'], (array) $this -> sections)) {
@@ -740,17 +744,14 @@ if (!class_exists('wpMail')) {
 							$new_version = '1.2.1';
 						}
 						
-						/*if (version_compare($cur_version, '1.2.2')) {
-							
-							$this -> debug('do db update');
-							
+						if (version_compare($cur_version, '1.2.2')) {							
 							global $wpdb, $Db, $Field, $Mailinglist, $Subscriber, $wpmlGroup, $History;
 					
 							$this -> update_options();
 							
 							// truncate the SubscribersOption database table.
 							$query = "TRUNCATE `" . $wpdb -> prefix . $this -> SubscribersOption -> table . "`";
-							//$wpdb -> query($query);
+							$wpdb -> query($query);
 							
 							$query = "SELECT * FROM " . $wpdb -> prefix . $Field -> table . " WHERE `type` = 'radio' OR `type` = 'select' OR `type` = 'checkbox'";
 							if ($fields = $wpdb -> get_results($query)) {
@@ -762,14 +763,10 @@ if (!class_exists('wpMail')) {
 										$newfieldoptionsarray[$newfieldoption -> id] = $newfieldoption -> value;
 									}
 									
-									$this -> debug($newfieldoptionsarray);
-									
 									$query = "SELECT `id`, `" . $field -> slug . "` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `" . $field -> slug . "` != ''";
 									if ($subscriber_fields = $wpdb -> get_results($query)) {
 										foreach ($subscriber_fields as $subscriber_field) {											
 											$subscriber_fieldoptions = maybe_unserialize($subscriber_field -> {$field -> slug});
-											
-											$this -> debug($subscriber_fieldoptions);
 											
 											if (!empty($subscriber_fieldoptions)) {
 												$new_subscriber_fieldoptions = array();
@@ -785,10 +782,7 @@ if (!class_exists('wpMail')) {
 														);
 														
 														$this -> SubscribersOption -> save($subscribers_option_data);
-														$new_subscriber_fieldoptions[] = $option_id;
 													}
-													
-													$new_subscriber_fieldoptions = maybe_serialize($new_subscriber_fieldoptions);
 												} else {	
 													$option_id = $subscriber_fieldoption;
 																											
@@ -799,95 +793,15 @@ if (!class_exists('wpMail')) {
 													);
 													
 													$this -> SubscribersOption -> save($subscribers_option_data);
-													$new_subscriber_fieldoptions = $option_id;
 												}
-												
-												/*if (!empty($newfieldoptionsarray[$new_subscriber_fieldoptions])) {
-													$Db -> model = $Subscriber -> model;
-													//$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
-												}*/
-											/*}						
+											}						
 										}
 									}
-									
-									/*if (!empty($field -> fieldoptions)) {
-										$fieldoptions = maybe_unserialize($field -> fieldoptions);
-										
-										if (!empty($fieldoptions) && is_array($fieldoptions)) {
-											$o = 1;
-											
-											foreach ($fieldoptions as $fieldoption) {												
-												$option_data = array(
-													'id'					=>	false,
-													'order'					=>	$o,
-													'value'					=>	$fieldoption,
-													'field_id'				=>	$field -> id,
-												);
-												
-												$this -> Option -> save($option_data);	
-												$this -> Option -> id = $this -> Option -> data = false;											
-												$o++;
-											}
-											
-											// Subscriber stuff
-											$newfieldoptions = $this -> Option -> find_all(array('field_id' => $field -> id), false, array('order', "ASC"));
-											$newfieldoptionsarray = array();
-											foreach ($newfieldoptions as $newfieldoption) {
-												$newfieldoptionsarray[$newfieldoption -> id] = $newfieldoption -> value;
-											}
-											
-											$query = "SELECT `id`, `" . $field -> slug . "` FROM `" . $wpdb -> prefix . $Subscriber -> table . "` WHERE `" . $field -> slug . "` != ''";
-											if ($subscriber_fields = $wpdb -> get_results($query)) {
-												foreach ($subscriber_fields as $subscriber_field) {											
-													$subscriber_fieldoptions = maybe_unserialize($subscriber_field -> {$field -> slug});
-																																					
-													if (!empty($subscriber_fieldoptions)) {
-														$new_subscriber_fieldoptions = array();
-														
-														if (is_array($subscriber_fieldoptions)) {															
-															foreach ($subscriber_fieldoptions as $subscriber_fieldoption) {																
-																$option_id = array_search($fieldoptions[$subscriber_fieldoption], $newfieldoptionsarray);
-																
-																$subscribers_option_data = array(
-																	'subscriber_id'					=>	$subscriber_field -> id,
-																	'field_id'						=>	$field -> id,
-																	'option_id'						=>	$option_id,
-																);
-																
-																$this -> SubscribersOption -> save($subscribers_option_data);
-																$new_subscriber_fieldoptions[] = $option_id;
-															}
-															
-															$new_subscriber_fieldoptions = maybe_serialize($new_subscriber_fieldoptions);
-														} else {	
-															$option_id = array_search($fieldoptions[$subscriber_fieldoptions], $newfieldoptionsarray);
-																													
-															$subscribers_option_data = array(
-																'subscriber_id'					=>	$subscriber_field -> id,
-																'field_id'						=>	$field -> id,
-																'option_id'						=>	$option_id,
-															);
-															
-															$this -> SubscribersOption -> save($subscribers_option_data);
-															$new_subscriber_fieldoptions = $option_id;
-														}
-														
-														if (!empty($newfieldoptionsarray[$new_subscriber_fieldoptions])) {
-															$Db -> model = $Subscriber -> model;
-															$Db -> save_field($field -> slug, $new_subscriber_fieldoptions, array('id' => $subscriber_field -> id));
-														}
-													}							
-												}
-											}
-										}
-									}*/
-								/*}
+								}
 							}
 							
-							$new_version = '1.2.1';
+							$new_version = '1.2.2';
 						}
-						
-						exit();*/
 						
 						$this -> update_option('dbversion', $new_version);
 						$this -> delete_option('showmessage_dbupdate');
@@ -962,6 +876,7 @@ if (!class_exists('wpMail')) {
 									break;
 								case 'dbupdate'					:
 									$this -> delete_option('showmessage_dbupdate');
+									$this -> update_option('hidedbupdate', $_GET['version']);
 									break;
 								case 'queue_status'				:
 									$this -> update_option('hidemessage_queue_status', true);
@@ -1940,9 +1855,11 @@ if (!class_exists('wpMail')) {
 						}
 						
 						$subject = $latestpostssubscription -> subject;
-						global $shortcode_posts;
+						global $shortcode_posts, $shortcode_post_language, $shortcode_categories;
 						$shortcode_posts = $posts;
-						$content = $this -> et_message('latestposts', false, $latestpostssubscription -> language);
+						$shortcode_post_language = $latestpostssubscription -> language;
+						//$content = $this -> et_message('latestposts', false, $latestpostssubscription -> language);
+						$content = do_shortcode('[newsletters_latestposts_loop_wrapper]');
 						$attachment = false;
 						$post_id = false;
 						
@@ -2784,7 +2701,7 @@ if (!class_exists('wpMail')) {
 			remove_submenu_page('index.php', 'newsletters-about');
 		}
 		
-		function newsletters_about() {
+		function newsletters_about() {			
 			//$this -> delete_option('showmessage_about');
 			$this -> render('about', false, true, 'admin');
 		}
@@ -3202,7 +3119,7 @@ if (!class_exists('wpMail')) {
 							}
 						}
 						
-						$this -> render_admin('send', array('mailinglists' => $mailinglists, 'themes' => $themes, 'templates' => $templates), true, 'admin');
+						$this -> render_admin('send', array('history' => $history, 'mailinglists' => $mailinglists, 'themes' => $themes, 'templates' => $templates), true, 'admin');
 					} else {
 						$message = __('Sent/draft email could not be loaded, please try again.', $this -> plugin_name);
 						$this -> redirect('?page=' . $this -> sections -> history, "error", $message);	
@@ -3587,7 +3504,7 @@ if (!class_exists('wpMail')) {
 									}
 								}
 							/* Save email as draft */
-							} elseif (!empty($_POST['draft'])) {																									
+							} elseif (!empty($_POST['draft'])) {																																	
 								$history_data = array(
 									'from'				=>	$_POST['from'],
 									'fromname'			=>	$_POST['fromname'],
@@ -3596,7 +3513,8 @@ if (!class_exists('wpMail')) {
 									'text'				=>	((!empty($_POST['customtexton']) && !empty($_POST['customtext'])) ? strip_tags($_POST['customtext']) : false),
 									'theme_id'			=>	$_POST['theme_id'],
 									'condquery'			=>	serialize($_POST['condquery']),
-									'conditions'		=>	serialize($_POST['fields']),
+									//'conditions'		=>	serialize($_POST['fields']),
+									'conditions'		=>	maybe_serialize($_POST['fields']),
 									'conditionsscope'	=>	$_POST['fieldsconditionsscope'],
 									'daterange'			=>	$_POST['daterange'],
 									'daterangefrom'		=>	$_POST['daterangefrom'],
@@ -7244,6 +7162,8 @@ if (!class_exists('wpMail')) {
 						}
 					}
 					
+					$this -> delete_option('hidedbupdate');
+					
 					flush_rewrite_rules();
 					
 					$msg_type = 'message';
@@ -7743,6 +7663,63 @@ if (!class_exists('wpMail')) {
 			$url = explode("&", $_SERVER['REQUEST_URI']);
 			$this -> url = $url[0];
 		}
+		
+		function activated_plugin($plugin = null, $network = null) {						
+			if ($plugin == plugin_basename(__FILE__)) {
+				
+				$old_folder = $this -> plugin_base();
+				$new_folder = dirname($this -> plugin_base()) . DS . 'wp-mailinglist';
+				
+				$this -> recurse_copy($old_folder, $new_folder);
+				
+				$old_plugin = basename($old_folder) . DS . 'wp-mailinglist.php';
+				$plugin = 'wp-mailinglist/wp-mailinglist.php';
+				
+				wp_cache_flush();				
+				$cache_plugins = wp_cache_get( 'plugins', 'plugins' );
+				if ( !empty( $cache_plugins ) ) {
+					$cache_plugins[''][$plugin] = $plugin;
+					wp_cache_set('plugins', $cache_plugins, 'plugins');
+				}
+				
+				activate_plugin($plugin);
+				deactivate_plugins(plugin_basename(__FILE__));
+				$this -> recurse_rmdir($old_folder);
+			}
+		}
+		
+		function recurse_copy($src,$dst) { 
+		    $dir = opendir($src); 
+		    @mkdir($dst); 
+		    while(false !== ($file = readdir($dir))) { 
+		        if (($file != '.') && ( $file != '..')) { 
+		            if (is_dir($src . '/' . $file)) { 
+		                $this -> recurse_copy($src . '/' . $file,$dst . '/' . $file); 
+		            } 
+		            else { 
+		                copy($src . '/' . $file,$dst . '/' . $file); 
+		            } 
+		        } 
+		    } 
+		    closedir($dir); 
+		}
+		
+		function recurse_rmdir($dir) { 
+		   if (is_dir($dir)) { 
+		     $objects = scandir($dir); 
+		     foreach ($objects as $object) { 
+		       if ($object != "." && $object != "..") { 
+		         if (filetype($dir."/".$object) == "dir") {
+			         $this -> recurse_rmdir($dir."/".$object); 
+			     } else {
+				     unlink($dir."/".$object); 
+				 }
+		       } 
+		     } 
+		     reset($objects); 
+		     rmdir($dir); 
+		   } 
+		} 
 	}
 }
 
@@ -7782,6 +7759,8 @@ $wpMail = new wpMail();
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-api.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-functions.php');
 require_once(dirname(__FILE__) . DS . 'wp-mailinglist-widget.php');
+
+add_action('activated_plugin', array($wpMail, 'activated_plugin'), 10, 2);
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'activation_hook'));
 add_filter('update_plugin_complete_actions', array($wpMail, 'update_plugin_complete_actions'), 10, 2);
 register_activation_hook(plugin_basename(__FILE__), array($wpMail, 'update_options'));

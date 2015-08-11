@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlCampaign')) {
 class wpmlCampaign extends wpMailPlugin {
 
 	var $model = 'Campaign';
@@ -35,6 +36,7 @@ class wpmlCampaign extends wpMailPlugin {
 		
 		$Db -> model = $this -> model;
 	}
+}
 }
 
 ?>

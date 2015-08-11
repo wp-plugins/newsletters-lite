@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlField')) {
 class wpmlField extends wpMailPlugin {
 
 	var $id;
@@ -792,6 +793,7 @@ class wpmlField extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

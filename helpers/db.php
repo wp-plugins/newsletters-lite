@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlDbHelper')) {
 class wpmlDbHelper extends wpMailPlugin {
 
 	var $name = "Db";	
@@ -193,7 +194,59 @@ class wpmlDbHelper extends wpMailPlugin {
 					}
 				}
 				
-				if ($wpdb -> query($query)) {
+				$result = $wpdb -> query($query);
+				
+				if ($result !== false && $result >= 0) {					
+					switch ($this -> model) {
+						case 'Subscriber'						:
+							global $Field, $wpmlSubscribersOption;
+							$this -> model = $Field -> model;
+							if ($customfield = $this -> find(array('slug' => $field))) {
+								$subscriber_id = $conditions['id'];
+								
+								if (!empty($subscriber_id)) {
+									$wpmlSubscribersOption -> delete_all(array('subscriber_id' => $subscriber_id, 'field_id' => $customfield -> id));
+									
+									if ($customfield -> type == "radio" || $customfield -> type == "checkbox" || $customfield -> type == "select") {
+										$subscriber_fieldoptions = maybe_unserialize($value);								
+										
+										
+										if (!empty($subscriber_fieldoptions)) {									
+											$new_subscriber_fieldoptions = array();
+											
+											if (is_array($subscriber_fieldoptions)) {															
+												foreach ($subscriber_fieldoptions as $subscriber_fieldoption) {																
+													$option_id = $subscriber_fieldoption;
+													
+													$subscribers_option_data = array(
+														'subscriber_id'					=>	$subscriber_id,
+														'field_id'						=>	$customfield -> id,
+														'option_id'						=>	$option_id,
+													);
+													
+													$wpmlSubscribersOption -> save($subscribers_option_data);
+												}
+											} else {	
+												$option_id = $subscriber_fieldoption;
+																										
+												$subscribers_option_data = array(
+													'subscriber_id'					=>	$subscriber_id,
+													'field_id'						=>	$customfield -> id,
+													'option_id'						=>	$option_id,
+												);
+												
+												$wpmlSubscribersOption -> save($subscribers_option_data);
+											}
+										}
+									}
+								}
+							}
+							
+							$this -> model = 'Subscriber';
+							
+							break;
+					}
+					
 					return true;
 				}
 			}
@@ -348,7 +401,7 @@ class wpmlDbHelper extends wpMailPlugin {
 							break;
 						case 'Subscriber'			:
 							//global variables
-							global $wpmlClick, $Autoresponderemail, $AutorespondersList, $Email, $wpmlOrder, $Queue, $SubscribersList;
+							global $wpmlClick, $wpmlSubscribersOption, $Autoresponderemail, $AutorespondersList, $Email, $wpmlOrder, $Queue, $SubscribersList;
 						
 							//remove all Orders
 							$this -> model = $wpmlOrder -> model;
@@ -371,6 +424,7 @@ class wpmlDbHelper extends wpMailPlugin {
                             $this -> delete_all(array('subscriber_id' => $record_id));
                             
                             $wpmlClick -> delete_all(array('subscriber_id' => $record_id));
+                            $wpmlSubscribersOption -> delete_all(array('subscriber_id' => $record_id));
 							return true;
 							break;
 						case 'Mailinglist'			:
@@ -623,6 +677,7 @@ class wpmlDbHelper extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpMailPaginate')) {
 class wpMailPaginate extends wpMailPlugin {
 	
 	/**
@@ -150,6 +151,7 @@ class wpMailPaginate extends wpMailPlugin {
 		
 		return $records;
 	}
+}
 }
 
 ?>

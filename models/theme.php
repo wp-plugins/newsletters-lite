@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlTheme')) {
 class wpmlTheme extends wpMailPlugin {
 
 	var $name = 'wpmlTheme';
@@ -189,6 +190,7 @@ class wpmlTheme extends wpMailPlugin {
 		
 		return apply_filters($this -> pre . '_themes_select', $themeselect);
 	}
+}
 }
 
 ?>

@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlShortcodeHelper')) {
 class wpmlShortcodeHelper extends wpMailPlugin {
 
 	var $name = 'Shortcode';
@@ -261,6 +262,37 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 		
 		wp_reset_query();
 		return $output;
+	}
+	
+	function latestposts_loop_wrapper($atts = array(), $content = null, $tag = null) {
+		global $wpml_eftype, $wpml_target, $Html, $shortcode_posts, $shortcode_categories, $shortcode_category, $shortcode_categories_done, 
+		$shortcode_post, $shortcode_post_row, $shortcode_post_language, $shortcode_post_showdate, $shortcode_thumbnail;
+		
+		$return = "";
+		
+		if (!empty($shortcode_categories)) {	
+			$shortcode_post_row = 1;			
+			foreach ($shortcode_categories as $category) {
+				$shortcode_category = $category['category'];
+				$shortcode_posts = $category['posts'];
+				
+				foreach ($shortcode_posts as $post) {					
+					$shortcode_post = $post;					
+					$return .= do_shortcode($this -> et_message('latestposts', false, $shortcode_post_language));
+					$shortcode_post_row++;
+				}
+			}
+		} elseif (!empty($shortcode_posts)) {
+			$shortcode_post_row = 1;				
+			foreach ($shortcode_posts as $post) {				
+				$shortcode_post = $post;				
+				$return .= do_shortcode($this -> et_message('latestposts', false, $shortcode_post_language));
+				$shortcode_post_row++;
+			}
+		}
+		
+		wp_reset_query();
+		return $return;
 	}
 	
 	function posts_loop_wrapper($atts = array(), $content = null, $tag = null) {
@@ -737,6 +769,7 @@ class wpmlShortcodeHelper extends wpMailPlugin {
 	function lagoon_rssurl($atts = array(), $content = null) {
 		return $this -> get_option('lagoon_rss');
 	}
+}
 }
 
 ?>

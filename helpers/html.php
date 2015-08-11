@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlHtmlHelper')) {
 class wpmlHtmlHelper extends wpMailPlugin {
 
 	var $name = 'Html';
@@ -1046,6 +1047,7 @@ class wpmlHtmlHelper extends wpMailPlugin {
 				
 		return preg_replace("/\?(\&)?/si", "?", $url);
 	}
+}
 }
 
 ?>

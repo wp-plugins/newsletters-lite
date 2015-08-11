@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlTemplate')) {
 class wpmlTemplate extends wpMailPlugin {
 
 	var $name = 'wpmlTemplate';
@@ -224,6 +225,7 @@ class wpmlTemplate extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 ?>

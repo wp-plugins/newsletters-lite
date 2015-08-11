@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlQueue')) {
 class wpmlQueue extends wpMailPlugin {
 
 	var $id;
@@ -360,6 +361,7 @@ class wpmlQueue extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 include_once(dirname(__FILE__) . DS . 'newsletter.php');

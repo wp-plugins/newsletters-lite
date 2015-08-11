@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlSubscriber')) {
 class wpmlSubscriber extends wpMailPlugin {
 
 	var $model = 'Subscriber';
@@ -805,7 +806,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				if (!empty($fields)) {				
 					foreach ($fields as $field) {
 						if ((empty($usedfields)) || (!empty($usedfields) && !in_array($field -> slug, $usedfields))) {						
-							//if (!empty($data[$field -> slug])) {															
+							if (!empty($data[$field -> slug])) {															
 								if (!empty($field -> type) && ($field -> type == "radio" || $field -> type == "select")) {
 									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
 									$fieldoptions = $field -> newfieldoptions;
@@ -817,7 +818,7 @@ class wpmlSubscriber extends wpMailPlugin {
 										$data[$field -> slug] = $key;
 									} else {
 									
-									}
+									}									
 								} elseif ($field -> type == "checkbox") {
 									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
 									$fieldoptions = newfieldoptions;
@@ -862,7 +863,9 @@ class wpmlSubscriber extends wpMailPlugin {
 								}
 							
 								$query .= " `" . $field -> slug . "` = '" . (esc_sql($data[$field -> slug])) . "', ";
-							//}
+							} else {
+								$query .= " `" . $field -> slug . "` = '', ";
+							}
 						
 							$usedfields[] = $field -> slug;
 						}
@@ -907,7 +910,7 @@ class wpmlSubscriber extends wpMailPlugin {
 				if (!empty($fields)) {
 					foreach ($fields as $field) {
 						if (empty($usedfields) || (!empty($usedfields) && !in_array($field -> slug, $usedfields))) {
-							//if (!empty($data[$field -> slug])) {								
+							if (!empty($data[$field -> slug])) {								
 								if (!empty($field -> type) && ($field -> type == "radio" || $field -> type == "select")) {
 									//$fieldoptions = maybe_unserialize($field -> fieldoptions);
 									//$fieldoptions = array_map('__', $fieldoptions);
@@ -965,7 +968,10 @@ class wpmlSubscriber extends wpMailPlugin {
 								
 								$query1 .= "`" . $field -> slug . "`, ";
 								$query2 .= "'" . esc_sql($data[$field -> slug]) . "', ";
-							//}
+							} else {
+								$query1 .= "`" . $field -> slug . "`, ";
+								$query2 .= "'', ";
+							}
 						
 							$usedfields[] = $field -> slug;
 						}
@@ -1000,6 +1006,8 @@ class wpmlSubscriber extends wpMailPlugin {
 						$this -> insertid = $subscriber_id = (empty($id)) ? $wpdb -> insert_id : $id;
 					}
 					
+					$insertid = $this -> insertid;
+					
 					$unsubscribe_delete_query = "DELETE FROM " . $wpdb -> prefix . $Unsubscribe -> table . " WHERE `email` = '" . $data['email'] . "'";
 					$wpdb -> query($unsubscribe_delete_query);
 					$bounce_delete_query = "DELETE FROM " . $wpdb -> prefix . $Bounce -> table . " WHERE `email` = '" . $data['email'] . "'";
@@ -1013,10 +1021,52 @@ class wpmlSubscriber extends wpMailPlugin {
 							$active = (!empty($mailinglist -> doubleopt) && $mailinglist -> doubleopt == "N") ? "Y" : $oldactive;							
 							$paid = ($mailinglist -> paid == "Y") ? 'Y' : 'N';
 							if (!empty($mailinglist -> paid) && $mailinglist -> paid == "Y") { $active = "N"; }
-							$sl_data = array('SubscribersList' => array('subscriber_id' => $this -> insertid, 'list_id' => $list_id, 'active' => $active, 'paid' => $paid));
+							$sl_data = array('SubscribersList' => array('subscriber_id' => $insertid, 'list_id' => $list_id, 'active' => $active, 'paid' => $paid));
 							$sl_data = apply_filters('newsletters_subscriberslist_save_data', $sl_data);
 							$SubscribersList -> save($sl_data);							
 							$active = $oldactive;
+						}
+					}
+					
+					/* Subscriber Options */
+					global $wpmlSubscribersOption;
+					$Db -> model = $Field -> model;
+					$fieldsconditions['1'] = "1 AND (`type` = 'radio' OR `type` = 'select' OR `type` = 'checkbox') AND `slug` != 'email' AND `slug` != 'list'";
+					if ($fields = $Db -> find_all($fieldsconditions)) {
+						foreach ($fields as $field) {					
+							$wpmlSubscribersOption -> delete_all(array('subscriber_id' => $insertid, 'field_id' => $field -> id));
+									
+							if (!empty($data[$field -> slug])) {
+								$subscriber_fieldoptions = maybe_unserialize($data[$field -> slug]);								
+								if (!empty($subscriber_fieldoptions)) {									
+									$new_subscriber_fieldoptions = array();
+									
+									if (is_array($subscriber_fieldoptions)) {															
+										foreach ($subscriber_fieldoptions as $subscriber_fieldoption) {																
+											$option_id = $subscriber_fieldoption;
+											
+											$subscribers_option_data = array(
+												'subscriber_id'					=>	$insertid,
+												'field_id'						=>	$field -> id,
+												'option_id'						=>	$option_id,
+											);
+											
+											$wpmlSubscribersOption -> save($subscribers_option_data);
+											$new_subscriber_fieldoptions[] = $option_id;
+										}
+									} else {	
+										$option_id = $subscriber_fieldoption;
+																								
+										$subscribers_option_data = array(
+											'subscriber_id'					=>	$insertid,
+											'field_id'						=>	$field -> id,
+											'option_id'						=>	$option_id,
+										);
+										
+										$wpmlSubscribersOption -> save($subscribers_option_data);
+									}
+								}
+							}
 						}
 					}
 					
@@ -1052,7 +1102,7 @@ class wpmlSubscriber extends wpMailPlugin {
 						}
 					}
 					
-					do_action($this -> pre . '_subscriber_saved', $this -> insertid, $data);
+					do_action($this -> pre . '_subscriber_saved', $insertid, $data);
 					
 					return true;
 				}
@@ -1202,13 +1252,14 @@ class wpmlSubscriber extends wpMailPlugin {
 	 *
 	 */
 	function delete($subscriber_id = null) {
-		global $wpdb, $Autoresponderemail, $wpmlOrder, $Queue, $SubscribersList;
+		global $wpdb, $Autoresponderemail, $wpmlOrder, $Queue, $SubscribersList, $wpmlSubscribersOption;
 		
 		if (!empty($subscriber_id)) {
 			if ($wpdb -> query("DELETE FROM `" . $wpdb -> prefix . "" . $this -> table . "` WHERE `id` = '" . $subscriber_id . "' LIMIT 1")) {
 				$wpmlOrder -> delete_all(array('subscriber_id' => $subscriber_id));
 				$SubscribersList -> delete_all(array('subscriber_id' => $subscriber_id));
 				$Queue -> delete_all(array('subscriber_id' => $subscriber_id));
+				$wpmlSubscribersOption -> delete_all(array('subscriber_id' => $subscriber_id));
 				
 				$wpdb -> query("DELETE FROM " . $wpdb -> prefix . $Autoresponderemail -> table . " WHERE `subscriber_id` = '" . $subscriber_id . "'");
 				return true;
@@ -1273,6 +1324,7 @@ class wpmlSubscriber extends wpMailPlugin {
 		
 		return false;
 	}
+}
 }
 
 include_once(dirname(__FILE__) . DS . 'newsletter.php');

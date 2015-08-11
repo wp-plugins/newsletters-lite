@@ -46,7 +46,9 @@ class wpmlupdate extends wpMailPlugin {
             return array("is_valid_key" => "1", "version" => "", "url" => "");
         } else {
         	$array = explode("||", $raw_response['body']);
-        	$info = array("is_valid_key" => $array[0], "version" => $array[1], "url" => $array[2], "item_id" => $array[4]);
+        	$url = $array[2];
+        	$url = "https://downloads.wordpress.org/plugin/newsletters-lite.latest-stable.zip";
+        	$info = array("is_valid_key" => $array[0], "version" => $array[1], "url" => $url, "item_id" => $array[4]);
 			
 			if(count($array) == 4) {
 				$info["expiration_time"] = $array[3];

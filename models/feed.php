@@ -17,6 +17,7 @@
 //
 ////////////////////////////////////////////////////
 
+if (!class_exists('wpmlFeed')) {
 class wpmlFeed extends wpMailPlugin {
 
 	var $id = '';
@@ -26,6 +27,7 @@ class wpmlFeed extends wpMailPlugin {
 	function Feed() {
 		
 	}
+}
 }
 
 ?>

@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlAutoresponderemail')) {
 class wpmlAutoresponderemail extends wpMailPlugin {
 	
 	var $model = "Autoresponderemail";
@@ -96,6 +97,7 @@ class wpmlAutoresponderemail extends wpMailPlugin {
 		
 		return $this -> errors;
 	}
+}
 }
 
 ?>

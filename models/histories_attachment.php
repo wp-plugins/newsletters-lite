@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlHistoriesAttachment')) {
 class wpmlHistoriesAttachment extends wpMailPlugin {
 
 	var $model = 'HistoriesAttachment';
@@ -70,6 +71,7 @@ class wpmlHistoriesAttachment extends wpMailPlugin {
 		
 		return $this -> errors;
 	}
+}
 }
 
 ?>

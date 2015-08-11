@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlHistoriesList')) {
 class wpmlHistoriesList extends wpMailPlugin {
 
 	var $model = 'HistoriesList';
@@ -65,6 +66,7 @@ class wpmlHistoriesList extends wpMailPlugin {
 		
 		return $this -> errors;
 	}
+}
 }
 
 ?>

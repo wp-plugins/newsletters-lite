@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlAutoresponder')) {
 class wpmlAutoresponder extends wpMailPlugin {
 
 	var $model = 'Autoresponder';
@@ -126,6 +127,7 @@ class wpmlAutoresponder extends wpMailPlugin {
 		
 		return $select;
 	}
+}
 }
 
 include_once(dirname(__FILE__) . DS . 'newsletter.php');

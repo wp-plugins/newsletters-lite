@@ -1,5 +1,6 @@
 <?php
 
+if (!class_exists('wpmlUnsubscribe')) {
 class wpmlUnsubscribe extends wpMailPlugin {
 
 	var $model = 'Unsubscribe';
@@ -109,6 +110,7 @@ class wpmlUnsubscribe extends wpMailPlugin {
 		
 		return $this -> errors;
 	}
+}
 }
 
 ?>
