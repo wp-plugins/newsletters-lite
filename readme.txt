@@ -3,7 +3,7 @@ Contributors: contrid
 Donate link: http://tribulant.com
 Tags: newsletters, email, bulk email, mailing list, subscribers, newsletter, optin, subscribe, marketing, auto newsletter, automatic newsletter, autoresponder, campaign, email, email alerts, email subscription, emailing, follow up, newsletter signup, newsletter widget, newsletters, post notification, subscription, bounce, latest posts, insert posts into newsletter
 Requires at least: 3.8
-Tested up to: 4.2.3
+Tested up to: 4.2.4
 Stable tag: 4.5.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html 
@@ -148,6 +148,24 @@ Installing the WordPress Newsletter plugin is simple. Follow these steps:
 10. Dashboard widget for quick overview
 
 == Changelog ==
+
+= 4.5.5.3 =
+* IMPROVE: Security to prevent direct access to files
+* IMPROVE: Ability to hide the database update message/notice
+* IMPROVE: Save all existing subscribers to SubscribersOption model
+* IMPROVE: Global CSV delimiter setting for exports
+* IMPROVE: Checkbox custom fields for fields conditions 
+* FIX: PCLZIP_ERR_BAD_FORMAT upon installation through WordPress
+* FIX: High load on the server
+* FIX: Newsletter sent to admin while creating newsletter
+* FIX: Unsubscribe not working: No subscriber ID was specified
+* FIX: Latest posts shortcodes not rendering posts
+* FIX: Permissions/sections/roles reset upon plugin update
+* FIX: Textdomain is incorrectly set
+* FIX: Import requires mailing list(s) to be selected
+* FIX: Send Preview Problem
+* FIX: Roles show Array on sent/draft emails
+* FIX: Conflict with CodeStyling Localization Plugin 
 
 = 4.5.5.2 =
 * ADD: Setting to turn on/off stripping of width/height attributes on images 

@@ -1,4 +1,6 @@
 <?php
+	
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 if (!class_exists('Newsletters_Widget')) {
 class Newsletters_Widget extends WP_Widget {

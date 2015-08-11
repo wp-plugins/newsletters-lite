@@ -213,6 +213,10 @@ class wpmlMetaboxHelper extends wpMailPlugin {
 		$this -> render('metaboxes' . DS . 'settings-comments', false, true, 'admin');	
 	}
 	
+	function settings_system_general() {
+		$this -> render('metaboxes' . DS . 'system' . DS . 'general', false, true, 'admin');
+	}
+	
 	function settings_system_captcha() {
 		$this -> render('metaboxes' . DS . 'system' . DS . 'captcha', false, true, 'admin');
 	}

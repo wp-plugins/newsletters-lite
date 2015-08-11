@@ -1,6 +1,11 @@
 <!-- Import/Export -->
 
-<?php $lists = $Mailinglist -> select(true); ?>
+<?php 
+	
+$lists = $Mailinglist -> select(true); 
+$csvdelimiter = $this -> get_option('csvdelimiter');
+
+?>
 
 <div class="wrap <?php echo $this -> pre; ?> newsletters">
 	<h2><?php _e('Import/Export Subscribers', $this -> plugin_name); ?></h2>
@@ -60,8 +65,8 @@
 							<tr>
 								<th><label for="delimiter"><?php _e('Delimiter', $this -> plugin_name); ?></label></th>
 								<td>
-									<input class="widefat" style="width:45px;" type="text" name="delimiter" value="<?php echo (empty($_POST['delimiter'])) ? ',' : esc_attr(stripslashes($_POST['delimiter'])); ?>" id="delimiter" />
-									<span class="howto"><?php _e('Operator delimiting field values. Open your CSV in a text editor to confirm with which operator field values are delimited. The default is comma (,).', $this -> plugin_name); ?></span>
+									<input class="widefat" style="width:45px;" type="text" name="delimiter" value="<?php echo (empty($_POST['delimiter'])) ? $csvdelimiter : esc_attr(stripslashes($_POST['delimiter'])); ?>" id="delimiter" />
+									<span class="howto"><?php echo sprintf(__('Operator delimiting field values. Open your CSV in a text editor to confirm with which operator field values are delimited. The default is comma (%s).', $this -> plugin_name), $csvdelimiter); ?></span>
 			                        <?php if (!empty($importerrors['delimiter'])) : ?><div class="alert alert-danger"><p><i class="fa fa-exclamation-triangle"></i> <?php echo $importerrors['delimiter']; ?></p></div><?php endif; ?>
 								</td>
 							</tr>
@@ -322,8 +327,8 @@
 		                <tr>
 		                	<th><label for="export_delimiter"><?php _e('Delimiter', $this -> plugin_name); ?></label></th>
 		                	<td>
-		                		<input type="text" class="widefat" style="width:45px;" name="export_delimiter" value="<?php echo (!empty($_POST['export_delimiter'])) ? esc_attr(stripslashes($_POST['export_delimiter'])) : ';'; ?>" id="export_delimiter" />
-		                		<span class="howto"><?php _e('Choose the delimiter to delimit columns with. The default is semi-colon (;)', $this -> plugin_name); ?></span>
+		                		<input type="text" class="widefat" style="width:45px;" name="export_delimiter" value="<?php echo (!empty($_POST['export_delimiter'])) ? esc_attr(stripslashes($_POST['export_delimiter'])) : $csvdelimiter; ?>" id="export_delimiter" />
+		                		<span class="howto"><?php echo sprintf(__('Choose the delimiter to delimit columns with. The default is semi-colon (%s)', $this -> plugin_name), $csvdelimiter); ?></span>
 		                	</td>
 		                </tr>
 		                <tr>

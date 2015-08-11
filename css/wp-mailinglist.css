@@ -418,10 +418,13 @@ table.mceLayout {
 }
 
 .newsletters_circular, 
-.newsletters img.avatar {
-    border-radius: 50%;
+.newsletters img.avatar, 
+.newsletters .img-rounded, 
+.newsletters .extensionicon {
+    /*border-radius: 50%;
     -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
+    -webkit-border-radius: 50%;*/
+    border-radius: 6px;
 }
 
 img.newsletters_gravatar {
@@ -544,12 +547,6 @@ table tbody tr.arow {
     color: #fff;
     text-align: center;
     white-space: normal;
-}
-
-.wpml .extensionicon {
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
-    -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
 }
 
 .wpml #farbtastic {

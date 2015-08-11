@@ -3,7 +3,7 @@
 /*
 Plugin Name: Newsletters
 Plugin URI: http://tribulant.com/plugins/view/1/wordpress-newsletter-plugin
-Version: 4.5.5.2
+Version: 4.5.5.3
 Description: This newsletter software allows users to subscribe to mutliple mailing lists on your WordPress website. Send newsletters manually or from posts, manage newsletter templates, view a complete history with tracking, import/export subscribers, accept paid subscriptions and much more.
 Author: Tribulant Software
 Author URI: http://tribulant.com
@@ -12,6 +12,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: wp-mailinglist
 Domain Path: /languages
 */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 if (!defined('DS')) { define("DS", DIRECTORY_SEPARATOR); }
 if (!defined('WP_MEMORY_LIMIT')) { define('WP_MEMORY_LIMIT', "1024M"); }
@@ -2913,6 +2915,7 @@ if (!class_exists('wpMail')) {
 		
 			add_meta_box('submitdiv', __('Configuration Settings', $this -> plugin_name), array($Metabox, 'settings_submit'), "newsletters_page_" . $this -> sections -> settings_system, 'side', 'core');
 			//add_meta_box('tableofcontentsdiv', __('Quick Links', $this -> plugin_name), array($Metabox, 'settings_system_tableofcontents'), "newsletters_page_" . $this -> sections -> settings_system, 'high', 'core');
+			add_meta_box('captchadiv', __('General', $this -> plugin_name), array($Metabox, 'settings_system_general'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('captchadiv', __('Captcha Settings', $this -> plugin_name) . $Html -> help(__('Use these settings for the captcha security image used in the subscribe forms.', $this -> plugin_name)), array($Metabox, 'settings_system_captcha'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('wprelateddiv', __('WordPress Related', $this -> plugin_name) . $Html -> help(__('These are settings related to WordPress directly and how the plugin interacts with it.', $this -> plugin_name)), array($Metabox, 'settings_wprelated'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
 			add_meta_box('permissionsdiv', __('Permissions', $this -> plugin_name), array($Metabox, 'settings_permissions'), "newsletters_page_" . $this -> sections -> settings_system, 'normal', 'core');
@@ -5026,7 +5029,7 @@ if (!class_exists('wpMail')) {
 					case 'import'			:												
 						if (empty($_FILES['file']['name'])) { $error['file'] = __('No file selected for uploading', $this -> plugin_name); }
 						elseif (!is_uploaded_file($_FILES['file']['tmp_name'])) { $error['file'] = __('File could not be uploaded', $this -> plugin_name); }
-						if (empty($_POST['importlists'])) { $error['mailinglists'] = __('No mailing list selected', $this -> plugin_name); }
+						//if (empty($_POST['importlists'])) { $error['mailinglists'] = __('No mailing list selected', $this -> plugin_name); }
 						if (empty($_POST['filetype'])) { $error['filetype'] = __('No file type has been selected', $this -> plugin_name); }
 						
 						if (empty($error)) {
@@ -5056,7 +5059,7 @@ if (!class_exists('wpMail')) {
 									fwrite($fh, $data);
 									fclose($fh);
 								} else {
-									$error[] = sprintf(__('Csv file could not be created! Check "%s" permissions!', $this -> plugin_name), $filePath);
+									$error[] = sprintf(__('CSV file could not be created! Check "%s" permissions!', $this -> plugin_name), $filePath);
 								}
 							} elseif ($_POST['filetype'] == "csv") {
 								$fileFull = $_FILES['file']['tmp_name'];
@@ -5067,7 +5070,8 @@ if (!class_exists('wpMail')) {
 							}
 							
 							if ($fh = fopen($fileFull, "r")) {
-								$delimiter = (empty($_POST['delimiter'])) ? "," : $_POST['delimiter'];
+								$csvdelimiter = $this -> get_option('csvdelimiter');
+								$delimiter = (empty($_POST['delimiter'])) ? $csvdelimiter : $_POST['delimiter'];
 								$d = 0;
 								$i_queries = array();
 								$import_progress = (empty($_POST['import_progress']) || $_POST['import_progress'] == "N") ? false : true;
@@ -5209,6 +5213,12 @@ if (!class_exists('wpMail')) {
 														foreach ($_POST['fields'] as $field => $value) {
 															if (!empty($import_overwrite) || empty($datasets[$d][$field])) {
 																$datasets[$d][$field] = ($row[($_POST[$field . 'column'] - 1)]);
+																
+																switch ($field) {
+																	case 'created'					:
+																		$datasets[$d]['created'] = date_i18n("Y-m-d H:i:s", strtotime($datasets[$d]['created']));
+																		break;
+																}
 															}
 														}
 													}
@@ -5346,7 +5356,8 @@ if (!class_exists('wpMail')) {
 								$fieldsconditions['1'] = "1 AND `slug` != 'email' AND `slug` != 'list'";
 								$fields = $Db -> find_all($fieldsconditions);
 								
-								$delimiter = (!empty($_POST['export_delimiter'])) ? $_POST['export_delimiter'] : ";";
+								$csvdelimiter = $this -> get_option('csvdelimiter');
+								$delimiter = (!empty($_POST['export_delimiter'])) ? $_POST['export_delimiter'] : $csvdelimiter;
 								
 								$headings = array();
 								$headings['id'] = __('ID', $this -> plugin_name);
@@ -6311,14 +6322,16 @@ if (!class_exists('wpMail')) {
 											
 											$headings = apply_filters('newsletters_admin_history_emails_export_headings', $headings, $data);
 											
-											fputcsv($fh, $headings, ";", '"');
+											$csvdelimiter = $this -> get_option('csvdelimiter');
+											
+											fputcsv($fh, $headings, $csvdelimiter, '"');
 											
 											if (!empty($data)) {
 												$data = apply_filters('newsletters_admin_history_emails_export_data', $data, $headings);
 												
 												foreach ($data as $dkey => $dval) {
 													$data[$dkey] = array_merge($headings_keys, $data[$dkey]);
-													fputcsv($fh, $data[$dkey], ";", '"');
+													fputcsv($fh, $data[$dkey], $csvdelimiter, '"');
 												}
 											}
 											
@@ -6367,26 +6380,27 @@ if (!class_exists('wpMail')) {
 								case 'export'				:
 									global $Db, $Html, $Email, $History, $Mailinglist, $Theme;
 									$Db -> model = $History -> model;
+									$csvdelimiter = $this -> get_option('csvdelimiter');
 									
 									if ($emails = $Db -> find_all(false, false, array('modified', "DESC"))) {
 										$data = "";
-										$data .= '"' . __('Id', $this -> plugin_name) . '",';
-										$data .= '"' . __('Subject', $this -> plugin_name) . '",';
-										$data .= '"' . __('Lists', $this -> plugin_name) . '",';
-										$data .= '"' . __('Template', $this -> plugin_name) . '",';
-										$data .= '"' . __('Author', $this -> plugin_name) . '",';
-										$data .= '"' . __('Read %', $this -> plugin_name) . '",';
-										$data .= '"' . __('Emails Sent', $this -> plugin_name) . '",';
-										$data .= '"' . __('Emails Read', $this -> plugin_name) . '",';
-										$data .= '"' . __('Created', $this -> plugin_name) . '",';
-										$data .= '"' . __('Modified', $this -> plugin_name) . '",';
+										$data .= '"' . __('Id', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Subject', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Lists', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Template', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Author', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Read %', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Emails Sent', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Emails Read', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Created', $this -> plugin_name) . '"' . $csvdelimiter;
+										$data .= '"' . __('Modified', $this -> plugin_name) . '"' . $csvdelimiter;
 										$data .= "\r\n";
 										
 										foreach ($emails as $email) {
 											$this -> remove_server_limits();			//remove the server resource limits
 											
-											$data .= '"' . $email -> id . '",';
-											$data .= '"' . $email -> subject . '",';						
+											$data .= '"' . $email -> id . '"' . $csvdelimiter;
+											$data .= '"' . $email -> subject . '"' . $csvdelimiter;						
 											
 											/* Mailing lists */
 											if (!empty($email -> mailinglists)) {
@@ -6398,15 +6412,15 @@ if (!class_exists('wpMail')) {
 													$data .= __($mailinglist -> title);
 													
 													if ($m < count($email -> mailinglists)) {
-														$data .= ', ';
+														$data .= $csvdelimiter . ' ';
 													}
 													
 													$m++;
 												}
 												
-												$data .= '",';
+												$data .= '"' . $csvdelimiter;
 											} else { 
-												$data .= '"",';
+												$data .= '""' . $csvdelimiter;
 											}
 											
 											/* Theme */
@@ -6414,23 +6428,23 @@ if (!class_exists('wpMail')) {
 												$Db -> model = $Theme -> model;
 												
 												if ($theme = $Db -> find(array('id' => $email -> theme_id))) {
-													$data .= '"' . $theme -> title . '",';
+													$data .= '"' . $theme -> title . '"' . $csvdelimiter;
 												} else {
-													$data .= '"",';	
+													$data .= '""' . $csvdelimiter;	
 												}
 											} else {
-												$data .= '"",';	
+												$data .= '""' . $csvdelimiter;	
 											}
 											
 											/* Author */
 											if (!empty($email -> user_id)) {
 												if ($user = get_userdata($email -> user_id)) {
-													$data .= '"' . $user -> display_name . '",';
+													$data .= '"' . $user -> display_name . '"' . $csvdelimiter;
 												} else {
-													$data .= '"",';	
+													$data .= '""' . $csvdelimiter;	
 												}
 											} else {
-												$data .= '"",';	
+												$data .= '""' . $csvdelimiter;	
 											}
 											
 											/* read % */
@@ -6438,12 +6452,12 @@ if (!class_exists('wpMail')) {
 											$etotal = $Db -> count(array('history_id' => $email -> id));
 											$eread = $Db -> count(array('history_id' => $email -> id, 'read' => "Y"));
 											$eperc = (!empty($etotal)) ? (($eread / $etotal) * 100) : 0;
-											$data .= '"' . number_format($eperc, 2, '.', '') . '% ' . __('read', $this -> plugin_name) . '",';
+											$data .= '"' . number_format($eperc, 2, '.', '') . '% ' . __('read', $this -> plugin_name) . '"' . $csvdelimiter;
 											
-											$data .= '"' . $etotal . '",'; 					// emails sent
-											$data .= '"' . $eread . '",';					// emails read
-											$data .= '"' . $email -> created . '",';		// created date
-											$data .= '"' . $email -> modified . '",';		// modified date
+											$data .= '"' . $etotal . '"' . $csvdelimiter; 					// emails sent
+											$data .= '"' . $eread . '"' . $csvdelimiter;					// emails read
+											$data .= '"' . $email -> created . '"' . $csvdelimiter;		// created date
+											$data .= '"' . $email -> modified . '"' . $csvdelimiter;		// modified date
 											
 											$data .= "\r\n";
 										}
@@ -6456,10 +6470,6 @@ if (!class_exists('wpMail')) {
 											if ($fh = fopen($filefull, "w")) {
 												fwrite($fh, $data);
 												fclose($fh);
-												
-												//$fileabs = $Html -> uploads_url() . '/' . $filename;	
-												//$message = __('CSV has been exported with filename "' . $filename . '".', $this -> plugin_name) . ' <a href="' . $fileabs . '" title="' . __('Download the CSV', $this -> plugin_name) . '">' . __('Download the CSV', $this -> plugin_name) . '</a>';
-												//$message = __('Sent and draft emails have been exported and your download will begin shortly', $this -> plugin_name); 
 												$this -> redirect(admin_url('admin.php?page=' . $this -> sections -> history . '&newsletters_exportlink=' . $filename));
 											} else {
 												$message = sprintf(__('CSV file could not be created, please check write permissions on "%s" folder.', $this -> plugin_name), $filepath);
@@ -6549,14 +6559,15 @@ if (!class_exists('wpMail')) {
 				
 					if (!empty($_GET['history_id'])) {
 						$Db -> model = $Email -> model;
+						$csvdelimiter = $this -> get_option('csvdelimiter');
 						
 						if ($emails = $Db -> find_all(array('history_id' => $_GET['history_id']), false, array('modified', "DESC"))) {
 							/* CSV Headings */
 							$data = "";
-							$data .= '"' . __('Email Address', $this -> plugin_name) . '",';
-							$data .= '"' . __('Mailing List', $this -> plugin_name) . '",';
-							$data .= '"' . __('Read/Opened', $this -> plugin_name) . '",';
-							$data .= '"' . __('Sent Date', $this -> plugin_name) . '",';
+							$data .= '"' . __('Email Address', $this -> plugin_name) . '"' . $csvdelimiter;
+							$data .= '"' . __('Mailing List', $this -> plugin_name) . '"' . $csvdelimiter;
+							$data .= '"' . __('Read/Opened', $this -> plugin_name) . '"' . $csvdelimiter;
+							$data .= '"' . __('Sent Date', $this -> plugin_name) . '"' . $csvdelimiter;
 							$data .= "\r\n";
 							
 							foreach ($emails as $email) {
@@ -6568,21 +6579,21 @@ if (!class_exists('wpMail')) {
 									/* Subscriber */
 									$Db -> model = $Subscriber -> model;
 		                        	$subscriber = $Db -> find(array('id' => $email -> subscriber_id));
-									$data .= '"' . $subscriber -> email . '",';
+									$data .= '"' . $subscriber -> email . '"' . $csvdelimiter;
 									
 									/* Mailing List */
 									$Db -> model = $Mailinglist -> model;
 		                        	$mailinglist = $Db -> find(array('id' => $email -> mailinglist_id));
-									$data .= '"' . __($mailinglist -> title) . '",';
+									$data .= '"' . __($mailinglist -> title) . '"' . $csvdelimiter;
 								} elseif (!empty($email -> user_id)) {
 									$user = $this -> userdata($email -> user_id);
-									$data .= '"' . $user -> user_email . '",';
-									$data .= '"' . '' . '",';
+									$data .= '"' . $user -> user_email . '"' . $csvdelimiter;
+									$data .= '"' . '' . '"' . $csvdelimiter;
 								}
 								
 								/* Read/Opened Status */
-								$data .= '"' . ((!empty($email -> read) && $email -> read == "Y") ? __('Yes', $this -> plugin_name) : __('No', $this -> plugin_name)) . '",';
-								$data .= '"' . (date_i18n("Y-m-d H:i:s", strtotime($email -> modified))) . '",';
+								$data .= '"' . ((!empty($email -> read) && $email -> read == "Y") ? __('Yes', $this -> plugin_name) : __('No', $this -> plugin_name)) . '"' . $csvdelimiter;
+								$data .= '"' . (date_i18n("Y-m-d H:i:s", strtotime($email -> modified))) . '"' . $csvdelimiter;
 								$data .= "\r\n";	
 							}
 							

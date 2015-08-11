@@ -107,11 +107,15 @@ $todate = (empty($_GET['to'])) ? $Html -> gen_date("Y-m-d", time()) : $_GET['to'
 				<tr class="<?php echo $class = (empty($class)) ? 'alternate' : ''; ?>">
 					<th><?php _e('Roles', $this -> plugin_name); ?></th>
 					<td>
-						<?php if (!empty($history -> roles)) : ?>
+						<?php
+							
+						$roles = maybe_unserialize($history -> roles); 	
+							
+						?>
+						<?php if (!empty($roles) && is_array($roles)) : ?>
 							<?php 
 								
 							global $wp_roles;
-							$roles = maybe_unserialize($history -> roles); 
 							$role_names = $wp_roles -> get_names();
 							$roles_output = array();
 							

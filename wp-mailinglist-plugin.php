@@ -1,11 +1,13 @@
 <?php
+	
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 if (!class_exists('wpMailPlugin')) {
 	class wpMailPlugin extends wpMailCheckinit {
 	
 		var $plugin_base;
 		var $pre = 'wpml';	
-		var $version = '4.5.5.2';
+		var $version = '4.5.5.3';
 		var $dbversion = '1.2.2';
 		var $debugging = false;			//set to "true" to turn on debugging
 		var $debug_level = 2; 			//set to 1 for only database errors and var dump; 2 for PHP errors as well
@@ -1178,7 +1180,8 @@ if (!class_exists('wpMailPlugin')) {
 			$exportfilefull = $exportfilepath . $exportfilename;
 				
 			if ($fp = fopen($exportfilefull, "a")) {				
-				$delimiter = (empty($_REQUEST['delimiter'])) ? ";" : $_REQUEST['delimiter'];
+				$csvdelimiter = $this -> get_option('csvdelimiter');
+				$delimiter = (empty($_REQUEST['delimiter'])) ? $csvdelimiter : $_REQUEST['delimiter'];
 				$headings = $_REQUEST['headings'];
 				$subscriber = stripslashes_deep($_REQUEST['subscriber']);
 				
@@ -1194,13 +1197,8 @@ if (!class_exists('wpMailPlugin')) {
 				}
 				
 				fclose($fp);
-				
-				//$subscriberrequest = @unserialize(stripslashes($_REQUEST['subscriber']));
-				//$row = '"' . implode('","', $subscriberrequest) . '"' . "\r\n";
-				//fwrite($fh, $row, 1024);
 			}
 			
-			//echo $subscriberrequest['email'];
 			echo $subscriber['email'];
 			
 			exit();
@@ -3676,6 +3674,15 @@ if (!class_exists('wpMailPlugin')) {
 			if (apply_filters('newsletters_enqueuescript_jquery', true)) { wp_enqueue_script('jquery'); }			
 	
 			if (is_admin()) {	
+				
+				$donotloadpages = array(
+					'codestyling-localization/codestyling-localization.php'
+				);
+				
+				if (!empty($_GET['page']) && in_array($_GET['page'], $donotloadpages)) {
+					return;
+				}
+				
 				if (apply_filters('newsletters_enqueuescript_jqueryuicore', true)) { wp_enqueue_script('jquery-ui-core'); }
 				if (apply_filters('newsletters_enqueuescript_jqueryuiwidget', true)) { wp_enqueue_script('jquery-ui-widget'); }
 				
@@ -5923,7 +5930,8 @@ if (!class_exists('wpMailPlugin')) {
 				
 				$mailtype = $this -> get_option('mailtype');
 	
-				if ($mailtype == "smtp" || $mailtype == "gmail") {
+				global $newsletters_presend, $newsletters_emailraw;
+				if ($mailtype == "smtp" || $mailtype == "gmail" || (!empty($newsletters_presend) && $newsletters_presend == true)) {
 					if (!is_object($phpmailer)) {
 						require_once(dirname(__FILE__) . DS . 'vendors' . DS . 'class.phpmailer.php');							
 						$phpmailer = new PHPMailer();
@@ -6830,9 +6838,9 @@ if (!class_exists('wpMailPlugin')) {
 					}
 				}
 				
-				if (version_compare($cur_version, "4.5.5") < 0) { 
+				if (version_compare($cur_version, "4.5.5.3") < 0) { 
 					$this -> update_options();
-					$version = '4.5.5';
+					$version = '4.5.5.3';
 				}
 			
 				//the current version is older.
@@ -6960,6 +6968,7 @@ if (!class_exists('wpMailPlugin')) {
 			$options['subscriberedirect'] = "N";
 			$options['subscriberedirecturl'] = $this -> get_managementpost(true);
 			$options['paymentmethod'] = 'paypal';
+			$options['csvdelimiter'] = ",";
 			$options['captcha_type'] = ($this -> is_plugin_active('captcha')) ? 'rsc' : 'none';
 			$options['recaptcha_theme'] = "light";
 			$options['recaptcha_language'] = "en";
